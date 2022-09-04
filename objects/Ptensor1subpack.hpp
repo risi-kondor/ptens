@@ -5,7 +5,6 @@
 #include "Ptensor1.hpp"
 #include "Cgraph.hpp"
 
-
 namespace ptens{
 
 
@@ -72,13 +71,15 @@ namespace ptens{
 
 
     Ptensor1subpack(const AtomsPack& _atoms, const rtensor& x):
-      rtensor(x), atoms(_atoms){
+      rtensor(x), 
+      atoms(_atoms){
       assert(atoms.getn()==getn());
       assert(atoms.getk()==getk());
     }
 
    Ptensor1subpack(const AtomsPack& _atoms, rtensor&& x):
-     rtensor(std::move(x)), atoms(_atoms){
+     rtensor(std::move(x)), 
+     atoms(_atoms){
       assert(atoms.getn()==getn());
       assert(atoms.getk()==getk());
     }
@@ -140,6 +141,13 @@ namespace ptens{
       graph.forall_edges([&](const int i, const int j){
 	  view_of_tensor(i).pull_msg(x.view_of_tensor(j));});
     }
+
+
+
+  public: // ---- Reductions ----------------------------------------------------------------------------------
+
+
+    rtensor reduce0(const 
 
 
   public: // ---- Operations ----------------------------------------------------------------------------------

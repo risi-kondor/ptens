@@ -24,4 +24,9 @@ int main(int argc, char** argv){
   Ptensor1 B(A,a2);
   cout<<B<<endl;
 
+  //vector<int> v(6);
+  //for(int i=0; i<7; i++)
+  //v[i]=i;
+  //cout<<vector<int>(v.begin()+3,v.begin()+5)<<endl;
+
 }
