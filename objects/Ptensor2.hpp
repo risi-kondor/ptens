@@ -5,17 +5,15 @@
 #include "RtensorObj.hpp"
 #include "Ptensor1.hpp"
 
-// #define PTENSOR_PTENSOR_IMPL cnine::RtensorObj
-
 
 namespace ptens{
 
-  class Ptensor2: public PTENSOR_PTENSOR_IMPL{
+  class Ptensor2: public cnine::RtensorA{
   public:
 
     Atoms atoms;
 
-    typedef cnine::RtensorObj rtensor;
+    typedef cnine::RtensorA rtensor;
 
 
     // ---- Constructors -------------------------------------------------------------------------------------
@@ -23,7 +21,7 @@ namespace ptens{
 
     template<typename FILLTYPE, typename = typename std::enable_if<std::is_base_of<cnine::fill_pattern, FILLTYPE>::value, FILLTYPE>::type>
     Ptensor2(const Atoms& _atoms, const int nc, const FILLTYPE& dummy, const int _dev=0):
-      PTENSOR_PTENSOR_IMPL(cnine::Gdims(_atoms.size(),_atoms.size(),nc),dummy,_dev),
+      rtensor(cnine::Gdims(_atoms.size(),_atoms.size(),nc),dummy,_dev),
       atoms(_atoms){
     }
 
@@ -52,7 +50,7 @@ namespace ptens{
     }
 
     float at_(const int i, const int j, const int c) const{
-      return value(atoms(i),atoms(j),c);
+      return (*this)(atoms(i),atoms(j),c);
     }
 
     void inc_(const int i, const int j, const int c, float x){
@@ -114,8 +112,8 @@ namespace ptens{
 
 	for(int i=0; i<k; i++)
 	  for(int j=0; j<k; j++){
-	    inc(ix[i],ix[j],cstride*c,x.value(xix[i],xix[j],c));
-	    inc(ix[j],ix[i],cstride*c+1,x.value(xix[i],xix[j],c));
+	    inc(ix[i],ix[j],cstride*c,x(xix[i],xix[j],c));
+	    inc(ix[j],ix[i],cstride*c+1,x(xix[i],xix[j],c));
 	}
 
 	rtensor R1=x.reductions1(xix,c);
@@ -159,11 +157,11 @@ namespace ptens{
       
       for(int i=0; i<k; i++){
 	int _i=ix[i];
-	{float s=0; for(int j=0; j<k; j++) s+=value(_i,ix[j],c); R.set(i,0,s);}
-	{float s=0; for(int j=0; j<k; j++) s+=value(ix[j],_i,c); R.set(i,1,s);}
-	{float s=0; for(int j=0; j<n; j++) s+=value(_i,j,c); R.set(i,2,s);}
-	{float s=0; for(int j=0; j<n; j++) s+=value(j,_i,c); R.set(i,3,s);}
-	R.set(i,4,value(_i,_i,c));
+	{float s=0; for(int j=0; j<k; j++) s+=(*this)(_i,ix[j],c); R.set(i,0,s);}
+	{float s=0; for(int j=0; j<k; j++) s+=(*this)(ix[j],_i,c); R.set(i,1,s);}
+	{float s=0; for(int j=0; j<n; j++) s+=(*this)(_i,j,c); R.set(i,2,s);}
+	{float s=0; for(int j=0; j<n; j++) s+=(*this)(j,_i,c); R.set(i,3,s);}
+	R.set(i,4,(*this)(_i,_i,c));
       }
 
       return R;
@@ -185,7 +183,7 @@ namespace ptens{
       float t=0;
       for(int i=0; i<n; i++)
 	for(int j=0; j<n; j++)
-	  t+=value(i,j,c);
+	  t+=(*this)(i,j,c);
       R.inc(1,t);
       
       return R;
@@ -203,14 +201,14 @@ namespace ptens{
 	for(int i=0; i<k; i++){
 	  int _i=ix[i];
 	  for(int j=0; j<k; j++)
-	    inc(_i,ix[j],coffs,R1.value(i,s));
+	    inc(_i,ix[j],coffs,R1(i,s));
 	  for(int j=0; j<k; j++)
-	    inc(ix[j],_i,coffs+1,R1.value(i,s));
+	    inc(ix[j],_i,coffs+1,R1(i,s));
 	  for(int j=0; j<n; j++)
-	    inc(_i,j,coffs+2,R1.value(i,s));
+	    inc(_i,j,coffs+2,R1(i,s));
 	  for(int j=0; j<n; j++)
-	    inc(j,_i,coffs+3,R1.value(i,s));
-	  inc(_i,_i,coffs+4,R1.value(i,s));
+	    inc(j,_i,coffs+3,R1(i,s));
+	  inc(_i,_i,coffs+4,R1(i,s));
 	}
 	coffs+=5;
       }
@@ -222,7 +220,7 @@ namespace ptens{
       const int n=dims(0);
 
       for(int s=0; s<R0.dim(0); s++){
-	float v=R0.value(s);
+	float v=R0(s);
 
 	for(int i=0; i<k; i++){
 	  int _i=ix[i];

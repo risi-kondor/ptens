@@ -5,7 +5,7 @@ INCLUDE= $(CNINE_INCLUDES) -I$(INCLUDEDIR) -I$(OBJECTSDIR)
 
 TESTS=$(patsubst %.cpp,%,$(wildcard *.cpp))
 
-DEPS=
+DEPS= ../*.hpp 
 
 OBJECTS= 
 
@@ -16,7 +16,7 @@ CUDA_OBJECTS=
 CUDA_OBJECTS+=$(CUDADIR)/RtensorUtils.o
 endif 
 
-$(TESTS): %: %.cpp
+$(TESTS): %: %.cpp $(DEPS)
 ifdef WITH_CUDA
 	$(NVCC) $(NVCCFLAGS) -o $@ $@.cpp $(CUDA_EXTERNS) $(CUDA_OBJECTS) $(OBJECTS) $(CFLAGS) $(MACROS) $(INCLUDE) $(LIBS) 
 else

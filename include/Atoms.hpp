@@ -9,24 +9,41 @@ namespace ptens{
   class Atoms: public vector<int>{
   public:
 
-    //using vector<int>::vector;
-    //vector<int> vec;
     map<int,int> lookup;
 
 
-  public: // ---- Constructors ----------------------
+  public: // ---- Constructors -------------------------------------------------------------------------------
 
 
-    Atoms(){
-    }
+    Atoms(){}
 
     Atoms(const initializer_list<int>& list){
       for(auto p:list)
 	push_back(p);
     }
 
+    Atoms(const vector<int>& x):
+      vector<int>(x){
+      for(int i=0; i<size(); i++)
+	lookup[(*this)[i]]=i;
+    }
 
-  public: // ---- Access --------------------
+
+  public: // ---- Constructors -------------------------------------------------------------------------------
+
+
+    static Atoms sequential(const int _k){
+      vector<int> v(_k);
+      for(int i=0; i<_k; i++) v[i]=i;
+      return Atoms(v);
+    }
+
+
+  public: // ---- Conversions --------------------------------------------------------------------------------
+
+
+
+  public: // ---- Access -------------------------------------------------------------------------------------
 
 
     int operator()(const int i) const{
@@ -34,6 +51,7 @@ namespace ptens{
       if(it==lookup.end()) return 0;
       return it->second;
     }
+
 
     vector<int> operator()(const vector<int>& I) const{
       const int k=I.size();
@@ -43,17 +61,19 @@ namespace ptens{
       return r;
     }
 
+
     void push_back(const int i){
       lookup[i]=size();
       vector<int>::push_back(i);
     }
+
 
     bool includes(const int i) const{
       return lookup.find(i)!=lookup.end();
     }
 
     
-  public: // ---- Operations -----------------------
+  public: // ---- Operations ---------------------------------------------------------------------------------
 
 
     Atoms intersect(const Atoms& y) const{
