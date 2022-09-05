@@ -206,7 +206,6 @@ namespace ptens{
     friend ostream& operator<<(ostream& stream, const Ptensor1pack& x){
       stream<<x.str(); return stream;}
 
-
   };
 
 }
