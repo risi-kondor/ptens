@@ -4,7 +4,7 @@
 #include "Atoms.hpp"
 #include "RtensorA.hpp"
 #include "RtensorObj.hpp"
-#include "PtensorSgntr.hpp"
+//#include "PtensorSgntr.hpp"
 
 
 namespace ptens{
@@ -59,9 +59,9 @@ namespace ptens{
       return dims.back();
     }
 
-    PtensorSgntr signature() const{
-      return PtensorSgntr(getk(),get_nc());
-    }
+    //PtensorSgntr signature() const{
+    //return PtensorSgntr(getk(),get_nc());
+    //}
 
     float at_(const int i, const int c) const{
       return (*this)(atoms(i),c);

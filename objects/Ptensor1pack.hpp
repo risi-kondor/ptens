@@ -2,28 +2,26 @@
 #define _ptens_Ptensor1pack
 
 #include "Cgraph.hpp"
-#include "Ptensor1subpack.hpp"
-#include "PtensorSubpackSpecializer.hpp"
-
+//#include "Ptensor1subpack.hpp"
+//#include "PtensorSubpackSpecializer.hpp"
+#include "RtensorPool.hpp"
+#include "AtomsPack.hpp"
+#include "AindexPack.hpp"
+#include "Ptensor1.hpp"
 
 
 namespace ptens{
 
 
-  class Ptensor1pack{
+  class Ptensor1pack: RtensorPool{
   public:
 
     typedef cnine::IntTensor itensor;
     typedef cnine::RtensorA rtensor;
 
-    mutable vector<Ptensor1subpack*> subpacks;
-    mutable unordered_map<PtensorSgntr,int> sgntr_lookup; 
-    mutable unordered_map<int,pair<int,int> > index_lookup;
-    int max_index=0;
+    AtomsPack atoms;
 
     ~Ptensor1pack(){
-      for(auto p:subpacks)
-	delete p;
     }
 
 
@@ -33,24 +31,16 @@ namespace ptens{
     Ptensor1pack(){}
 
 
-  public: // ----- Constructors ------------------------------------------------------------------------------
+  public: // ----- Copying -----------------------------------------------------------------------------------
 
 
-    Ptensor1pack(const Ptensor1pack& x){
-      for(auto p:x.subpacks)
-	subpacks.push_back(new Ptensor1subpack(*p)); 
-      sgntr_lookup=x.sgntr_lookup;
-      index_lookup=x.index_lookup;
-      max_index=x.max_index;
-    }
+    Ptensor1pack(const Ptensor1pack& x):
+      RtensorPool(x),
+      atoms(x.atoms){}
 	
-    Ptensor1pack(Ptensor1pack&& x){
-      subpacks=x.subpacks;
-      x.subpacks.clear();
-      sgntr_lookup=x.sgntr_lookup;
-      index_lookup=x.index_lookup;
-      max_index=x.max_index;
-    }
+    Ptensor1pack(Ptensor1pack&& x):
+      RtensorPool(std::move(x)),
+      atoms(std::move(x.atoms)){}
 
     Ptensor1pack& operator=(const Ptensor1pack& x)=delete;
 
@@ -58,63 +48,146 @@ namespace ptens{
   public: // ----- Access ------------------------------------------------------------------------------------
 
 
-    pair<int,int> index_of_tensor(const int i) const{
-      assert(index_lookup.find(i)!=index_lookup.end());
-      return index_lookup[i];
-    }
-
-    int index_of_subpack(const PtensorSgntr& sgntr) const{
-      auto it=sgntr_lookup.find(sgntr);
-      if(it!=sgntr_lookup.end()) return it->second;
-      subpacks.push_back(new Ptensor1subpack(sgntr));
-      int i=subpacks.size()-1;
-      sgntr_lookup[sgntr]=i;
-      return i;
-    }
-
-    void insert(const int ix, const Ptensor1& x){
-      assert(index_lookup.find(ix)==index_lookup.end());
-      int pix=index_of_subpack(x.signature());
-      int subix=subpacks[pix]->push_back(x);
-      index_lookup[ix]=make_pair(pix,subix);
-      max_index=std::max(max_index,ix);
+    Atoms atoms_of(const int i) const{
+      return Atoms(atoms(i));
     }
 
     int push_back(const Ptensor1& x){
-      int pix=index_of_subpack(x.signature());
-      int subix=subpacks[pix]->push_back(x);
-      index_lookup[max_index]=make_pair(pix,subix);
-      return max_index++;
+      RtensorPool::push_back(x);
+      atoms.push_back(x.atoms);
+      return size()-1;
     }
 
 
   public: // ---- Message passing ----------------------------------------------------------------------------
 
 
-    void collect(const Ptensor1pack& x, const Cgraph& graph){
-      PtensorSubgraphSpecializer execs;
-      
-      graph.forall_edges([&](const int i, const int j){
-	  auto ix0=index_of_tensor(i);
-	  auto ix1=x.index_of_tensor(j);
-	  execs.graph(ix0.first,ix1.first).push(ix0.second,ix1.second);
-	});
-
-      execs.forall([&](const int i, const int j, const Cgraph& graph){
-	  subpacks[i]->collect(*subpacks[j],graph);});
+    Ptensor1pack fwd(const Cgraph& graph) const{
+      Ptensor1pack R;
+      for(int i=0; i<graph.maxj; i++) //TODO
+	R.push_back(Ptensor1::zero(atoms_of(i),5*2));
+      R.forwardMP(*this,graph);
+      return R;
     }
 
 
-  public: // ---- Operations ---------------------------------------------------------------------------------
+    void forwardMP(const Ptensor1pack& x, const Cgraph& graph){
+      AindexPack src_indices;
+      AindexPack dest_indices;
+
+      graph.forall_edges([&](const int i, const int j){
+	  Atoms atoms0=atoms_of(i);
+	  Atoms atoms1=atoms_of(j);
+	  Atoms intersect=atoms0.intersect(atoms1);
+	  src_indices.push_back(i,atoms0(intersect));
+	  dest_indices.push_back(j,atoms1(intersect));
+	});
+
+      RtensorPool messages0=x.messages0(src_indices);
+      add_messages0(messages0,dest_indices,0);
+      //cout<<messages0<<endl;
+
+      RtensorPool messages1=x.messages1(src_indices);
+      add_messages1(messages1,dest_indices,5); // TODO 
+      //cout<<messages1<<endl;
+
+    }
 
 
-    Ptensor1pack operator*(const rtensor& W){
-      Ptensor1pack R;
-      for(auto p:subpacks)
-	R.subpacks.push_back(new Ptensor1subpack(p->atoms,(*p)*W));
-      R.sgntr_lookup=sgntr_lookup;
-      R.index_lookup=index_lookup;
+  public: // ---- Reductions ---------------------------------------------------------------------------------
+
+
+    RtensorPool messages0(const AindexPack& src_list) const{
+      int N=src_list.size();
+
+      array_pool<int> msg_dims;
+      for(int i=0; i<N; i++)
+	msg_dims.push_back({dims_of(src_list.tix(i)).back()});
+      RtensorPool R(msg_dims,cnine::fill_zero());
+
+      for(int i=0; i<N; i++){
+	Rtensor2_view source=view2_of(src_list.tix(i));
+	Rtensor1_view dest=R.view1_of(i);
+	vector<int> ix=src_list.indices(i);
+	int n=ix.size();
+	int nc=dest.n0;
+
+	for(int c=0; c<nc; c++){
+	  float t=0; 
+	  for(int j=0; j<n; j++) 
+	    t+=source(ix[j],c);
+	  dest.set(c,t);
+	}
+      }
+
       return R;
+    }
+
+
+    RtensorPool messages1(const AindexPack& src_list) const{
+      int N=src_list.size();
+
+      array_pool<int> msg_dims;
+      for(int i=0; i<N; i++)
+	msg_dims.push_back({src_list.nindices(i),dims_of(src_list.tix(i)).back()});
+      RtensorPool R(msg_dims,cnine::fill_zero());
+
+      for(int i=0; i<N; i++){
+	Rtensor2_view source=view2_of(src_list.tix(i));
+	Rtensor2_view dest=R.view2_of(i);
+	vector<int> ix=src_list.indices(i);
+	int n=ix.size();
+	int nc=dest.n1;
+
+	for(int c=0; c<nc; c++){
+	  for(int j=0; j<n; j++) 
+	    dest.set(j,c,source(ix[j],c));
+	}
+      }
+
+      return R;
+    }
+
+
+  public: // ---- Broadcasting -------------------------------------------------------------------------------
+
+
+    void add_messages0(const RtensorPool& messages, const AindexPack& dest_list, const int coffs){
+      int N=dest_list.size();
+      assert(messages.size()==N);
+
+      for(int i=0; i<N; i++){
+	Rtensor1_view source=messages.view1_of(i);
+	Rtensor2_view dest=view2_of(dest_list.tix(i));
+	vector<int> ix=dest_list.indices(i);
+	int n=ix.size();
+	int nc=source.n0;
+
+	for(int c=0; c<nc; c++){
+	  float v=source(c);
+	  for(int j=0; j<n; j++) 
+	    dest.inc(ix[j],c+coffs,v);
+	}
+      }
+    }
+
+
+    void add_messages1(const RtensorPool& messages, const AindexPack& dest_list, const int coffs){
+      int N=dest_list.size();
+      assert(messages.size()==N);
+
+      for(int i=0; i<N; i++){
+	Rtensor2_view source=messages.view2_of(i);
+	Rtensor2_view dest=view2_of(dest_list.tix(i));
+	vector<int> ix=dest_list.indices(i);
+	int n=ix.size();
+	int nc=source.n1;
+
+	for(int c=0; c<nc; c++){
+	  for(int j=0; j<n; j++) 
+	    dest.inc(ix[j],c+coffs,source(j,c));
+	}
+      }
     }
 
 
@@ -123,17 +196,18 @@ namespace ptens{
 
     string str(const string indent="") const{
       ostringstream oss;
-      for(auto p:subpacks)
-	oss<<p->str(indent)<<endl;
+      for(int i=0; i<size(); i++){
+	oss<<indent<<"Ptensor "<<i<<" "<<Atoms(atoms(i))<<":"<<endl;
+	oss<<RtensorPool::operator()(i).str()<<endl;
+      }
       return oss.str();
     }
 
     friend ostream& operator<<(ostream& stream, const Ptensor1pack& x){
       stream<<x.str(); return stream;}
-   
+
 
   };
-
 
 }
 

@@ -28,6 +28,8 @@ namespace ptens{
 
     typedef cnine::IntTensor IntTensor;
 
+    int maxi=0;
+    int maxj=0;
     map<int,CgraphList*> lists;
     //vector<int> rstrides;
     //vector<int> xstrides;
@@ -85,6 +87,8 @@ namespace ptens{
  
     void push(const int i, const int j){
       current=false;
+      maxi=std::max(i+1,maxi);
+      maxj=std::max(j+1,maxj);
       auto it=lists.find(i);
       if(it!=lists.end())
 	it->second->push_back(j);

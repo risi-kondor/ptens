@@ -1,8 +1,12 @@
 #ifndef _RtensorPool
 #define _RtensorPool
 
+#include "array_pool.hpp"
 #include "vector_pool.hpp"
 #include "RtensorA.hpp"
+#include "Rtensor1_view.hpp"
+#include "Rtensor2_view.hpp"
+
 
 namespace ptens{
 
@@ -10,6 +14,8 @@ namespace ptens{
   public:
 
     typedef cnine::RtensorA rtensor;
+    typedef cnine::Rtensor1_view Rtensor1_view;
+    typedef cnine::Rtensor2_view Rtensor2_view;
 
     float* arr=nullptr;
     float* arrg=nullptr;
@@ -27,7 +33,32 @@ namespace ptens{
   public: // ---- Constructors -------------------------------------------------------------------------------
 
 
-    RtensorPool(){}
+    //RtensorPool(){}
+
+    RtensorPool(const int _dev=0):
+      dev(_dev){}
+
+    RtensorPool(const array_pool<int>& dimensions, const cnine::fill_zero& dummy, const int _dev=0){
+      dev=_dev;
+
+      int reserve_size=0;
+      for(int i=0; i<dimensions.size(); i++){
+	vector<int> v=dimensions(i);
+	int t=1; for(int j=0; j<v.size(); j++) t*=v[j];
+	reserve_size+=t;
+      }
+      reserve(reserve_size);
+      if(dev==0) std::fill(arr,arr+reserve_size,0);
+      if(dev==1){}
+
+      for(int i=0; i<dimensions.size(); i++){
+	vector<int> v=dimensions(i);
+	int t=1; for(int j=0; j<v.size(); j++) t*=v[j];
+	headers.push_back_cat(tail,v);
+	tail+=t;
+      }
+
+    }
 
 
   public: // ---- Memory management --------------------------------------------------------------------------
@@ -65,6 +96,12 @@ namespace ptens{
       return headers.size();
     }
 
+    float* get_arr() const{
+      if(dev==0) return arr;
+      else return arrg;
+    }
+
+
     int addr_of(const int i) const{
       assert(i<size());
       return headers(i)[0];
@@ -75,10 +112,12 @@ namespace ptens{
       return cnine::Gdims(headers.subvector_of(i,1));
     }
 
-    float* get_arr() const{
-      if(dev==0) return arr;
-      else return arrg;
+    float* arr_of(const int i) const{
+      if(dev==1) return arrg+addr_of(i);
+      return arr+addr_of(i);
     }
+
+
 
 
     rtensor operator()(const int i) const{
@@ -86,10 +125,26 @@ namespace ptens{
       return rtensor(dims_of(i),get_arr()+addr_of(i),dev);
     }
 
-    rtensor tensor(const int i) const{
-      assert(i<size());
-      return rtensor(dims_of(i),get_arr()+addr_of(i),dev);
+    //rtensor tensor(const int i) const{
+    //assert(i<size());
+    //return rtensor(dims_of(i),get_arr()+addr_of(i),dev);
+    //}
+
+    Rtensor1_view view1_of(const int i) const{
+      vector<int> v=headers(i);
+      assert(v.size()==2);
+      if(dev==1) return Rtensor1_view(arrg+v[0],v[1],1,1);
+      return Rtensor1_view(arr+v[0],v[1],1,0);
     }
+
+    Rtensor2_view view2_of(const int i) const{
+      vector<int> v=headers(i);
+      assert(v.size()==3);
+      if(dev==1) return Rtensor2_view(arrg+v[0],v[1],v[2],v[2],1,1);
+      return Rtensor2_view(arr+v[0],v[1],v[2],v[2],1,0);
+    }
+
+
 
     void push_back(const rtensor& x){
       assert(x.dev==dev);
@@ -104,6 +159,7 @@ namespace ptens{
       headers.push_back_cat(tail,x.dims);
       tail+=x.asize;
     }
+
 
   public: // ---- I/O ----------------------------------------------------------------------------------------
 
