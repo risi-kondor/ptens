@@ -60,6 +60,19 @@ namespace ptens{
 
   public:
 
+
+    static Cgraph random(const int n, const float p=0.5){
+      Cgraph G;
+      uniform_real_distribution<double> distr(0,1);
+      for(int i=0; i<n; i++) 
+	for(int j=0; j<i; j++)
+	  if(distr(rndGen)<p){
+	    G.push(i,j);
+	    G.push(j,i);
+	  }
+      return G;
+    }
+
     static Cgraph from_list(const IntTensor& M){
       Cgraph R; 
       assert(M.ndims()==2);
@@ -109,6 +122,18 @@ namespace ptens{
     }
 
 
+    IntTensor tensor() const{
+      int n=maxi;
+      IntTensor R=IntTensor::zero({n,n});
+      for(auto p:lists){
+	int i=p.first;
+	for(auto q: *p.second)
+	  R.set(i,q,1);
+      }
+      return R;
+    }
+
+
   public: // ---- GPU side ---------------------------------------------------------------------------------
 
 
@@ -142,7 +167,11 @@ namespace ptens{
       //#endif
     }
 
-    string str(const string indent=""){
+
+  public: // ---- I/O ----------------------------------------------------------------------------------------
+
+
+    string str(const string indent="") const{
       ostringstream oss;
       for(auto it: lists){
 	oss<<indent<<it.first<<"<-(";
@@ -156,6 +185,9 @@ namespace ptens{
       }
       return oss.str();
     }
+
+    friend ostream& operator<<(ostream& stream, const Cgraph& x){
+      stream<<x.str(); return stream;}
 
   };
 

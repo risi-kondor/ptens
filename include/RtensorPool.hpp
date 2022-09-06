@@ -6,6 +6,7 @@
 #include "RtensorA.hpp"
 #include "Rtensor1_view.hpp"
 #include "Rtensor2_view.hpp"
+#include "Rtensor3_view.hpp"
 
 
 namespace ptens{
@@ -16,6 +17,7 @@ namespace ptens{
     typedef cnine::RtensorA rtensor;
     typedef cnine::Rtensor1_view Rtensor1_view;
     typedef cnine::Rtensor2_view Rtensor2_view;
+    typedef cnine::Rtensor3_view Rtensor3_view;
 
     float* arr=nullptr;
     float* arrg=nullptr;
@@ -142,6 +144,13 @@ namespace ptens{
       assert(v.size()==3);
       if(dev==1) return Rtensor2_view(arrg+v[0],v[1],v[2],v[2],1,1);
       return Rtensor2_view(arr+v[0],v[1],v[2],v[2],1,0);
+    }
+
+    Rtensor3_view view3_of(const int i) const{
+      vector<int> v=headers(i);
+      assert(v.size()==4);
+      if(dev==1) return Rtensor3_view(arrg+v[0],v[1],v[2],v[3],v[2]*v[3],v[3],1,1);
+      return Rtensor3_view(arr+v[0],v[1],v[2],v[3],v[2]*v[3],v[3],1,0);
     }
 
 

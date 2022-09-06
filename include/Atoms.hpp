@@ -72,6 +72,12 @@ namespace ptens{
       return lookup.find(i)!=lookup.end();
     }
 
+
+    void foreach(const std::function<void(const int)>& lambda) const{
+      for(int i=0; i<size(); i++)
+	lambda((*this)[i]);
+    }
+
     
   public: // ---- Operations ---------------------------------------------------------------------------------
 
