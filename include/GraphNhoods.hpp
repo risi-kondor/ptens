@@ -16,7 +16,29 @@ namespace ptens{
 	delete p;
     }
 
-  public:
+
+  public: // ---- Copying -------------------------------------------------------------------------------------
+
+
+    Nhoods(){}
+
+    Nhoods(const Nhoods& x){
+      for(auto p:x.nhoods)
+	nhoods.push_back(new set<int>(*p));
+    }
+
+
+    Nhoods(Nhoods&& x){
+      for(auto p:x.nhoods)
+	nhoods.push_back(p);
+      x.nhoods.clear();
+    }
+
+    Nhoods& operator=(const Nhoods& x)=delete;
+
+
+  public: // ---- I/O -----------------------------------------------------------------------------------------
+
 
     string str(const string indent="") const{
       ostringstream oss;
@@ -29,10 +51,12 @@ namespace ptens{
       return oss.str();
     }
 
+
     friend ostream& operator<<(ostream& stream, const Nhoods& x){
       stream<<x.str(); return stream;}
 
   };
+
 
 
   class GraphNhoods{
