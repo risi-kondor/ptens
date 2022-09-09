@@ -57,11 +57,45 @@ namespace ptens{
     }
 
 
+  public: // ---- Copying ------------------------------------------------------------------------------------
+
+
+    array_pool(const array_pool& x){
+      dev=x.dev;
+      tail=x.tail;
+      memsize=tail;
+      if(dev==0){
+	arr=new TYPE[memsize];
+	std::copy(x.arr,x.arr+memsize,arr);
+      }
+      if(dev==1){
+	CNINE_UNIMPL();
+      }
+      lookup=x.lookup;
+    }
+
+    array_pool(array_pool&& x){
+      dev=x.dev;
+      tail=x.tail; x.tail=0;
+      memsize=x.memsize; x.memsize=0; 
+      arr=x.arr; x.arr=nullptr;
+      arrg=x.arrg; x.arrg=nullptr;
+      lookup=std::move(x.lookup);
+      x.lookup.clear();
+    }
+
+
+
   public: // ---- Access -------------------------------------------------------------------------------------
 
 
     int size() const{
       return lookup.size();
+    }
+
+    int size_of(const int i) const{
+      assert(i<size());
+      return lookup[i].second;
     }
 
     vector<TYPE> operator()(const int i) const{

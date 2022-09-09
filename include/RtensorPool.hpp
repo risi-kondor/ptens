@@ -14,6 +14,7 @@ namespace ptens{
   class RtensorPool{
   public:
 
+    typedef cnine::Gdims Gdims;
     typedef cnine::RtensorA rtensor;
     typedef cnine::Rtensor1_view Rtensor1_view;
     typedef cnine::Rtensor2_view Rtensor2_view;
@@ -27,7 +28,7 @@ namespace ptens{
     vector_pool<int> headers;
 
     ~RtensorPool(){
-      if(arr) delete[] arr;
+      //if(arr) delete[] arr;
       if(arrg) {CUDA_SAFE(cudaFree(arrg));}
     }
 
@@ -35,10 +36,31 @@ namespace ptens{
   public: // ---- Constructors -------------------------------------------------------------------------------
 
 
-    //RtensorPool(){}
+    RtensorPool(){}
 
-    RtensorPool(const int _dev=0):
+    RtensorPool(const int _dev):
       dev(_dev){}
+
+    RtensorPool(const int _N, const Gdims& _dims, const cnine::fill_raw& dummy, const int _dev=0):
+      RtensorPool(_dev){
+      int asize=_dims.asize();
+      reserve(_N*asize);
+      for(int i=0; i<_N; i++){
+	headers.push_back_cat(i*asize,_dims);
+      }
+      tail=_N*asize;
+    }
+
+    RtensorPool(const int _N, const Gdims& _dims, const cnine::fill_zero& dummy, const int _dev=0):
+      RtensorPool(_dev){
+      int asize=_dims.asize();
+      reserve(_N*asize);
+      if(dev==0) std::fill(arr,arr+memsize,0);
+      if(dev==1){}
+      for(int i=0; i<_N; i++)
+	headers.push_back_cat(i*asize,_dims);
+      tail=_N*asize;
+    }
 
     RtensorPool(const array_pool<int>& dimensions, const cnine::fill_zero& dummy, const int _dev=0){
       dev=_dev;
@@ -79,7 +101,7 @@ namespace ptens{
 	memsize=newsize;
       }
       if(dev==1){
-	float* newarrg;
+	float* newarrg=nullptr;
 	CUDA_SAFE(cudaMalloc((void **)&newarrg, newsize*sizeof(float)));
 	if(arrg){
 	  CUDA_SAFE(cudaMemcpy(newarrg,arrg,memsize*sizeof(float),cudaMemcpyDeviceToDevice));  
@@ -87,6 +109,33 @@ namespace ptens{
 	}
 	arrg=newarrg;
 	memsize=newsize;
+      }
+    }
+
+
+    void reserve_zero(const int n){
+      if(n<=memsize) return;
+      //int newsize=n;
+      if(dev==0){
+	float* newarr=new float[n];
+	if(arr){
+	  std::copy(arr,arr+memsize,newarr);
+	  delete[] arr;
+	}
+	arr=newarr;
+	std::fill(arr+memsize,arr+n,0);
+	memsize=n;
+      }
+      if(dev==1){
+	float* newarrg=nullptr;
+	CUDA_SAFE(cudaMalloc((void **)&newarrg, n*sizeof(float)));
+	if(arrg){
+	  CUDA_SAFE(cudaMemcpy(newarrg,arrg,memsize*sizeof(float),cudaMemcpyDeviceToDevice));  
+	  CUDA_SAFE(cudaFree(arrg));
+	}
+	arrg=newarrg;
+	CUDA_SAFE(cudaMemset(arrg+memsize,0,(n-memsize)*sizeof(float)));
+	memsize=n;
       }
     }
 
@@ -112,6 +161,11 @@ namespace ptens{
     cnine::Gdims dims_of(const int i) const{
       assert(i<size());
       return cnine::Gdims(headers.subvector_of(i,1));
+    }
+
+    int dim(const int i, const int j) const{
+      assert(i<size());
+      return headers(i,1+j);
     }
 
     float* arr_of(const int i) const{
@@ -163,10 +217,32 @@ namespace ptens{
 	std::copy(x.arr,x.arr+x.asize,arr+tail);
       }
       if(dev==1){
-	CUDA_SAFE(cudaMemcpy(arr+tail,x.arrg,x.asize*sizeof(float),cudaMemcpyDeviceToDevice));
+	CUDA_SAFE(cudaMemcpy(arrg+tail,x.arrg,x.asize*sizeof(float),cudaMemcpyDeviceToDevice));
       }
       headers.push_back_cat(tail,x.dims);
       tail+=x.asize;
+    }
+
+    void push_back_raw(const Gdims& _dims){
+      int asize=_dims.asize();
+      if(tail+asize>memsize)
+	reserve(std::max(2*memsize,tail+asize));
+      headers.push_back_cat(tail,_dims);
+      tail+=asize;
+    }
+      
+    void push_back_zero(const Gdims& _dims){
+      int asize=_dims.asize();
+      if(tail+asize>memsize)
+	reserve(std::max(2*memsize,tail+asize));
+      if(dev==0){
+	std::fill(arr+tail,arr+tail+asize,0);
+      }
+      if(dev==1){
+	CUDA_SAFE(cudaMemset(arrg+tail,0,asize*sizeof(float)));
+      }
+      headers.push_back_cat(tail,_dims);
+      tail+=asize;
     }
 
 

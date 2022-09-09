@@ -1,5 +1,5 @@
-#ifndef _ptens_Ptensor0pack
-#define _ptens_Ptensor0pack
+#ifndef _ptens_Ptensors0
+#define _ptens_Ptensors0
 
 #include "Cgraph.hpp"
 #include "RtensorPool.hpp"
@@ -11,7 +11,7 @@
 namespace ptens{
 
 
-  class Ptensor0pack: public RtensorPool{
+  class Ptensors0: public RtensorPool{
   public:
 
     typedef cnine::IntTensor itensor;
@@ -23,85 +23,72 @@ namespace ptens{
     int nc=0;
     AtomsPack atoms;
 
-    ~Ptensor0pack(){
+    ~Ptensors0(){
     }
 
 
   public: // ----- Constructors ------------------------------------------------------------------------------
 
 
-    Ptensor0pack(){}
+    //Ptensors0(){}
 
-    Ptensor0pack(const int _nc, const int _dev=0):
+    Ptensors0(const int _nc, const int _dev=0):
       RtensorPool(_dev), nc(_nc){}
 
-    Ptensor0pack(const int _nc, const int _memsize, const int _dev):
-      RtensorPool(_dev), nc(_nc){
-      reserve(_memsize);
-    }
+    //Ptensors0(const int _nc, const int _memsize, const int _dev):
+    //RtensorPool(_dev), nc(_nc){
+    //reserve(_memsize);
+    //}
     
     template<typename FILLTYPE, typename = typename std::enable_if<std::is_base_of<cnine::fill_pattern, FILLTYPE>::value, FILLTYPE>::type>
-    Ptensor0pack(const int _n, const int _nc, const FILLTYPE& dummy, const int _dev=0):
+    Ptensors0(const int _n, const int _nc, const FILLTYPE& dummy, const int _dev=0):
       RtensorPool(_n, cnine::Gdims({_nc}), dummy, _dev), atoms(_n), nc(_nc){}
 
-    Ptensor0pack(const int _n, const int _nc, const cnine::fill_sequential& dummy, const int _dev=0):
-      RtensorPool(_n,cnine::Gdims({_nc}),cnine::fill_raw(),_dev), atoms(_n), nc(_nc){
-      for(int i=0; i<_n; i++)
-	view1_of(i).set(i);
-    }
+    template<typename FILLTYPE, typename = typename std::enable_if<std::is_base_of<cnine::fill_pattern, FILLTYPE>::value, FILLTYPE>::type>
+    Ptensors0(const AtomsPack& _atoms, const int _nc, const FILLTYPE& dummy, const int _dev=0):
+      RtensorPool(_atoms.size(), cnine::Gdims({_nc}), dummy, _dev), atoms(_atoms), nc(_nc){}
 
 
   public: // ----- Constructors ------------------------------------------------------------------------------
 
 
-    static Ptensor0pack raw(const int _n, const int _nc, const int _dev=0){
-      return Ptensor0pack R(_n,_nc,cnine::fill_raw(),_dev);}
-    static Ptensor0pack raw(const int _n, const int _nc, const int _dev=0){
-      return Ptensor0pack R(_n,_nc,cnine::fill_zero(),_dev);}
-    static Ptensor0pack sequential(const int _n, const int _nc, const int _dev=0){
-      return Ptensor0pack R(_n,_nc,cnine::fill_sequential(),_dev);}
+    static Ptensors0 raw(const int _n, const int _nc, const int _dev=0){
+      return Ptensors0(_n,_nc,cnine::fill_raw(),_dev);}
 
-    /*
-    static Ptensor0pack raw(const AtomsPack& _atoms, const int _nc, const int _dev=0){
-      Ptensor0pack R(_nc,_dev);
-      R.reserve(_atoms.tsize0()*_nc);
+    static Ptensors0 zero(const int _n, const int _nc, const int _dev=0){
+      return Ptensors0(_n,_nc,cnine::fill_zero(),_dev);}
 
-      for(int i=0; i<_atoms.size(); i++){
-	R.push_back(Ptensor0::raw(_atoms(i),_nc));
-      }
+    static Ptensors0 sequential(const int _n, const int _nc, const int _dev=0){
+      Ptensors0 R(_n,_nc,cnine::fill_raw(),_dev);
+      for(int i=0; i<_n; i++) R.view1_of(i).set(i);
       return R;
     }
-    static Ptensor0pack zero(const AtomsPack& _atoms, const int _nc, const int _dev=0){
-      Ptensor0pack R(_nc,_dev);
-      for(int i=0; i<_atoms.size(); i++){
-	R.push_back(Ptensor0::zero(_atoms(i),_nc));
-      }
+
+    static Ptensors0 raw(const AtomsPack& _atoms, const int _nc, const int _dev=0){
+      return Ptensors0(_atoms,_nc,cnine::fill_raw(),_dev);}
+
+    static Ptensors0 zero(const AtomsPack& _atoms, const int _nc, const int _dev=0){
+      return Ptensors0(_atoms,_nc,cnine::fill_zero(),_dev);}
+
+    static Ptensors0 sequential(const AtomsPack& _atoms, const int _nc, const int _dev=0){
+      Ptensors0 R(_atoms,_nc,cnine::fill_raw(),_dev);
+      for(int i=0; i<R.size(); i++) R.view1_of(i).set(i);
       return R;
     }
-    static Ptensor0pack sequential(const AtomsPack& _atoms, const int _nc, const int _dev=0){
-      Ptensor0pack R(_nc,_dev);
-      for(int i=0; i<_atoms.size(); i++){
-	R.push_back(Ptensor0::zero(_atoms(i),_nc));
-	auto A=R.view1_of(i);
-	for(int j=0; j<_nc; j++) A.set(j,i);
-      }
-      return R;
-    }
-    */
 
 
   public: // ----- Copying -----------------------------------------------------------------------------------
 
 
-    Ptensor0pack(const Ptensor0pack& x):
+    Ptensors0(const Ptensors0& x):
       RtensorPool(x),
       atoms(x.atoms){}
 	
-    Ptensor0pack(Ptensor0pack&& x):
+    Ptensors0(Ptensors0&& x):
       RtensorPool(std::move(x)),
       atoms(std::move(x.atoms)){}
 
-    Ptensor0pack& operator=(const Ptensor0pack& x)=delete;
+    Ptensors0& operator=(const Ptensors0& x)=delete;
 
 
   public: // ----- Access ------------------------------------------------------------------------------------
@@ -115,7 +102,6 @@ namespace ptens{
       return Atoms(atoms(i));
     }
     
-    
     void push_back(const Ptensor0& x){
       if(nc==0) nc=x.get_nc();
       else assert(nc==x.get_nc());
@@ -123,12 +109,27 @@ namespace ptens{
       atoms.push_back(x.atoms);
     }
 
-    //void push_back_zero(const Gdims& 
+
+  public: // ---- Maps ---------------------------------------------------------------------------------------
 
 
+    Ptensors0 hom() const{
+      Ptensors0 R=Ptensors0::zero(atoms,nc,dev);
+      R.add_hom(*this);
+      return R;
+    }
 
-  public: // ---- Message passing ----------------------------------------------------------------------------
 
+    void add_hom(const Ptensors0& x, const int offs=0){
+      assert(x.size()==size());
+      assert(offs+2*x.nc<=nc);
+      int _nc=x.nc;
+      for(int i=0; i<size(); i++){
+	view1_of(i).add(x.view1_of(i));
+	//	view1_of(i).block(offs,_nc)=x.view1_of(i);
+	//view1_of(i).block(offs+_nc,_nc).set(x.view1_of(i).sum());
+      }
+    }
 
 
   public: // ---- Reductions ---------------------------------------------------------------------------------
@@ -173,7 +174,7 @@ namespace ptens{
       return oss.str();
     }
 
-    friend ostream& operator<<(ostream& stream, const Ptensor0pack& x){
+    friend ostream& operator<<(ostream& stream, const Ptensors0& x){
       stream<<x.str(); return stream;}
 
   };

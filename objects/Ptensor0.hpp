@@ -12,9 +12,21 @@ namespace ptens{
   class Ptensor0: public cnine::RtensorA{
   public:
 
-    Atoms atoms;
 
     typedef cnine::RtensorA rtensor;
+
+    Atoms atoms;
+
+    #ifdef WITH_FAKE_GRAD
+    Ptensor0* grad=nullptr;
+    #endif 
+
+
+    ~Ptensor0(){
+      #ifdef WITH_FAKE_GRAD
+      if(!is_view) delete grad;
+      #endif 
+    }
 
 
     // ---- Constructors -------------------------------------------------------------------------------------

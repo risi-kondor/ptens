@@ -1,18 +1,19 @@
-#ifndef _ptens_Ptensor2pack
-#define _ptens_Ptensor2pack
+#ifndef _ptens_Ptensors1
+#define _ptens_Ptensors1
 
-#include "Rtensor3_view.hpp"
 #include "Cgraph.hpp"
+//#include "Ptensor1subpack.hpp"
+//#include "PtensorSubpackSpecializer.hpp"
 #include "RtensorPool.hpp"
 #include "AtomsPack.hpp"
 #include "AindexPack.hpp"
-#include "Ptensor2.hpp"
+#include "Ptensor1.hpp"
 
 
 namespace ptens{
 
 
-  class Ptensor2pack: public RtensorPool{
+  class Ptensors1: public RtensorPool{
   public:
 
     typedef cnine::IntTensor itensor;
@@ -24,35 +25,53 @@ namespace ptens{
     int nc;
     AtomsPack atoms;
 
-    ~Ptensor2pack(){
+    ~Ptensors1(){
     }
 
 
   public: // ----- Constructors ------------------------------------------------------------------------------
 
 
-    Ptensor2pack(){}
+    Ptensors1(){}
 
-    Ptensor2pack(const int _nc, const int _dev=0):
+    Ptensors1(const int _nc, const int _dev=0):
       RtensorPool(_dev), nc(_nc){}
 
+    // TODO 
+    template<typename FILLTYPE, typename = typename std::enable_if<std::is_base_of<cnine::fill_pattern, FILLTYPE>::value, FILLTYPE>::type>
+    Ptensors1(const int _n, const int _k, const int _nc, const FILLTYPE& dummy, const int _dev=0):
+      RtensorPool(_n,{_k,_nc},dummy,_dev), atoms(_n,_k), nc(_nc){}
 
-  public: // ----- Named constructors ------------------------------------------------------------------------
+
+  public: // ----- Constructors ------------------------------------------------------------------------------
 
 
-    static Ptensor2pack raw(const AtomsPack& _atoms, const int _nc, const int _dev=0){
-      Ptensor2pack R(_nc,_dev);
-      for(int i=0; i<_atoms.size(); i++){
-	R.push_back(Ptensor2::raw(_atoms(i),_nc));
-      }
+    static Ptensors1 raw(const int _n, const int _k, const int _nc, const int _dev=0){
+      return Ptensors1(_n,_k,_nc,cnine::fill_raw(),_dev);}
+
+    static Ptensors1 zero(const int _n, const int _k, const int _nc, const int _dev=0){
+      return Ptensors1(_n,_k,_nc,cnine::fill_zero(),_dev);}
+
+    static Ptensors1 sequential(const int _n, const int _k, const int _nc, const int _dev=0){
+      Ptensors1 R(_n,_k,_nc,cnine::fill_raw(),_dev);
+      for(int i=0; i<_n; i++)
+	R.view2_of(i).set(i); 
       return R;
     }
 
 
-    static Ptensor2pack zero(const AtomsPack& _atoms, const int _nc, const int _dev=0){
-      Ptensor2pack R(_nc,_dev);
+    static Ptensors1 raw(const AtomsPack& _atoms, const int _nc, const int _dev=0){
+      Ptensors1 R(_nc,_dev);
       for(int i=0; i<_atoms.size(); i++){
-	R.push_back(Ptensor2::zero(_atoms(i),_nc));
+	R.push_back(Ptensor1::raw(_atoms(i),_nc));
+      }
+      return R;
+    }
+
+    static Ptensors1 zero(const AtomsPack& _atoms, const int _nc, const int _dev=0){
+      Ptensors1 R(_nc,_dev);
+      for(int i=0; i<_atoms.size(); i++){
+	R.push_back(Ptensor1::zero(_atoms(i),_nc));
       }
       return R;
     }
@@ -61,15 +80,15 @@ namespace ptens{
   public: // ----- Copying -----------------------------------------------------------------------------------
 
 
-    Ptensor2pack(const Ptensor2pack& x):
+    Ptensors1(const Ptensors1& x):
       RtensorPool(x),
       atoms(x.atoms){}
 	
-    Ptensor2pack(Ptensor2pack&& x):
+    Ptensors1(Ptensors1&& x):
       RtensorPool(std::move(x)),
       atoms(std::move(x.atoms)){}
 
-    Ptensor2pack& operator=(const Ptensor2pack& x)=delete;
+    Ptensors1& operator=(const Ptensors1& x)=delete;
 
 
   public: // ----- Access ------------------------------------------------------------------------------------
@@ -83,7 +102,7 @@ namespace ptens{
       return Atoms(atoms(i));
     }
 
-    int push_back(const Ptensor2& x){
+    int push_back(const Ptensor1& x){
       if(size()==0) nc=x.get_nc();
       else assert(nc==x.get_nc());
       RtensorPool::push_back(x);
@@ -92,19 +111,48 @@ namespace ptens{
     }
 
 
+  public: // ---- Maps ---------------------------------------------------------------------------------------
+
+
+    Ptensors1 hom() const{
+      Ptensors1 R=Ptensors1::zero(atoms,2*nc,dev);
+      R.add_hom(*this);
+      return R;
+    }
+
+
+    void add_hom(const Ptensors1& x, const int offs=0){
+      assert(x.size()==size());
+      assert(offs+2*x.nc<=nc);
+      int _nc=x.nc;
+      for(int i=0; i<size(); i++){
+	int k=x.dim(i,0);
+	assert(dim(i,0)==k);
+	view2_of(i).block(0,offs,k,_nc)+=x.view2_of(i);
+	for(int c=0; c<_nc; c++){
+	  float t=0; 
+	  for(int j=0; j<k; j++)
+	    t+=x.view2_of(i)(j,c);
+	  for(int j=0; j<k; j++)
+	    view2_of(i).inc(j,offs+c+_nc,t);
+	}
+      }
+    }
+
+
   public: // ---- Message passing ----------------------------------------------------------------------------
 
-    /*
-    Ptensor2pack fwd(const Cgraph& graph) const{
-      Ptensor2pack R;
-      for(int i=0; i<graph.maxj; i++) //TODO
-	R.push_back(Ptensor2::zero(atoms_of(i),5*2));
+
+    Ptensors1 fwd(const Cgraph& graph) const{
+      Ptensors1 R;
+      for(int i=0; i<graph.m; i++) //TODO
+	R.push_back(Ptensor1::zero(atoms_of(i),5*2));
       R.forwardMP(*this,graph);
       return R;
     }
 
 
-    void forwardMP(const Ptensor2pack& x, const Cgraph& graph){
+    void forwardMP(const Ptensors1& x, const Cgraph& graph){
       AindexPack src_indices;
       AindexPack dest_indices;
 
@@ -125,7 +173,6 @@ namespace ptens{
       //cout<<messages1<<endl;
 
     }
-    */
 
 
   public: // ---- Reductions ---------------------------------------------------------------------------------
@@ -140,26 +187,17 @@ namespace ptens{
       RtensorPool R(msg_dims,cnine::fill_zero());
 
       for(int i=0; i<N; i++){
-	Rtensor3_view source=view3_of(src_list.tix(i));
+	Rtensor2_view source=view2_of(src_list.tix(i));
 	Rtensor1_view dest=R.view1_of(i);
 	vector<int> ix=src_list.indices(i);
 	int n=ix.size();
-	int nc=source.n2;
-	assert(dest.n0==2*nc);
+	int nc=dest.n0;
 
 	for(int c=0; c<nc; c++){
 	  float t=0; 
-	  for(int j0=0; j0<n; j0++) 
-	    for(int j1=0; j1<n; j1++) 
-	      t+=source(ix[j0],ix[j1],c);
+	  for(int j=0; j<n; j++) 
+	    t+=source(ix[j],c);
 	  dest.set(c,t);
-	}
-
-	for(int c=0; c<nc; c++){
-	  float t=0; 
-	  for(int j0=0; j0<n; j0++) 
-	    t+=source(ix[j0],ix[j0],c);
-	  dest.set(c+nc,t);
 	}
       }
 
@@ -176,65 +214,15 @@ namespace ptens{
       RtensorPool R(msg_dims,cnine::fill_zero());
 
       for(int i=0; i<N; i++){
-	Rtensor3_view source=view3_of(src_list.tix(i));
+	Rtensor2_view source=view2_of(src_list.tix(i));
 	Rtensor2_view dest=R.view2_of(i);
 	vector<int> ix=src_list.indices(i);
 	int n=ix.size();
-	int nc=source.n2;
-	assert(dest.n1==3*nc);
+	int nc=dest.n1;
 
 	for(int c=0; c<nc; c++){
-	  for(int j0=0; j0<n; j0++){
-	    float t=0; 
-	    for(int j1=0; j1<n; j1++) 
-	      t+=source(ix[j0],ix[j1],c);
-	    dest.set(j0,c,t);
-	  }
-	}
-
-	for(int c=0; c<nc; c++){
-	  for(int j0=0; j0<n; j0++){
-	    float t=0; 
-	    for(int j1=0; j1<n; j1++) 
-	      t+=source(ix[j1],ix[j0],c);
-	    dest.set(j0,c+nc,t);
-	  }
-	}
-
-	for(int c=0; c<nc; c++){
-	  for(int j0=0; j0<n; j0++){
-	    dest.set(j0,c+2*nc,source(ix[j0],ix[j0],c));
-	  }
-	}
-      }
-
-      return R;
-    }
-
-
-    RtensorPool messages2(const AindexPack& src_list) const{
-      int N=src_list.size();
-
-      array_pool<int> msg_dims;
-      for(int i=0; i<N; i++)
-	msg_dims.push_back({src_list.nindices(i),dims_of(src_list.tix(i)).back()});
-      RtensorPool R(msg_dims,cnine::fill_zero());
-
-      for(int i=0; i<N; i++){
-	Rtensor3_view source=view3_of(src_list.tix(i));
-	Rtensor3_view dest=R.view3_of(i);
-	vector<int> ix=src_list.indices(i);
-	int n=ix.size();
-	int nc=source.n2;
-	assert(dest.n2==nc);
-
-
-	for(int c=0; c<nc; c++){
-	  for(int j0=0; j0<n; j0++){
-	    for(int j1=0; j1<n; j1++){
-	      dest.set(j0,j1,c,source(ix[j1],ix[j0],c));
-	    }
-	  }
+	  for(int j=0; j<n; j++) 
+	    dest.set(j,c,source(ix[j],c));
 	}
       }
 
@@ -244,7 +232,7 @@ namespace ptens{
 
   public: // ---- Broadcasting -------------------------------------------------------------------------------
 
-    /*
+
     void add_messages0(const RtensorPool& messages, const AindexPack& dest_list, const int coffs){
       int N=dest_list.size();
       assert(messages.size()==N);
@@ -282,7 +270,7 @@ namespace ptens{
 	}
       }
     }
-    */
+
 
   public: // ---- I/O ----------------------------------------------------------------------------------------
 
@@ -296,7 +284,7 @@ namespace ptens{
       return oss.str();
     }
 
-    friend ostream& operator<<(ostream& stream, const Ptensor2pack& x){
+    friend ostream& operator<<(ostream& stream, const Ptensors1& x){
       stream<<x.str(); return stream;}
 
   };

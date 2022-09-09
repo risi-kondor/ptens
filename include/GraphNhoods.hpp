@@ -87,7 +87,8 @@ namespace ptens{
       levels.push_back(level0);
       */
 
-      for(int i=0; i<G.maxi; i++){
+      int N=G.getn();
+      for(int i=0; i<N; i++){
 	set<int>* nhood=new set<int>;
 	nhood->insert(i);
 	level0->nhoods.push_back(nhood);

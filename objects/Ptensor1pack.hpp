@@ -34,9 +34,23 @@ namespace ptens{
 
     Ptensor1pack(){}
 
-    static Ptensor1pack zero(const AtomsPack& _atoms, const int _nc){
-      Ptensor1pack R;
-      R.nc=_nc;
+    Ptensor1pack(const int _nc, const int _dev=0):
+      RtensorPool(_dev), nc(_nc){}
+
+
+  public: // ----- Constructors ------------------------------------------------------------------------------
+
+
+    static Ptensor1pack raw(const AtomsPack& _atoms, const int _nc, const int _dev=0){
+      Ptensor1pack R(_nc,_dev);
+      for(int i=0; i<_atoms.size(); i++){
+	R.push_back(Ptensor1::raw(_atoms(i),_nc));
+      }
+      return R;
+    }
+
+    static Ptensor1pack zero(const AtomsPack& _atoms, const int _nc, const int _dev=0){
+      Ptensor1pack R(_nc,_dev);
       for(int i=0; i<_atoms.size(); i++){
 	R.push_back(Ptensor1::zero(_atoms(i),_nc));
       }

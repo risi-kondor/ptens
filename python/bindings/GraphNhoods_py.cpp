@@ -6,9 +6,9 @@ pybind11::class_<Nhoods>(m,"nhoods")
 
 
 
-pybind11::class_<graphNhoods>(m,"graphNhoods")
+pybind11::class_<GraphNhoods>(m,"graphNhoods")
 
   .def(pybind11::init<const Cgraph&, const int>())
 
-  .def("level",&Nhoods::level);
+  .def("level",&GraphNhoods::level);
 

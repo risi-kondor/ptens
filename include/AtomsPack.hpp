@@ -23,6 +23,20 @@ namespace ptens{
   public: // ---- Constructors ------------------------------------------------------------------------------
 
 
+    AtomsPack(const int N){
+      for(int i=0; i<N; i++)
+	push_back(vector<int>({i}));
+    }
+
+    AtomsPack(const int N, const int k){
+      for(int i=0; i<N; i++){
+	vector<int> v;
+	for(int j=0; j<k; j++) 
+	  v.push_back(j);
+	push_back(v);
+      }
+    }
+
     AtomsPack(const Nhoods& N){
       for(int i=0; i<N.nhoods.size(); i++){
 	vector<int> v;
@@ -35,48 +49,24 @@ namespace ptens{
 
   public: // ---- Access -------------------------------------------------------------------------------------
 
-    /*
-    vector<int> operator()(const int i) const{
-      int k=getk();
-      vector<int> R(k);
-      for(int j=0; j<k; j++)
-	R[j]=get(i,j);
-      return R;
+
+    int tsize0(){
+      return size();
     }
 
-    int operator()(const int i, const int j) const{
-      for(int a=0; a<dims[1] ;a++)
-	if(get(i,a)==j) return a;
-      return -1;
+    int tsize1(){
+      int t=0;
+      for(int i=0; i<size(); i++)
+	t+=sizeof(i);
+      return t;
     }
 
-    vector<int> operator()(const int i, const vector<int>& I) const{
-      const int k=I.size();
-      vector<int> r(k);
-      for(int i=0; i<k; i++)
-	r[i]=(*this)(i,I[i]);
-      return r;
+    int tsize2(){
+      int t=0;
+      for(int i=0; i<size(); i++)
+	t+=size_of(i)*size_of(i);
+      return t;
     }
-
-    bool includes(const int i, const int j) const{
-      for(int a=0; a<dims[1] ;a++)
-	if(get(i,a)==j) return true;
-      return false;
-    }
-    */
-
-    /*
-    void push_back(const vector<int>& v){
-      assert(v.size()==getk());
-      push_back_slice0(IntTensor(v));
-    }
-
-    void push_back(const IntTensor& v){
-      assert(v.getk()==1);
-      assert(v.dim(0)==getk());
-      push_back_slice0(v);
-    }
-    */
 
     
   public: // ---- Operations ---------------------------------------------------------------------------------

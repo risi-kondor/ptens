@@ -45,7 +45,7 @@ namespace ptens{
 	memsize=newsize;
       }
       if(dev==1){
-	TYPE* newarrg;
+	TYPE* newarrg=nullptr;
 	CUDA_SAFE(cudaMalloc((void **)&newarrg, newsize*sizeof(TYPE)));
 	if(arrg){
 	  CUDA_SAFE(cudaMemcpy(newarrg,arrg,memsize*sizeof(TYPE),cudaMemcpyDeviceToDevice));  
@@ -70,9 +70,18 @@ namespace ptens{
       int addr=p.first;
       int len=p.second;
       vector<TYPE> R(len);
-      for(int i=0; i<len; i++)
-	R[i]=arr[addr+i];
+      for(int j=0; j<len; j++)
+	R[j]=arr[addr+j];
       return R;
+    }
+
+    int operator()(const int i, const int j) const{
+      assert(i<size());
+      auto& p=lookup[i];
+      int addr=p.first;
+      int len=p.second;
+      assert(j<len);
+      return arr[addr+j];
     }
 
     vector<TYPE> subvector_of(const int i, const int beg) const{
@@ -82,8 +91,8 @@ namespace ptens{
       int len=p.second-beg;
       assert(len>=0);
       vector<TYPE> R(len);
-      for(int i=0; i<len; i++)
-	R[i]=arr[addr+i];
+      for(int j=0; j<len; j++)
+	R[j]=arr[addr+j];
       return R;
     }
 
