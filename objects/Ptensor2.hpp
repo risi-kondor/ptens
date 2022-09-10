@@ -11,18 +11,23 @@ namespace ptens{
   class Ptensor2: public cnine::RtensorA{
   public:
 
+    int k;
+    int nc;
     Atoms atoms;
 
     typedef cnine::RtensorA rtensor;
+    typedef cnine::Rtensor1_view Rtensor1_view;
+    typedef cnine::Rtensor2_view Rtensor2_view;
+    typedef cnine::Rtensor3_view Rtensor3_view;
 
 
     // ---- Constructors -------------------------------------------------------------------------------------
 
 
     template<typename FILLTYPE, typename = typename std::enable_if<std::is_base_of<cnine::fill_pattern, FILLTYPE>::value, FILLTYPE>::type>
-    Ptensor2(const Atoms& _atoms, const int nc, const FILLTYPE& dummy, const int _dev=0):
-      rtensor(cnine::Gdims(_atoms.size(),_atoms.size(),nc),dummy,_dev),
-      atoms(_atoms){
+    Ptensor2(const Atoms& _atoms, const int _nc, const FILLTYPE& dummy, const int _dev=0):
+      rtensor(cnine::Gdims(_atoms.size(),_atoms.size(),_nc),dummy,_dev),
+      atoms(_atoms), k(_atoms.size()), nc(_nc){
     }
 
 
@@ -42,11 +47,27 @@ namespace ptens{
       return Ptensor2(_atoms,nc,cnine::fill_sequential(),_dev);}
 
     
+    // ---- Conversions --------------------------------------------------------------------------------------
+
+
+    Ptensor2(Atoms&& _atoms, RtensorA&& x):
+      RtensorA(std::move(x)),
+      atoms(std::move(_atoms)){
+      k=dims(0);
+      nc=dims.back();
+    }
+ 
+
     // ---- Access -------------------------------------------------------------------------------------------
 
 
+    int getk() const{
+      return k;
+    }
+
     int get_nc() const{
-      return dims.back();
+      return nc;
+      //      return dims.back();
     }
 
     float at_(const int i, const int j, const int c) const{
@@ -116,10 +137,10 @@ namespace ptens{
 	    inc(ix[j],ix[i],cstride*c+1,x(xix[i],xix[j],c));
 	}
 
-	rtensor R1=x.reductions1(xix,c);
+	rtensor R1=x.reductions1e(xix,c);
 	broadcast1(R1,ix,cstride*c+2);
 
-	rtensor R0=x.reductions0(R1,xix,c);
+	rtensor R0=x.reductions0e(R1,xix,c);
 	broadcast0(R0,ix,cstride*c+27);
 
       }
@@ -138,37 +159,107 @@ namespace ptens{
       vector<int> xix(x.atoms(common));
 
       for(int c=0; c<nc; c++){
-	rtensor R1=reductions1(ix,c);
+	rtensor R1=reductions1e(ix,c);
 	x.broadcast1(R1,xix,cstride*c);
-	rtensor R0=reductions0(R1,ix,c);
+	rtensor R0=reductions0e(R1,ix,c);
 	x.broadcast0(R0,xix,cstride*c+5);
       }
       
     }
 
 
-    // ---- Reductions ---------------------------------------------------------------------------------------
+    // ---- Linmaps ------------------------------------------------------------------------------------------
 
 
-    rtensor reductions1(const vector<int>& ix, const int c) const{
-      const int k=ix.size();
-      const int n=dims(0);
-      rtensor R=rtensor::raw({k,5});
-      
-      for(int i=0; i<k; i++){
-	int _i=ix[i];
-	{float s=0; for(int j=0; j<k; j++) s+=(*this)(_i,ix[j],c); R.set(i,0,s);}
-	{float s=0; for(int j=0; j<k; j++) s+=(*this)(ix[j],_i,c); R.set(i,1,s);}
-	{float s=0; for(int j=0; j<n; j++) s+=(*this)(_i,j,c); R.set(i,2,s);}
-	{float s=0; for(int j=0; j<n; j++) s+=(*this)(j,_i,c); R.set(i,3,s);}
-	R.set(i,4,(*this)(_i,_i,c));
+    void add_linmaps(const Ptensor0& x, int offs=0){ // 2
+      assert(offs+2*x.nc<=nc);
+      offs+=broadcast(x.view1(),offs); // 2*1
+    }
+    
+    void add_linmaps(const Ptensor1& x, int offs=0){ // 5 
+      assert(x.k==k);
+      assert(offs+5*x.nc<=nc);
+      offs+=broadcast(x.reductions0().view1(),offs); // 2*1
+      offs+=broadcast(x.view2(),offs); // 3*1
+    }
+    
+    void add_linmaps(const Ptensor2& x, int offs=0){ // 15
+      assert(x.k==k);
+      assert(offs+15*x.nc<=nc);
+      offs+=broadcast(x.reductions0().view1(),offs); // 2*2
+      offs+=broadcast(x.reductions1().view2(),offs); // 3*3
+      offs+=broadcast(x.view3(),offs); // 2
+    }
+    
+    void add_linmaps_to(Ptensor0& x, int offs=0) const{ // 2
+      assert(offs+2*nc<=x.nc);
+      offs+=x.broadcast(reductions0().view1(),offs); // 1*2
+    }
+    
+    void add_linmaps_to(Ptensor1& x, int offs=0) const{ // 5 
+      assert(x.k==k);
+      assert(offs+5*nc<=x.nc);
+      offs+=x.broadcast(reductions0().view1(),offs); // 1*2
+      offs+=x.broadcast(reductions1().view2(),offs); // 1*3
+    }
+    
+
+
+    Ptensor0 reductions0() const{ // 2
+      auto R=Ptensor0::raw(atoms,2*nc);
+      for(int c=0; c<nc; c++){
+	auto slice=view3().slice2(c);
+	R.set(c,slice.sum());
+	R.set(nc+c,slice.diag().sum());
       }
+      return R;
+    }
 
+    Ptensor1 reductions1() const{ // 3
+      auto R=Ptensor1::raw(atoms,3*nc);
+      for(int c=0; c<nc; c++){
+	auto slice=view3().slice2(c);
+	slice.sum0_into(R.view2().slice1(c));
+	slice.sum1_into(R.view2().slice1(c+nc));
+	R.view2().slice1(c+2*nc)=slice.diag();
+      }
       return R;
     }
 
 
-    rtensor reductions0(const rtensor& R1, const vector<int>& ix, const int c) const{
+    int broadcast(const Rtensor1_view& x, const int offs=0){ // 2
+      int n=x.n0;
+      assert(2*n+offs<=nc);
+      view3().block(0,0,offs,k,k,n)+=repeat0(repeat0(x,k),k);
+      view3().block(0,0,offs+n,k,k,n).diag01()+=repeat0(x,k);
+      return 2*n;
+    }
+
+    int broadcast(const Rtensor2_view& x, const int offs=0){ // 3
+      int n=x.n1;
+      assert(x.n0==k);
+      assert(3*n+offs<=nc);
+      view3().block(0,0,offs,k,k,n)+=repeat0(x,k);
+      view3().block(0,0,offs+n,k,k,n)+=repeat1(x,k);
+      view3().block(0,0,offs+2*n,k,k,n).diag01()+=x;
+      return 3*n;
+    }
+
+    int broadcast(const Rtensor3_view& x, const int offs=0){ // 2 
+      int n=x.n2;
+      assert(x.n0==k);
+      assert(x.n1==k);
+      assert(2*n+offs<=nc);
+      view3().block(0,0,offs,k,k,n)+=x;
+      view3().block(0,0,offs+n,k,k,n)+=x.transp01();
+      return 2*n;
+    }
+
+
+    // ---- Extended reductions ------------------------------------------------------------------------------
+
+
+    rtensor reductions0e(const rtensor& R1, const vector<int>& ix, const int c) const{
       const int k=ix.size();
       const int n=dims(0);
       rtensor R=rtensor::zero({5});
@@ -188,6 +279,26 @@ namespace ptens{
       
       return R;
     }
+
+
+    rtensor reductions1e(const vector<int>& ix, const int c) const{
+      const int k=ix.size();
+      const int n=dims(0);
+      rtensor R=rtensor::raw({k,5});
+      
+      for(int i=0; i<k; i++){
+	int _i=ix[i];
+	{float s=0; for(int j=0; j<k; j++) s+=(*this)(_i,ix[j],c); R.set(i,0,s);}
+	{float s=0; for(int j=0; j<k; j++) s+=(*this)(ix[j],_i,c); R.set(i,1,s);}
+	{float s=0; for(int j=0; j<n; j++) s+=(*this)(_i,j,c); R.set(i,2,s);}
+	{float s=0; for(int j=0; j<n; j++) s+=(*this)(j,_i,c); R.set(i,3,s);}
+	R.set(i,4,(*this)(_i,_i,c));
+      }
+
+      return R;
+    }
+
+
 
     
   public: // ---- Broadcasting -------------------------------------------------------------------------------
@@ -245,6 +356,19 @@ namespace ptens{
   public: // ---- I/O ----------------------------------------------------------------------------------------
 
 
+    string str(const string indent="") const{
+      ostringstream oss;
+      oss<<indent<<"Ptensor2"<<atoms<<":"<<endl;
+      for(int c=0; c<get_nc(); c++){
+	oss<<indent<<"channel "<<c<<":"<<endl;
+	oss<<view3().slice2(c).str(indent+"  ")<<endl;
+      }
+      return oss.str();
+    }
+
+
+    friend ostream& operator<<(ostream& stream, const Ptensor2& x){
+      stream<<x.str(); return stream;}
 
   };
 

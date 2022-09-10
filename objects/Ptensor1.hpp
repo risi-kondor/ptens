@@ -12,18 +12,24 @@ namespace ptens{
   class Ptensor1: public cnine::RtensorA{
   public:
 
+    int k;
+    int nc;
     Atoms atoms;
 
     typedef cnine::RtensorA rtensor;
+    typedef cnine::Rtensor1_view Rtensor1_view;
+    typedef cnine::Rtensor2_view Rtensor2_view;
 
 
     // ---- Constructors -------------------------------------------------------------------------------------
 
 
     template<typename FILLTYPE, typename = typename std::enable_if<std::is_base_of<cnine::fill_pattern, FILLTYPE>::value, FILLTYPE>::type>
-    Ptensor1(const Atoms& _atoms, const int nc, const FILLTYPE& dummy, const int _dev=0):
-      rtensor(cnine::Gdims(_atoms.size(),nc),dummy,_dev),
-      atoms(_atoms){
+    Ptensor1(const Atoms& _atoms, const int _nc, const FILLTYPE& dummy, const int _dev=0):
+      rtensor(cnine::Gdims(_atoms.size(),_nc),dummy,_dev),
+      atoms(_atoms),
+      k(_atoms.size()), 
+      nc(_nc){
     }
 
 
@@ -43,7 +49,10 @@ namespace ptens{
       return Ptensor1(_atoms,nc,cnine::fill_sequential(),_dev);}
 
     
-    Ptensor1(RtensorA&& x, Atoms&& _atoms):
+    // ---- Conversions --------------------------------------------------------------------------------------
+
+
+    Ptensor1(Atoms&& _atoms, RtensorA&& x):
       RtensorA(std::move(x)),
       atoms(std::move(_atoms)){}
  
@@ -69,6 +78,49 @@ namespace ptens{
 
     void inc_(const int i, const int c, float x){
       inc(atoms(i),c,x);
+    }
+
+
+    // ---- Linmaps ------------------------------------------------------------------------------------------
+
+
+    void add_linmaps(const Ptensor0& x, int offs=0){ // 1
+      assert(offs+1*x.nc<=nc);
+      offs+=broadcast(x.view1(),offs); // 1*1
+    }
+    
+    void add_linmaps(const Ptensor1& x, int offs=0){ // 2 
+      assert(x.k==k);
+      assert(offs+2*x.nc<=nc);
+      offs+=broadcast(x.reductions0().view1(),offs); // 1*1
+      offs+=broadcast(x.view2(),offs); // 1*1
+    }
+    
+    void add_linmaps_to(Ptensor0& x, int offs=0) const{ // 1 
+      assert(offs+1*nc<=x.nc);
+      offs+=x.broadcast(reductions0().view1(),offs); // 1*1
+    }
+    
+
+    Ptensor0 reductions0() const{ // 1
+      auto R=Ptensor0::raw(atoms,nc);
+      view2().sum0_into(R.view1());
+      return R;
+    }
+
+    int broadcast(const Rtensor1_view& x, const int offs=0){ // 1
+      int n=x.n0;
+      assert(n+offs<=nc);
+      view2().block(0,offs,k,n)+=repeat0(x,k);
+      return n;
+    }
+
+    int broadcast(const Rtensor2_view& x, const int offs=0){ // 1
+      int n=x.n1;
+      assert(x.n0==k);
+      assert(n+offs<=nc);
+      view2().block(0,offs,k,n)+=x;
+      return n;
     }
 
 
@@ -173,10 +225,12 @@ namespace ptens{
     string str(const string indent="")const{
       ostringstream oss;
       oss<<indent<<"Ptensor1"<<atoms<<":"<<endl;
-      oss<<rtensor::str(indent);
+      oss<<view2().transp().str(indent);
       return oss.str();
     }
 
+    friend ostream& operator<<(ostream& stream, const Ptensor1& x){
+      stream<<x.str(); return stream;}
 
   };
 

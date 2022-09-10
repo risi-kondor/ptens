@@ -98,10 +98,22 @@ namespace ptens{
       return nc;
     }
 
+    int k_of(const int i) const{
+      return dim_of(i,0);
+    }
+
     Atoms atoms_of(const int i) const{
       return Atoms(atoms(i));
     }
     
+    rtensor tensor_of(const int i) const{
+      return RtensorPool::operator()(i);
+    }
+
+    Ptensor0 operator()(const int i) const{
+      return Ptensor0(atoms_of(i),tensor_of(i));
+    }
+
     void push_back(const Ptensor0& x){
       if(nc==0) nc=x.get_nc();
       else assert(nc==x.get_nc());
@@ -115,14 +127,14 @@ namespace ptens{
 
     Ptensors0 hom() const{
       Ptensors0 R=Ptensors0::zero(atoms,nc,dev);
-      R.add_hom(*this);
+      R.add_linmaps(*this);
       return R;
     }
 
 
-    void add_hom(const Ptensors0& x, const int offs=0){
+    void add_linmaps(const Ptensors0& x, const int offs=0){
       assert(x.size()==size());
-      assert(offs+2*x.nc<=nc);
+      assert(offs+x.nc<=nc);
       int _nc=x.nc;
       for(int i=0; i<size(); i++){
 	view1_of(i).add(x.view1_of(i));
@@ -168,8 +180,9 @@ namespace ptens{
     string str(const string indent="") const{
       ostringstream oss;
       for(int i=0; i<size(); i++){
-	oss<<indent<<"Ptensor "<<i<<" "<<Atoms(atoms(i))<<":"<<endl;
-	oss<<RtensorPool::operator()(i).str()<<endl;
+	oss<<indent<<(*this)(i)<<endl;
+	//oss<<indent<<"Ptensor "<<i<<" "<<Atoms(atoms(i))<<":"<<endl;
+	//oss<<RtensorPool::operator()(i).str()<<endl;
       }
       return oss.str();
     }

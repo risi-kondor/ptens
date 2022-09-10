@@ -14,7 +14,10 @@ namespace ptens{
 
 
     typedef cnine::RtensorA rtensor;
+    typedef cnine::Rtensor1_view Rtensor1_view;
 
+    int k;
+    int nc;
     Atoms atoms;
 
     #ifdef WITH_FAKE_GRAD
@@ -33,29 +36,42 @@ namespace ptens{
 
 
     template<typename FILLTYPE, typename = typename std::enable_if<std::is_base_of<cnine::fill_pattern, FILLTYPE>::value, FILLTYPE>::type>
-    Ptensor0(const Atoms& _atoms, const int nc, const FILLTYPE& dummy, const int _dev=0):
-      rtensor(cnine::Gdims(nc),dummy,_dev),
-      atoms(_atoms){
+    Ptensor0(const Atoms& _atoms, const int _nc, const FILLTYPE& dummy, const int _dev=0):
+      rtensor(cnine::Gdims(_nc),dummy,_dev),
+      atoms(_atoms),
+      k(_atoms.size()), 
+      nc(_nc){
     }
+
+    //template<typename FILLTYPE, typename = typename std::enable_if<std::is_base_of<cnine::fill_pattern, FILLTYPE>::value, FILLTYPE>::type>
+    //Ptensor0(const int _k, const int _nc, const FILLTYPE& dummy, const int _dev=0):
+    //rtensor(cnine::Gdims(_nc),dummy,_dev),
+    //atoms(_atoms),
+    //k(_k), 
+    //nc(_nc){
+    //}
 
 
     // ---- Constructors -------------------------------------------------------------------------------------
     
 
-    static Ptensor0 raw(const Atoms& _atoms, const int nc, const int _dev=0){
+    static Ptensor0 raw(const Atoms& _atoms, const int nc=1, const int _dev=0){
       return Ptensor0(_atoms,nc,cnine::fill_raw(),_dev);}
 
-    static Ptensor0 zero(const Atoms& _atoms, const int nc, const int _dev=0){
+    static Ptensor0 zero(const Atoms& _atoms, const int nc=1, const int _dev=0){
       return Ptensor0(_atoms,nc,cnine::fill_zero(),_dev);}
 
-    static Ptensor0 gaussian(const Atoms& _atoms, const int nc, const int _dev=0){
+    static Ptensor0 gaussian(const Atoms& _atoms, const int nc=1, const int _dev=0){
       return Ptensor0(_atoms,nc,cnine::fill_gaussian(),_dev);}
 
-    static Ptensor0 sequential(const Atoms& _atoms, const int nc, const int _dev=0){
+    static Ptensor0 sequential(const Atoms& _atoms, const int nc=1, const int _dev=0){
       return Ptensor0(_atoms,nc,cnine::fill_sequential(),_dev);}
 
     
-    Ptensor0(RtensorA&& x, Atoms&& _atoms):
+    // ---- Conversions --------------------------------------------------------------------------------------
+
+
+    Ptensor0(Atoms&& _atoms, RtensorA&& x):
       RtensorA(std::move(x)),
       atoms(std::move(_atoms)){}
  
@@ -71,16 +87,28 @@ namespace ptens{
       return dims.back();
     }
 
-    //PtensorSgntr signature() const{
-    //return PtensorSgntr(getk(),get_nc());
-    //}
-
     float at_(const int i, const int c) const{
       return (*this)(atoms(i),c);
     }
 
     void inc_(const int i, const int c, float x){
       inc(atoms(i),c,x);
+    }
+
+
+    // ---- Linmaps ------------------------------------------------------------------------------------------
+
+
+    void add_linmaps(const Ptensor0& x, int offs=0){ // 1 
+      assert(offs+1*x.nc<=nc);
+      offs+=broadcast(x.view1(),offs); // 1*1
+    }
+    
+    int broadcast(const Rtensor1_view& x, const int offs=0){ // 1
+      int n=x.n0;
+      assert(n+offs<=nc);
+      view1().block(offs,n)+=x;
+      return n;
     }
 
 
@@ -167,6 +195,8 @@ namespace ptens{
       return oss.str();
     }
 
+    friend ostream& operator<<(ostream& stream, const Ptensor0& x){
+      stream<<x.str(); return stream;}
 
   };
 
@@ -174,4 +204,8 @@ namespace ptens{
 
 
 #endif 
+
+    //PtensorSgntr signature() const{
+    //return PtensorSgntr(getk(),get_nc());
+    //}
 

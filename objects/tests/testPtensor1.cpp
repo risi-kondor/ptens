@@ -1,7 +1,6 @@
-
 #include "Cnine_base.cpp"
 #include "CnineSession.hpp"
-#include "Ptensor1.hpp"
+#include "LinMaps.hpp"
 
 using namespace ptens;
 using namespace cnine;
@@ -11,22 +10,10 @@ int main(int argc, char** argv){
 
   cnine_session session;
 
-  Atoms a1({1,2,3});
-  Atoms a2({2,3,4});
-
-  cout<<a1.intersect(a2)<<endl;
-
-  Ptensor1 A=Ptensor1::sequential(a1,1);
+  auto A=Ptensor1::gaussian({0,1,2,3},3);
   cout<<A<<endl;
-
-  //Ptensor1 B=Ptensor1::zero(a2,1);
-  //B.gather(A);
-  Ptensor1 B(A,a2);
-  cout<<B<<endl;
-
-  //vector<int> v(6);
-  //for(int i=0; i<7; i++)
-  //v[i]=i;
-  //cout<<vector<int>(v.begin()+3,v.begin()+5)<<endl;
+  cout<<linmaps0(A)<<endl;
+  cout<<linmaps1(A)<<endl;
+  cout<<linmaps2(A)<<endl;
 
 }

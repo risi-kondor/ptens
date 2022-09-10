@@ -163,7 +163,7 @@ namespace ptens{
       return cnine::Gdims(headers.subvector_of(i,1));
     }
 
-    int dim(const int i, const int j) const{
+    int dim_of(const int i, const int j) const{
       assert(i<size());
       return headers(i,1+j);
     }

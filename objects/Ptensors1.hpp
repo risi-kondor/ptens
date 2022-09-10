@@ -9,6 +9,8 @@
 #include "AindexPack.hpp"
 #include "Ptensor1.hpp"
 
+#include "Ptensors0.hpp"
+
 
 namespace ptens{
 
@@ -98,8 +100,20 @@ namespace ptens{
       return nc;
     }
 
+    int k_of(const int i) const{
+      return dim_of(i,0);
+    }
+
     Atoms atoms_of(const int i) const{
       return Atoms(atoms(i));
+    }
+
+    rtensor tensor_of(const int i) const{
+      return RtensorPool::operator()(i);
+    }
+
+    Ptensor1 operator()(const int i) const{
+      return Ptensor1(atoms_of(i),tensor_of(i));
     }
 
     int push_back(const Ptensor1& x){
@@ -111,23 +125,37 @@ namespace ptens{
     }
 
 
-  public: // ---- Maps ---------------------------------------------------------------------------------------
+  public: // ---- Linmaps ------------------------------------------------------------------------------------
 
 
-    Ptensors1 hom() const{
-      Ptensors1 R=Ptensors1::zero(atoms,2*nc,dev);
-      R.add_hom(*this);
-      return R;
+    void add_linmaps(const Ptensors0& x, const int offs=0){
+      assert(x.size()==size());
+      assert(offs+x.nc<=nc);
+      int _nc=x.nc;
+      for(int i=0; i<size(); i++){
+	for(int c=0; c<_nc; c++)
+	  view2_of(i).slice1(offs+c).add(x.view1_of(i)(c));
+	}
     }
 
 
-    void add_hom(const Ptensors1& x, const int offs=0){
+    void add_linmaps_to(Ptensors0& x, const int offs=0) const{
+      assert(x.size()==size());
+      assert(offs+nc<=x.nc);
+      for(int i=0; i<size(); i++){
+	for(int c=0; c<nc; c++)
+	  x.view1_of(i).inc(c+offs,view2_of(i).slice1(c).sum());
+	}
+    }
+
+
+    void add_linmaps(const Ptensors1& x, const int offs=0){
       assert(x.size()==size());
       assert(offs+2*x.nc<=nc);
       int _nc=x.nc;
       for(int i=0; i<size(); i++){
-	int k=x.dim(i,0);
-	assert(dim(i,0)==k);
+	int k=x.k_of(i);
+	assert(k==k_of(i));
 	view2_of(i).block(0,offs,k,_nc)+=x.view2_of(i);
 	for(int c=0; c<_nc; c++){
 	  float t=0; 
@@ -278,8 +306,9 @@ namespace ptens{
     string str(const string indent="") const{
       ostringstream oss;
       for(int i=0; i<size(); i++){
-	oss<<indent<<"Ptensor "<<i<<" "<<Atoms(atoms(i))<<":"<<endl;
-	oss<<RtensorPool::operator()(i).str()<<endl;
+	oss<<indent<<(*this)(i)<<endl;
+	//oss<<indent<<"Ptensor "<<i<<" "<<Atoms(atoms(i))<<":"<<endl;
+	//oss<<RtensorPool::operator()(i).str()<<endl;
       }
       return oss.str();
     }
