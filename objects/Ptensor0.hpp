@@ -68,13 +68,48 @@ namespace ptens{
       return Ptensor0(_atoms,nc,cnine::fill_sequential(),_dev);}
 
     
+    // ---- Copying ------------------------------------------------------------------------------------------
+
+
+    Ptensor0(const Ptensor0& x):
+      RtensorA(x), atoms(x.atoms){
+      k=x.k;
+      nc=x.nc;
+    }
+
+    Ptensor0(Ptensor0&& x):
+      RtensorA(std::move(x)), atoms(std::move(x.atoms)){
+      k=x.k;
+      nc=x.nc;
+    }
+
+    Ptensor0& operator=(const Ptensor0& x)=delete;
+
+
     // ---- Conversions --------------------------------------------------------------------------------------
 
 
-    Ptensor0(Atoms&& _atoms, RtensorA&& x):
+    //Ptensor0(Atoms&& _atoms, RtensorA&& x):
+    //RtensorA(std::move(x)),
+    //atoms(std::move(_atoms)){}
+
+    Ptensor0(RtensorA&& x, Atoms&& _atoms):
       RtensorA(std::move(x)),
-      atoms(std::move(_atoms)){}
- 
+      atoms(std::move(_atoms)){
+      k=dims(0);
+      nc=dims.back();
+    }
+
+    //Ptensor0(RtensorA&& x, const Atoms& _atoms):
+    //RtensorA(std::move(x)),
+    //atoms(std::move(_atoms)){}
+
+    #ifdef _WITH_ATEN
+    static Ptensor0 view(at::Tensor& x, Atoms&& _atoms){
+      return Ptensor0(RtensorA::view(x),std::move(_atoms));
+    }
+    #endif 
+
 
     // ---- Access -------------------------------------------------------------------------------------------
 
@@ -192,6 +227,7 @@ namespace ptens{
       ostringstream oss;
       oss<<indent<<"Ptensor0"<<atoms<<":"<<endl;
       oss<<rtensor::str(indent);
+      oss<<is_view<<endl;
       return oss.str();
     }
 

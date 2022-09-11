@@ -97,7 +97,7 @@ namespace ptens{
 
     Ptensor1pack fwd(const Cgraph& graph) const{
       Ptensor1pack R;
-      for(int i=0; i<graph.maxj; i++) //TODO
+      for(int i=0; i<graph.n; i++) //TODO
 	R.push_back(Ptensor1::zero(atoms_of(i),5*2));
       R.forwardMP(*this,graph);
       return R;

@@ -55,11 +55,11 @@ namespace ptens{
 
 
     static Ptensor0pack raw(const int _n, const int _nc, const int _dev=0){
-      return Ptensor0pack R(_n,_nc,cnine::fill_raw(),_dev);}
-    static Ptensor0pack raw(const int _n, const int _nc, const int _dev=0){
-      return Ptensor0pack R(_n,_nc,cnine::fill_zero(),_dev);}
+      return Ptensor0pack(_n,_nc,cnine::fill_raw(),_dev);}
+    static Ptensor0pack zero(const int _n, const int _nc, const int _dev=0){
+      return Ptensor0pack(_n,_nc,cnine::fill_zero(),_dev);}
     static Ptensor0pack sequential(const int _n, const int _nc, const int _dev=0){
-      return Ptensor0pack R(_n,_nc,cnine::fill_sequential(),_dev);}
+      return Ptensor0pack(_n,_nc,cnine::fill_sequential(),_dev);}
 
     /*
     static Ptensor0pack raw(const AtomsPack& _atoms, const int _nc, const int _dev=0){

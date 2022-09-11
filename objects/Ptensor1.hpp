@@ -49,12 +49,44 @@ namespace ptens{
       return Ptensor1(_atoms,nc,cnine::fill_sequential(),_dev);}
 
     
+    // ---- Copying ------------------------------------------------------------------------------------------
+
+
+    Ptensor1(const Ptensor1& x):
+      RtensorA(x), atoms(x.atoms){
+      k=x.k;
+      nc=x.nc;
+    }
+
+    Ptensor1(Ptensor1&& x):
+      RtensorA(std::move(x)), atoms(std::move(x.atoms)){
+      k=x.k;
+      nc=x.nc;
+    }
+
+    Ptensor1& operator=(const Ptensor1& x)=delete;
+
+
     // ---- Conversions --------------------------------------------------------------------------------------
 
 
-    Ptensor1(Atoms&& _atoms, RtensorA&& x):
+    //Ptensor1(Atoms&& _atoms, RtensorA&& x):
+    //RtensorA(std::move(x)),
+    //atoms(std::move(_atoms)){}
+ 
+    Ptensor1(RtensorA&& x, Atoms&& _atoms):
       RtensorA(std::move(x)),
-      atoms(std::move(_atoms)){}
+      atoms(std::move(_atoms)){
+      k=dims(0);
+      nc=dims.back();
+     }
+
+
+    #ifdef _WITH_ATEN
+    static Ptensor1 view(at::Tensor& x, Atoms&& _atoms){
+      return Ptensor1(RtensorA::view(x),std::move(_atoms));
+    }
+    #endif 
  
 
     // ---- Access -------------------------------------------------------------------------------------------
