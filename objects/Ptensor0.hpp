@@ -96,6 +96,7 @@ namespace ptens{
     Ptensor0(RtensorA&& x, Atoms&& _atoms):
       RtensorA(std::move(x)),
       atoms(std::move(_atoms)){
+      assert(x.getk()==1);
       k=dims(0);
       nc=dims.back();
     }

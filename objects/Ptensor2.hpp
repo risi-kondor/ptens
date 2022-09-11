@@ -71,6 +71,7 @@ namespace ptens{
     Ptensor2(RtensorA&& x, Atoms&& _atoms):
       RtensorA(std::move(x)),
       atoms(std::move(_atoms)){
+      assert(x.getk()==3);
       k=dims(0);
       nc=dims.back();
     }

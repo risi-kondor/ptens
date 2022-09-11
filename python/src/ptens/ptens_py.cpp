@@ -27,7 +27,11 @@ PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
 
   #include "../../bindings/Cgraph_py.cpp"
   #include "../../bindings/GraphNhoods_py.cpp"
+
   #include "../../bindings/Ptensor0_py.cpp"
+  #include "../../bindings/Ptensor1_py.cpp"
+  #include "../../bindings/Ptensor2_py.cpp"
+
   #include "../../bindings/Ptensor0pack_py.cpp"
   #include "../../bindings/Ptensor1pack_py.cpp"
   #include "../../bindings/Ptensor2pack_py.cpp"
