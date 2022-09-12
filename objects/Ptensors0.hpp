@@ -111,7 +111,7 @@ namespace ptens{
     }
 
     Ptensor0 operator()(const int i) const{
-      return Ptensor0(atoms_of(i),tensor_of(i));
+      return Ptensor0(tensor_of(i),atoms_of(i));
     }
 
     void push_back(const Ptensor0& x){

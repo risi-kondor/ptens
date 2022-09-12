@@ -123,6 +123,10 @@ namespace ptens{
       return dims.back();
     }
 
+    vector<int> atomsv() const{
+      return atoms;
+    }
+
     float at_(const int i, const int c) const{
       return (*this)(atoms(i),c);
     }
@@ -132,14 +136,31 @@ namespace ptens{
     }
 
 
+    Rtensor1_view view() const{
+      return view1();
+    }
+
+    Rtensor1_view view(const int offs, const int n) const{
+      assert(offs+n<=nc);
+      return view1().block(offs,n);
+    }
+
+
     // ---- Linmaps ------------------------------------------------------------------------------------------
 
 
+    // 1 -> 1
     void add_linmaps(const Ptensor0& x, int offs=0){ // 1 
       assert(offs+1*x.nc<=nc);
       offs+=broadcast(x.view1(),offs); // 1*1
     }
+
+    void add_linmaps_back(const Ptensor0& x, int offs=0){ // 1 
+      assert(offs+1*nc<=x.nc);
+      view().add(x.view(offs,nc));
+    }
     
+
     int broadcast(const Rtensor1_view& x, const int offs=0){ // 1
       int n=x.n0;
       assert(n+offs<=nc);
@@ -228,7 +249,6 @@ namespace ptens{
       ostringstream oss;
       oss<<indent<<"Ptensor0"<<atoms<<":"<<endl;
       oss<<rtensor::str(indent);
-      oss<<is_view<<endl;
       return oss.str();
     }
 

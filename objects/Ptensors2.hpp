@@ -92,7 +92,7 @@ namespace ptens{
     }
 
     Ptensor2 operator()(const int i) const{
-      return Ptensor2(atoms_of(i),tensor_of(i));
+      return Ptensor2(tensor_of(i),atoms_of(i));
     }
 
     int push_back(const Ptensor2& x){

@@ -1,6 +1,12 @@
 import torch
 
+import ptens_base 
 from ptens_base import ptensor0 as _ptensor0
+from ptens_base import ptensor1 as _ptensor1
+from ptens_base import ptensor2 as _ptensor2
+
+import ptens.ptensor1
+import ptens.ptensor2
 
 
 class ptensor0(torch.Tensor):
@@ -14,6 +20,12 @@ class ptensor0(torch.Tensor):
     @classmethod
     def randn(self, _atoms, _nc):
         R=ptensor0(torch.randn(_nc))
+        R.atoms=_atoms
+        return R
+
+    @classmethod
+    def sequential(self, _atoms, _nc):
+        R=ptensor0(_ptensor0.sequential(_atoms,_nc).torch())
         R.atoms=_atoms
         return R
 
@@ -56,40 +68,56 @@ class Ptensor0_Linmaps0Fn(torch.autograd.Function):
     def forward(ctx,x):
         R=ptensor0.zeros(x.atoms,x.get_nc())
         u=_ptensor0.view(x,x.atoms)
-        _ptensor0.view(R,R.atoms).add_linmaps(u)
+        r=_ptensor0.view(R,R.atoms) 
+        ptens_base.add_linmaps0to0(r,u)
         return R
         
     @staticmethod
     def backward(ctx,g):
-        print("ddp")
+        R=ptensor0.zeros(g.atoms,g.get_nc())
+        u=_ptensor0.view(g,g.atoms)
+        r=_ptensor0.view(R,R.atoms) 
+        ptens_base.add_linmaps0to0_back(r,u) 
+        return R
 
 
 class Ptensor0_Linmaps1Fn(torch.autograd.Function):
 
     @staticmethod
     def forward(ctx,x):
-        R=ptensor1.zeros(x.atoms,x.get_nc())
+        R=ptens.ptensor1.zeros(x.atoms,x.get_nc())
         u=_ptensor0.view(x,x.atoms)
-        _ptensor1.view(R,R.atoms).add_linmaps(u)
+        r=_ptensor1.view(R,R.atoms)
+        ptens_base.add_linmaps0to1(r,u)
+        print(R)
         return R
         
     @staticmethod
     def backward(ctx,g):
-        print("ddp")
+        R=ptensor0.zeros(g.atoms,g.get_nc())
+        u=_ptensor1.view(g,g.atoms)
+        r=_ptensor0.view(R,R.atoms)
+        ptens_base.add_linmaps0to1_back(r,u) 
+        return R
 
 
 class Ptensor0_Linmaps2Fn(torch.autograd.Function):
 
     @staticmethod
     def forward(ctx,x):
-        R=ptensor2.zeros(x.atoms,2*x.get_nc())
+        R=ptens.ptensor2.zeros(x.atoms,2*x.get_nc())
         u=_ptensor0.view(x,x.atoms)
-        _ptensor2.view(R,R.atoms).add_linmaps(u)
+        r=_ptensor2.view(R,R.atoms) 
+        ptens_base.add_linmaps0to2(r,u)
         return R
         
     @staticmethod
     def backward(ctx,g):
-        print("ddp")
+        R=ptensor0.zeros(g.atoms,g.get_nc()/2)
+        u=_ptensor2.view(g,g.atoms)
+        r=_ptensor0.view(R,R.atoms)
+        ptens_base.add_linmaps0to2_back(r,u) 
+        return R
 
 
 # ------------------------------------------------------------------------------------------------------------

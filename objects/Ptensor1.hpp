@@ -114,14 +114,31 @@ namespace ptens{
     }
 
 
+    Rtensor2_view view() const{
+      return view2();
+    }
+
+    Rtensor2_view view(const int offs, const int n) const{
+      assert(offs+n<=nc);
+      return view2().block(0,offs,k,n);
+    }
+    
+
     // ---- Linmaps ------------------------------------------------------------------------------------------
 
 
+    // 0 -> 1 
     void add_linmaps(const Ptensor0& x, int offs=0){ // 1
       assert(offs+1*x.nc<=nc);
       offs+=broadcast(x.view1(),offs); // 1*1
     }
     
+    void add_linmaps_back_to(Ptensor0& x, int offs=0) const{ // 1
+      view(offs,x.nc).sum0_into(x.view1());
+    }
+
+    
+    // 1->1 
     void add_linmaps(const Ptensor1& x, int offs=0){ // 2 
       assert(x.k==k);
       assert(offs+2*x.nc<=nc);
@@ -129,9 +146,23 @@ namespace ptens{
       offs+=broadcast(x.view2(),offs); // 1*1
     }
     
+    void add_linmaps_back(const Ptensor1& x, int offs=0){ // 2 
+      assert(x.k==k);
+      assert(offs+2*nc<=x.nc);
+      broadcast(x.reductions0(offs,nc).view());
+      broadcast(x.view(offs+nc,nc));
+    }
+    
+
+    // 1 -> 0
     void add_linmaps_to(Ptensor0& x, int offs=0) const{ // 1 
       assert(offs+1*nc<=x.nc);
       offs+=x.broadcast(reductions0().view1(),offs); // 1*1
+    }
+    
+    void add_linmaps_back(const Ptensor0& x, int offs=0){ // 1 
+      assert(offs+1*nc<=x.nc);
+      view()+=repeat0(x.view(offs,nc),k);
     }
     
 
@@ -141,19 +172,40 @@ namespace ptens{
       return R;
     }
 
-    int broadcast(const Rtensor1_view& x, const int offs=0){ // 1
+    Ptensor0 reductions0(const int offs, const int n) const{ // 1
+      auto R=Ptensor0::raw(atoms,n);
+      view(offs,n).sum0_into(R.view());
+      return R;
+    }
+
+
+    int broadcast(const Rtensor1_view& x, const int offs){ // 1
       int n=x.n0;
       assert(n+offs<=nc);
       view2().block(0,offs,k,n)+=repeat0(x,k);
       return n;
     }
 
-    int broadcast(const Rtensor2_view& x, const int offs=0){ // 1
+    void broadcast(const Rtensor1_view& x){ // 1
+      int n=x.n0;
+      assert(n<=nc);
+      view()+=repeat0(x,k);
+    }
+
+
+    int broadcast(const Rtensor2_view& x, const int offs){ // 1
       int n=x.n1;
       assert(x.n0==k);
       assert(n+offs<=nc);
       view2().block(0,offs,k,n)+=x;
       return n;
+    }
+
+    void broadcast(const Rtensor2_view& x){ // 1
+      int n=x.n1;
+      assert(x.n0==k);
+      assert(n==nc);
+      add(x);
     }
 
 
@@ -258,7 +310,7 @@ namespace ptens{
     string str(const string indent="")const{
       ostringstream oss;
       oss<<indent<<"Ptensor1"<<atoms<<":"<<endl;
-      oss<<view2().transp().str(indent);
+      oss<<view2().str(indent);
       return oss.str();
     }
 
