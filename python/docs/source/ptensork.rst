@@ -322,6 +322,28 @@ Hence the number of channels multiplies fivefold.
    [ 0 0 8 ]
 
 
+--------
+ptensor2
+--------
+
+The space of equivariant maps from a second order Ptensor to a zeroth order Ptensor is spanned by 
+:math:`B^1_{c}=\sum_i \sum_j A_{i,j,c}` and 
+:math:`B^2_{c}=\sum_i A_{i,i,c}`. 
+
+The space of equivariant maps from a second order Ptensor to a first order Ptensor is spanned by 
+:math:`B^1_{i',c}=\sum_i \sum_j A_{i,j,c}`, 
+:math:`B^2_{i',c}=\sum_i A_{i,i,c}`,
+:math:`B^3_{i,c}=\sum_j A_{i,j,c}`, 
+:math:`B^4_{i,c}=\sum_j A_{j,i,c}`, and  
+:math:`B^5_{i,c}=\sum_j A_{i,i,c}`. 
+
+The space of equivariant maps from a second order Ptensor to a second order Ptensor is spanned by 
+15 different maps. 
+
+ 
+
+
+
 
 
 
