@@ -272,7 +272,6 @@ namespace ptens{
     }
 
     rtensor reductions0(const vector<int>& ix) const{
-      const int n=dim(0);
       auto R=rtensor::zero(Gdims(nc));
       view(ix).sum0_into(R.view1());
       return R;

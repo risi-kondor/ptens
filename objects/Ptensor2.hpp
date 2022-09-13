@@ -16,6 +16,7 @@ namespace ptens{
     int nc;
     Atoms atoms;
 
+    typedef cnine::Gdims Gdims;
     typedef cnine::RtensorA rtensor;
     typedef cnine::Rtensor1_view Rtensor1_view;
     typedef cnine::Rtensor2_view Rtensor2_view;
@@ -115,6 +116,10 @@ namespace ptens{
       return view3().block(0,0,offs,k,k,n);
     }
     
+    Ptensor2_xview view(const vector<int>& ix) const{
+      return Ptensor2_xview(arr,nc,strides[0],strides[1],strides[2],ix,dev);
+    }
+
 
     // ---- Message passing ----------------------------------------------------------------------------------
 
@@ -282,46 +287,6 @@ namespace ptens{
     }
     
 
-
-    Ptensor0 reductions0() const{ // 2
-      auto R=Ptensor0::raw(atoms,2*nc);
-      for(int c=0; c<nc; c++){
-	auto slice=view3().slice2(c);
-	R.set(c,slice.sum());
-	R.set(nc+c,slice.diag().sum());
-      }
-      return R;
-    }
-
-    Ptensor0 reductions0(const int offs, const int n) const{ // 2
-      auto R=Ptensor0::raw(atoms,n);
-      for(int c=0; c<n; c++){
-	auto slice=view().slice2(c+offs);
-	R.set(c,view().slice2(c+offs).sum()+view().slice2(c+n+offs).diag().sum());
-      }
-      return R;
-    }
-
-    Ptensor1 reductions1() const{ // 3
-      auto R=Ptensor1::raw(atoms,3*nc);
-      for(int c=0; c<nc; c++){
-	auto slice=view3().slice2(c);
-	slice.sum0_into(R.view2().slice1(c));
-	slice.sum1_into(R.view2().slice1(c+nc));
-	R.view2().slice1(c+2*nc)=slice.diag();
-      }
-      return R;
-    }
-
-    Ptensor1 reductions1(const int offs, const int n) const{ // 3
-      auto R=Ptensor1::raw(atoms,n);
-      view(offs,n).sum0_into(R.view());
-      view(offs+n,n).sum1_into(R.view());
-      R.view()+=view(offs+2*n,n).diag01();
-      return R;
-    }
-
-
     int broadcast(const Rtensor1_view& x, const int offs){ // 2
       int n=x.n0;
       assert(2*n+offs<=nc);
@@ -378,45 +343,60 @@ namespace ptens{
     }
 
 
-    // ---- Extended reductions ------------------------------------------------------------------------------
+  public: // ---- Reductions ---------------------------------------------------------------------------------
 
 
-    rtensor reductions0e(const rtensor& R1, const vector<int>& ix, const int c) const{
-      const int k=ix.size();
-      const int n=dims(0);
-      rtensor R=rtensor::zero({5});
+    Ptensor0 reductions0() const{ // 2
+      auto R=Ptensor0::raw(atoms,2*nc);
+      for(int c=0; c<nc; c++){
+	auto slice=view3().slice2(c);
+	R.set(c,slice.sum());
+	R.set(nc+c,slice.diag().sum());
+      }
+      return R;
+    }
 
-      for(int i=0; i<k; i++){
-	  R.inc(0,R1(i,0));
-	  R.inc(2,R1(i,2));
-	  R.inc(3,R1(i,3));
-	  R.inc(4,R1(i,4));
-	}
+    rtensor reductions0(const vector<int>& ix) const{
+      auto R=rtensor::zero(Gdims(2*nc));
+      view(ix).sum01_into(R.view1().block(0,nc));
+      view(ix).diag01().sum0_into(R.view1().block(nc,nc));
+      return R;
+    }
 
-      float t=0;
-      for(int i=0; i<n; i++)
-	for(int j=0; j<n; j++)
-	  t+=(*this)(i,j,c);
-      R.inc(1,t);
-      
+    Ptensor0 reductions0(const int offs, const int n) const{ // 2
+      auto R=Ptensor0::raw(atoms,n);
+      for(int c=0; c<n; c++){
+	auto slice=view().slice2(c+offs);
+	R.set(c,view().slice2(c+offs).sum()+view().slice2(c+n+offs).diag().sum());
+      }
       return R;
     }
 
 
-    rtensor reductions1e(const vector<int>& ix, const int c) const{
-      const int k=ix.size();
-      const int n=dims(0);
-      rtensor R=rtensor::raw({k,5});
-      
-      for(int i=0; i<k; i++){
-	int _i=ix[i];
-	{float s=0; for(int j=0; j<k; j++) s+=(*this)(_i,ix[j],c); R.set(i,0,s);}
-	{float s=0; for(int j=0; j<k; j++) s+=(*this)(ix[j],_i,c); R.set(i,1,s);}
-	{float s=0; for(int j=0; j<n; j++) s+=(*this)(_i,j,c); R.set(i,2,s);}
-	{float s=0; for(int j=0; j<n; j++) s+=(*this)(j,_i,c); R.set(i,3,s);}
-	R.set(i,4,(*this)(_i,_i,c));
+    Ptensor1 reductions1() const{ // 3
+      auto R=Ptensor1::raw(atoms,3*nc);
+      for(int c=0; c<nc; c++){
+	auto slice=view3().slice2(c);
+	slice.sum0_into(R.view2().slice1(c));
+	slice.sum1_into(R.view2().slice1(c+nc));
+	R.view2().slice1(c+2*nc)=slice.diag();
       }
+      return R;
+    }
 
+    rtensor reductions1(const vector<int>& ix) const{ // 3
+      auto R=rtensor::zero({k,3*nc});
+      view(ix).sum0_into(R.view2().block(0,0,k,nc));
+      view(ix).sum1_into(R.view2().block(0,nc,k,nc));
+      R.view2().block(0,2*nc,k,nc).add(view(ix).diag01());
+      return R;
+    }
+
+    Ptensor1 reductions1(const int offs, const int n) const{ // 3
+      auto R=Ptensor1::raw(atoms,n);
+      view(offs,n).sum0_into(R.view());
+      view(offs+n,n).sum1_into(R.view());
+      R.view()+=view(offs+2*n,n).diag01();
       return R;
     }
 
@@ -499,3 +479,43 @@ namespace ptens{
 
 
 #endif 
+    /*
+    rtensor reductions0e(const rtensor& R1, const vector<int>& ix, const int c) const{
+      const int k=ix.size();
+      const int n=dims(0);
+      rtensor R=rtensor::zero({5});
+
+      for(int i=0; i<k; i++){
+	  R.inc(0,R1(i,0));
+	  R.inc(2,R1(i,2));
+	  R.inc(3,R1(i,3));
+	  R.inc(4,R1(i,4));
+	}
+
+      float t=0;
+      for(int i=0; i<n; i++)
+	for(int j=0; j<n; j++)
+	  t+=(*this)(i,j,c);
+      R.inc(1,t);
+      
+      return R;
+    }
+
+
+    rtensor reductions1e(const vector<int>& ix, const int c) const{
+      const int k=ix.size();
+      const int n=dims(0);
+      rtensor R=rtensor::raw({k,5});
+      
+      for(int i=0; i<k; i++){
+	int _i=ix[i];
+	{float s=0; for(int j=0; j<k; j++) s+=(*this)(_i,ix[j],c); R.set(i,0,s);}
+	{float s=0; for(int j=0; j<k; j++) s+=(*this)(ix[j],_i,c); R.set(i,1,s);}
+	{float s=0; for(int j=0; j<n; j++) s+=(*this)(_i,j,c); R.set(i,2,s);}
+	{float s=0; for(int j=0; j<n; j++) s+=(*this)(j,_i,c); R.set(i,3,s);}
+	R.set(i,4,(*this)(_i,_i,c));
+      }
+
+      return R;
+    }
+    */
