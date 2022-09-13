@@ -1,10 +1,11 @@
 #ifndef _ptens_Ptensor2
 #define _ptens_Ptensor2
 
+#include "Ptens_base.hpp"
 #include "Atoms.hpp"
 #include "RtensorObj.hpp"
 #include "Ptensor1.hpp"
-
+#include "Ptensor2_xview.hpp"
 
 namespace ptens{
 
@@ -117,7 +118,7 @@ namespace ptens{
 
     // ---- Message passing ----------------------------------------------------------------------------------
 
-
+    /*
     Ptensor2(const Ptensor2& x, const Atoms& _atoms):
       Ptensor2(_atoms,52*x.get_nc(),cnine::fill_zero()){
       pull_msg(x);
@@ -202,7 +203,7 @@ namespace ptens{
       }
       
     }
-
+    */
 
     // ---- Linmaps ------------------------------------------------------------------------------------------
 

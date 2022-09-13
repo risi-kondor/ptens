@@ -1,10 +1,13 @@
 #ifndef _ptens_Ptensor1
 #define _ptens_Ptensor1
 
+#include "Ptens_base.hpp"
 #include "Atoms.hpp"
 #include "RtensorA.hpp"
 #include "RtensorObj.hpp"
-//#include "PtensorSgntr.hpp"
+#include "Ptensor0.hpp"
+
+#include "Ptensor1_xview.hpp"
 
 
 namespace ptens{
@@ -17,6 +20,7 @@ namespace ptens{
     Atoms atoms;
 
     typedef cnine::RtensorA rtensor;
+    typedef cnine::Gdims Gdims;
     typedef cnine::Rtensor1_view Rtensor1_view;
     typedef cnine::Rtensor2_view Rtensor2_view;
 
@@ -122,33 +126,39 @@ namespace ptens{
       assert(offs+n<=nc);
       return view2().block(0,offs,k,n);
     }
-    
+
+    Ptensor1_xview view(const vector<int>& ix) const{
+      return Ptensor1_xview(arr,nc,strides[0],strides[1],ix,dev);
+    }
+
 
     // ---- Linmaps ------------------------------------------------------------------------------------------
 
 
     // 0 -> 1 
     void add_linmaps(const Ptensor0& x, int offs=0){ // 1
-      assert(offs+1*x.nc<=nc);
+      PTENS_K_SAME(x);
+      PTENS_CHANNELS(offs+1*x.nc<=nc);
       offs+=broadcast(x.view1(),offs); // 1*1
     }
     
     void add_linmaps_back_to(Ptensor0& x, int offs=0) const{ // 1
+      PTENS_K_SAME(x)
       view(offs,x.nc).sum0_into(x.view1());
     }
 
     
     // 1->1 
     void add_linmaps(const Ptensor1& x, int offs=0){ // 2 
-      assert(x.k==k);
-      assert(offs+2*x.nc<=nc);
+      PTENS_K_SAME(x)
+      PTENS_CHANNELS(offs+2*x.nc<=nc);
       offs+=broadcast(x.reductions0().view1(),offs); // 1*1
       offs+=broadcast(x.view2(),offs); // 1*1
     }
     
     void add_linmaps_back(const Ptensor1& x, int offs=0){ // 2 
-      assert(x.k==k);
-      assert(offs+2*nc<=x.nc);
+      PTENS_K_SAME(x)
+      PTENS_CHANNELS(offs+2*nc<=x.nc);
       broadcast(x.reductions0(offs,nc).view());
       broadcast(x.view(offs+nc,nc));
     }
@@ -156,39 +166,35 @@ namespace ptens{
 
     // 1 -> 0
     void add_linmaps_to(Ptensor0& x, int offs=0) const{ // 1 
-      assert(offs+1*nc<=x.nc);
+      PTENS_K_SAME(x)
+      PTENS_CHANNELS(offs+1*nc<=x.nc);
       offs+=x.broadcast(reductions0().view1(),offs); // 1*1
     }
     
     void add_linmaps_back(const Ptensor0& x, int offs=0){ // 1 
-      assert(offs+1*nc<=x.nc);
+      PTENS_K_SAME(x)
+      PTENS_CHANNELS(offs+1*nc<=x.nc);
       view()+=repeat0(x.view(offs,nc),k);
     }
-    
 
-    Ptensor0 reductions0() const{ // 1
-      auto R=Ptensor0::raw(atoms,nc);
-      view2().sum0_into(R.view1());
-      return R;
-    }
 
-    Ptensor0 reductions0(const int offs, const int n) const{ // 1
-      auto R=Ptensor0::raw(atoms,n);
-      view(offs,n).sum0_into(R.view());
-      return R;
-    }
+    // ---- Reductions 
+
+
+
+    // ---- Broadcast 
 
 
     int broadcast(const Rtensor1_view& x, const int offs){ // 1
       int n=x.n0;
-      assert(n+offs<=nc);
-      view2().block(0,offs,k,n)+=repeat0(x,k);
+      PTENS_CHANNELS(n+offs<=nc);
+      view().block(0,offs,k,n)+=repeat0(x,k);
       return n;
     }
 
     void broadcast(const Rtensor1_view& x){ // 1
       int n=x.n0;
-      assert(n<=nc);
+      PTENS_CHANNELS(n<=nc);
       view()+=repeat0(x,k);
     }
 
@@ -196,22 +202,24 @@ namespace ptens{
     int broadcast(const Rtensor2_view& x, const int offs){ // 1
       int n=x.n1;
       assert(x.n0==k);
-      assert(n+offs<=nc);
-      view2().block(0,offs,k,n)+=x;
+      PTENS_CHANNELS(n+offs<=nc);
+      view().block(0,offs,k,n)+=x;
       return n;
     }
 
     void broadcast(const Rtensor2_view& x){ // 1
       int n=x.n1;
       assert(x.n0==k);
-      assert(n==nc);
+      PTENS_CHANNELS(n==nc);
       add(x);
     }
 
 
     // ---- Message passing ----------------------------------------------------------------------------------
 
+   
 
+    /*
     Ptensor1(const Ptensor1& x, const Atoms& _atoms):
       Ptensor1(_atoms,5*x.get_nc(),cnine::fill_zero()){
       pull_msg(x);
@@ -252,32 +260,47 @@ namespace ptens{
       }
 
     }
-
+    */
 
   public: // ---- Reductions ---------------------------------------------------------------------------------
 
 
-    rtensor reductions1(const vector<int>& ix, const int c) const{
-      const int k=ix.size();
-      rtensor R=rtensor::raw(cnine::Gdims(k));
-      for(int i=0; i<k; i++)
-	R.set(i,(*this)(ix[i],c));
+    Ptensor0 reductions0() const{
+      auto R=Ptensor0::zero(atoms,nc);
+      view().sum0_into(R.view1());
       return R;
     }
 
-    rtensor reductions0(const vector<int>& ix, const int c) const{
+    rtensor reductions0(const vector<int>& ix) const{
       const int n=dim(0);
-      const int k=ix.size();
-      rtensor R=rtensor::raw(cnine::Gdims(2));
-      {float t=0; for(int i=0; i<k; i++) t+=(*this)(ix[i],c); R.set(0,t);}
-      {float t=0; for(int i=0; i<n; i++) t+=(*this)(i,c); R.set(1,t);}
+      auto R=rtensor::zero(Gdims(nc));
+      view(ix).sum0_into(R.view1());
+      return R;
+    }
+
+    Ptensor0 reductions0(const int offs, const int n) const{
+      auto R=Ptensor0::zero(atoms,n);
+      view(offs,n).sum0_into(R.view());
+      return R;
+    }
+
+
+    Ptensor0 reductions1() const{
+      auto R=Ptensor0::zero(atoms,nc);
+      R.view2().add(view());
+      return R;
+    }
+
+    rtensor reductions1(const vector<int>& ix) const{
+      auto R=rtensor::zero({(int)ix.size(),nc});
+      R.view2().add(view(ix));
       return R;
     }
 
 
   public: // ---- Broadcasting -------------------------------------------------------------------------------
 
-
+    /*
     void broadcast1(const rtensor& R1, const vector<int>& ix, int coffs){
       const int k=ix.size();
       //const int n=dims(0);
@@ -302,7 +325,7 @@ namespace ptens{
 	coffs+=2;
       }
     }
-    
+    */
 
   public: // ---- I/O ----------------------------------------------------------------------------------------
 
@@ -354,4 +377,23 @@ namespace ptens{
     
   };
   */
+
+    /*
+    rtensor reductions1(const vector<int>& ix, const int c) const{
+      const int k=ix.size();
+      rtensor R=rtensor::raw(cnine::Gdims(k));
+      for(int i=0; i<k; i++)
+	R.set(i,(*this)(ix[i],c));
+      return R;
+    }
+
+    rtensor reductions0(const vector<int>& ix, const int c) const{
+      const int n=dim(0);
+      const int k=ix.size();
+      rtensor R=rtensor::raw(cnine::Gdims(2));
+      {float t=0; for(int i=0; i<k; i++) t+=(*this)(ix[i],c); R.set(0,t);}
+      {float t=0; for(int i=0; i<n; i++) t+=(*this)(i,c); R.set(1,t);}
+      return R;
+    }
+    */
 

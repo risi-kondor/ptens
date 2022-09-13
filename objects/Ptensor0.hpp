@@ -1,6 +1,7 @@
 #ifndef _ptens_Ptensor0
 #define _ptens_Ptensor0
 
+#include "Ptens_base.hpp"
 #include "Atoms.hpp"
 #include "RtensorA.hpp"
 #include "RtensorObj.hpp"
@@ -89,10 +90,6 @@ namespace ptens{
     // ---- Conversions --------------------------------------------------------------------------------------
 
 
-    //Ptensor0(Atoms&& _atoms, RtensorA&& x):
-    //RtensorA(std::move(x)),
-    //atoms(std::move(_atoms)){}
-
     Ptensor0(RtensorA&& x, Atoms&& _atoms):
       RtensorA(std::move(x)),
       atoms(std::move(_atoms)){
@@ -100,10 +97,6 @@ namespace ptens{
       k=dims(0);
       nc=dims.back();
     }
-
-    //Ptensor0(RtensorA&& x, const Atoms& _atoms):
-    //RtensorA(std::move(x)),
-    //atoms(std::move(_atoms)){}
 
     #ifdef _WITH_ATEN
     static Ptensor0 view(at::Tensor& x, Atoms&& _atoms){

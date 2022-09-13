@@ -105,7 +105,7 @@ class Ptensor2_Linmaps2Fn(torch.autograd.Function):
     def forward(ctx,x):
         R=ptensor2.zeros(x.atoms,15*x.get_nc())
         u=_ptensor2.view(x,x.atoms)
-        u=_ptensor2.view(R,R.atoms)
+        r=_ptensor2.view(R,R.atoms)
         ptens_base.add_linmaps2to2(r,u)
         return R
         

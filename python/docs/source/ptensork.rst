@@ -330,6 +330,32 @@ The space of equivariant maps from a second order Ptensor to a zeroth order Pten
 :math:`B^1_{c}=\sum_i \sum_j A_{i,j,c}` and 
 :math:`B^2_{c}=\sum_i A_{i,i,c}`. 
 
+
+.. code-block:: python
+
+ >>> A=ptens.ptensor2.sequential([1,2,3],3)
+ >>> print(A)
+ Ptensor2(1,2,3):
+ channel 0:
+   [ 0 3 6 ]
+   [ 9 12 15 ]
+   [ 18 21 24 ]
+
+ channel 1:
+   [ 1 4 7 ]
+   [ 10 13 16 ]
+   [ 19 22 25 ]
+
+ channel 2:
+   [ 2 5 8 ]
+   [ 11 14 17 ]
+   [ 20 23 26 ]
+
+ >>> B=ptens.linmaps0(A)
+ >>> print(B)
+ Ptensor0(1,2,3):
+ [ 108 117 126 36 39 42 ]
+
 The space of equivariant maps from a second order Ptensor to a first order Ptensor is spanned by 
 :math:`B^1_{i',c}=\sum_i \sum_j A_{i,j,c}`, 
 :math:`B^2_{i',c}=\sum_i A_{i,i,c}`,
@@ -337,10 +363,64 @@ The space of equivariant maps from a second order Ptensor to a first order Ptens
 :math:`B^4_{i,c}=\sum_j A_{j,i,c}`, and  
 :math:`B^5_{i,c}=\sum_j A_{i,i,c}`. 
 
-The space of equivariant maps from a second order Ptensor to a second order Ptensor is spanned by 
-15 different maps. 
+.. code-block:: python
 
- 
+ >>> B=ptens.linmaps1(A)
+ >>> print(B)
+ Ptensor1(1,2,3):
+ [ 108 117 126 36 39 42 27 30 33 9 12 15 0 1 2 ]
+ [ 108 117 126 36 39 42 36 39 42 36 39 42 12 13 14 ]
+ [ 108 117 126 36 39 42 45 48 51 63 66 69 24 25 26 ]
+
+
+The space of equivariant maps from a second order Ptensor to a second order Ptensor is spanned by 
+15 different maps (output truncated). 
+
+.. code-block:: python
+
+ >>> B=ptens.linmaps2(A)
+ >>> print(B)
+ Ptensor2(1,2,3):
+ channel 0:
+   [ 108 108 108 ]
+   [ 108 108 108 ]
+   [ 108 108 108 ]
+
+ channel 1:
+   [ 117 117 117 ]
+   [ 117 117 117 ]
+   [ 117 117 117 ]
+
+ channel 2:
+   [ 126 126 126 ]
+   [ 126 126 126 ]
+   [ 126 126 126 ]
+
+ channel 3:
+   [ 36 36 36 ]
+   [ 36 36 36 ]
+   [ 36 36 36 ]
+
+ channel 4:
+   [ 39 39 39 ]
+   [ 39 39 39 ]
+   [ 39 39 39 ]
+
+ channel 5:
+   [ 42 42 42 ]
+   [ 42 42 42 ]
+   [ 42 42 42 ]
+
+ channel 6:
+   [ 108 0 0 ]
+   [ 0 108 0 ]
+   [ 0 0 108 ]
+
+ channel 7:
+   [ 117 0 0 ]
+   [ 0 117 0 ]
+   [ 0 0 117 ]
+
 
 
 

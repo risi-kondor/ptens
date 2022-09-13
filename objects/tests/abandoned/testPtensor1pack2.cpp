@@ -16,6 +16,7 @@ int main(int argc, char** argv){
   Cgraph G=Cgraph::random(n,0.4);
   cout<<G.tensor()<<endl;
 
+  /*
   GraphNhoods nhoods(G,3);
   Ptensor0pack layer0=Ptensor0pack::sequential(nhoods.level(0),5);
   Ptensor1pack layer1=Ptensor1pack::zero(nhoods.level(1),5);
@@ -25,7 +26,7 @@ int main(int argc, char** argv){
 
   cout<<layer0<<endl;
   cout<<layer1<<endl;
-    
+  */
 
 
   /*

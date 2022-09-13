@@ -10,7 +10,8 @@ int main(int argc, char** argv){
 
   cnine_session session;
 
-  auto A=Ptensor2::gaussian({0,1,2,3},3);
+  //auto A=Ptensor2::gaussian({0,1,2,3},3);
+  auto A=Ptensor2::sequential({0,1,2,3},3);
   cout<<A<<endl;
   cout<<linmaps0(A)<<endl;
   cout<<linmaps1(A)<<endl;
