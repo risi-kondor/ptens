@@ -43,6 +43,20 @@ namespace ptens{
     }
     */
 
+  public: // ---- Cumulative operations ----------------------------------------------------------------------
+
+
+    void add(const Rtensor2_view& x) const{
+      CNINE_CPUONLY();
+      for(int i0=0; i0<n0; i0++)
+	for(int i1=0; i1<n1; i1++)
+	  arr[s0*ix[i0]+s1*i1]+=x.arr[x.s0*i0+x.s1*i1];
+    }
+
+    void operator+=(const Rtensor2_view& x) const{
+      return add(x);
+    }
+
 
   public: // ---- Operations --------------------------------------------------------------------------------
 
@@ -58,7 +72,10 @@ namespace ptens{
       }
     }
 
+
   };
+
+
 
 }
 

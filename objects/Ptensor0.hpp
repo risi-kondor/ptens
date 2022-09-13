@@ -14,6 +14,7 @@ namespace ptens{
   public:
 
 
+    typedef cnine::Gdims Gdims;
     typedef cnine::RtensorA rtensor;
     typedef cnine::Rtensor1_view Rtensor1_view;
 
@@ -154,17 +155,61 @@ namespace ptens{
     }
     
 
-    int broadcast(const Rtensor1_view& x, const int offs=0){ // 1
-      int n=x.n0;
-      assert(n+offs<=nc);
-      view1().block(offs,n)+=x;
-      return n;
+
+  public: // ---- Reductions ---------------------------------------------------------------------------------
+
+
+    rtensor reduce0() const{
+      auto R=rtensor::zero(Gdims(nc));
+      R.view1().add(view());
+      return R;
+    }
+
+    rtensor reduce0(const int offs, const int n) const{
+      auto R=rtensor::zero(Gdims(n));
+      R.view1().add(view(offs,n));
+      return R;
     }
 
 
-    // ---- Message passing ----------------------------------------------------------------------------------
+  public: // ---- Broadcasting -------------------------------------------------------------------------------
 
 
+    void broadcast(const Rtensor1_view& x){
+      view()+=x;
+    }
+
+    int broadcast(const Rtensor1_view& x, const int offs=0){
+      view(offs,x.n0)+=x;
+      return x.n0;
+    }
+
+
+  public: // ---- I/O ----------------------------------------------------------------------------------------
+
+
+    string str(const string indent="")const{
+      ostringstream oss;
+      oss<<indent<<"Ptensor0"<<atoms<<":"<<endl;
+      oss<<rtensor::str(indent);
+      return oss.str();
+    }
+
+    friend ostream& operator<<(ostream& stream, const Ptensor0& x){
+      stream<<x.str(); return stream;}
+
+  };
+
+}
+
+
+#endif 
+
+    //PtensorSgntr signature() const{
+    //return PtensorSgntr(getk(),get_nc());
+    //}
+
+    /*
     Ptensor0(const Ptensor0& x, const Atoms& _atoms):
       Ptensor0(_atoms,5*x.get_nc(),cnine::fill_zero()){
       pull_msg(x);
@@ -205,10 +250,7 @@ namespace ptens{
       }
 
     }
-
-
-  public: // ---- Reductions ---------------------------------------------------------------------------------
-
+    */
     /*
     rtensor reductions0(const vector<int>& ix, const int c) const{
       const int n=dim(0);
@@ -220,9 +262,6 @@ namespace ptens{
       return R;
     }
     */
-
-  public: // ---- Broadcasting -------------------------------------------------------------------------------
-
     /*
    void broadcast0(const rtensor& R0, const vector<int>& ix, int coffs){
      assert(R0.ndims()==1);
@@ -233,29 +272,3 @@ namespace ptens{
       }
     }
     */
-
-
-  public: // ---- I/O ----------------------------------------------------------------------------------------
-
-
-    string str(const string indent="")const{
-      ostringstream oss;
-      oss<<indent<<"Ptensor0"<<atoms<<":"<<endl;
-      oss<<rtensor::str(indent);
-      return oss.str();
-    }
-
-    friend ostream& operator<<(ostream& stream, const Ptensor0& x){
-      stream<<x.str(); return stream;}
-
-  };
-
-}
-
-
-#endif 
-
-    //PtensorSgntr signature() const{
-    //return PtensorSgntr(getk(),get_nc());
-    //}
-
