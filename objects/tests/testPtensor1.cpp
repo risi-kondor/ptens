@@ -18,7 +18,8 @@ int main(int argc, char** argv){
   cout<<linmaps2(A)<<endl;
   cout<<"---------------"<<endl<<endl;
 
-  auto B=Ptensor1::zero({0,1,5},3);
+  cout<<A<<endl;
+  auto B=Ptensor1::zero({0,1,5},2);
   A>>B; //add_msg(B,A);
   cout<<B<<endl;
 
@@ -26,5 +27,7 @@ int main(int argc, char** argv){
   A>>C; //add_msg(C,A);
   cout<<C<<endl;
 
+  auto D=Ptensor1::zero({2,3},2);
+  cout<<(A>>D)<<endl;
 
 }

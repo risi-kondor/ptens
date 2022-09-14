@@ -31,7 +31,15 @@ namespace ptens{
   public: // ---- Access -------------------------------------------------------------------------------------
 
 
+    bool is_regular() const{
+      return false;
+    }
+
     float operator()(const int i0, const int i1) const{
+      return arr[s0*ix[i0]+s1*i1];
+    }
+
+    float get(const int i0, const int i1) const{
       return arr[s0*ix[i0]+s1*i1];
     }
 

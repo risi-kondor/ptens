@@ -50,10 +50,24 @@ class ptensor1(torch.Tensor):
         return Ptensor1_Linmaps2Fn.apply(self);
 
 
+    def transfer0(self,_atoms):
+        return Ptensor1_Transfer0Fn.apply(self,_atoms)
+
+    def transfer1(self,_atoms):
+        return Ptensor1_Transfer1Fn.apply(self,_atoms)
+
+    def transfer2(self,_atoms):
+        return Ptensor1_Transfer2Fn.apply(self,_atoms)
+
+
     # ---- I/O -----------------------------------------------------------------------------------------------
 
 
     def __str__(self):
+        u=_ptensor1.view(self,self.atoms)
+        return u.__str__()
+
+    def __repr__(self):
         u=_ptensor1.view(self,self.atoms)
         return u.__str__()
 
@@ -119,6 +133,63 @@ class Ptensor1_Linmaps2Fn(torch.autograd.Function):
         return R
 
 
+class Ptensor1_Transfer0Fn(torch.autograd.Function):
+
+    @staticmethod
+    def forward(ctx,x,_atoms):
+        R=ptens.ptensor0.zeros(_atoms,x.get_nc())
+        u=_ptensor1.view(x,x.atoms)
+        r=_ptensor0.view(R,R.atoms) 
+        ptens_base.add_msg(r,u)
+        return R
+        
+    @staticmethod
+    def backward(ctx,g):
+        R=ptensor1.zeros(g.atoms,g.get_nc())
+        u=_ptensor0.view(g,g.atoms)
+        r=_ptensor1.view(R,R.atoms) 
+        ptens_base.add_msg_back(r,u) 
+        return R,None
+
+
+class Ptensor1_Transfer1Fn(torch.autograd.Function):
+
+    @staticmethod
+    def forward(ctx,x,_atoms):
+        R=ptensor1.zeros(_atoms,2*x.get_nc())
+        u=_ptensor1.view(x,x.atoms)
+        r=_ptensor1.view(R,R.atoms) 
+        ptens_base.add_msg(r,u)
+        return R
+        
+    @staticmethod
+    def backward(ctx,g):
+        R=ptensor1.zeros(g.atoms,g.get_nc()/2)
+        u=_ptensor1.view(g,g.atoms)
+        r=_ptensor1.view(R,R.atoms) 
+        ptens_base.add_msg_back(r,u) 
+        return R,None
+
+
+class Ptensor1_Transfer2Fn(torch.autograd.Function):
+
+    @staticmethod
+    def forward(ctx,x,_atoms):
+        R=ptens.ptensor2.zeros(_atoms,x.get_nc()*5)
+        u=_ptensor1.view(x,x.atoms)
+        r=_ptensor2.view(R,R.atoms) 
+        ptens_base.add_msg(r,u)
+        return R
+        
+    @staticmethod
+    def backward(ctx,g):
+        R=ptensor1.zeros(g.atoms,g.get_nc()/5)
+        u=_ptensor2.view(g,g.atoms)
+        r=_ptensor1.view(R,R.atoms) 
+        ptens_base.add_msg_back(r,u) 
+        return R,None
+
+
 # ------------------------------------------------------------------------------------------------------------
 
 
@@ -132,4 +203,12 @@ def linmaps2(x):
     return x.linmaps2()
     
 
-        
+def transfer0(x,_atoms):
+    return x.transfer0(_atoms)
+    
+def transfer1(x,_atoms):
+    return x.transfer1(_atoms)
+    
+def transfer2(x,_atoms):
+    return x.transfer2(_atoms)
+    
