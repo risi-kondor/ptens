@@ -16,13 +16,14 @@ int main(int argc, char** argv){
   cout<<linmaps0(A)<<endl;
   cout<<linmaps1(A)<<endl;
   cout<<linmaps2(A)<<endl;
+  cout<<"---------------"<<endl<<endl;
 
   auto B=Ptensor1::zero({0,1,5},3);
-  add_msg(B,A);
+  A>>B; //add_msg(B,A);
   cout<<B<<endl;
 
   auto C=Ptensor2::zero({0,1,5},5);
-  add_msg(C,A);
+  A>>C; //add_msg(C,A);
   cout<<C<<endl;
 
 

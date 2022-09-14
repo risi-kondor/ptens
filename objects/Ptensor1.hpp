@@ -235,19 +235,17 @@ namespace ptens{
     }
 
     int broadcast0(const rtensor& x, const int offs){
-      int n=x.dim(0);
-      view(offs,n)+=repeat0(x.view1(),k);
-      return n;
+      view(offs,x.dim(0))+=repeat0(x.view1(),k);
+      return x.dim(0);
     }
 
-    void broadcast0(const rtensor& x, vector<int>& ix){
+    void broadcast0(const rtensor& x, const vector<int>& ix){
       view(ix)+=repeat0(x.view1(),ix.size());
     }
 
-    int broadcast0(const rtensor& x, vector<int>& ix, const int offs){
-      int n=x.dim(0);
-      view(ix,offs,n)+=repeat0(x.view1(),ix.size());
-      return n;
+    int broadcast0(const rtensor& x, const vector<int>& ix, const int offs){
+      view(ix,offs,x.dim(0))+=repeat0(x.view1(),ix.size());
+      return x.dim(0);
     }
 
 
@@ -256,9 +254,8 @@ namespace ptens{
     }
 
     int broadcast1(const rtensor& x, const int offs){
-      int n=x.dim(1);
-      view(offs,n)+=x.view2();
-      return n;
+      view(offs,x.dim(1))+=x.view2();
+      return x.dim(1);
     }
 
     void broadcast1(const rtensor& x, const vector<int>& ix){
@@ -266,9 +263,8 @@ namespace ptens{
     }
 
     int broadcast1(const rtensor& x, const vector<int>& ix, const int offs){
-      int n=x.dim(1);
-      view(ix,offs,n)+=x.view2();
-      return n;
+      view(ix,offs,x.dim(1))+=x.view2();
+      return x.dim(1);
     }
 
 

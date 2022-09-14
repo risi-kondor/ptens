@@ -206,14 +206,14 @@ namespace ptens{
 
 
     rtensor reduce0() const{ // 2
-      auto R=rtensor::zero({k,2*nc});
+      auto R=rtensor::zero({2*nc});
       view().sum01_into(R.view1().block(0,nc));
       view().diag01().sum0_into(R.view1().block(nc,nc));
       return R;
     }
 
     rtensor reduce0(const int offs, const int n) const{ // 2
-      auto R=rtensor::zero({k,n});
+      auto R=rtensor::zero({n});
       view(offs,n).sum01_into(R.view1());
       view(offs+n,n).diag01().sum0_into(R.view1());
       return R;
@@ -251,15 +251,16 @@ namespace ptens{
     }
 
     rtensor reduce1(const vector<int>& ix) const{
-      auto R=rtensor::zero({k,3*nc});
-      view(ix).sum0_into(R.view2().block(0,0,k,nc));
-      view(ix).sum1_into(R.view2().block(0,nc,k,nc));
-      R.view2().block(0,2*nc,k,nc).add(view(ix).diag01());
+      int K=ix.size();
+      auto R=rtensor::zero({K,3*nc});
+      view(ix).sum0_into(R.view2().block(0,0,K,nc));
+      view(ix).sum1_into(R.view2().block(0,nc,K,nc));
+      R.view2().block(0,2*nc,K,nc).add(view(ix).diag01());
       return R;
     }
 
     rtensor reduce1(const vector<int>& ix, const int offs, const int n) const{
-      auto R=rtensor::zero({k,n});
+      auto R=rtensor::zero({(int)ix.size(),n});
       view(ix,offs,n).sum0_into(R.view2());
       view(ix,offs+n,n).sum1_into(R.view2());
       R.view2().add(view(ix,offs+2*n,n).diag01());
@@ -274,9 +275,9 @@ namespace ptens{
     }
 
     rtensor reduce2(const int offs, const int n) const{ // flipping
-      auto R=rtensor::zero({k,k,2*n});
+      auto R=rtensor::zero({k,k,n});
       R.view3().block(0,0,0,k,k,n).add(view(offs,n));
-      R.view3().block(0,0,n,k,k,2*n).add(view(offs,n).transp01());
+      R.view3().block(0,0,n,k,k,n).add(view(offs+n,n).transp01());
       return R;
     }
 
@@ -288,9 +289,9 @@ namespace ptens{
 
     rtensor reduce2(const vector<int>& ix, const int offs, const int n) const{ // flipping
       int K=ix.size();
-      auto R=rtensor::zero({(int)ix.size(),(int)ix.size(),2*n});
+      auto R=rtensor::zero({(int)ix.size(),(int)ix.size(),n});
       R.view3().block(0,0,0,K,K,n).add(view(ix,offs,n));
-      R.view3().block(0,0,0,K,K,n).add(view(ix,offs,n).transp01());
+      R.view3().block(0,0,0,K,K,n).add(view(ix,offs+n,n).transp01());
       return R;
     }
 
@@ -508,7 +509,8 @@ namespace ptens{
       oss<<indent<<"Ptensor2"<<atoms<<":"<<endl;
       for(int c=0; c<get_nc(); c++){
 	oss<<indent<<"channel "<<c<<":"<<endl;
-	oss<<view3().slice2(c).str(indent+"  ")<<endl;
+	oss<<view3().slice2(c).str(indent+"  ");
+	if(c<get_nc()-1) oss<<endl;
       }
       return oss.str();
     }

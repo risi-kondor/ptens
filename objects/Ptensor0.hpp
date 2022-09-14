@@ -171,18 +171,44 @@ namespace ptens{
       return R;
     }
 
+    rtensor reduce0(const vector<int>& ix) const{
+      assert(ix.size()==1);
+      auto R=rtensor::zero(Gdims(nc));
+      R.view1()+=view();
+      return R;
+    }
+
+    rtensor reduce0(const vector<int>& ix, const int offs, const int n) const{
+      assert(ix.size()==1);
+      auto R=rtensor::zero(Gdims(n));
+      R.view1()+=view(offs,n);
+      return R;
+    }
+
 
   public: // ---- Broadcasting -------------------------------------------------------------------------------
 
+
+    void broadcast0(const rtensor& x){
+      view(0,x.dim(0))+=x.view1();
+    }
 
     int broadcast0(const rtensor& x, const int offs){
       view(offs,x.dim(0))+=x.view1();
       return x.dim(0);
     }
 
-    void broadcast0(const rtensor& x){
-      view()+=x.view1();
+    void broadcast0(const rtensor& x, const vector<int>& ix){
+      assert(ix.size()==1);
+      view(0,x.dim(0))+=x.view1();
     }
+
+    void broadcast0(const rtensor& x, const vector<int>& ix, const int offs){
+      assert(ix.size()==1);
+      view(offs,x.dim(0))+=x.view1();
+    }
+
+
 
 
   private: // ---- Broadcasting -------------------------------------------------------------------------------
