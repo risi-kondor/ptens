@@ -131,7 +131,7 @@ namespace ptens{
     // 0 -> 2
     void add_linmaps(const Ptensor0& x, int offs=0){ // 2
       assert(offs+2*x.nc<=nc);
-      offs+=broadcast(x.view1(),offs); // 2*1
+      offs+=broadcast0(x,offs); // 2*1
     }
 
     void add_linmaps_back_to(Ptensor0& x, int offs=0) const{ // 2
@@ -144,15 +144,15 @@ namespace ptens{
     void add_linmaps(const Ptensor1& x, int offs=0){ // 5 
       assert(x.k==k);
       assert(offs+5*x.nc<=nc);
-      offs+=broadcast(x.reduce0().view1(),offs); // 2*1
-      offs+=broadcast(x.view2(),offs); // 3*1
+      offs+=broadcast0(x.reduce0(),offs); // 2*1
+      offs+=broadcast1(x,offs); // 3*1
     }
 
     void add_linmaps_back_to(Ptensor1& x, int offs=0) const{ // 5 
       assert(x.k==k);
       assert(offs+5*x.nc<=nc);
-      x.broadcast(reduce0(offs,x.nc).view1());
-      x.broadcast(reduce1(offs+2*x.nc,x.nc).view1());
+      x.broadcast0(reduce0(offs,x.nc));
+      x.broadcast1(reduce1(offs+2*x.nc,x.nc));
     }
     
 
@@ -160,24 +160,24 @@ namespace ptens{
     void add_linmaps(const Ptensor2& x, int offs=0){ // 15
       assert(x.k==k);
       assert(offs+15*x.nc<=nc);
-      offs+=broadcast(x.reduce0().view1(),offs); // 2*2
-      offs+=broadcast(x.reduce1().view2(),offs); // 3*3
-      offs+=broadcast(x.view3(),offs); // 2
+      offs+=broadcast0(x.reduce0(),offs); // 2*2
+      offs+=broadcast1(x.reduce1(),offs); // 3*3
+      offs+=broadcast2(x,offs); // 2
     }
     
     void add_linmaps_back(const Ptensor2& x, int offs=0){ // 15 check offsets!!!
       assert(x.k==k);
       assert(offs+15*nc<=x.nc);
-      broadcast(x.reduce0(offs,nc).view1()); // 2*2
-      broadcast(x.reduce1(offs+2*nc,nc).view2()); // 3*3
-      broadcast(x.view(offs+5*nc,nc)); // 2 
+      broadcast0(x.reduce0(offs,nc)); // 2*2
+      broadcast1(x.reduce1(offs+2*nc,nc)); // 3*3
+      broadcast2(x.view(offs+5*nc,nc)); // 2 
     }
     
 
     // 2 -> 0 
     void add_linmaps_to(Ptensor0& x, int offs=0) const{ // 2
       assert(offs+2*nc<=x.nc);
-      offs+=x.broadcast(reduce0().view1(),offs); // 1*2
+      offs+=x.broadcast0(reduce0(),offs); // 1*2
     }
     
     void add_linmaps_back(const Ptensor0& x, int offs=0){ // 2
@@ -190,8 +190,8 @@ namespace ptens{
     void add_linmaps_to(Ptensor1& x, int offs=0) const{ // 5 
       assert(x.k==k);
       assert(offs+5*nc<=x.nc);
-      offs+=x.broadcast(reduce0().view1(),offs); // 1*2
-      offs+=x.broadcast(reduce1().view2(),offs); // 1*3
+      offs+=x.broadcast0(reduce0(),offs); // 1*2
+      offs+=x.broadcast1(reduce1(),offs); // 1*3
     }
     
     void add_linmaps_back(const Ptensor1& x, int offs=0){ // 5 
@@ -298,6 +298,109 @@ namespace ptens{
   public: // ---- Broadcasting -------------------------------------------------------------------------------
 
 
+    int broadcast0(const rtensor& x, const int offs){
+      int n=x.dim(0);
+      assert(2*n+offs<=nc);
+      view(offs,n)+=repeat0(repeat0(x.view1(),k),k);
+      view(offs+n,n).diag01()+=repeat0(x.view1(),k);
+      return 2*n;
+    }
+
+    void broadcast0(const rtensor& x){
+      int n=x.dim(0);
+      assert(n==2*nc);
+      view()+=repeat0(repeat0(x.view1().block(0,n),k),k);
+      view().diag01()+=repeat0(x.view1().block(n,n),k);
+    }
+
+    int broadcast0(const rtensor& x, const vector<int>& ix, const int offs){
+      int n=x.dim(0);
+      int K=ix.size();
+      assert(2*n+offs<=nc);
+      view(ix,offs,n)+=repeat0(repeat0(x.view1(),K),K);
+      view(ix,offs+n,n).diag01()+=repeat0(x.view1(),K);
+      return 2*n;
+    }
+
+    void broadcast0(const rtensor& x, const vector<int>& ix){
+      int n=x.dim(0);
+      int K=ix.size();
+      assert(n==2*nc);
+      view(ix)+=repeat0(repeat0(x.view1().block(0,n),K),K);
+      view(ix).diag01()+=repeat0(x.view1().block(0,n),K);
+    }
+
+
+    int broadcast1(const rtensor& x, const int offs){
+      int n=x.dim(1);
+      assert(3*n+offs<=nc);
+      view(offs,n)+=repeat0(x.view2(),k);
+      view(offs+n,n)+=repeat1(x.view2(),k);
+      view(offs+2*n,n).diag01()+=x.view2();
+      return 3*n;
+    }
+
+    void broadcast1(const rtensor& x){
+      int n=x.dim(1);
+      assert(n==3*nc);
+      view()+=repeat0(x.view2().block(0,0,k,nc),k);
+      view()+=repeat1(x.view2().block(0,nc,k,nc),k);
+      view().diag01()+=x.view2().block(0,2*nc,k,nc);
+    }
+
+    int broadcast1(const rtensor& x, const vector<int>& ix, const int offs){
+      int n=x.dim(1);
+      int K=ix.size();
+      assert(3*n+offs<=nc);
+      view(ix,offs,n)+=repeat0(x.view2(),K);
+      view(ix,offs+n,n)+=repeat1(x.view2(),K);
+      view(ix,offs+2*n,n).diag01()+=x.view2();
+      return 3*n;
+    }
+
+    void broadcast1(const rtensor& x, const vector<int>& ix){
+      int n=x.dim(1);
+      int K=ix.size();
+      assert(n==3*nc);
+      view(ix)+=repeat0(x.view2().block(0,0,K,nc),K);
+      view(ix)+=repeat1(x.view2().block(0,nc,K,nc),K);
+      view(ix).diag01()+=x.view2().block(0,2*nc,K,nc);
+    }
+
+  
+    int broadcast2(const rtensor& x, const int offs){
+      int n=x.dim(2);
+      assert(2*n+offs<=nc);
+      view(offs,n)+=x.view3();
+      view(offs+n,n)+=x.view3().transp01();
+      return 2*n;
+    }
+
+    void broadcast2(const rtensor& x){ // no flipping
+      int n=x.dim(2);
+      assert(n==nc);
+      view()+=x.view3();
+    }
+
+    int broadcast2(const rtensor& x, const vector<int>& ix, const int offs){
+      int n=x.dim(2);
+      assert(2*n+offs<=nc);
+      view(ix,offs,n)+=x.view3();
+      view(ix,offs+n,n)+=x.view3().transp01();
+      return 2*n;
+    }
+
+    void broadcast2(const rtensor& x, const vector<int>& ix){ // no flipping
+      int n=x.dim(2);
+      assert(n==nc);
+      view(ix)+=x.view3();
+    }
+
+
+  private: // ---- Broadcasting -------------------------------------------------------------------------------
+    // These methods are deprectated / on hold 
+
+    /*
     int broadcast(const Rtensor1_view& x, const int offs){
       int n=x.n0;
       assert(2*n+offs<=nc);
@@ -313,7 +416,7 @@ namespace ptens{
       view().diag01()+=repeat0(x.block(n,n),k);
     }
 
-    int broadcast(const vector<int>& ix, const Rtensor1_view& x, const int offs){
+    int broadcast(const Rtensor1_view& x, const vector<int>& ix, const int offs){
       int n=x.n0;
       int K=ix.size();
       assert(2*n+offs<=nc);
@@ -322,7 +425,7 @@ namespace ptens{
       return 2*n;
     }
 
-    void broadcast(const vector<int>& ix, const Rtensor1_view& x){
+    void broadcast(const Rtensor1_view& x, const vector<int>& ix){
       int n=x.n0;
       int K=ix.size();
       assert(n==2*nc);
@@ -348,7 +451,7 @@ namespace ptens{
       view().diag01()+=x.block(0,2*nc,k,nc);
     }
 
-    int broadcast(const vector<int>& ix, const Rtensor2_view& x, const int offs){
+    int broadcast(const Rtensor2_view& x, const vector<int>& ix, const int offs){
       int n=x.n1;
       int K=ix.size();
       assert(3*n+offs<=nc);
@@ -358,7 +461,7 @@ namespace ptens{
       return 3*n;
     }
 
-    void broadcast(const vector<int>& ix, const Rtensor2_view& x){
+    void broadcast(const Rtensor2_view& x, const vector<int>& ix){
       int n=x.n1;
       int K=ix.size();
       assert(n==3*nc);
@@ -382,7 +485,7 @@ namespace ptens{
       view()+=x;
     }
 
-    int broadcast(const vector<int>& ix, const Rtensor3_view& x, const int offs){
+    int broadcast(const Rtensor3_view& x, const vector<int>& ix, const int offs){
       int n=x.n2;
       assert(2*n+offs<=nc);
       view(ix,offs,n)+=x;
@@ -390,12 +493,12 @@ namespace ptens{
       return 2*n;
     }
 
-    void broadcast(const vector<int>& ix, const Rtensor3_view& x){ // no flipping
+    void broadcast(const Rtensor3_view& x, const vector<int>& ix){ // no flipping
       int n=x.n2;
       assert(n==nc);
       view(ix)+=x;
     }
-
+    */
 
   public: // ---- I/O ----------------------------------------------------------------------------------------
 

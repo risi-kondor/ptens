@@ -135,7 +135,7 @@ namespace ptens{
     void add_linmaps(const Ptensor0& x, int offs=0){ // 1
       PTENS_K_SAME(x);
       PTENS_CHANNELS(offs+1*x.nc<=nc);
-      offs+=broadcast(x.view1(),offs); // 1*1
+      offs+=broadcast0(x.view1(),offs); // 1*1
     }
     
     void add_linmaps_back_to(Ptensor0& x, int offs=0) const{ // 1
@@ -148,15 +148,15 @@ namespace ptens{
     void add_linmaps(const Ptensor1& x, int offs=0){ // 2 
       PTENS_K_SAME(x)
       PTENS_CHANNELS(offs+2*x.nc<=nc);
-      offs+=broadcast(x.reduce0().view1(),offs); // 1*1
-      offs+=broadcast(x.view(),offs); // 1*1
+      offs+=broadcast0(x.reduce0().view1(),offs); // 1*1
+      offs+=broadcast1(x.view(),offs); // 1*1
     }
     
     void add_linmaps_back(const Ptensor1& x, int offs=0){ // 2 
       PTENS_K_SAME(x)
       PTENS_CHANNELS(offs+2*nc<=x.nc);
-      broadcast(x.reduce0(offs,nc).view2());
-      broadcast(x.view(offs+nc,nc));
+      broadcast0(x.reduce0(offs,nc).view2());
+      broadcast1(x.view(offs+nc,nc));
     }
     
 
@@ -164,7 +164,7 @@ namespace ptens{
     void add_linmaps_to(Ptensor0& x, int offs=0) const{ // 1 
       PTENS_K_SAME(x)
       PTENS_CHANNELS(offs+1*nc<=x.nc);
-      offs+=x.broadcast(reduce0().view1(),offs); // 1*1
+      offs+=x.broadcast0(reduce0(),offs); // 1*1
     }
     
     void add_linmaps_back(const Ptensor0& x, int offs=0){ // 1 
@@ -230,39 +230,84 @@ namespace ptens{
   public: // ---- Broadcasting -------------------------------------------------------------------------------
 
 
-    void broadcast(const Rtensor1_view& x){ // 1
+    void broadcast0(const rtensor& x){
+      view()+=repeat0(x.view1(),k);
+    }
+
+    int broadcast0(const rtensor& x, const int offs){
+      int n=x.dim(0);
+      view(offs,n)+=repeat0(x.view1(),k);
+      return n;
+    }
+
+    void broadcast0(const rtensor& x, vector<int>& ix){
+      view(ix)+=repeat0(x.view1(),ix.size());
+    }
+
+    int broadcast0(const rtensor& x, vector<int>& ix, const int offs){
+      int n=x.dim(0);
+      view(ix,offs,n)+=repeat0(x.view1(),ix.size());
+      return n;
+    }
+
+
+    void broadcast1(const rtensor& x){
+      add(x.view2());
+    }
+
+    int broadcast1(const rtensor& x, const int offs){
+      int n=x.dim(1);
+      view(offs,n)+=x.view2();
+      return n;
+    }
+
+    void broadcast1(const rtensor& x, const vector<int>& ix){
+      view(ix)+=x.view2();
+    }
+
+    int broadcast1(const rtensor& x, const vector<int>& ix, const int offs){
+      int n=x.dim(1);
+      view(ix,offs,n)+=x.view2();
+      return n;
+    }
+
+
+  private: // ---- Broadcasting -------------------------------------------------------------------------------
+    // These methods are deprectated / on hold 
+
+    void broadcast0(const Rtensor1_view& x){
       view()+=repeat0(x,k);
     }
 
-    int broadcast(const Rtensor1_view& x, const int offs){ // 1
+    int broadcast0(const Rtensor1_view& x, const int offs){
       view(offs,x.n0)+=repeat0(x,k);
       return x.n0;
     }
 
-    void broadcast(const Rtensor1_view& x, vector<int>& ix){
+    void broadcast0(const Rtensor1_view& x, vector<int>& ix){
       view(ix)+=repeat0(x,ix.size());
     }
 
-    int broadcast(const Rtensor1_view& x, vector<int>& ix, const int offs){
+    int broadcast0(const Rtensor1_view& x, vector<int>& ix, const int offs){
       view(ix,offs,x.n0)+=repeat0(x,ix.size());
       return x.n0;
     }
 
 
-    void broadcast(const Rtensor2_view& x){
+    void broadcast1(const Rtensor2_view& x){
       add(x);
     }
 
-    int broadcast(const Rtensor2_view& x, const int offs){
+    int broadcast1(const Rtensor2_view& x, const int offs){
       view(offs,x.n1)+=x;
       return x.n1;
     }
 
-    void broadcast(const Rtensor2_view& x, const vector<int>& ix){
+    void broadcast1(const Rtensor2_view& x, const vector<int>& ix){
       view(ix)+=x;
     }
 
-    int broadcast(const Rtensor2_view& x, const vector<int>& ix, const int offs){
+    int broadcast1(const Rtensor2_view& x, const vector<int>& ix, const int offs){
       view(ix,offs,x.n1)+=x;
       return x.n1;
     }

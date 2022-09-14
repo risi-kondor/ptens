@@ -146,12 +146,12 @@ namespace ptens{
     // 1 -> 1
     void add_linmaps(const Ptensor0& x, int offs=0){ // 1 
       assert(offs+1*x.nc<=nc);
-      offs+=broadcast(x.view1(),offs); // 1*1
+      offs+=broadcast0(x,offs); // 1*1
     }
 
     void add_linmaps_back(const Ptensor0& x, int offs=0){ // 1 
       assert(offs+1*nc<=x.nc);
-      view().add(x.view(offs,nc));
+      broadcast0(x.reduce0(offs,nc));
     }
     
 
@@ -175,11 +175,24 @@ namespace ptens{
   public: // ---- Broadcasting -------------------------------------------------------------------------------
 
 
-    void broadcast(const Rtensor1_view& x){
+    int broadcast0(const rtensor& x, const int offs){
+      view(offs,x.dim(0))+=x.view1();
+      return x.dim(0);
+    }
+
+    void broadcast0(const rtensor& x){
+      view()+=x.view1();
+    }
+
+
+  private: // ---- Broadcasting -------------------------------------------------------------------------------
+    // These methods are deprectated / on hold 
+
+    void broadcast0(const Rtensor1_view& x){
       view()+=x;
     }
 
-    int broadcast(const Rtensor1_view& x, const int offs=0){
+    int broadcast0(const Rtensor1_view& x, const int offs){
       view(offs,x.n0)+=x;
       return x.n0;
     }
