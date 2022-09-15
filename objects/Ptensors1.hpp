@@ -39,7 +39,6 @@ namespace ptens{
     Ptensors1(const int _nc, const int _dev=0):
       RtensorPool(_dev), nc(_nc){}
 
-    // TODO 
     template<typename FILLTYPE, typename = typename std::enable_if<std::is_base_of<cnine::fill_pattern, FILLTYPE>::value, FILLTYPE>::type>
     Ptensors1(const int _n, const int _k, const int _nc, const FILLTYPE& dummy, const int _dev=0):
       RtensorPool(_n,{_k,_nc},dummy,_dev), atoms(_n,_k), nc(_nc){}
@@ -112,6 +111,14 @@ namespace ptens{
       return RtensorPool::operator()(i);
     }
 
+    Rtensor2_view view_of(const int i) const{
+      return RtensorPool::view2_of(i);
+    }
+
+    Rtensor2_view view_of(const int i, const int offs, const int n) const{
+      return RtensorPool::view2_of(i).block(0,offs,-1,n);
+    }
+
     Ptensor1 operator()(const int i) const{
       return Ptensor1(tensor_of(i),atoms_of(i));
     }
@@ -125,87 +132,68 @@ namespace ptens{
     }
 
 
-  public: // ---- Linmaps ------------------------------------------------------------------------------------
+  public: // ---- Reductions ---------------------------------------------------------------------------------
 
 
-    void add_linmaps(const Ptensors0& x, const int offs=0){
-      assert(x.size()==size());
-      assert(offs+x.nc<=nc);
-      int _nc=x.nc;
-      for(int i=0; i<size(); i++){
-	for(int c=0; c<_nc; c++)
-	  view2_of(i).slice1(offs+c).add(x.view1_of(i)(c));
-	}
-    }
-
-
-    void add_linmaps_to(Ptensors0& x, const int offs=0) const{
-      assert(x.size()==size());
-      assert(offs+nc<=x.nc);
-      for(int i=0; i<size(); i++){
-	for(int c=0; c<nc; c++)
-	  x.view1_of(i).inc(c+offs,view2_of(i).slice1(c).sum());
-	}
-    }
-
-
-    void add_linmaps(const Ptensors1& x, const int offs=0){
-      assert(x.size()==size());
-      assert(offs+2*x.nc<=nc);
-      int _nc=x.nc;
-      for(int i=0; i<size(); i++){
-	int k=x.k_of(i);
-	assert(k==k_of(i));
-	view2_of(i).block(0,offs,k,_nc)+=x.view2_of(i);
-	for(int c=0; c<_nc; c++){
-	  float t=0; 
-	  for(int j=0; j<k; j++)
-	    t+=x.view2_of(i)(j,c);
-	  for(int j=0; j<k; j++)
-	    view2_of(i).inc(j,offs+c+_nc,t);
-	}
-      }
-    }
-
-
-  public: // ---- Message passing ----------------------------------------------------------------------------
-
-
-    Ptensors1 fwd(const Cgraph& graph) const{
-      Ptensors1 R;
-      for(int i=0; i<graph.m; i++) //TODO
-	R.push_back(Ptensor1::zero(atoms_of(i),5*2));
-      R.forwardMP(*this,graph);
+    RtensorPool reduce0() const{
+      RtensorPool R(size(),Gdims(nc),cnine::fill_zero());
+      for(int i=0; i<size(); i++)
+	view_of(i).sum0_into(R.view1_of(i));
       return R;
     }
 
 
-    void forwardMP(const Ptensors1& x, const Cgraph& graph){
-      AindexPack src_indices;
-      AindexPack dest_indices;
-
-      graph.forall_edges([&](const int i, const int j){
-	  Atoms atoms0=atoms_of(i);
-	  Atoms atoms1=atoms_of(j);
-	  Atoms intersect=atoms0.intersect(atoms1);
-	  src_indices.push_back(i,atoms0(intersect));
-	  dest_indices.push_back(j,atoms1(intersect));
-	});
-
-      RtensorPool messages0=x.messages0(src_indices);
-      add_messages0(messages0,dest_indices,0);
-      //cout<<messages0<<endl;
-
-      RtensorPool messages1=x.messages1(src_indices);
-      add_messages1(messages1,dest_indices,5); // TODO 
-      //cout<<messages1<<endl;
-
+    RtensorPool reduce1() const{
+      return *this;
     }
 
 
-  public: // ---- Reductions ---------------------------------------------------------------------------------
+
+  public: // ---- Broadcasting -------------------------------------------------------------------------------
 
 
+    void broadcast0(const RtensorPool& x, const int offs){
+      const int n=x.dim_of(0,0);
+      for(int i=0; i<size(); i++){
+	view_of(i,offs,n)+=repeat0(x.view1_of(i),k_of(i));
+      }
+    }
+
+
+    void broadcast1(const RtensorPool& x, const int offs){
+      const int n=x.dim_of(0,1);
+      for(int i=0; i<size(); i++){
+	view_of(i,offs,n)+=x.view2_of(i);
+      }
+    }
+
+
+
+
+
+  public: // ---- I/O ----------------------------------------------------------------------------------------
+
+
+    string str(const string indent="") const{
+      ostringstream oss;
+      for(int i=0; i<size(); i++){
+	oss<<indent<<(*this)(i)<<endl;
+	//oss<<indent<<"Ptensor "<<i<<" "<<Atoms(atoms(i))<<":"<<endl;
+	//oss<<RtensorPool::operator()(i).str()<<endl;
+      }
+      return oss.str();
+    }
+
+    friend ostream& operator<<(ostream& stream, const Ptensors1& x){
+      stream<<x.str(); return stream;}
+
+  };
+
+}
+
+
+#endif 
+    /*
     RtensorPool messages0(const AindexPack& src_list) const{
       int N=src_list.size();
 
@@ -256,11 +244,81 @@ namespace ptens{
 
       return R;
     }
+    */
+    /*
+    Ptensors1 fwd(const Cgraph& graph) const{
+      Ptensors1 R;
+      for(int i=0; i<graph.m; i++) //TODO
+	R.push_back(Ptensor1::zero(atoms_of(i),5*2));
+      R.forwardMP(*this,graph);
+      return R;
+    }
 
 
-  public: // ---- Broadcasting -------------------------------------------------------------------------------
+    void forwardMP(const Ptensors1& x, const Cgraph& graph){
+      AindexPack src_indices;
+      AindexPack dest_indices;
+
+      graph.forall_edges([&](const int i, const int j){
+	  Atoms atoms0=atoms_of(i);
+	  Atoms atoms1=atoms_of(j);
+	  Atoms intersect=atoms0.intersect(atoms1);
+	  src_indices.push_back(i,atoms0(intersect));
+	  dest_indices.push_back(j,atoms1(intersect));
+	});
+
+      RtensorPool messages0=x.messages0(src_indices);
+      add_messages0(messages0,dest_indices,0);
+      //cout<<messages0<<endl;
+
+      RtensorPool messages1=x.messages1(src_indices);
+      add_messages1(messages1,dest_indices,5); // TODO 
+      //cout<<messages1<<endl;
+
+    }
+    */
+    /*
+    void add_linmaps(const Ptensors0& x, const int offs=0){
+      assert(x.size()==size());
+      assert(offs+x.nc<=nc);
+      int _nc=x.nc;
+      for(int i=0; i<size(); i++){
+	for(int c=0; c<_nc; c++)
+	  view2_of(i).slice1(offs+c).add(x.view1_of(i)(c));
+	}
+    }
 
 
+    void add_linmaps_to(Ptensors0& x, const int offs=0) const{
+      assert(x.size()==size());
+      assert(offs+nc<=x.nc);
+      for(int i=0; i<size(); i++){
+	for(int c=0; c<nc; c++)
+	  x.view1_of(i).inc(c+offs,view2_of(i).slice1(c).sum());
+	}
+    }
+
+
+    void add_linmaps(const Ptensors1& x, const int offs=0){
+      assert(x.size()==size());
+      assert(offs+2*x.nc<=nc);
+      int _nc=x.nc;
+      for(int i=0; i<size(); i++){
+	int k=x.k_of(i);
+	assert(k==k_of(i));
+	view2_of(i).block(0,offs,k,_nc)+=x.view2_of(i);
+	for(int c=0; c<_nc; c++){
+	  float t=0; 
+	  for(int j=0; j<k; j++)
+	    t+=x.view2_of(i)(j,c);
+	  for(int j=0; j<k; j++)
+	    view2_of(i).inc(j,offs+c+_nc,t);
+	}
+      }
+    }
+    */
+
+    /*
     void add_messages0(const RtensorPool& messages, const AindexPack& dest_list, const int coffs){
       int N=dest_list.size();
       assert(messages.size()==N);
@@ -298,27 +356,4 @@ namespace ptens{
 	}
       }
     }
-
-
-  public: // ---- I/O ----------------------------------------------------------------------------------------
-
-
-    string str(const string indent="") const{
-      ostringstream oss;
-      for(int i=0; i<size(); i++){
-	oss<<indent<<(*this)(i)<<endl;
-	//oss<<indent<<"Ptensor "<<i<<" "<<Atoms(atoms(i))<<":"<<endl;
-	//oss<<RtensorPool::operator()(i).str()<<endl;
-      }
-      return oss.str();
-    }
-
-    friend ostream& operator<<(ostream& stream, const Ptensors1& x){
-      stream<<x.str(); return stream;}
-
-  };
-
-}
-
-
-#endif 
+    */

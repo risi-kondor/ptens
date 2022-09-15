@@ -110,6 +110,18 @@ namespace ptens{
       return RtensorPool::operator()(i);
     }
 
+    //Rtensor1_view view_of_tensor(const int i) const{
+    //return RtensorPool::view1_of(i);
+    //}
+
+    Rtensor1_view view_of(const int i) const{
+      return RtensorPool::view1_of(i);
+    }
+
+    Rtensor1_view view_of(const int i, const int offs, const int n) const{
+      return RtensorPool::view1_of(i).block(offs,n);
+    }
+
     Ptensor0 operator()(const int i) const{
       return Ptensor0(tensor_of(i),atoms_of(i));
     }
@@ -122,16 +134,27 @@ namespace ptens{
     }
 
 
-  public: // ---- Maps ---------------------------------------------------------------------------------------
+  public: // ---- Linmaps -------------------------------------------------------------------------------------
 
 
-    Ptensors0 hom() const{
-      Ptensors0 R=Ptensors0::zero(atoms,nc,dev);
-      R.add_linmaps(*this);
-      return R;
+    // 0 -> 0
+    /*
+    void add_linmaps(const Ptensors0& x, int offs=0){ 
+      assert(x.size()==size());
+      assert(offs+1*x.nc<=nc);
+      for(int i=0; i<size(); i++){
+      }
+      offs+=broadcast0(reduce0(x),offs); // 1*1
     }
 
+    void add_linmaps_back(const Ptensors0& x, int offs=0){ 
+      assert(x.size()==size());
+      assert(offs+1*nc<=x.nc);
 
+    }
+    */
+
+    /*
     void add_linmaps(const Ptensors0& x, const int offs=0){
       assert(x.size()==size());
       assert(offs+x.nc<=nc);
@@ -142,12 +165,21 @@ namespace ptens{
 	//view1_of(i).block(offs+_nc,_nc).set(x.view1_of(i).sum());
       }
     }
+    */
 
 
   public: // ---- Reductions ---------------------------------------------------------------------------------
 
 
-    RtensorPool messages0(const AindexPack& src_list) const{
+    RtensorPool reduce0() const{
+      RtensorPool R(size(),Gdims(nc),cnine::fill_zero());
+      for(int i=0; i<size(); i++)
+	R.view1_of(i).add(view_of(i));
+      return R;
+    }
+
+    /*
+    RtensorPool reduce0(const AindexPack& src_list) const{
       int N=src_list.size();
 
       array_pool<int> msg_dims;
@@ -160,11 +192,20 @@ namespace ptens{
 
       return R;
     }
+    */
 
 
   public: // ---- Broadcasting -------------------------------------------------------------------------------
 
+    
+    void broadcast0(const RtensorPool& x, const int offs){
+      const int n=x.dim_of(0,0);
+      for(int i=0; i<size(); i++)
+	view_of(i,offs,n).add(x.view1_of(i));
+    }
 
+
+    /*
     void add_messages0(const RtensorPool& messages, const AindexPack& dest_list, const int coffs){
       int N=dest_list.size();
       assert(messages.size()==N);
@@ -172,6 +213,7 @@ namespace ptens{
       for(int i=0; i<N; i++)
 	view1_of(dest_list.tix(i))=messages.view1_of(i);
     }
+    */
 
 
   public: // ---- I/O ----------------------------------------------------------------------------------------
@@ -196,3 +238,10 @@ namespace ptens{
 
 
 #endif 
+    //Ptensors0 hom() const{
+    //Ptensors0 R=Ptensors0::zero(atoms,nc,dev);
+    //R.add_linmaps(*this);
+    //return R;
+    //}
+
+

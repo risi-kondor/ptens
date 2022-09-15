@@ -57,6 +57,51 @@ namespace ptens{
     }
 
 
+  public: // ---- Copying ------------------------------------------------------------------------------------
+
+
+    vector_pool(const vector_pool& x){
+      dev=x.dev;
+      tail=x.tail;
+      memsize=tail;
+      if(dev==0){
+	arr=new int[memsize];
+	std::copy(x.arr,x.arr+memsize,arr);
+      }
+      if(dev==1){
+	CNINE_UNIMPL();
+      }
+      lookup=x.lookup;
+    }
+
+    vector_pool(vector_pool&& x){
+      dev=x.dev;
+      tail=x.tail; x.tail=0;
+      memsize=x.memsize; x.memsize=0; 
+      arr=x.arr; x.arr=nullptr;
+      arrg=x.arrg; x.arrg=nullptr;
+      lookup=std::move(x.lookup);
+      x.lookup.clear();
+    }
+
+    vector_pool& operator=(const vector_pool& x){
+      dev=x.dev;
+      tail=x.tail;
+      memsize=tail;
+      if(arr) delete[] arr;
+      if(arrg) {CUDA_SAFE(cudaFree(arrg));}
+      if(dev==0){
+	arr=new int[memsize];
+	std::copy(x.arr,x.arr+memsize,arr);
+      }
+      if(dev==1){
+	CNINE_UNIMPL();
+      }
+      lookup=x.lookup;
+      return *this;
+    }
+
+
   public: // ---- Access -------------------------------------------------------------------------------------
 
 

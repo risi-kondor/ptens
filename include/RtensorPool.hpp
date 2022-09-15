@@ -84,6 +84,19 @@ namespace ptens{
 
     }
 
+  public: // ---- Named constructors -------------------------------------------------------------------------
+
+
+    static RtensorPool zeros_like(const RtensorPool& x){
+      RtensorPool R(x.dev);
+      R.reserve(x.tail);
+      if(x.dev==0) std::fill(R.arr,R.arr+x.tail,0);
+      if(x.dev==1){}
+      R.headers=x.headers;
+      R.tail=x.tail;
+      return R;
+    }
+
 
   public: // ---- Memory management --------------------------------------------------------------------------
 
@@ -138,6 +151,35 @@ namespace ptens{
 	memsize=n;
       }
     }
+
+
+  public: // ---- Copying ------------------------------------------------------------------------------------
+
+
+    RtensorPool(const RtensorPool& x){
+      dev=x.dev;
+      tail=x.tail;
+      memsize=tail;
+      if(dev==0){
+	arr=new float[memsize];
+	std::copy(x.arr,x.arr+memsize,arr);
+      }
+      if(dev==1){
+	CNINE_UNIMPL();
+      }
+      headers=x.headers;
+    }
+
+    RtensorPool(RtensorPool&& x){
+      dev=x.dev;
+      tail=x.tail; x.tail=0;
+      memsize=x.memsize; x.memsize=0; 
+      arr=x.arr; x.arr=nullptr;
+      arrg=x.arrg; x.arrg=nullptr;
+      headers=std::move(x.headers);
+    }
+
+    RtensorPool& operator=(const RtensorPool& x)=delete;
 
 
   public: // ---- Access -------------------------------------------------------------------------------------
