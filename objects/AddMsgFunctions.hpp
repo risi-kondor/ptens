@@ -155,6 +155,42 @@ namespace ptens{
   Ptensor2& operator>>(const Ptensor2& x, Ptensor2& r) {add_msg(r,x); return r;}
 
 
+  // --------------------------------------------------------------------------------------------------------
+
+  /*
+  // 0 -> 0
+  void add_msg(Ptensors0& r, const Ptensors0& x, int offs=0){
+    r.broadcast0(x.reduce0(),offs);
+  }
+  void add_msg_back(Ptensor0& r, const Ptensor0& x, int offs=0){
+    r.broadcast0(x.reduce0(offs,r.nc));
+  }
+
+  // 0 -> 1
+  void add_msg(Ptensor1& r, const Ptensor0& x, int offs=0){
+    Atoms common=r.atoms.intersect(x.atoms);
+    r.broadcast0(x,r.atoms(common),offs);
+  }
+  void add_msg_back(Ptensor0& r, const Ptensor1& x, int offs=0){
+    Atoms common=r.atoms.intersect(x.atoms);
+    r.broadcast0(x.reduce0(offs,r.nc));
+  }
+    
+  // 0 -> 2
+  void add_msg(Ptensor2& r, const Ptensor0& x, int offs=0){
+    Atoms common=r.atoms.intersect(x.atoms);
+    vector<int> rix(r.atoms(common));
+    vector<int> xix(x.atoms(common));
+    r.broadcast0(x,rix,offs);
+  }
+  void add_msg_back(Ptensor0& r, const Ptensor2& x, int offs=0){
+    Atoms common=r.atoms.intersect(x.atoms);
+    vector<int> rix(r.atoms(common));
+    vector<int> xix(x.atoms(common));
+    r.broadcast0(x.reduce0(xix,offs,r.nc));
+  }
+
+  */
   
 }
 

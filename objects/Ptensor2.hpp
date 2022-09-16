@@ -310,8 +310,8 @@ namespace ptens{
     void broadcast0(const rtensor& x){
       int n=x.dim(0);
       assert(n==2*nc);
-      view()+=repeat0(repeat0(x.view1().block(0,n),k),k);
-      view().diag01()+=repeat0(x.view1().block(n,n),k);
+      view()+=repeat0(repeat0(x.view1().block(0,nc),k),k);
+      view().diag01()+=repeat0(x.view1().block(nc,nc),k);
     }
 
     int broadcast0(const rtensor& x, const vector<int>& ix, const int offs){
@@ -327,8 +327,8 @@ namespace ptens{
       int n=x.dim(0);
       int K=ix.size();
       assert(n==2*nc);
-      view(ix)+=repeat0(repeat0(x.view1().block(0,n),K),K);
-      view(ix).diag01()+=repeat0(x.view1().block(0,n),K);
+      view(ix)+=repeat0(repeat0(x.view1().block(0,nc),K),K);
+      view(ix).diag01()+=repeat0(x.view1().block(nc,nc),K);
     }
 
 

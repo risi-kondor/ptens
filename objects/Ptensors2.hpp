@@ -117,6 +117,20 @@ namespace ptens{
       return RtensorPool::view3_of(i).block(0,0,offs,-1,-1,n);
     }
 
+    Ptensor2_xview view_of(const int i, const vector<int>& ix) const{
+      vector<int> v=headers(i);
+      assert(v.size()==4);
+      if(dev==1) return Ptensor2_xview(arrg+v[0],v[3],v[2]*v[3],v[3],1,ix,1);
+      return Ptensor2_xview(arr+v[0],v[3],v[2]*v[3],v[3],1,ix,0);
+    }
+
+    Ptensor2_xview view_of(const int i, const vector<int>& ix, const int offs, const int n) const{
+      vector<int> v=headers(i);
+      assert(v.size()==4);
+      if(dev==1) return Ptensor2_xview(arrg+v[0]+offs,n,v[2]*v[3],v[3],1,ix,1);
+      return Ptensor2_xview(arr+v[0]+offs,n,v[2]*v[3],v[3],1,ix,0);
+    }
+
     Ptensor2 operator()(const int i) const{
       return Ptensor2(tensor_of(i),atoms_of(i));
     }
@@ -142,11 +156,43 @@ namespace ptens{
 
 
     RtensorPool reduce0() const{
-      RtensorPool R(size(),Gdims(nc),cnine::fill_zero());
-      for(int i=0; i<size(); i++)
-	view_of(i).sum01_into(R.view1_of(i));
+      RtensorPool R(size(),Gdims(2*nc),cnine::fill_zero());
+      for(int i=0; i<size(); i++){
+	view_of(i).sum01_into(R.view1_of(i).block(0,nc));
+	view_of(i).diag01().sum0_into(R.view1_of(i).block(nc,nc));
+      }
       return R;
     }
+
+    RtensorPool reduce0(const int offs, const int n) const{
+      RtensorPool R(size(),Gdims(n),cnine::fill_zero());
+      for(int i=0; i<size(); i++){
+	view_of(i,offs,n).sum01_into(R.view1_of(i));
+	view_of(i,offs+n,n).diag01().sum0_into(R.view1_of(i));
+      }
+      return R;
+    }
+
+    RtensorPool reduce0(const AindexPack& list) const{
+      int N=list.size();
+      RtensorPool R(N,Gdims(2*nc),cnine::fill_zero());
+      for(int i=0; i<N; i++){
+	view_of(list.tens(i),list.ix(i)).sum01_into(R.view1_of(i).block(0,nc));
+	view_of(list.tens(i),list.ix(i)).diag01().sum0_into(R.view1_of(i).block(nc,nc));
+      }
+      return R;
+    }
+
+    RtensorPool reduce0(const AindexPack& list, const int offs, const int n) const{
+      int N=list.size();
+      RtensorPool R(N,Gdims(n),cnine::fill_zero());
+      for(int i=0; i<N; i++){
+	view_of(list.tens(i),list.ix(i),offs,n).sum01_into(R.view1_of(i));
+	view_of(list.tens(i),list.ix(i),offs+n,n).diag01().sum0_into(R.view1_of(i));
+      }
+      return R;
+    }
+
 
     RtensorPool reduce1() const{
       array_pool<int> dims;
@@ -156,18 +202,105 @@ namespace ptens{
       for(int i=0; i<size(); i++){
 	view_of(i).sum0_into(R.view2_of(i).block(0,0,-1,nc));
 	view_of(i).sum1_into(R.view2_of(i).block(0,nc,-1,nc));
-	R.view2_of(i).block(0,nc,-1,nc)+=view_of(i).diag01();
+	R.view2_of(i).block(0,2*nc,-1,nc)+=view_of(i).diag01();
       }
       return R;
     }
+
+    RtensorPool reduce1(const int offs, const int n) const{
+      array_pool<int> dims;
+      for(int i=0; i<size(); i++)
+	dims.push_back(vector<int>({k_of(i),n}));
+      RtensorPool R(dims,cnine::fill_zero());
+      for(int i=0; i<size(); i++){
+	view_of(i,offs,n).sum0_into(R.view2_of(i));
+	view_of(i,offs+n,n).sum1_into(R.view2_of(i));
+	R.view2_of(i)+=view_of(i,offs+2*n,n).diag01();
+      }
+      return R;
+    }
+
+    RtensorPool reduce1(const AindexPack& list) const{
+      int N=list.size();
+      array_pool<int> dims;
+      for(int i=0; i<N; i++)
+	dims.push_back(vector<int>({list.nix(i),3*nc}));
+      RtensorPool R(dims,cnine::fill_zero());
+      for(int i=0; i<N; i++){
+	view_of(list.tens(i),list.ix(i)).sum0_into(R.view2_of(i).block(0,0,-1,nc));
+	view_of(list.tens(i),list.ix(i)).sum1_into(R.view2_of(i).block(0,nc,-1,nc));
+	R.view2_of(i).block(0,2*nc,-1,nc)+=view_of(list.tens(i),list.ix(i)).diag01();
+      }
+      return R;
+    }
+
+    RtensorPool reduce1(const AindexPack& list, const int offs, const int n) const{
+      int N=list.size();
+      array_pool<int> dims;
+      for(int i=0; i<N; i++)
+	dims.push_back(vector<int>({list.nix(i),n}));
+      RtensorPool R(dims,cnine::fill_zero());
+      for(int i=0; i<N; i++){
+	view_of(list.tens(i),list.ix(i),offs,n).sum0_into(R.view2_of(i));
+	view_of(list.tens(i),list.ix(i),offs+n,n).sum1_into(R.view2_of(i));
+	R.view2_of(i)+=view_of(list.tens(i),list.ix(i),offs+2*n,n).diag01();
+      }
+      return R;
+    }
+
+
 
     RtensorPool reduce2() const{
       return *this;
     }
 
+    RtensorPool reduce2(const int offs, const int n) const{
+      array_pool<int> dims;
+      for(int i=0; i<size(); i++)
+	dims.push_back(vector<int>({k_of(i),k_of(i),n}));
+      RtensorPool R(dims,cnine::fill_zero());
+      for(int i=0; i<size(); i++)
+	R.view3_of(i)+=view_of(i,offs,n);
+      return R;
+    }
+
+    RtensorPool reduce2(const AindexPack& list) const{ // no flipping 
+      int N=list.size();
+      array_pool<int> dims;
+      for(int i=0; i<N; i++)
+	dims.push_back(vector<int>({list.nix(i),list.nix(i),nc}));
+      RtensorPool R(dims,cnine::fill_zero());
+      for(int i=0; i<N; i++){
+	R.view3_of(i)+=view_of(list.tens(i),list.ix(i));
+      }
+      return R;
+    }
+
+    RtensorPool reduce2(const AindexPack& list, const int offs, const int n) const{
+      int N=list.size();
+      array_pool<int> dims;
+      for(int i=0; i<N; i++)
+	dims.push_back(vector<int>({list.nix(i),list.nix(i),nc}));
+      RtensorPool R(dims,cnine::fill_zero());
+      for(int i=0; i<N; i++){
+	R.view3_of(i)+=view_of(list.tens(i),list.ix(i),offs,n);
+	R.view3_of(i)+=view_of(list.tens(i),list.ix(i),offs+n,n).transp01();
+      }
+      return R;
+    }
+
+
 
   public: // ---- Broadcasting -------------------------------------------------------------------------------
 
+
+    void broadcast0(const RtensorPool& x){
+      const int n=x.dim_of(0,0);
+      for(int i=0; i<size(); i++){
+	view_of(i)+=repeat0(repeat0(x.view1_of(i).block(0,nc),k_of(i)),k_of(i));
+	view_of(i).diag01()+=repeat0(x.view1_of(i).block(nc,nc),k_of(i));
+      }
+    }
 
     void broadcast0(const RtensorPool& x, const int offs){
       const int n=x.dim_of(0,0);
@@ -177,12 +310,69 @@ namespace ptens{
       }
     }
 
+    void broadcast0(const RtensorPool& x, const AindexPack& list){
+      int N=list.size();
+      const int n=x.dim_of(0,0);
+      for(int i=0; i<N; i++){
+	view_of(list.tens(i),list.ix(i))+=repeat0(repeat0(x.view1_of(i).block(0,nc),list.nix(i)),list.nix(i));
+	view_of(list.tens(i),list.ix(i)).diag01()+=repeat0(x.view1_of(i).block(nc,nc),list.nix(i));
+      }
+    }
+
+    void broadcast0(const RtensorPool& x, const AindexPack& list, const int offs){
+      int N=list.size();
+      const int n=x.dim_of(0,0);
+      for(int i=0; i<N; i++){
+	view_of(list.tens(i),list.ix(i),offs,n)+=repeat0(repeat0(x.view1_of(i),list.nix(i)),list.nix(i));
+	view_of(list.tens(i),list.ix(i),offs+n,n).diag01()+=repeat0(x.view1_of(i),list.nix(i));
+      }
+    }
+
+
+
+    void broadcast1(const RtensorPool& x){
+      //const int n=x.dim_of(0,1);
+      for(int i=0; i<size(); i++){
+	view_of(i)+=repeat0(x.view2_of(i).block(0,0,-1,nc),k_of(i));
+	view_of(i)+=repeat1(x.view2_of(i).block(0,nc,-1,nc),k_of(i));
+	view_of(i).diag01()+=x.view2_of(i).block(0,2*nc,-1,nc);
+      }
+    }
+
     void broadcast1(const RtensorPool& x, const int offs){
       const int n=x.dim_of(0,1);
       for(int i=0; i<size(); i++){
 	view_of(i,offs,n)+=repeat0(x.view2_of(i),k_of(i));
 	view_of(i,offs+n,n)+=repeat1(x.view2_of(i),k_of(i));
-	view_of(i,offs+n,n).diag01()+=x.view2_of(i);
+	view_of(i,offs+2*n,n).diag01()+=x.view2_of(i);
+      }
+    }
+
+    void broadcast1(const RtensorPool& x, const AindexPack& list){
+      int N=list.size();
+      //const int n=x.dim_of(0,0);
+      for(int i=0; i<N; i++){
+	view_of(list.tens(i),list.ix(i))+=repeat0(x.view2_of(i).block(0,0,-1,nc),list.nix(i));
+	view_of(list.tens(i),list.ix(i))+=repeat1(x.view2_of(i).block(0,nc,-1,nc),list.nix(i));
+	view_of(list.tens(i),list.ix(i)).diag01()+=x.view2_of(i).block(0,2*nc,-1,nc);
+      }
+    }
+
+    void broadcast1(const RtensorPool& x, const AindexPack& list, const int offs){
+      int N=list.size();
+      const int n=x.dim_of(0,1);
+      for(int i=0; i<N; i++){
+	view_of(list.tens(i),list.ix(i),offs,n)+=repeat0(x.view2_of(i),list.nix(i));
+	view_of(list.tens(i),list.ix(i),offs+n,n)+=repeat1(x.view2_of(i),list.nix(i));
+	view_of(list.tens(i),list.ix(i),offs+2*n,n).diag01()+=x.view2_of(i);
+      }
+    }
+
+
+    void broadcast2(const RtensorPool& x){ // no flipping
+      //const int n=x.dim_of(0,2);
+      for(int i=0; i<size(); i++){
+	view_of(i)+=x.view3_of(i);
       }
     }
 

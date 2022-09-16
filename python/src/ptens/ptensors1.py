@@ -1,24 +1,24 @@
 import torch
 
-from ptens_base import ptensor0pack as _ptensor0pack
+from ptens_base import ptensors1 as _ptensors1
 
 
-class ptensors0(torch.Tensor):
+class ptensors1(torch.Tensor):
 
     @classmethod
     def raw(self, _atoms, _nc, _dev=0):
-        R=ptensors0(1)
-        R.obj=_ptensor0pack.raw(_atoms,_nc,_dev)
+        R=ptensors1(1)
+        R.obj=_ptensors1.raw(_atoms,_nc,_dev)
 
     @classmethod
     def zero(self, _atoms, _nc, _dev=0):
-        R=ptensors0(1)
-        R.obj=_ptensor0pack.zero(_atoms,_nc,_dev)
+        R=ptensors1(1)
+        R.obj=_ptensors1.zero(_atoms,_nc,_dev)
 
     @classmethod
     def sequential(self, _atoms, _nc, _dev=0):
-        R=ptensors0(1)
-        R.obj=_ptensor0pack.sequential(_atoms,_nc,_dev)
+        R=ptensors1(1)
+        R.obj=_ptensors1.sequential(_atoms,_nc,_dev)
 
 
     # ----- Access -------------------------------------------------------------------------------------------
@@ -61,5 +61,6 @@ class ptensors0(torch.Tensor):
 
     def __str__(self):
         return self.obj.__str__()
+
 
 

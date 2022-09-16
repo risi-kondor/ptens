@@ -42,6 +42,37 @@ namespace ptens{
       return R;
     }
 
+    int tens(const int i) const{
+      assert(i<size());
+      return arr[lookup[i].first];
+    }
+
+    vector<int> ix(const int i) const{
+      assert(i<size());
+      auto& p=lookup[i];
+      int addr=p.first+1;
+      int len=p.second-1;
+      assert(len>=0);
+      vector<int> R(len);
+      for(int i=0; i<len; i++)
+	R[i]=arr[addr+i];
+      return R;
+    }
+
+    int ix(const int i, const int j) const{
+      assert(i<size());
+      auto& p=lookup[i];
+      int addr=p.first+1;
+      int len=p.second-1;
+      assert(len>=0);
+      return arr[addr+j];
+    }
+
+    int nix(const int i) const{
+      assert(i<size());
+      return lookup[i].second-1;
+    }
+
     int nindices(const int i) const{
       assert(i<size());
       return lookup[i].second-1;

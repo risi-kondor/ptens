@@ -7,12 +7,11 @@
 #include "Ptensor0.hpp"
 #include "Ptensor1.hpp"
 #include "Ptensor2.hpp"
-
+#include "Ptensors0.hpp"
+#include "Ptensors1.hpp"
+#include "Ptensors2.hpp"
 #include "LinMaps.hpp"
 #include "AddMsgFunctions.hpp"
-//#include "Ptensor0pack.hpp"
-//#include "Ptensor1pack.hpp"
-//#include "Ptensor2pack.hpp"
 
 
 //std::default_random_engine rndGen;
@@ -37,10 +36,11 @@ PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
   #include "../../bindings/Ptensor1_py.cpp"
   #include "../../bindings/Ptensor2_py.cpp"
 
-  //#include "../../bindings/Ptensor0pack_py.cpp"
-  //#include "../../bindings/Ptensor1pack_py.cpp"
-  //#include "../../bindings/Ptensor2pack_py.cpp"
+  #include "../../bindings/Ptensors0_py.cpp"
+  #include "../../bindings/Ptensors1_py.cpp"
+  #include "../../bindings/Ptensors2_py.cpp"
 
+  #include "../../bindings/LinMaps_py.cpp"
   #include "../../bindings/AddMsgFunctions_py.cpp"
 
   

@@ -119,6 +119,20 @@ namespace ptens{
       return RtensorPool::view2_of(i).block(0,offs,-1,n);
     }
 
+    Ptensor1_xview view_of(const int i, const vector<int>& ix) const{
+      vector<int> v=headers(i);
+      assert(v.size()==3);
+      if(dev==1) return Ptensor1_xview(arrg+v[0],v[2],v[2],1,ix,1);
+      return Ptensor1_xview(arr+v[0],v[2],v[2],1,ix,0);
+    }
+
+    Ptensor1_xview view_of(const int i, const vector<int>& ix, const int offs, const int n) const{
+      vector<int> v=headers(i);
+      assert(v.size()==3);
+      if(dev==1) return Ptensor1_xview(arrg+v[0]+offs,n,v[2],1,ix,1);
+      return Ptensor1_xview(arr+v[0]+offs,n,v[2],1,ix,0);
+    }
+
     Ptensor1 operator()(const int i) const{
       return Ptensor1(tensor_of(i),atoms_of(i));
     }
@@ -142,15 +156,75 @@ namespace ptens{
       return R;
     }
 
+    RtensorPool reduce0(const int offs, const int n) const{
+      RtensorPool R(size(),Gdims(nc),cnine::fill_zero());
+      for(int i=0; i<size(); i++)
+	view_of(i,offs,n).sum0_into(R.view1_of(i));
+      return R;
+    }
+
+    RtensorPool reduce0(const AindexPack& list) const{
+      int N=list.size();
+      RtensorPool R(N,Gdims(nc),cnine::fill_zero());
+      for(int i=0; i<N; i++)
+	view_of(list.tens(i),list.ix(i)).sum0_into(R.view1_of(i));
+      return R;
+    }
+
+    RtensorPool reduce0(const AindexPack& list, const int offs, const int n) const{
+      int N=list.size();
+      RtensorPool R(N,Gdims(nc),cnine::fill_zero());
+      for(int i=0; i<N; i++)
+	view_of(list.tens(i),list.ix(i),offs,n).sum0_into(R.view1_of(i));
+      return R;
+    }
+
 
     RtensorPool reduce1() const{
       return *this;
     }
 
+    RtensorPool reduce1(const int offs, const int n) const{
+      array_pool<int> dims;
+      for(int i=0; i<size(); i++)
+	dims.push_back(vector<int>({k_of(i),n}));
+      RtensorPool R(dims,cnine::fill_zero());
+      for(int i=0; i<size(); i++)
+	R.view2_of(i)+=view_of(i,offs,n);
+      return *this;
+    }
+
+    RtensorPool reduce1(const AindexPack& list) const{
+      int N=list.size();
+      array_pool<int> dims;
+      for(int i=0; i<N; i++)
+	dims.push_back({list.nix(i),nc});
+      RtensorPool R(dims,cnine::fill_zero());
+      for(int i=0; i<N; i++)
+	R.view2_of(i)+=view_of(list.tens(i),list.ix(i));
+      return R;
+    }
+
+    RtensorPool reduce1(const AindexPack& list, const int offs, const int n) const{
+      int N=list.size();
+      array_pool<int> dims;
+      for(int i=0; i<N; i++)
+	dims.push_back({list.nix(i),n});
+      RtensorPool R(dims,cnine::fill_zero());
+      for(int i=0; i<N; i++)
+	R.view2_of(i)+=view_of(list.tens(i),list.ix(i),offs,n);
+      return R;
+    }
 
 
   public: // ---- Broadcasting -------------------------------------------------------------------------------
 
+
+    void broadcast0(const RtensorPool& x){
+      for(int i=0; i<size(); i++){
+	view_of(i)+=repeat0(x.view1_of(i),k_of(i));
+      }
+    }
 
     void broadcast0(const RtensorPool& x, const int offs){
       const int n=x.dim_of(0,0);
@@ -159,6 +233,25 @@ namespace ptens{
       }
     }
 
+    void broadcast0(const RtensorPool& x, const AindexPack& list){
+      int N=list.size();
+      for(int i=0; i<N; i++)
+	view_of(list.tens(i))+=repeat0(x.view1_of(i),list.nix(i));
+    }
+
+    void broadcast0(const RtensorPool& x, const AindexPack& list, const int offs){
+      int N=list.size();
+      const int n=x.dim_of(0,0);
+      for(int i=0; i<N; i++)
+	view_of(list.tens(i),list.ix(i),offs,n)+=repeat0(x.view1_of(i),list.nix(i));
+    }
+
+
+    void broadcast1(const RtensorPool& x){
+      for(int i=0; i<size(); i++){
+	view_of(i)+=x.view2_of(i);
+      }
+    }
 
     void broadcast1(const RtensorPool& x, const int offs){
       const int n=x.dim_of(0,1);
@@ -167,6 +260,18 @@ namespace ptens{
       }
     }
 
+    void broadcast1(const RtensorPool& x, const AindexPack& list){
+      int N=list.size();
+      for(int i=0; i<N; i++)
+	view_of(list.tens(i),list.ix(i))+=x.view2_of(i);
+    }
+
+    void broadcast1(const RtensorPool& x, const AindexPack& list, const int offs){
+      int N=list.size();
+      const int n=x.dim_of(0,1);
+      for(int i=0; i<N; i++)
+	view_of(list.tens(i),list.ix(i),offs,n)+=x.view2_of(i);
+    }
 
 
 
