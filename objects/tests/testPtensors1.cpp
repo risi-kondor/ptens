@@ -18,10 +18,4 @@ int main(int argc, char** argv){
   cout<<linmaps2(A)<<endl;
   cout<<"-----"<<endl;
 
-  //cout<<linmaps1(A)<<endl;
-
-  //Ptensors1 B=Ptensors1::sequential(5,3,3);
-  //cout<<B<<endl;
-  //cout<<linmaps1(B)<<endl;
-
 }

@@ -5,7 +5,7 @@
 
 #include "array_pool.hpp"
 #include "Atoms.hpp"
-#include "GraphNhoods.hpp"
+//#include "GraphNhoods.hpp"
 
 
 namespace ptens{
@@ -37,6 +37,7 @@ namespace ptens{
       }
     }
 
+    /*
     AtomsPack(const Nhoods& N){
       for(int i=0; i<N.nhoods.size(); i++){
 	vector<int> v;
@@ -45,6 +46,7 @@ namespace ptens{
 	push_back(v);
       }
     }
+    */
 
 
   public: // ---- Access -------------------------------------------------------------------------------------

@@ -118,6 +118,19 @@ namespace ptens{
       tail+=len;
     }
 
+    void push_back(const set<TYPE>& v){
+      int len=v.size();
+      if(tail+len>memsize)
+	reserve(std::max(2*memsize,tail+len));
+      int i=0; 
+      for(TYPE p:v){
+	arr[tail+i]=p;
+	i++;
+      }
+      lookup.push_back(pair<int,int>(tail,len));
+      tail+=len;
+    }
+
     void push_back(const initializer_list<TYPE>& v){
       push_back(vector<TYPE>(v));
     }
