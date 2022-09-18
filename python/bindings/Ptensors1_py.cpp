@@ -1,6 +1,6 @@
 
 
-pybind11::class_<Ptensor1pack>(m,"ptensors1")
+pybind11::class_<Ptensors1>(m,"ptensors1")
 
 //.def(pybind11::init<const Ptensor0&, const Atoms&, const int, const FILLTYPE& dummy, const int _dev>(),"")
 
