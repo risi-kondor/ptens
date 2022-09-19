@@ -170,6 +170,12 @@ namespace ptens{
       it->second->set(j,v);
     }
 
+    SparseVec& row(const int i){
+      if(lists.find(i)==lists.end())
+	lists[i]=new SparseVec(m);
+      return *lists[i];
+    }
+
     void forall_nonzero(std::function<void(const int, const int, const float)> lambda) const{
       for(auto& p: lists){
 	int i=p.first;

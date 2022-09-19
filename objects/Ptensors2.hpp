@@ -384,6 +384,23 @@ namespace ptens{
       }
     }
 
+    void broadcast2(const RtensorPool& x, const AindexPack& list){
+      int N=list.size();
+      const int n=x.dim_of(0,2);
+      for(int i=0; i<N; i++){
+	view_of(list.tens(i),list.ix(i))+=x.view3_of(i);
+      }
+    }
+
+    void broadcast2(const RtensorPool& x, const AindexPack& list, const int offs){
+      int N=list.size();
+      const int n=x.dim_of(0,2);
+      for(int i=0; i<N; i++){
+	view_of(list.tens(i),list.ix(i),offs,n)+=x.view3_of(i);
+	view_of(list.tens(i),list.ix(i),offs+n,n)+=x.view3_of(i).transp01();
+      }
+    }
+
 
   public: // ---- I/O ----------------------------------------------------------------------------------------
 

@@ -52,6 +52,10 @@ namespace ptens{
   public: // ---- Access -------------------------------------------------------------------------------------
 
 
+    Atoms operator[](const int i) const{
+      return Atoms(array_pool<int>::operator()(i));
+    }
+
     int tsize0(){
       return size();
     }

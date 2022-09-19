@@ -1,6 +1,12 @@
 #ifndef _AddMsgFunctions
 #define _AddMsgFunctions
 
+#include "Ptensors0.hpp"
+#include "Ptensors1.hpp"
+#include "Ptensors2.hpp"
+#include "Hgraph.hpp"
+
+
 namespace ptens{
 
 
@@ -144,6 +150,124 @@ namespace ptens{
   }
     
 
+  // --------------------------------------------------------------------------------------------------------
+
+
+  // 0 -> 0
+  void add_msg(Ptensors0& r, const Ptensors0& x, const Hgraph& G, int offs=0){
+    auto indices=G.intersects(x.atoms,r.atoms);
+    r.broadcast0(x.reduce0(indices.first),indices.second,offs);
+  }
+  void add_msg_back(Ptensors0& r, const Ptensors0& x, const Hgraph& G, int offs=0){
+    auto indices=G.intersects(r.atoms,x.atoms);
+    r.broadcast0(x.reduce0(indices.second,offs,r.nc),indices.first);
+  }
+
+  // 0 -> 1
+  void add_msg(Ptensors1& r, const Ptensors0& x, const Hgraph& G, int offs=0){
+    auto indices=G.intersects(x.atoms,r.atoms);
+    r.broadcast0(x.reduce0(indices.first),indices.second,offs);
+  }
+  void add_msg_back(Ptensors0& r, const Ptensors1& x, const Hgraph& G, int offs=0){
+    auto indices=G.intersects(r.atoms,x.atoms);
+    r.broadcast0(x.reduce0(indices.second,offs,r.nc),indices.first);
+  }
+    
+  // 0 -> 2
+  void add_msg(Ptensors2& r, const Ptensors0& x, const Hgraph& G, int offs=0){
+    auto indices=G.intersects(x.atoms,r.atoms);
+    r.broadcast0(x.reduce0(indices.first),indices.second,offs);
+  }
+  void add_msg_back(Ptensors0& r, const Ptensors2& x, const Hgraph& G, int offs=0){
+    auto indices=G.intersects(r.atoms,x.atoms);
+    r.broadcast0(x.reduce0(indices.second,offs,r.nc),indices.first);
+  }
+
+
+  // 1 -> 0
+  void add_msg(Ptensors0& r, const Ptensors1& x, const Hgraph& G, int offs=0){
+    auto indices=G.intersects(x.atoms,r.atoms);
+    r.broadcast0(x.reduce0(indices.first),indices.second,offs);
+  }
+  void add_msg_back(Ptensors1& r, const Ptensors0& x, const Hgraph& G, int offs=0){
+    auto indices=G.intersects(r.atoms,x.atoms);
+    r.broadcast0(x.reduce0(indices.second,offs,r.nc),indices.first);
+  }
+
+  // 1 -> 1
+  void add_msg(Ptensors1& r, const Ptensors1& x, const Hgraph& G, int offs=0){
+    int nc=x.get_nc();
+    auto indices=G.intersects(x.atoms,r.atoms);
+    r.broadcast0(x.reduce0(indices.first),indices.second,offs);
+    r.broadcast1(x.reduce1(indices.first),indices.second,offs+nc);
+  }
+  void add_msg_back(Ptensors1& r, const Ptensors1& x, const Hgraph& G, int offs=0){
+    int nc=r.get_nc();
+    auto indices=G.intersects(r.atoms,x.atoms);
+    r.broadcast0(x.reduce0(indices.second,offs,nc),indices.first);
+    r.broadcast1(x.reduce1(indices.second,offs+nc,nc),indices.first);
+  }
+
+
+  // 1 -> 2
+  void add_msg(Ptensors2& r, const Ptensors1& x, const Hgraph& G, int offs=0){
+    int nc=x.get_nc();
+    auto indices=G.intersects(x.atoms,r.atoms);
+    r.broadcast0(x.reduce0(indices.first),indices.second,offs);
+    r.broadcast1(x.reduce1(indices.first),indices.second,offs+2*nc);
+  }
+  void add_msg_back(Ptensors1& r, const Ptensors2& x, const Hgraph& G, int offs=0){
+    int nc=r.get_nc();
+    auto indices=G.intersects(r.atoms,x.atoms);
+    r.broadcast0(x.reduce0(indices.second,offs,nc),indices.first);
+    r.broadcast1(x.reduce1(indices.second,offs+2*nc,nc),indices.first);
+  }
+
+
+  // 2 -> 0
+  void add_msg(Ptensors0& r, const Ptensors2& x, const Hgraph& G, int offs=0){
+    auto indices=G.intersects(x.atoms,r.atoms);
+    r.broadcast0(x.reduce0(indices.first),indices.second,offs);
+  }
+  void add_msg_back(Ptensors2& r, const Ptensors0& x, const Hgraph& G, int offs=0){
+    int nc=r.get_nc();
+    auto indices=G.intersects(r.atoms,x.atoms);
+    r.broadcast0(x.reduce0(indices.second,offs,nc),indices.first);
+  }
+
+  // 2 -> 1
+  void add_msg(Ptensors1& r, const Ptensors2& x, const Hgraph& G, int offs=0){
+    int nc=x.get_nc();
+    auto indices=G.intersects(x.atoms,r.atoms);
+    r.broadcast0(x.reduce0(indices.first),indices.second,offs);
+    r.broadcast1(x.reduce1(indices.first),indices.second,offs+2*nc);
+  }
+  void add_msg_back(Ptensors2& r, const Ptensors1& x, const Hgraph& G, int offs=0){
+    int nc=r.get_nc();
+    auto indices=G.intersects(r.atoms,x.atoms);
+    r.broadcast0(x.reduce0(indices.second,offs,nc),indices.first);
+    r.broadcast1(x.reduce1(indices.second,offs+2*nc,nc),indices.first);
+  }
+
+  // 2 -> 2
+  void add_msg(Ptensors2& r, const Ptensors2& x, const Hgraph& G, int offs=0){
+    int nc=x.get_nc();
+    auto indices=G.intersects(x.atoms,r.atoms);
+    r.broadcast0(x.reduce0(indices.first),indices.second,offs);
+    r.broadcast1(x.reduce1(indices.first),indices.second,offs+4*nc);
+    r.broadcast2(x.reduce2(indices.first),indices.second,offs+13*nc);
+  }
+    
+  void add_msg_back(Ptensors2& r, const Ptensors2& x, const Hgraph& G, int offs=0){
+    int nc=r.get_nc();
+    auto indices=G.intersects(r.atoms,x.atoms);
+    r.broadcast0(x.reduce0(indices.second,offs,nc),indices.first);
+    r.broadcast1(x.reduce1(indices.second,offs+4*nc,nc),indices.first);
+    r.broadcast2(x.reduce2(indices.second,offs+13*nc,nc),indices.first);
+  }
+    
+
+
   Ptensor0& operator>>(const Ptensor0& x, Ptensor0& r) {add_msg(r,x); return r;}
   Ptensor0& operator>>(const Ptensor1& x, Ptensor0& r) {add_msg(r,x); return r;}
   Ptensor0& operator>>(const Ptensor2& x, Ptensor0& r) {add_msg(r,x); return r;}
@@ -153,56 +277,9 @@ namespace ptens{
   Ptensor2& operator>>(const Ptensor0& x, Ptensor2& r) {add_msg(r,x); return r;}
   Ptensor2& operator>>(const Ptensor1& x, Ptensor2& r) {add_msg(r,x); return r;}
   Ptensor2& operator>>(const Ptensor2& x, Ptensor2& r) {add_msg(r,x); return r;}
-
-
-  // --------------------------------------------------------------------------------------------------------
-
-  /*
-  // 0 -> 0
-  void add_msg(Ptensors0& r, const Ptensors0& x, int offs=0){
-    r.broadcast0(x.reduce0(),offs);
-  }
-  void add_msg_back(Ptensor0& r, const Ptensor0& x, int offs=0){
-    r.broadcast0(x.reduce0(offs,r.nc));
-  }
-
-  // 0 -> 1
-  void add_msg(Ptensor1& r, const Ptensor0& x, int offs=0){
-    Atoms common=r.atoms.intersect(x.atoms);
-    r.broadcast0(x,r.atoms(common),offs);
-  }
-  void add_msg_back(Ptensor0& r, const Ptensor1& x, int offs=0){
-    Atoms common=r.atoms.intersect(x.atoms);
-    r.broadcast0(x.reduce0(offs,r.nc));
-  }
-    
-  // 0 -> 2
-  void add_msg(Ptensor2& r, const Ptensor0& x, int offs=0){
-    Atoms common=r.atoms.intersect(x.atoms);
-    vector<int> rix(r.atoms(common));
-    vector<int> xix(x.atoms(common));
-    r.broadcast0(x,rix,offs);
-  }
-  void add_msg_back(Ptensor0& r, const Ptensor2& x, int offs=0){
-    Atoms common=r.atoms.intersect(x.atoms);
-    vector<int> rix(r.atoms(common));
-    vector<int> xix(x.atoms(common));
-    r.broadcast0(x.reduce0(xix,offs,r.nc));
-  }
-
-  */
   
+   
 }
 
 #endif 
 
-
-    //Atoms common=atoms.intersect(x.atoms);
-    //int k=common.size();
-    //vector<int> rix(r.atoms(common));
-    //vector<int> xix(x.atoms(common));
-
-
-  //void add_msg_back(Ptensor0&  r, const Ptensor1& x, int offs=0){
-  //}
-  

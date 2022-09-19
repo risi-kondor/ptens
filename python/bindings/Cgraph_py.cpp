@@ -1,5 +1,3 @@
-
-
 pybind11::class_<Cgraph>(m,"cgraph")
 
   .def_static("random",static_cast<Cgraph(*)(const int, const float)>(&Cgraph::random))

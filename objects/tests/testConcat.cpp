@@ -1,5 +1,7 @@
+#include "Cnine_base.cpp"
+#include "CnineSession.hpp"
 #include "Hgraph.hpp"
-#include "CatFuncations.hpp"
+#include "ConcatFunctions.hpp"
 
 
 using namespace ptens;
@@ -11,14 +13,12 @@ int main(int argc, char** argv){
 
   int N=8;
   Hgraph G=Hgraph::random(N,0.3);
+  cout<<G.dense()<<endl;
 
-  Ptensors A=Ptensors::sequential(N,1);
+  Ptensors0 A=Ptensors0::sequential(N,1);
   cout<<A<<endl;
 
-  auto nh1=G.nhoods(1);
-  cout<<nh1<<endl;
-
-  auto B=concat(A,G,nh1);
-
+  auto B=concat(A,G);
+  cout<<B<<endl;
 
 }
