@@ -145,6 +145,18 @@ namespace ptens{
       return R;
     }
 
+  public: // ---- Conversions ------------------------------------------------------------------------------
+
+
+    SparseMx(const rtensor& x){
+      assert(x.ndsim()==2);
+      n=x.dim(0);
+      m=x.dim(1);
+      for(int i=0; i<n; i++)
+	for(int j=0; j<m; j++)
+	  if(x(i,j)!=0) set(i,j,x(i,j));
+    }
+
 
   public: // ---- Access -----------------------------------------------------------------------------------
 

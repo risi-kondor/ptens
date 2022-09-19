@@ -5,6 +5,7 @@
 #include "Ptens_base.hpp"
 #include "SparseMx.hpp"
 #include "AtomsPack.hpp"
+#include "AindexPack.hpp"
 
 
 namespace ptens{

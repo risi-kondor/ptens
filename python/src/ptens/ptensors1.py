@@ -1,4 +1,4 @@
-limport torch
+import torch
 
 from ptens_base import ptensors1 as _ptensors1
 
