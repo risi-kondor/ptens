@@ -103,7 +103,6 @@ class Ptensor0_Linmaps1Fn(torch.autograd.Function):
         u=_ptensor0.view(x,x.atoms)
         r=_ptensor1.view(R,R.atoms)
         ptens_base.add_linmaps0to1(r,u)
-        print(R)
         return R
         
     @staticmethod
