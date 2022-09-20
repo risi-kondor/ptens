@@ -1,7 +1,7 @@
 import torch
 
 from ptens_base import ptensors1 as _ptensors1
-
+#import ptens_base 
 
 class ptensors1(torch.Tensor):
 
@@ -9,16 +9,25 @@ class ptensors1(torch.Tensor):
     def raw(self, _atoms, _nc, _dev=0):
         R=ptensors1(1)
         R.obj=_ptensors1.raw(_atoms,_nc,_dev)
+        return R
 
     @classmethod
     def zero(self, _atoms, _nc, _dev=0):
         R=ptensors1(1)
         R.obj=_ptensors1.zero(_atoms,_nc,_dev)
+        return R
+
+    @classmethod
+    def randn(self, _atoms, _nc, _dev=0):
+        R=ptensors1(1)
+        R.obj=_ptensors1.gaussian(_atoms,_nc,_dev)
+        return R
 
     @classmethod
     def sequential(self, _atoms, _nc, _dev=0):
         R=ptensors1(1)
         R.obj=_ptensors1.sequential(_atoms,_nc,_dev)
+        return R
 
 
     # ----- Access -------------------------------------------------------------------------------------------
@@ -31,12 +40,12 @@ class ptensors1(torch.Tensor):
         return self.obj.view_of_grad()
     
     def get_grad(self):
-        R=rtensorvar(1)
+        R=ptensors1(1)
         R.obj=self.obj.get_grad()
         return R
     
     def view_of_grad(self):
-        R=rtensorvar(1)
+        R=ptensors1(1)
         R.obj=self.obj.view_of_grad()
         return R
 
@@ -49,8 +58,6 @@ class ptensors1(torch.Tensor):
 
     def push_back(self, x):
         return self.obj.push_back(x)
-
-
 
     
     # ---- I/O ----------------------------------------------------------------------------------------------

@@ -70,6 +70,9 @@ namespace ptens{
     static Ptensors0 zero(const AtomsPack& _atoms, const int _nc, const int _dev=0){
       return Ptensors0(_atoms,_nc,cnine::fill_zero(),_dev);}
 
+    static Ptensors0 gaussian(const AtomsPack& _atoms, const int _nc, const int _dev=0){
+      return Ptensors0(_atoms,_nc,cnine::fill_gaussian(),_dev);}
+
     static Ptensors0 sequential(const AtomsPack& _atoms, const int _nc, const int _dev=0){
       Ptensors0 R(_atoms,_nc,cnine::fill_raw(),_dev);
       for(int i=0; i<R.size(); i++) R.view1_of(i).set(i);

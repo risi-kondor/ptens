@@ -37,6 +37,11 @@ namespace ptens{
       }
     }
 
+    AtomsPack(const vector<vector<int> >& x){
+      for(auto& p:x)
+	push_back(p);
+    }
+
     /*
     AtomsPack(const Nhoods& N){
       for(int i=0; i<N.nhoods.size(); i++){

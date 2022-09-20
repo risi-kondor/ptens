@@ -1,17 +1,18 @@
 ***********************
-Equivariant linear maps
+Linmaps
 ***********************
 
-The neurons in permutation equivariant networks correspond to learnable equivariant mappings 
-between Ptensors. `ptens` implements all such possible linear maps. 
-We start with the case where the reference domain of the input and output are the same. 
+The neurons in permutation equivariant networks implement learnable equivariant maps between Ptensors. 
+The ``linmaps`` functions described in this section are such equivariant maps that can be 
+applied in the case that the reference domains of the input and output tensors are the *same*. 
 
 ==========
-Order zero
+Linmaps from zeroth order Ptensors
 ==========
 
-The only equivariant linear maps between zeroth order Ptensors are multiples of the identity, 
-therefore ``linmaps0`` applied to a ``ptensor0``, is just the identity mapping:
+The only possible equivariant linear maps from one zeroth order Ptensor to another zeroth order 
+ptensor are multiples of the identity, 
+Therefore ``linmaps0`` applied to a ``ptensor0``, is just the identity map`:
 
 .. code-block:: python
 
@@ -24,7 +25,7 @@ therefore ``linmaps0`` applied to a ``ptensor0``, is just the identity mapping:
  Ptensor0(1,2,3):
  [ 0 1 2 3 4 ]
 
-The only equivariant map from a ``ptensor0`` to ``ptensor1`` is given by :math:`B_{i,c}=A_c`:
+The only equivariant map from a ``ptensor0`` to ``ptensor1`` is :math:`B_{i,c}=A_c`:
 
 .. code-block:: python
 
@@ -41,7 +42,7 @@ The only equivariant map from a ``ptensor0`` to ``ptensor1`` is given by :math:`
 
 On the other hand, the space of equivariant maps from a ``ptensor0`` to ``ptensor1`` are 
 spanned by two differrent maps: :math:`C^1_{i,j,c}=A_c` and :math:`C^2_{i,j,c}=\delta_{i,j} A_c`. 
-Consequently, `linmaps2` doubles the number of channels:
+Consequently, ``linmaps2`` doubles the number of channels:
 
 .. code-block:: python
 
@@ -84,7 +85,7 @@ Consequently, `linmaps2` doubles the number of channels:
    [ 0 0 2 ]
 
 ==========
-Order one
+Linmaps from first order Ptensors
 ==========
 
 When mapping a first order Ptensor to a zeroth order Ptensor, the only equivariant linear map 
@@ -217,7 +218,7 @@ Hence the number of channels multiplies fivefold.
    [ 0 0 8 ]
 
 ==========
-Order two
+Linmaps from second order Ptensors
 ==========
 
 The space of equivariant maps from a second order Ptensor to a zeroth order Ptensor is spanned by 

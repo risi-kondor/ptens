@@ -13,9 +13,9 @@ by a permutation :math:`\sigma`, then :math:`A` transforms to :math:`A'` with
   A'_{i_1,\ldots,i_k,c}=A_{i_{\sigma^{-1}(1)},\ldots,i_{\sigma^{-1}(k)},c}
 
 Currently `ptens` supports zeroth, first and second order Ptensors with corresponding classes 
-``ptensor0``, ``ptensor1`` and ``ptensor2``. Each of these classes is derived from the 
-``torch.Tensor`` class, hence all the usual arithmetic operations can be applied to PTensors. 
-Note that some of these operations might break equiavriance, though. For example, applying 
+``ptensor0``, ``ptensor1`` and ``ptensor2``. Each of these classes is derived  
+``torch.Tensor``. Hence all the usual arithmetic operations in PyTorch can be directly applied to PTensors. 
+Note, however, that some of these operations might break equiavriance. For example, applying 
 a specific operation to just one slice of a Ptensor (unless it is a slice corresponding to a 
 given setting of the channel dimension) generally breaks equivariance. 
 
@@ -47,13 +47,11 @@ size of the reference domain. For example, the following creates a first order P
  >>> B=ptens.ptensor1.randn([1,2,3],5)
  >>> print(B)
  Ptensor1(1,2,3):
- [ 1.57658 0.278142 1.78178 ]
- [ 0.524821 -0.496081 -0.427595 ]
- [ -1.94122 -0.0458005 1.8405 ]
- [ 0.848817 0.209676 0.323065 ]
- [ -0.529721 -0.903987 0.081249 ]
+ [ 0.0515154 -0.0194946 -1.39105 -1.38258 0.658819 ]
+ [ 0.85989 0.278101 0.890897 -0.000561227 1.54719 ]
+ [ 1.22424 -0.099083 -0.849395 -0.396878 -0.119167 ]
 
-Similalry, the following creates and prints out a second order Ptensor over the reference domain 
+Similarly, the following creates and prints out a second order Ptensor over the reference domain 
 :math:`(1,2,3)`:
 
 .. code-block:: python
@@ -95,11 +93,9 @@ For debugging purposes `ptens` also provides a ``sequential`` initializer for ea
  >>> A=ptens.ptensor1.sequential([1,2,3],5)
  >>> print(A)
  Ptensor1(1,2,3):
- [ 0 5 10 ]
- [ 1 6 11 ]
- [ 2 7 12 ]
- [ 3 8 13 ]
- [ 4 9 14 ]
+ [ 0 1 2 3 4 ]
+ [ 5 6 7 8 9 ]
+ [ 10 11 12 13 14 ]
 
 
 

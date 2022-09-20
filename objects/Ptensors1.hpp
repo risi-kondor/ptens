@@ -77,6 +77,22 @@ namespace ptens{
       return R;
     }
 
+    static Ptensors1 gaussian(const AtomsPack& _atoms, const int _nc, const int _dev=0){
+      Ptensors1 R(_nc,_dev);
+      for(int i=0; i<_atoms.size(); i++){
+	R.push_back(Ptensor1::gaussian(_atoms(i),_nc));
+      }
+      return R;
+    }
+
+    static Ptensors1 sequential(const AtomsPack& _atoms, const int _nc, const int _dev=0){
+      Ptensors1 R(_nc,_dev);
+      for(int i=0; i<_atoms.size(); i++){
+	R.push_back(Ptensor1::sequential(_atoms(i),_nc));
+      }
+      return R;
+    }
+
 
   public: // ----- Copying -----------------------------------------------------------------------------------
 

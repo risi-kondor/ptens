@@ -29,24 +29,20 @@ PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
   using namespace cnine;
   using namespace ptens;
   namespace py=pybind11;
-
-  //#include "../../bindings/Cgraph_py.cpp"
-  //#include "../../bindings/GraphNhoods_py.cpp"
-
-  #include "../../bindings/AtomsPack_py.cpp"
-  #include "../../bindings/Hgraph_py.cpp"
-
-  #include "../../bindings/Ptensor0_py.cpp"
-  #include "../../bindings/Ptensor1_py.cpp"
-  #include "../../bindings/Ptensor2_py.cpp"
-
-  #include "../../bindings/Ptensors0_py.cpp"
-  #include "../../bindings/Ptensors1_py.cpp"
-  #include "../../bindings/Ptensors2_py.cpp"
-
-  // #include "../../bindings/LinMaps_py.cpp"
-  #include "../../bindings/AddMsgFunctions_py.cpp"
-
   
+
+  #include "AtomsPack_py.cpp"
+  #include "Hgraph_py.cpp"
+
+  #include "Ptensor0_py.cpp"
+  #include "Ptensor1_py.cpp"
+  #include "Ptensor2_py.cpp"
+
+  #include "Ptensors0_py.cpp"
+  #include "Ptensors1_py.cpp"
+  #include "Ptensors2_py.cpp"
+
+  #include "Linmaps_py.cpp"
+  #include "AddMsgFunctions_py.cpp"
 
 }

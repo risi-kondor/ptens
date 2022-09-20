@@ -114,7 +114,7 @@ def main():
             depends=_depends
         )]
     else:
-        ext_modules = [CppExtension('ptens_base', ['src/ptens/ptens_py.cpp'],
+        ext_modules = [CppExtension('ptens_base', ['bindings/ptens_py.cpp'],
                                     include_dirs=_include_dirs,
                                     # sources=sources,
                                     extra_compile_args={

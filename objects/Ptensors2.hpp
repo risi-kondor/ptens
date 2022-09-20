@@ -66,11 +66,26 @@ namespace ptens{
       return R;
     }
 
-
     static Ptensors2 zero(const AtomsPack& _atoms, const int _nc, const int _dev=0){
       Ptensors2 R(_nc,_dev);
       for(int i=0; i<_atoms.size(); i++){
 	R.push_back(Ptensor2::zero(_atoms(i),_nc));
+      }
+      return R;
+    }
+
+    static Ptensors2 gaussian(const AtomsPack& _atoms, const int _nc, const int _dev=0){
+      Ptensors2 R(_nc,_dev);
+      for(int i=0; i<_atoms.size(); i++){
+	R.push_back(Ptensor2::gaussian(_atoms(i),_nc));
+      }
+      return R;
+    }
+
+    static Ptensors2 sequential(const AtomsPack& _atoms, const int _nc, const int _dev=0){
+      Ptensors2 R(_nc,_dev);
+      for(int i=0; i<_atoms.size(); i++){
+	R.push_back(Ptensor2::sequential(_atoms(i),_nc));
       }
       return R;
     }

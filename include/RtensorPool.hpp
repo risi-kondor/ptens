@@ -62,6 +62,18 @@ namespace ptens{
       tail=_N*asize;
     }
 
+    RtensorPool(const int _N, const Gdims& _dims, const cnine::fill_gaussian& dummy, const int _dev=0):
+      RtensorPool(_dev){
+      CNINE_CPUONLY();
+      int asize=_dims.asize();
+      reserve(_N*asize);
+      normal_distribution<double> distr;
+      for(int i=0; i<asize; i++) arr[i]=distr(rndGen);
+      for(int i=0; i<_N; i++)
+	headers.push_back_cat(i*asize,_dims);
+      tail=_N*asize;
+    }
+
     RtensorPool(const array_pool<int>& dimensions, const cnine::fill_zero& dummy, const int _dev=0){
       dev=_dev;
 

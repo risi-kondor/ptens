@@ -11,6 +11,7 @@ Welcome to ptens's documentation!
    :caption: Contents:
 
    ptensork.rst
+   ptensorsk.rst
    linmaps.rst
 
 

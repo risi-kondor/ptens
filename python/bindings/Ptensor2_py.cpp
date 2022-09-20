@@ -27,18 +27,3 @@ pybind11::class_<Ptensor2>(m,"ptensor2")
   .def("__str__",&Ptensor2::str,py::arg("indent")="");
 
 
-m.def("add_linmaps2to0",[](Ptensor0& r, const Ptensor2& x, int offs){
-    return x.add_linmaps_to(r,offs);}, py::arg("r"), py::arg("x"), py::arg("offs")=0);
-m.def("add_linmaps2to0_back",[](Ptensor2& r, const Ptensor0& x, int offs){
-    return r.add_linmaps_back(x,offs);}, py::arg("r"), py::arg("x"), py::arg("offs")=0);
-
-m.def("add_linmaps2to1",[](Ptensor1& r, const Ptensor2& x, int offs){
-    return x.add_linmaps_to(r,offs);},  py::arg("r"), py::arg("x"), py::arg("offs")=0);
-m.def("add_linmaps2to1_back",[](Ptensor2& r, const Ptensor1& x, int offs){
-    return r.add_linmaps_back(x,offs);},  py::arg("r"), py::arg("x"), py::arg("offs")=0);
-
-m.def("add_linmaps2to2",[](Ptensor2& r, const Ptensor2& x, int offs){
-    return r.add_linmaps(x,offs);},  py::arg("r"), py::arg("x"), py::arg("offs")=0);
-m.def("add_linmaps2to2_back",[](Ptensor2& r, const Ptensor2& x, int offs){
-    return r.add_linmaps_back(x,offs);},  py::arg("r"), py::arg("x"), py::arg("offs")=0);
-
