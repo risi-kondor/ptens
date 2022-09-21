@@ -46,7 +46,8 @@ namespace ptens{
 
     template<typename FILLTYPE, typename = typename std::enable_if<std::is_base_of<cnine::fill_pattern, FILLTYPE>::value, FILLTYPE>::type>
     Ptensors0(const AtomsPack& _atoms, const int _nc, const FILLTYPE& dummy, const int _dev=0):
-      RtensorPool(_atoms.size(), cnine::Gdims({_nc}), dummy, _dev), atoms(_atoms), nc(_nc){}
+      RtensorPool(_atoms.size(), cnine::Gdims({_nc}), dummy, _dev), atoms(_atoms), nc(_nc){
+    }
 
 
   public: // ----- Constructors ------------------------------------------------------------------------------
@@ -85,11 +86,13 @@ namespace ptens{
 
     Ptensors0(const Ptensors0& x):
       RtensorPool(x),
-      atoms(x.atoms){}
+      atoms(x.atoms),
+      nc(x.nc){}
 	
     Ptensors0(Ptensors0&& x):
       RtensorPool(std::move(x)),
-      atoms(std::move(x.atoms)){}
+      atoms(std::move(x.atoms)),
+      nc(x.nc){}
 
     Ptensors0& operator=(const Ptensors0& x)=delete;
 

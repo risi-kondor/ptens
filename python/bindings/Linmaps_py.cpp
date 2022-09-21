@@ -45,3 +45,56 @@ m.def("add_linmaps2to2",[](Ptensor2& r, const Ptensor2& x, int offs){
 m.def("add_linmaps2to2_back",[](Ptensor2& r, const Ptensor2& x, int offs){
     return r.add_linmaps_back(x,offs);},  py::arg("r"), py::arg("x"), py::arg("offs")=0);
 
+
+// -----------------------------------------------------------------------------------------------------------
+
+
+m.def("add_linmaps0to0",[](Ptensors0& r, const Ptensors0& x, int offs){
+    return add_linmaps(r,x,offs);}, py::arg("r"), py::arg("x"), py::arg("offs")=0);
+m.def("add_linmaps0to0_back",[](Ptensors0& r, const Ptensors0& x, int offs){
+    return add_linmaps_back(r,x,offs);}, py::arg("r"), py::arg("x"), py::arg("offs")=0);
+m.def("add_linmaps0to0_back",[](Ptensors0* r, const Ptensors0& x, int offs){
+    return add_linmaps_back(*r,x,offs);}, py::arg("r"), py::arg("x"), py::arg("offs")=0);
+
+m.def("add_linmaps0to1",[](Ptensors1& r, const Ptensors0& x, int offs){
+    return add_linmaps(r,x,offs);},  py::arg("r"), py::arg("x"), py::arg("offs")=0);
+m.def("add_linmaps0to1_back",[](Ptensors0& r, const Ptensors1& x, int offs){
+    return add_linmaps_back(r,x,offs);},  py::arg("r"), py::arg("x"), py::arg("offs")=0);
+
+m.def("add_linmaps0to2",[](Ptensors2& r, const Ptensors0& x, int offs){
+    return add_linmaps(r,x,offs);},  py::arg("r"), py::arg("x"), py::arg("offs")=0);
+m.def("add_linmaps0to2_back",[](Ptensors0& r, const Ptensors2& x, int offs){
+    return add_linmaps_back(r,x,offs);},  py::arg("r"), py::arg("x"), py::arg("offs")=0);
+
+
+m.def("add_linmaps1to0",[](Ptensors0& r, const Ptensors1& x, int offs){
+    return add_linmaps(r,x,offs);}, py::arg("r"), py::arg("x"), py::arg("offs")=0);
+m.def("add_linmaps1to0_back",[](Ptensors1& r, const Ptensors0& x, int offs){
+    return add_linmaps_back(r,x,offs);}, py::arg("r"), py::arg("x"), py::arg("offs")=0);
+
+m.def("add_linmaps1to1",[](Ptensors1& r, const Ptensors1& x, int offs){
+    return add_linmaps(r,x,offs);},  py::arg("r"), py::arg("x"), py::arg("offs")=0);
+m.def("add_linmaps1to1_back",[](Ptensors1& r, const Ptensors1& x, int offs){
+    return add_linmaps_back(r,x,offs);},  py::arg("r"), py::arg("x"), py::arg("offs")=0);
+
+m.def("add_linmaps1to2",[](Ptensors2& r, const Ptensors1& x, int offs){
+    return add_linmaps(r,x,offs);},  py::arg("r"), py::arg("x"), py::arg("offs")=0);
+m.def("add_linmaps1to2_back",[](Ptensors1& r, const Ptensors2& x, int offs){
+    return add_linmaps_back(r,x,offs);},  py::arg("r"), py::arg("x"), py::arg("offs")=0);
+
+
+m.def("add_linmaps2to0",[](Ptensors0& r, const Ptensors2& x, int offs){
+    return add_linmaps(r,x,offs);}, py::arg("r"), py::arg("x"), py::arg("offs")=0);
+m.def("add_linmaps2to0_back",[](Ptensors2& r, const Ptensors0& x, int offs){
+    return add_linmaps_back(r,x,offs);}, py::arg("r"), py::arg("x"), py::arg("offs")=0);
+
+m.def("add_linmaps2to1",[](Ptensors1& r, const Ptensors2& x, int offs){
+    return add_linmaps(r,x,offs);},  py::arg("r"), py::arg("x"), py::arg("offs")=0);
+m.def("add_linmaps2to1_back",[](Ptensors2& r, const Ptensors1& x, int offs){
+    return add_linmaps_back(r,x,offs);},  py::arg("r"), py::arg("x"), py::arg("offs")=0);
+
+m.def("add_linmaps2to2",[](Ptensors2& r, const Ptensors2& x, int offs){
+    return add_linmaps(r,x,offs);},  py::arg("r"), py::arg("x"), py::arg("offs")=0);
+m.def("add_linmaps2to2_back",[](Ptensors2& r, const Ptensors2& x, int offs){
+    return add_linmaps_back(r,x,offs);},  py::arg("r"), py::arg("x"), py::arg("offs")=0);
+

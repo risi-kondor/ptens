@@ -314,7 +314,7 @@ namespace ptens{
 
     string str(const string indent="")const{
       ostringstream oss;
-      oss<<indent<<"Ptensor1"<<atoms<<":"<<endl;
+      oss<<indent<<"Ptensor1 "<<atoms<<":"<<endl;
       oss<<view2().str(indent);
       return oss.str();
     }

@@ -12,12 +12,16 @@ by a permutation :math:`\sigma`, then :math:`A` transforms to :math:`A'` with
 .. math::
   A'_{i_1,\ldots,i_k,c}=A_{i_{\sigma^{-1}(1)},\ldots,i_{\sigma^{-1}(k)},c}
 
-Currently `ptens` supports zeroth, first and second order Ptensors with corresponding classes 
+Currently `ptens` supports zeroth, first and second order Ptensors. thecorresponding classes 
 ``ptensor0``, ``ptensor1`` and ``ptensor2``. Each of these classes is derived  
-``torch.Tensor``. Hence all the usual arithmetic operations in PyTorch can be directly applied to PTensors. 
-Note, however, that some of these operations might break equiavriance. For example, applying 
-a specific operation to just one slice of a Ptensor (unless it is a slice corresponding to a 
-given setting of the channel dimension) generally breaks equivariance. 
+``torch.Tensor``, allowing all the usual PyTorch arithmetic operations to be applied to PTensors. 
+Note, however, that some of these operations might break equivariance. For example, changing 
+just one slice or one element of a Ptensor is generally not an equivariant 
+operation. 
+
+.. 
+  (unless it is a slice corresponding to a 
+  given setting of the channel dimension) generally breaks equivariance. 
 
 =================
 Creating Ptensors
@@ -84,7 +88,8 @@ Similarly, the following creates and prints out a second order Ptensor over the 
    [ -1.76276 -0.139075 -0.349366 ]
    [ -0.0366747 -0.563576 0.233288 ]
 
-Note that for better legibility the `ptensor` classes use their own custom printout methods. 
+..
+  Note that for better legibility the `ptensor` classes use their own custom printout methods. 
 
 For debugging purposes `ptens` also provides a ``sequential`` initializer for each of these classes, e.g.:
 

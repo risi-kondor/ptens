@@ -36,8 +36,16 @@ namespace ptens{
       return false;
     }
 
-    float operator()(const int i0, const int i1) const{
-      return arr[s0*ix[i0]+s1*i1];
+    //float operator()(const int i0, const int i1) const{
+    //return arr[s0*ix[i0]+s1*i1];
+    //}
+
+    float operator()(const int i0, const int i1, const int i2) const{
+      return arr[s0*ix[i0]+s1*ix[i1]+s2*i2];
+    }
+
+    float get(const int i0, const int i1, const int i2) const{
+      return arr[s0*ix[i0]+s1*ix[i1]+s2*i2];
     }
 
     /*

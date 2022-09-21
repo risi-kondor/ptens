@@ -12,7 +12,7 @@ class ptensors2(torch.Tensor):
         return R
 
     @classmethod
-    def zero(self, _atoms, _nc, _dev=0):
+    def zeros(self, _atoms, _nc, _dev=0):
         R=ptensors2(1)
         R.obj=_ptensors2.zero(_atoms,_nc,_dev)
         return R

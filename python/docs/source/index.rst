@@ -13,6 +13,7 @@ Welcome to ptens's documentation!
    ptensork.rst
    ptensorsk.rst
    linmaps.rst
+   transfer.rst
 
 
 Indices and tables

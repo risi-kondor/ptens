@@ -45,7 +45,7 @@ namespace ptens{
 	memsize=newsize;
       }
       if(dev==1){
-	TYPE* newarrg;
+	TYPE* newarrg=nullptr;
 	CUDA_SAFE(cudaMalloc((void **)&newarrg, newsize*sizeof(TYPE)));
 	if(arrg){
 	  CUDA_SAFE(cudaMemcpy(newarrg,arrg,memsize*sizeof(TYPE),cudaMemcpyDeviceToDevice));  

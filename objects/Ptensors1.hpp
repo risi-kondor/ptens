@@ -26,8 +26,17 @@ namespace ptens{
 
     int nc;
     AtomsPack atoms;
+    bool is_view=false;
+
+
+#ifdef WITH_FAKE_GRAD
+    Ptensors1* grad=nullptr;
+#endif 
 
     ~Ptensors1(){
+#ifdef WITH_FAKE_GRAD
+      if(!is_view) delete grad;
+#endif 
     }
 
 
@@ -94,18 +103,62 @@ namespace ptens{
     }
 
 
+  public: // ---- Spawning -----------------------------------------------------------------------------------
+
+    //static Ptensors0 zeros_like(const Ptenso
+
+    static Ptensors1* new_zeros_like(const Ptensors1& x){
+      return new Ptensors1(RtensorPool::zeros_like(x),x.atoms,x.nc);
+    }
+
+    
+  public: // ----- Conversions -------------------------------------------------------------------------------
+
+
+    Ptensors1(RtensorPool&& x, const AtomsPack& _atoms, const int _nc):
+      RtensorPool(std::move(x)), atoms(_atoms), nc(_nc){}
+
+
   public: // ----- Copying -----------------------------------------------------------------------------------
 
 
     Ptensors1(const Ptensors1& x):
       RtensorPool(x),
-      atoms(x.atoms){}
+      atoms(x.atoms),
+      nc(x.nc){}
 	
     Ptensors1(Ptensors1&& x):
       RtensorPool(std::move(x)),
-      atoms(std::move(x.atoms)){}
+      atoms(std::move(x.atoms)),
+      nc(x.nc){}
 
     Ptensors1& operator=(const Ptensors1& x)=delete;
+
+
+  public: // ---- Experimental -------------------------------------------------------------------------------
+
+
+    #ifdef WITH_FAKE_GRAD
+    //void add_to_grad(const Ptensors1& x){
+    //if(grad) grad->add(x);
+    //else grad=new Ptensors1(x);
+    //}
+
+    Ptensors1& get_grad(){
+      if(!grad) grad=Ptensors1::new_zeros_like(*this);
+      return *grad;
+    }
+
+    Ptensors1* get_gradp(){
+      if(!grad) grad=Ptensors1::new_zeros_like(*this);
+      return grad;
+    }
+
+    //Ptensors1 view_of_grad(){
+    //if(!grad) grad=new_zeros_like(*this);
+    //return grad->view();
+    //}
+    #endif 
 
 
   public: // ----- Access ------------------------------------------------------------------------------------
@@ -113,6 +166,10 @@ namespace ptens{
 
     int get_nc() const{
       return nc;
+    }
+
+    AtomsPack& get_atomsref(){
+      return atoms;
     }
 
     int k_of(const int i) const{

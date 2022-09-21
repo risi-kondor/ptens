@@ -506,7 +506,7 @@ namespace ptens{
 
     string str(const string indent="") const{
       ostringstream oss;
-      oss<<indent<<"Ptensor2"<<atoms<<":"<<endl;
+      oss<<indent<<"Ptensor2 "<<atoms<<":"<<endl;
       for(int c=0; c<get_nc(); c++){
 	oss<<indent<<"channel "<<c<<":"<<endl;
 	oss<<view3().slice2(c).str(indent+"  ");

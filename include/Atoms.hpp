@@ -95,11 +95,11 @@ namespace ptens{
 
     string str(const string indent="") const{
       ostringstream oss;
-      oss<<"(";
+      oss<<"[";
       for(int i=0; i<size()-1; i++)
 	oss<<(*this)[i]<<",";
       if(size()>0) oss<<(*this)[size()-1];
-      oss<<")";
+      oss<<"]";
       return oss.str();
     }
 

@@ -96,11 +96,13 @@ namespace ptens{
 
     Ptensors2(const Ptensors2& x):
       RtensorPool(x),
-      atoms(x.atoms){}
+      atoms(x.atoms),
+      nc(x.nc){}
 	
     Ptensors2(Ptensors2&& x):
       RtensorPool(std::move(x)),
-      atoms(std::move(x.atoms)){}
+      atoms(std::move(x.atoms)),
+      nc(x.nc){}
 
     Ptensors2& operator=(const Ptensors2& x)=delete;
 

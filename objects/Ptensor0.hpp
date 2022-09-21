@@ -229,7 +229,7 @@ namespace ptens{
 
     string str(const string indent="")const{
       ostringstream oss;
-      oss<<indent<<"Ptensor0"<<atoms<<":"<<endl;
+      oss<<indent<<"Ptensor0 "<<atoms<<":"<<endl;
       oss<<rtensor::str(indent);
       return oss.str();
     }

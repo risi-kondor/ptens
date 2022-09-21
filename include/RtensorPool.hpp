@@ -109,6 +109,16 @@ namespace ptens{
       return R;
     }
 
+    static RtensorPool* new_zeros_like(const RtensorPool& x){
+      RtensorPool*  R=new RtensorPool(x.dev);
+      R->reserve(x.tail);
+      if(x.dev==0) std::fill(R->arr,R->arr+x.tail,0);
+      if(x.dev==1){}
+      R->headers=x.headers;
+      R->tail=x.tail;
+      return R;
+    }
+
 
   public: // ---- Memory management --------------------------------------------------------------------------
 
