@@ -23,8 +23,17 @@ namespace ptens{
 
     int nc;
     AtomsPack atoms;
+    bool is_view=false;
+
+
+#ifdef WITH_FAKE_GRAD
+    Ptensors2* grad=nullptr;
+#endif 
 
     ~Ptensors2(){
+#ifdef WITH_FAKE_GRAD
+      if(!is_view) delete grad;
+#endif 
     }
 
 
@@ -91,6 +100,22 @@ namespace ptens{
     }
 
 
+  public: // ---- Spawning -----------------------------------------------------------------------------------
+
+    //static Ptensors0 zeros_like(const Ptenso
+
+    static Ptensors2* new_zeros_like(const Ptensors2& x){
+      return new Ptensors2(RtensorPool::zeros_like(x),x.atoms,x.nc);
+    }
+
+    
+  public: // ----- Conversions -------------------------------------------------------------------------------
+
+
+    Ptensors2(RtensorPool&& x, const AtomsPack& _atoms, const int _nc):
+      RtensorPool(std::move(x)), atoms(_atoms), nc(_nc){}
+
+
   public: // ----- Copying -----------------------------------------------------------------------------------
 
 
@@ -107,12 +132,43 @@ namespace ptens{
     Ptensors2& operator=(const Ptensors2& x)=delete;
 
 
+  public: // ---- Experimental -------------------------------------------------------------------------------
+
+
+    #ifdef WITH_FAKE_GRAD
+    //void add_to_grad(const Ptensors1& x){
+    //if(grad) grad->add(x);
+    //else grad=new Ptensors1(x);
+    //}
+
+    Ptensors2& get_grad(){
+      if(!grad) grad=Ptensors2::new_zeros_like(*this);
+      return *grad;
+    }
+
+    Ptensors2* get_gradp(){
+      if(!grad) grad=Ptensors2::new_zeros_like(*this);
+      return grad;
+    }
+
+    //Ptensors1 view_of_grad(){
+    //if(!grad) grad=new_zeros_like(*this);
+    //return grad->view();
+    //}
+    #endif 
+
+
   public: // ----- Access ------------------------------------------------------------------------------------
 
 
     int get_nc() const{
       return nc;
     }
+
+    AtomsPack view_of_atoms(){
+      return atoms.view();
+    }
+
 
     int k_of(const int i) const{
       return dim_of(i,0);

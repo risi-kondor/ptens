@@ -54,6 +54,38 @@ namespace ptens{
     */
 
 
+  public: // ---- Copying ------------------------------------------------------------------------------------
+
+
+    AtomsPack(const AtomsPack& x):
+      array_pool(x){
+      //cout<<"AtomsPack copied"<<endl;
+    }
+
+    AtomsPack(AtomsPack&& x):
+      array_pool(std::move(x)){
+      //cout<<"AtomsPack moved"<<endl;
+    }
+
+    AtomsPack& operator=(const AtomsPack& x)=delete;
+
+
+
+  public: // ---- Views --------------------------------------------------------------------------------------
+
+
+    AtomsPack(array_pool<int>&& x):
+      array_pool<int>(std::move(x)){}
+
+
+  public: // ---- Views --------------------------------------------------------------------------------------
+
+
+    AtomsPack view(){
+      return AtomsPack(array_pool<int>::view());
+    }
+
+
   public: // ---- Access -------------------------------------------------------------------------------------
 
 

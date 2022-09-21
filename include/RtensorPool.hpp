@@ -26,9 +26,11 @@ namespace ptens{
     int memsize=0;
     int tail=0;
     vector_pool<int> headers;
+    //bool is_view=false;
 
     ~RtensorPool(){
-      //if(arr) delete[] arr;
+      //if(is_view) return;
+      if(arr) delete[] arr;
       if(arrg) {CUDA_SAFE(cudaFree(arrg));}
     }
 

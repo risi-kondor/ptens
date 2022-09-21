@@ -14,10 +14,12 @@ namespace ptens{
     int memsize=0;
     int tail=0;
     int dev=0;
+    bool is_view=false;
 
     vector<pair<int,int> > lookup;
 
     ~array_pool(){
+      if(is_view) return;
       if(arr) delete[] arr;
       if(arrg) {CUDA_SAFE(cudaFree(arrg));}
     }
@@ -82,6 +84,25 @@ namespace ptens{
       arrg=x.arrg; x.arrg=nullptr;
       lookup=std::move(x.lookup);
       x.lookup.clear();
+      is_view=x.is_view;
+    }
+
+    array_pool<int>& operator=(const array_pool<int>& x)=delete;
+
+
+  public: // ---- Views --------------------------------------------------------------------------------------
+
+
+    array_pool<TYPE> view(){
+      array_pool<TYPE> R;
+      R.dev=dev;
+      R.tail=tail;
+      R.memsize=memsize;
+      R.arr=arr;
+      R.arrg=arrg;
+      R.lookup=lookup;
+      R.is_view=true;
+      return R;
     }
 
 

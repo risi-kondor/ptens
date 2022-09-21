@@ -43,6 +43,8 @@ pybind11::class_<Ptensors1>(m,"ptensors1")
 
   .def("get_nc",&Ptensors1::get_nc)
   .def("get_atomsref",&Ptensors1::get_atomsref)
+  .def("view_of_atoms",&Ptensors1::view_of_atoms)
+
   .def("atoms_of",&Ptensors1::atoms_of)
   .def("push_back",&Ptensors1::push_back)
 

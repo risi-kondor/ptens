@@ -22,7 +22,27 @@ pybind11::class_<Ptensors0>(m,"ptensors0")
   .def_static("sequential",[](const AtomsPack& _atoms, const int _nc, const int _dev){
       return Ptensors0::sequential(_atoms,_nc,_dev);}, py::arg("atoms"),py::arg("nc"),py::arg("device")=0)
 
+
+// ---- Conversions, transport, etc. ------------------------------------------------------------------------
+
+
+//.def("add_to_grad",&Ptensors0::add_to_grad)
+  .def("get_grad",&Ptensors0::get_grad)
+  .def("get_gradp",&Ptensors0::get_grad)
+//  .def("view_of_grad",&Ptensors0::view_of_grad)
+
+//.def("device",&Ptensors0::get_device)
+//.def("to",&Ptensors0::to_device)
+//.def("to_device",&Ptensors0::to_device)
+//.def("move_to",[](Ptensors0& x, const int _dev){x.move_to_device(_dev);})
+
+
+// ---- Access ----------------------------------------------------------------------------------------------
+
+
   .def("get_nc",&Ptensors0::get_nc)
+  .def("view_of_atoms",&Ptensors0::view_of_atoms)
+
   .def("atoms_of",&Ptensors0::atoms_of)
   .def("push_back",&Ptensors0::push_back)
 
