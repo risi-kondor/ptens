@@ -58,6 +58,20 @@ namespace ptens{
       RtensorPool(_atoms.size(), cnine::Gdims({_nc}), dummy, _dev), atoms(_atoms), nc(_nc){
     }
 
+    Ptensors0(const rtensor& A):
+      RtensorPool(A), atoms(A.dim(0)){
+      nc=A.dim(1);
+    }
+
+    #ifdef _WITH_ATEN
+    Ptensors0(const at::Tensor& T):
+      RtensorPool(rtensor(T)){
+      assert(size()>0);
+      atoms=AtomsPack(size());
+      nc=dim_of(0,0);
+    }
+    #endif 
+
 
   public: // ----- Constructors ------------------------------------------------------------------------------
 
@@ -106,6 +120,12 @@ namespace ptens{
       RtensorPool(std::move(x)), atoms(_atoms), nc(_nc){}
 
 
+    rtensor tensor() const{
+      CNINE_CPUONLY();
+      return rtensor({size(),nc},arr,0);
+    }
+
+
   public: // ----- Copying -----------------------------------------------------------------------------------
 
 
@@ -134,6 +154,11 @@ namespace ptens{
     Ptensors0& get_grad(){
       if(!grad) grad=Ptensors0::new_zeros_like(*this);
       return *grad;
+    }
+
+    Ptensors0* gradp(){
+      if(!grad) grad=Ptensors0::new_zeros_like(*this);
+      return grad;
     }
 
     Ptensors0* get_gradp(){

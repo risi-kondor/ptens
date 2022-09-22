@@ -151,6 +151,11 @@ namespace ptens{
       return grad;
     }
 
+    Ptensors2* gradp(){
+      if(!grad) grad=Ptensors2::new_zeros_like(*this);
+      return grad;
+    }
+
     //Ptensors1 view_of_grad(){
     //if(!grad) grad=new_zeros_like(*this);
     //return grad->view();

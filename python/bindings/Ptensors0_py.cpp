@@ -2,7 +2,7 @@
 
 pybind11::class_<Ptensors0>(m,"ptensors0")
 
-//.def(pybind11::init<const Ptensor0&, const Atoms&, const int, const FILLTYPE& dummy, const int _dev>(),"")
+  .def(pybind11::init<const at::Tensor&>())
 
   .def_static("raw",[](const vector<vector<int> >& v, const int _nc, const int _dev){
       return Ptensors0::raw(AtomsPack(v),_nc,_dev);}, py::arg("atoms"),py::arg("nc"),py::arg("device")=0)
@@ -28,13 +28,17 @@ pybind11::class_<Ptensors0>(m,"ptensors0")
 
 //.def("add_to_grad",&Ptensors0::add_to_grad)
   .def("get_grad",&Ptensors0::get_grad)
-  .def("get_gradp",&Ptensors0::get_grad)
+  .def("gradp",&Ptensors0::gradp)
+  .def("get_gradp",&Ptensors0::get_gradp)
 //  .def("view_of_grad",&Ptensors0::view_of_grad)
 
 //.def("device",&Ptensors0::get_device)
 //.def("to",&Ptensors0::to_device)
 //.def("to_device",&Ptensors0::to_device)
 //.def("move_to",[](Ptensors0& x, const int _dev){x.move_to_device(_dev);})
+
+  .def("__getitem__",[](const Ptensors0& x, const int i){return x(i);})
+  .def("torch",[](const Ptensors0& x){return x.tensor().torch();})
 
 
 // ---- Access ----------------------------------------------------------------------------------------------

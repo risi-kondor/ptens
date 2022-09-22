@@ -87,7 +87,34 @@ namespace ptens{
       is_view=x.is_view;
     }
 
-    array_pool<int>& operator=(const array_pool<int>& x)=delete;
+    array_pool<TYPE>& operator=(const array_pool<TYPE>& x){
+
+      if(is_view){
+	arr=nullptr;
+	arrg=nullptr;
+      }else{
+	delete arr; 
+	arr=nullptr;
+	if(arrg){CUDA_SAFE(cudaFree(arrg));}
+	arrg=nullptr;
+      }
+
+      dev=x.dev;
+      tail=x.tail;
+      memsize=x.tail;
+      lookup=x.lookup;
+      is_view=false;
+
+      if(dev==0){
+	arr=new TYPE[memsize]; 
+	std::copy(x.arr,x.arr+memsize,arr);
+      }
+      if(dev==1){
+	CUDA_SAFE(cudaMalloc((void **)&arrg, memsize*sizeof(float)));
+	CUDA_SAFE(cudaMemcpy(arrg,x.arrg,asize*sizeof(float),cudaMemcpyDeviceToDevice));  
+      }
+      return *this;
+    }
 
 
   public: // ---- Views --------------------------------------------------------------------------------------

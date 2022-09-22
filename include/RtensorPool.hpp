@@ -70,11 +70,12 @@ namespace ptens{
       int asize=_dims.asize();
       reserve(_N*asize);
       normal_distribution<double> distr;
-      for(int i=0; i<asize; i++) arr[i]=distr(rndGen);
+      for(int i=0; i<_N*asize; i++) arr[i]=distr(rndGen);
       for(int i=0; i<_N; i++)
 	headers.push_back_cat(i*asize,_dims);
       tail=_N*asize;
     }
+
 
     RtensorPool(const array_pool<int>& dimensions, const cnine::fill_zero& dummy, const int _dev=0){
       dev=_dev;
@@ -95,8 +96,23 @@ namespace ptens{
 	headers.push_back_cat(tail,v);
 	tail+=t;
       }
-
     }
+
+    RtensorPool(const rtensor& x){
+      assert(x.ndims()==2);
+      int m=x.dim(1);
+      CNINE_CPUONLY();
+      dev=x.dev;
+      memsize=x.memsize;
+      tail=memsize;
+      if(x.dev==0){
+	arr=new float[memsize];
+	std::copy(x.arr,x.arr+memsize,arr);
+      }
+      for(int i=0; i<x.dim(0); i++)
+	headers.push_back({i*m,m});
+    }
+
 
   public: // ---- Named constructors -------------------------------------------------------------------------
 

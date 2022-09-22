@@ -104,14 +104,15 @@ class Ptensors2_Linmaps0Fn(torch.autograd.Function):
 
     @staticmethod
     def forward(ctx,x):
-        ctx.x=x
         R=ptens.ptensors0.zeros(x.obj.view_of_atoms(),x.obj.get_nc()*2)
         ptens_base.add_linmaps2to0(R.obj,x.obj)
+        ctx.x=x.obj
+        ctx.r=R.obj
         return R
         
     @staticmethod
     def backward(ctx,g):
-        ptens_base.add_linmaps2to0_back(ctx.x.obj.get_gradp(),g.obj)
+        ptens_base.add_linmaps2to0_back(ctx.x.gradp(),ctx.r.gradp())
         return ptensors2(1)
 
 
@@ -119,14 +120,15 @@ class Ptensors2_Linmaps1Fn(torch.autograd.Function):
 
     @staticmethod
     def forward(ctx,x):
-        ctx.x=x
         R=ptens.ptensors1.zeros(x.obj.view_of_atoms(),x.obj.get_nc()*5)
         ptens_base.add_linmaps2to1(R.obj,x.obj)
+        ctx.x=x.obj
+        ctx.r=R.obj
         return R
         
     @staticmethod
     def backward(ctx,g):
-        ptens_base.add_linmaps2to1_back(ctx.x.obj.get_gradp(),g.obj)
+        ptens_base.add_linmaps2to1_back(ctx.x.gradp(),ctx.r.gradp())
         return ptensors2(1)
 
 
@@ -134,14 +136,15 @@ class Ptensors2_Linmaps2Fn(torch.autograd.Function):
 
     @staticmethod
     def forward(ctx,x):
-        ctx.x=x
         R=ptens.ptensors2.zeros(x.obj.view_of_atoms(),x.obj.get_nc()*15)
         ptens_base.add_linmaps2to2(R.obj,x.obj)
+        ctx.x=x.obj
+        ctx.r=R.obj
         return R
         
     @staticmethod
     def backward(ctx,g):
-        ptens_base.add_linmaps2to2_back(ctx.x.obj.get_gradp(),g.obj)
+        ptens_base.add_linmaps2to2_back(ctx.x.gradp(),ctx.r.gradp())
         return ptensors2(1)
 
 

@@ -28,7 +28,7 @@ pybind11::class_<Ptensors1>(m,"ptensors1")
 
 //.def("add_to_grad",&Ptensors1::add_to_grad)
   .def("get_grad",&Ptensors1::get_grad)
-  .def("get_gradp",&Ptensors1::get_grad)
+  .def("gradp",&Ptensors1::gradp)
 //  .def("view_of_grad",&Ptensors1::view_of_grad)
 
 //.def("device",&Ptensors1::get_device)

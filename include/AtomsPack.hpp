@@ -67,7 +67,10 @@ namespace ptens{
       //cout<<"AtomsPack moved"<<endl;
     }
 
-    AtomsPack& operator=(const AtomsPack& x)=delete;
+    AtomsPack& operator=(const AtomsPack& x){
+      array_pool<int>::operator=(x);
+      return *this;
+    }
 
 
 
