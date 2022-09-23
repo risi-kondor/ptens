@@ -47,9 +47,8 @@ namespace ptens{
       RtensorPool(_dev){
       int asize=_dims.asize();
       reserve(_N*asize);
-      for(int i=0; i<_N; i++){
+      for(int i=0; i<_N; i++)
 	headers.push_back_cat(i*asize,_dims);
-      }
       tail=_N*asize;
     }
 
@@ -256,11 +255,17 @@ namespace ptens{
     }
 
 
-
-
     rtensor operator()(const int i) const{
       assert(i<size());
       return rtensor(dims_of(i),get_arr()+addr_of(i),dev);
+    }
+
+    rtensor view_of_tensor(const int i){
+      return rtensor::view_of_blob(dims_of(i),get_arr()+addr_of(i),dev);
+    }
+
+    const rtensor view_of_tensor(const int i) const{
+      return rtensor::view_of_blob(dims_of(i),get_arr()+addr_of(i),dev);
     }
 
     //rtensor tensor(const int i) const{

@@ -3,6 +3,7 @@ import torch
 import ptens_base
 from ptens_base import ptensors0 as _ptensors0
 
+import ptens.ptensor0
 import ptens.ptensors1
 import ptens.ptensors2 
 
@@ -68,17 +69,16 @@ class ptensors0(torch.Tensor):
         return self.obj.push_back(x)
 
     def __getitem__(self,i):
-        R=ptensor0.zeros(self.atoms_of(i),self.get_nc())
-        _ptensor0.view(R,R.atoms).set(self.obj[i])
-        return R
-
-
+        return Ptensors0_getFn.apply(self,i)
+    
     def torch(self):
         return Ptensors0_toMxFn.apply(self)
     
 
     # ---- Operations ----------------------------------------------------------------------------------------
 
+    def __mul__(self,y):
+        return Ptensors0_mprodFn.apply(self,y)
     
     def linmaps0(self):
         return Ptensors0_Linmaps0Fn.apply(self);
@@ -138,6 +138,38 @@ class Ptensors0_toMxFn(torch.autograd.Function):
        R.obj=_ptensors0(x)
        return R
     
+
+class Ptensors0_getFn(torch.autograd.Function):
+
+    @staticmethod
+    def forward(ctx,x,i):
+        R=ptens.ptensor0(x.obj[i].torch())
+        R.atoms=x.atoms_of(i)
+        ctx.x=x.obj
+        ctx.i=i
+        return R
+
+    @staticmethod
+    def backward(ctx,g):
+        R=ptensors0(1)
+        ctx.x.add_to_grad(ctx.i,g)
+        return R,None
+
+    
+class Ptensors0_mprodFn(torch.autograd.Function):
+    
+    @staticmethod
+    def forward(ctx,x,y):
+        R=ptens.ptensors0.zeros(x.obj.view_of_atoms(),y.size(1))
+        R.obj.add_mprod(x.obj,y)
+        ctx.x=x.obj
+        ctx.r=R.obj
+        return R
+
+    @staticmethod
+    def backward(ctx,x,y):
+        pass
+
 
 class Ptensors0_Linmaps0Fn(torch.autograd.Function):
 

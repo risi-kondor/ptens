@@ -11,8 +11,9 @@ on all the Ptensors in a given layer *in parallel*, even if their reference doma
 Defining Ptensor layers
 =======================
 
-Similarly to individual Ptensors, one way to define Ptensor layers is using the ``zero``, 
-``randn`` or ``sequential`` constructors. For example, the following creates a layer consisting of three 
+One way to define Ptensor layers is using the ``zero``, ``randn`` or ``sequential`` constructors, 
+similalry to how individual Ptensors can be constructed.  
+For example, the following creates a layer consisting of three 
 random first order Ptensors with reference domains :math:`(1,2,3)`, :math:`(3,5)` and :math:`(2)`
 and 3 channels: 
 
@@ -84,8 +85,40 @@ PyTorch tensor:
          [1., 1., 1., 1., 1.],
          [2., 2., 2., 2., 2.]])
 
-In higher order Ptensor layers, the tensors cannot be jointly converted to/from a single PyTorch tensor, 
-since their dimensionalities might be different. 
+.. 
+  In higher order Ptensor layers, the tensors cannot be jointly converted to/from a single PyTorch tensor, 
+  since their dimensionalities might be different. 
+
+For higher order tensor layers, the individual tensors have to be accessed one by one if they are to 
+be converted to a Pytorch tensor, for example:
+
+.. code-block:: python
+
+ >>> A=ptens.ptensors1.randn([[1,2],[2,3],[3]],5)
+ >>> A
+ Ptensor1 [1,2]:
+ [ -1.23974 -0.407472 1.61201 0.399771 1.3828 ]
+ [ 0.0523187 -0.904146 1.87065 -1.66043 -0.688081 ]
+ 
+ Ptensor1 [2,3]:
+ [ 0.0757219 1.47339 0.097221 -0.89237 -0.228782 ]
+ [ 1.16493 0.584898 -0.660558 0.534755 -0.607787 ] 
+
+ Ptensor1 [3]:
+ [ 0.74589 -1.75177 -0.965146 -0.474282 -0.546571 ]
+ 
+ >>> B=A[1]
+ >>> B
+ Ptensor1 [2,3]:
+ [ 0.0757219 1.47339 0.097221 -0.89237 -0.228782 ]
+ [ 1.16493 0.584898 -0.660558 0.534755 -0.607787 ]
+ 
+
+Note that accessing individual tensors, as well as the constructor and ``torch()`` methods for ``ptensors0`` 
+described above are differentiable operations.
+
+
+
 
 
 

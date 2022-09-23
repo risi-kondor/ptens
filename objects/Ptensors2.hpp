@@ -222,14 +222,16 @@ namespace ptens{
     }
 
 
-  public: // ---- Linmaps ------------------------------------------------------------------------------------
+  public: // ---- Cumulative operations ----------------------------------------------------------------------
 
 
+    void add_mprod(const Ptensors2& x, const rtensor& y){
+      assert(x.size()==size());
+      for(int i=0; i<size(); i++)
+	view_of_tensor(i).add_mprod(x.view_of_tensor(i),y);
+    }
 
-  public: // ---- Message passing ----------------------------------------------------------------------------
-
-
-
+ 
   public: // ---- Reductions ---------------------------------------------------------------------------------
 
 

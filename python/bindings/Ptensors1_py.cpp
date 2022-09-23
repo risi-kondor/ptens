@@ -31,6 +31,10 @@ pybind11::class_<Ptensors1>(m,"ptensors1")
   .def("gradp",&Ptensors1::gradp)
 //  .def("view_of_grad",&Ptensors1::view_of_grad)
 
+  .def("add_to_grad",[](Ptensors1& x, const int i, at::Tensor& T){
+      x.get_grad().view_of_tensor(i).add(RtensorA::view(T));
+    })
+
 //.def("device",&Ptensors1::get_device)
 //.def("to",&Ptensors1::to_device)
 //.def("to_device",&Ptensors1::to_device)
@@ -45,8 +49,22 @@ pybind11::class_<Ptensors1>(m,"ptensors1")
   .def("get_atomsref",&Ptensors1::get_atomsref)
   .def("view_of_atoms",&Ptensors1::view_of_atoms)
 
-  .def("atoms_of",&Ptensors1::atoms_of)
+  .def("__getitem__",[](const Ptensors1& x, const int i){return x(i);})
+
+  .def("atoms_of",[](const Ptensors1& x, const int i){return vector<int>(x.atoms_of(i));})
   .def("push_back",&Ptensors1::push_back)
+
+
+// ---- Operations -------------------------------------------------------------------------------------------
+
+
+  .def("add_mprod",[](Ptensors1& r, const Ptensors1& x, at::Tensor& y){
+      r.add_mprod(x,RtensorA::view(y));
+    })
+
+
+// ---- I/O --------------------------------------------------------------------------------------------------
+
 
   .def("str",&Ptensors1::str,py::arg("indent")="")
   .def("__str__",&Ptensors1::str,py::arg("indent")="")

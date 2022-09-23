@@ -60,6 +60,9 @@ class ptensors2(torch.Tensor):
     def atoms_of(self, i):
         return self.obj.atoms_of(i)
 
+    def __getitem__(self,i):
+        return Ptensors2_getFn.apply(self,i)
+    
     def push_back(self, x):
         return self.obj.push_back(x)
 
@@ -67,6 +70,10 @@ class ptensors2(torch.Tensor):
     # ---- Operations ----------------------------------------------------------------------------------------
 
     
+    def __mul__(self,y):
+        return Ptensors0_mprodFn.apply(self,y)
+    
+
     def linmaps0(self):
         return Ptensors2_Linmaps0Fn.apply(self);
 
@@ -98,6 +105,38 @@ class ptensors2(torch.Tensor):
 
 
 # ------------------------------------------------------------------------------------------------------------
+
+
+class Ptensors2_getFn(torch.autograd.Function):
+
+    @staticmethod
+    def forward(ctx,x,i):
+        R=ptens.ptensor2(x.obj[i].torch())
+        R.atoms=x.atoms_of(i)
+        ctx.x=x.obj
+        ctx.i=i
+        return R
+
+    @staticmethod
+    def backward(ctx,g):
+        R=ptensors2(1)
+        ctx.x.add_to_grad(ctx.i,g)
+        return R, None
+    
+
+class Ptensors2_mprodFn(torch.autograd.Function):
+    
+    @staticmethod
+    def forward(ctx,x,y):
+        R=ptens.ptensors2.zeros(x.obj.view_of_atoms(),y.size(1))
+        R.obj.add_mprod(x.obj,y)
+        ctx.x=x.obj
+        ctx.r=R.obj
+        return R
+
+    @staticmethod
+    def backward(ctx,x,y):
+        pass
 
 
 class Ptensors2_Linmaps0Fn(torch.autograd.Function):
