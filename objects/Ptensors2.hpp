@@ -7,12 +7,13 @@
 #include "AtomsPack.hpp"
 #include "AindexPack.hpp"
 #include "Ptensor2.hpp"
+#include "diff_class.hpp"
 
 
 namespace ptens{
 
 
-  class Ptensors2: public RtensorPool{
+  class Ptensors2: public RtensorPool, public diff_class<Ptensors2>{
   public:
 
     typedef cnine::IntTensor itensor;
@@ -25,10 +26,6 @@ namespace ptens{
     AtomsPack atoms;
     bool is_view=false;
 
-
-#ifdef WITH_FAKE_GRAD
-    Ptensors2* grad=nullptr;
-#endif 
 
     ~Ptensors2(){
 #ifdef WITH_FAKE_GRAD
@@ -69,40 +66,43 @@ namespace ptens{
 
     static Ptensors2 raw(const AtomsPack& _atoms, const int _nc, const int _dev=0){
       Ptensors2 R(_nc,_dev);
-      for(int i=0; i<_atoms.size(); i++){
+      for(int i=0; i<_atoms.size(); i++)
 	R.push_back(Ptensor2::raw(_atoms(i),_nc));
-      }
       return R;
     }
 
     static Ptensors2 zero(const AtomsPack& _atoms, const int _nc, const int _dev=0){
       Ptensors2 R(_nc,_dev);
-      for(int i=0; i<_atoms.size(); i++){
+      for(int i=0; i<_atoms.size(); i++)
 	R.push_back(Ptensor2::zero(_atoms(i),_nc));
-      }
       return R;
     }
 
     static Ptensors2 gaussian(const AtomsPack& _atoms, const int _nc, const int _dev=0){
       Ptensors2 R(_nc,_dev);
-      for(int i=0; i<_atoms.size(); i++){
+      for(int i=0; i<_atoms.size(); i++)
 	R.push_back(Ptensor2::gaussian(_atoms(i),_nc));
-      }
       return R;
     }
 
     static Ptensors2 sequential(const AtomsPack& _atoms, const int _nc, const int _dev=0){
       Ptensors2 R(_nc,_dev);
-      for(int i=0; i<_atoms.size(); i++){
+      for(int i=0; i<_atoms.size(); i++)
 	R.push_back(Ptensor2::sequential(_atoms(i),_nc));
-      }
+      return R;
+    }
+
+
+    static Ptensors2 concat(const Ptensors2& x, const Ptensors2& y){
+      Ptensors2 R=Ptensors2::zero(x.atoms,x.nc+y.nc);
+      R.add_to_channels(x,0);
+      R.add_to_channels(y,x.nc);
       return R;
     }
 
 
   public: // ---- Spawning -----------------------------------------------------------------------------------
 
-    //static Ptensors0 zeros_like(const Ptenso
 
     static Ptensors2* new_zeros_like(const Ptensors2& x){
       return new Ptensors2(RtensorPool::zeros_like(x),x.atoms,x.nc);
@@ -132,37 +132,6 @@ namespace ptens{
     Ptensors2& operator=(const Ptensors2& x)=delete;
 
 
-  public: // ---- Experimental -------------------------------------------------------------------------------
-
-
-    #ifdef WITH_FAKE_GRAD
-    //void add_to_grad(const Ptensors1& x){
-    //if(grad) grad->add(x);
-    //else grad=new Ptensors1(x);
-    //}
-
-    Ptensors2& get_grad(){
-      if(!grad) grad=Ptensors2::new_zeros_like(*this);
-      return *grad;
-    }
-
-    Ptensors2* get_gradp(){
-      if(!grad) grad=Ptensors2::new_zeros_like(*this);
-      return grad;
-    }
-
-    Ptensors2* gradp(){
-      if(!grad) grad=Ptensors2::new_zeros_like(*this);
-      return grad;
-    }
-
-    //Ptensors1 view_of_grad(){
-    //if(!grad) grad=new_zeros_like(*this);
-    //return grad->view();
-    //}
-    #endif 
-
-
   public: // ----- Access ------------------------------------------------------------------------------------
 
 
@@ -189,6 +158,10 @@ namespace ptens{
 
     Rtensor3_view view_of(const int i) const{
       return RtensorPool::view3_of(i);
+    }
+
+    Rtensor2_view fused_view_of(const int i) const{
+      return RtensorPool::view3_of(i).fuse01();
     }
 
     Rtensor3_view view_of(const int i, const int offs, const int n) const{
@@ -225,10 +198,36 @@ namespace ptens{
   public: // ---- Cumulative operations ----------------------------------------------------------------------
 
 
+    void add_to_channels(const Ptensors2& x, const int offs){
+      int N=size();
+      assert(x.size()==N);
+      for(int i=0; i<N; i++)
+	view_of(i,offs,x.nc)+=x.view_of(i);
+    }
+
+    void add_channels(const Ptensors2& x, const int offs){
+      int N=size();
+      assert(x.size()==N);
+      for(int i=0; i<N; i++)
+	view_of(i)+=x.view_of(i,offs,x.nc);
+    }
+
     void add_mprod(const Ptensors2& x, const rtensor& y){
       assert(x.size()==size());
       for(int i=0; i<size(); i++)
-	view_of_tensor(i).add_mprod(x.view_of_tensor(i),y);
+	fused_view_of(i).add_matmul_AA(x.fused_view_of(i),y.view2());
+    }
+
+    void add_mprod_back0(const Ptensors2& g, const rtensor& y){
+      assert(x.size()==size());
+      for(int i=0; i<size(); i++)
+	fused_view_of(i).add_matmul_AT(g.fused_view_of(i),y.view2());
+    }
+
+    void add_mprod_back1_to(rtensor& r, const Ptensors2& x) const{
+      assert(x.size()==size());
+      for(int i=0; i<size(); i++)
+	r.view2().add_matmul_TA(x.fused_view_of(i),fused_view_of(i));
     }
 
  
@@ -370,7 +369,6 @@ namespace ptens{
     }
 
 
-
   public: // ---- Broadcasting -------------------------------------------------------------------------------
 
 
@@ -409,9 +407,7 @@ namespace ptens{
     }
 
 
-
     void broadcast1(const RtensorPool& x){
-      //const int n=x.dim_of(0,1);
       for(int i=0; i<size(); i++){
 	view_of(i)+=repeat0(x.view2_of(i).block(0,0,-1,nc),k_of(i));
 	view_of(i)+=repeat1(x.view2_of(i).block(0,nc,-1,nc),k_of(i));
@@ -489,8 +485,6 @@ namespace ptens{
       ostringstream oss;
       for(int i=0; i<size(); i++){
 	oss<<indent<<(*this)(i)<<endl;
-	//oss<<indent<<"Ptensor "<<i<<" "<<Atoms(atoms(i))<<":"<<endl;
-	//oss<<RtensorPool::operator()(i).str()<<endl;
       }
       return oss.str();
     }
@@ -504,6 +498,8 @@ namespace ptens{
 
 
 #endif 
+
+
     /*
     void add_messages0(const RtensorPool& messages, const AindexPack& dest_list, const int coffs){
       int N=dest_list.size();
@@ -760,5 +756,21 @@ namespace ptens{
 	for(int c=0; c<_nc; c++)
 	  x.view1_of(i).inc(c,view2_of(i).slice1(c).sum());
 	}
+    }
+    */
+    /*
+    void add_to_grad(const Ptensors2& x){
+      if(grad) grad->add(x);
+      else grad=new Ptensors2(x);
+    }
+
+    Ptensors2& get_grad(){
+      if(!grad) grad=Ptensors2::new_zeros_like(*this);
+      return *grad;
+    }
+
+    loose_ptr<Ptensors2> get_gradp(){
+      if(!grad) grad=Ptensors2::new_zeros_like(*this);
+      return grad;
     }
     */

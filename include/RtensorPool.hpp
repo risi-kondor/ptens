@@ -332,6 +332,16 @@ namespace ptens{
       tail+=asize;
     }
 
+  public: // ---- Cumulative operations ----------------------------------------------------------------------
+
+
+    void add(const RtensorPool& x){
+      assert(x.dev==dev);
+      assert(x.tail==tail);
+      CPUCODE(cnine::stdadd(x.arr,x.arr+tail,arr));
+      GPUCODE(const float alpha = 1.0; CUBLAS_SAFE(cublasSaxpy(cnine_cublas, asize, &alpha, x.arrg, 1, arrg, 1)));
+    }
+
 
   public: // ---- I/O ----------------------------------------------------------------------------------------
 

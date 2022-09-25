@@ -77,8 +77,15 @@ class ptensors0(torch.Tensor):
 
     # ---- Operations ----------------------------------------------------------------------------------------
 
+
+    def __add__(self,y):
+        return Ptensors0_addFn.apply(self,y)
+
     def __mul__(self,y):
         return Ptensors0_mprodFn.apply(self,y)
+
+    def concat(self,y):
+        return Ptensors0_concatFn.apply(self,y)
     
     def linmaps0(self):
         return Ptensors0_Linmaps0Fn.apply(self);
@@ -155,6 +162,42 @@ class Ptensors0_getFn(torch.autograd.Function):
         ctx.x.add_to_grad(ctx.i,g)
         return R,None
 
+
+class Ptensors0_addFn(torch.autograd.Function):
+    
+    @staticmethod
+    def forward(ctx,x,y):
+        R=ptensors0(1)
+        R.obj=_ptensors0(x.obj)
+        R.obj.add(y.obj)
+        ctx.x=x.obj
+        ctx.y=y.obj
+        ctx.r=R.obj
+        return R
+
+    @staticmethod
+    def backward(ctx,g):
+        ctx.x.add_to_grad(ctx.r.get_gradp())
+        ctx.y.add_to_grad(ctx.r.get_gradp())
+        return ptensors0(1),ptensors0(1)
+
+class Ptensors0_concatFn(torch.autograd.Function):
+    
+    @staticmethod
+    def forward(ctx,x,y):
+        r=ptensors0(1)
+        r.obj=_ptensors0.concat(x.obj,y.obj)
+        ctx.x=x.obj
+        ctx.y=y.obj
+        ctx.r=r.obj
+        return r
+
+    @staticmethod
+    def backward(ctx,g):
+        ctx.x.add_concat_back(ctx.r,0)
+        ctx.y.add_concat_back(ctx.r,ctx.x.get_nc())
+        return ptensors0(1),ptensors0(1)
+
     
 class Ptensors0_mprodFn(torch.autograd.Function):
     
@@ -163,12 +206,14 @@ class Ptensors0_mprodFn(torch.autograd.Function):
         R=ptens.ptensors0.zeros(x.obj.view_of_atoms(),y.size(1))
         R.obj.add_mprod(x.obj,y)
         ctx.x=x.obj
+        ctx.y=y
         ctx.r=R.obj
         return R
 
     @staticmethod
-    def backward(ctx,x,y):
-        pass
+    def backward(ctx,g):
+        ctx.x.add_mprod_back0(ctx.r.gradp(),ctx.y)
+        return ptensors0(1), ctx.x.mprod_back1(ctx.r.gradp())
 
 
 class Ptensors0_Linmaps0Fn(torch.autograd.Function):

@@ -6,12 +6,14 @@
 #include "AtomsPack.hpp"
 #include "AindexPack.hpp"
 #include "Ptensor0.hpp"
+#include "loose_ptr.hpp"
+#include "diff_class.hpp"
 
 
 namespace ptens{
 
 
-  class Ptensors0: public RtensorPool{
+  class Ptensors0: public RtensorPool, public diff_class<Ptensors0>{
   public:
 
     typedef cnine::IntTensor itensor;
@@ -25,13 +27,9 @@ namespace ptens{
     bool is_view=false;
 
 
-#ifdef WITH_FAKE_GRAD
-    Ptensors0* grad=nullptr;
-#endif 
-
     ~Ptensors0(){
 #ifdef WITH_FAKE_GRAD
-      if(!is_view) delete grad;
+      if(!is_view && grad) delete grad;
 #endif 
     }
 
@@ -39,16 +37,9 @@ namespace ptens{
   public: // ----- Constructors ------------------------------------------------------------------------------
 
 
-    //Ptensors0(){}
-
     Ptensors0(const int _nc, const int _dev=0):
       RtensorPool(_dev), nc(_nc){}
 
-    //Ptensors0(const int _nc, const int _memsize, const int _dev):
-    //RtensorPool(_dev), nc(_nc){
-    //reserve(_memsize);
-    //}
-    
     template<typename FILLTYPE, typename = typename std::enable_if<std::is_base_of<cnine::fill_pattern, FILLTYPE>::value, FILLTYPE>::type>
     Ptensors0(const int _n, const int _nc, const FILLTYPE& dummy, const int _dev=0):
       RtensorPool(_n, cnine::Gdims({_nc}), dummy, _dev), atoms(_n), nc(_nc){}
@@ -58,22 +49,8 @@ namespace ptens{
       RtensorPool(_atoms.size(), cnine::Gdims({_nc}), dummy, _dev), atoms(_atoms), nc(_nc){
     }
 
-    Ptensors0(const rtensor& A):
-      RtensorPool(A), atoms(A.dim(0)){
-      nc=A.dim(1);
-    }
 
-    #ifdef _WITH_ATEN
-    Ptensors0(const at::Tensor& T):
-      RtensorPool(rtensor(T)){
-      assert(size()>0);
-      atoms=AtomsPack(size());
-      nc=dim_of(0,0);
-    }
-    #endif 
-
-
-  public: // ----- Constructors ------------------------------------------------------------------------------
+  public: // ----- Named Constructors ------------------------------------------------------------------------
 
 
     static Ptensors0 raw(const int _n, const int _nc, const int _dev=0){
@@ -104,9 +81,16 @@ namespace ptens{
     }
 
 
+    static Ptensors0 concat(const Ptensors0& x, const Ptensors0& y){
+      Ptensors0 R=Ptensors0::zero(x.atoms,x.nc+y.nc);
+      R.add_to_channels(x,0);
+      R.add_to_channels(y,x.nc);
+      return R;
+    }
+
+
   public: // ---- Spawning -----------------------------------------------------------------------------------
 
-    //static Ptensors0 zeros_like(const Ptenso
 
     static Ptensors0* new_zeros_like(const Ptensors0& x){
       return new Ptensors0(RtensorPool::zeros_like(x),x.atoms,x.nc);
@@ -119,11 +103,24 @@ namespace ptens{
     Ptensors0(RtensorPool&& x, const AtomsPack& _atoms, const int _nc):
       RtensorPool(std::move(x)), atoms(_atoms), nc(_nc){}
 
+    Ptensors0(const rtensor& A):
+      RtensorPool(A), atoms(A.dim(0)){
+      nc=A.dim(1);
+    }
 
     rtensor tensor() const{
       CNINE_CPUONLY();
       return rtensor({size(),nc},arr,0);
     }
+
+    #ifdef _WITH_ATEN
+    Ptensors0(const at::Tensor& T):
+      RtensorPool(rtensor(T)){
+      assert(size()>0);
+      atoms=AtomsPack(size());
+      nc=dim_of(0,0);
+    }
+    #endif 
 
 
   public: // ----- Copying -----------------------------------------------------------------------------------
@@ -132,45 +129,23 @@ namespace ptens{
     Ptensors0(const Ptensors0& x):
       RtensorPool(x),
       atoms(x.atoms),
-      nc(x.nc){}
+      nc(x.nc){
+      #ifdef WITH_FAKE_GRAD
+      if(x.grad) grad=new Ptensors0(*grad);
+      #endif 
+    }
 	
     Ptensors0(Ptensors0&& x):
       RtensorPool(std::move(x)),
       atoms(std::move(x.atoms)),
-      nc(x.nc){}
+      nc(x.nc){
+      #ifdef WITH_FAKE_GRAD
+      grad=x.grad;
+      x.grad=nullptr;
+      #endif 
+    }
 
     Ptensors0& operator=(const Ptensors0& x)=delete;
-
-
-  public: // ---- Experimental -------------------------------------------------------------------------------
-
-
-    #ifdef WITH_FAKE_GRAD
-    //void add_to_grad(const Ptensors1& x){
-    //if(grad) grad->add(x);
-    //else grad=new Ptensors1(x);
-    //}
-
-    Ptensors0& get_grad(){
-      if(!grad) grad=Ptensors0::new_zeros_like(*this);
-      return *grad;
-    }
-
-    Ptensors0* gradp(){
-      if(!grad) grad=Ptensors0::new_zeros_like(*this);
-      return grad;
-    }
-
-    Ptensors0* get_gradp(){
-      if(!grad) grad=Ptensors0::new_zeros_like(*this);
-      return grad;
-    }
-
-    //Ptensors1 view_of_grad(){
-    //if(!grad) grad=new_zeros_like(*this);
-    //return grad->view();
-    //}
-    #endif 
 
 
   public: // ----- Access ------------------------------------------------------------------------------------
@@ -196,10 +171,6 @@ namespace ptens{
     rtensor tensor_of(const int i) const{
       return RtensorPool::operator()(i);
     }
-
-    //Rtensor1_view view_of_tensor(const int i) const{
-    //return RtensorPool::view1_of(i);
-    //}
 
     Rtensor1_view view_of(const int i) const{
       return RtensorPool::view1_of(i);
@@ -232,13 +203,42 @@ namespace ptens{
   public: // ---- Cumulative operations ----------------------------------------------------------------------
 
 
+    void add_to_channels(const Ptensors0& x, const int offs){
+      int N=size();
+      assert(x.size()==N);
+      for(int i=0; i<N; i++)
+	view_of(i,offs,x.nc)+=x.view_of(i);
+    }
+
+    void add_channels(const Ptensors0& x, const int offs){
+      int N=size();
+      assert(x.size()==N);
+      for(int i=0; i<N; i++)
+	view_of(i)+=x.view_of(i,offs,x.nc);
+    }
+
     void add_mprod(const Ptensors0& x, const rtensor& y){
       assert(x.size()==size());
       for(int i=0; i<size(); i++)
-	view_of_tensor(i).add_mprod(x.view_of_tensor(i),y);
+	add_matmul_Ax_to(view_of(i),y.view2().transp(),x.view_of(i));
+	//view_of_tensor(i).add_mprod(x.view_of_tensor(i),y);
     }
 
+    void add_mprod_back0(const Ptensors0& g, const rtensor& y){
+      assert(x.size()==size());
+      for(int i=0; i<size(); i++)
+	add_matmul_Ax_to(view_of(i),y.view2(),g.view_of(i));
+	//view_of_tensor(i).add_Mprod_AT(g.view_of_tensor(i),y);
+    }
+
+    void add_mprod_back1_to(rtensor& r, const Ptensors0& x) const{
+      assert(x.size()==size());
+      for(int i=0; i<size(); i++)
+	r.view2().add_outer(x.view_of(i),view_of(i));
+	//r.add_Mprod_TA(x.view_of_tensor(i),view_of_tensor(i));
+    }
  
+
   public: // ---- Reductions ---------------------------------------------------------------------------------
 
 
@@ -260,10 +260,6 @@ namespace ptens{
       int N=src_list.size();
       array_pool<int> dims;
       RtensorPool R(N,Gdims(nc),cnine::fill_zero());
-      //for(int i=0; i<N; i++)
-      //dims.push_back({dims_of(src_list.tix(i)).back()});
-      //RtensorPool R(dims,cnine::fill_zero());
-
       for(int i=0; i<N; i++)
 	R.view1_of(i)=view_of(src_list.tix(i));
       return R;
@@ -272,11 +268,6 @@ namespace ptens{
     RtensorPool reduce0(const AindexPack& src_list, const int offs, const int n) const{
       int N=src_list.size();
       RtensorPool R(N,Gdims(nc),cnine::fill_zero());
-      //array_pool<int> dims;
-      //for(int i=0; i<N; i++)
-      //dims.push_back({dims_of(src_list.tix(i)).back()});
-      //RtensorPool R(dims,cnine::fill_zero());
-
       for(int i=0; i<N; i++)
 	R.view1_of(i)=view_of(src_list.tix(i),offs,n);
       return R;
@@ -319,8 +310,6 @@ namespace ptens{
       ostringstream oss;
       for(int i=0; i<size(); i++){
 	oss<<indent<<(*this)(i)<<endl;
-	//oss<<indent<<"Ptensor "<<i<<" "<<Atoms(atoms(i))<<":"<<endl;
-	//oss<<RtensorPool::operator()(i).str()<<endl;
       }
       return oss.str();
     }
@@ -334,52 +323,39 @@ namespace ptens{
 
 
 #endif 
-    //Ptensors0 hom() const{
-    //Ptensors0 R=Ptensors0::zero(atoms,nc,dev);
-    //R.add_linmaps(*this);
-    //return R;
+
+    //Ptensors0* gradp(){
+    //if(!grad) grad=Ptensors0::new_zeros_like(*this);
+    //return grad;
     //}
 
+    //Ptensors0* get_gradp(){
+    //if(!grad) grad=Ptensors0::new_zeros_like(*this);
+    //return grad;
+    //}
 
-   /*
-    void add_messages0(const RtensorPool& messages, const AindexPack& dest_list, const int coffs){
-      int N=dest_list.size();
-      assert(messages.size()==N);
-
-      for(int i=0; i<N; i++)
-	view1_of(dest_list.tix(i))=messages.view1_of(i);
-    }
-    */
-
-//public: // ---- Linmaps -------------------------------------------------------------------------------------
-
-
-    // 0 -> 0
-    /*
-    void add_linmaps(const Ptensors0& x, int offs=0){ 
-      assert(x.size()==size());
-      assert(offs+1*x.nc<=nc);
-      for(int i=0; i<size(); i++){
-      }
-      offs+=broadcast0(reduce0(x),offs); // 1*1
-    }
-
-    void add_linmaps_back(const Ptensors0& x, int offs=0){ 
-      assert(x.size()==size());
-      assert(offs+1*nc<=x.nc);
-
-    }
-    */
+    //Ptensors1 view_of_grad(){
+    //if(!grad) grad=new_zeros_like(*this);
+    //return grad->view();
+    //}
+    //void add_to_grad(const Ptensors0* x){
+    //if(grad) grad->add(*x);
+    //else grad=new Ptensors0(*x);
+    //}
 
     /*
-    void add_linmaps(const Ptensors0& x, const int offs=0){
-      assert(x.size()==size());
-      assert(offs+x.nc<=nc);
-      int _nc=x.nc;
-      for(int i=0; i<size(); i++){
-	view1_of(i).add(x.view1_of(i));
-	//	view1_of(i).block(offs,_nc)=x.view1_of(i);
-	//view1_of(i).block(offs+_nc,_nc).set(x.view1_of(i).sum());
-      }
+    void add_to_grad(const Ptensors0& x){
+      if(grad) grad->add(x);
+      else grad=new Ptensors0(x);
+    }
+
+    Ptensors0& get_grad(){
+      if(!grad) grad=Ptensors0::new_zeros_like(*this);
+      return *grad;
+    }
+
+    loose_ptr<Ptensors0> get_gradp(){
+      if(!grad) grad=Ptensors0::new_zeros_like(*this);
+      return grad;
     }
     */

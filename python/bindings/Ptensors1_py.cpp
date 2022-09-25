@@ -1,8 +1,6 @@
+pybind11::class_<Ptensors1,RtensorPool>(m,"ptensors1")
 
-
-pybind11::class_<Ptensors1>(m,"ptensors1")
-
-//.def(pybind11::init<const Ptensor0&, const Atoms&, const int, const FILLTYPE& dummy, const int _dev>(),"")
+  .def(pybind11::init<const Ptensors1&>())
 
   .def_static("raw",[](const vector<vector<int> >& v, const int _nc, const int _dev){
       return Ptensors1::raw(AtomsPack(v),_nc,_dev);}, py::arg("atoms"),py::arg("nc"),py::arg("device")=0)
@@ -22,18 +20,21 @@ pybind11::class_<Ptensors1>(m,"ptensors1")
   .def_static("sequential",[](const AtomsPack& _atoms, const int _nc, const int _dev){
     return Ptensors1::sequential(_atoms,_nc,_dev);}, py::arg("atoms"),py::arg("nc"),py::arg("device")=0)
 
+  .def_static("concat",&Ptensors1::concat)
+
 
 // ---- Conversions, transport, etc. ------------------------------------------------------------------------
 
 
-//.def("add_to_grad",&Ptensors1::add_to_grad)
+  .def("add_to_grad",[](Ptensors1& x, const Ptensors1& y){x.add_to_grad(y);})
+  .def("add_to_grad",[](Ptensors1& x, const loose_ptr<Ptensors1>& y){x.add_to_grad(y);})
   .def("get_grad",&Ptensors1::get_grad)
-  .def("gradp",&Ptensors1::gradp)
+  .def("get_gradp",&Ptensors1::get_gradp)
+  .def("gradp",&Ptensors1::get_gradp)
 //  .def("view_of_grad",&Ptensors1::view_of_grad)
 
   .def("add_to_grad",[](Ptensors1& x, const int i, at::Tensor& T){
-      x.get_grad().view_of_tensor(i).add(RtensorA::view(T));
-    })
+      x.get_grad().view_of_tensor(i).add(RtensorA::view(T));})
 
 //.def("device",&Ptensors1::get_device)
 //.def("to",&Ptensors1::to_device)
@@ -58,10 +59,20 @@ pybind11::class_<Ptensors1>(m,"ptensors1")
 // ---- Operations -------------------------------------------------------------------------------------------
 
 
-  .def("add_mprod",[](Ptensors1& r, const Ptensors1& x, at::Tensor& y){
-      r.add_mprod(x,RtensorA::view(y));
-    })
+  .def("add",&Ptensors1::add)
 
+  .def("add_concat_back",[](Ptensors1& x, Ptensors1& g, const int offs){
+      x.get_grad().add_channels(g.get_grad(),offs);})
+
+  .def("add_mprod",[](Ptensors1& r, const Ptensors1& x, at::Tensor& y){
+      r.add_mprod(x,RtensorA::view(y));})
+  .def("add_mprod_back0",[](Ptensors1& x, const Ptensors1& g, at::Tensor& M){
+      x.get_grad().add_mprod_back0(g,RtensorA::view(M));})
+  .def("mprod_back1",[](Ptensors1& x, const Ptensors1& g){
+      RtensorA R=RtensorA::zero({x.nc,g.nc});
+      g.add_mprod_back1_to(R,x);
+      return R.torch();
+    })
 
 // ---- I/O --------------------------------------------------------------------------------------------------
 
@@ -70,4 +81,8 @@ pybind11::class_<Ptensors1>(m,"ptensors1")
   .def("__str__",&Ptensors1::str,py::arg("indent")="")
   .def("__repr__",&Ptensors1::str,py::arg("indent")="");
 
+
+
+
+pybind11::class_<loose_ptr<Ptensors1> >(m,"ptensors1_lptr");
 

@@ -1,8 +1,6 @@
+pybind11::class_<Ptensors2,RtensorPool>(m,"ptensors2")
 
-
-pybind11::class_<Ptensors2>(m,"ptensors2")
-
-//.def(pybind11::init<const Ptensor0&, const Atoms&, const int, const FILLTYPE& dummy, const int _dev>(),"")
+  .def(pybind11::init<const Ptensors2&>())
 
   .def_static("raw",[](const vector<vector<int> >& v, const int _nc, const int _dev){
       return Ptensors2::raw(AtomsPack(v),_nc,_dev);}, py::arg("atoms"),py::arg("nc"),py::arg("device")=0)
@@ -22,17 +20,21 @@ pybind11::class_<Ptensors2>(m,"ptensors2")
   .def_static("sequential",[](const AtomsPack& _atoms, const int _nc, const int _dev){
       return Ptensors2::sequential(_atoms,_nc,_dev);}, py::arg("atoms"),py::arg("nc"),py::arg("device")=0)
 
+  .def_static("concat",&Ptensors2::concat)
+
+
 // ---- Conversions, transport, etc. ------------------------------------------------------------------------
 
 
-//.def("add_to_grad",&Ptensors2::add_to_grad)
+  .def("add_to_grad",[](Ptensors2& x, const Ptensors2& y){x.add_to_grad(y);})
+  .def("add_to_grad",[](Ptensors2& x, const loose_ptr<Ptensors2>& y){x.add_to_grad(y);})
   .def("get_grad",&Ptensors2::get_grad)
-  .def("gradp",&Ptensors2::gradp)
+  .def("get_gradp",&Ptensors2::get_gradp)
+  .def("gradp",&Ptensors2::get_gradp)
 //  .def("view_of_grad",&Ptensors2::view_of_grad)
 
   .def("add_to_grad",[](Ptensors2& x, const int i, at::Tensor& T){
-      x.get_grad().view_of_tensor(i).add(RtensorA::view(T));
-    })
+      x.get_grad().view_of_tensor(i).add(RtensorA::view(T));})
 
 //.def("device",&Ptensors2::get_device)
 //.def("to",&Ptensors2::to_device)
@@ -54,8 +56,19 @@ pybind11::class_<Ptensors2>(m,"ptensors2")
 // ---- Operations -------------------------------------------------------------------------------------------
 
 
+  .def("add",&Ptensors2::add)
+
+  .def("add_concat_back",[](Ptensors2& x, Ptensors2& g, const int offs){
+      x.get_grad().add_channels(g.get_grad(),offs);})
+
   .def("add_mprod",[](Ptensors2& r, const Ptensors2& x, at::Tensor& y){
-      r.add_mprod(x,RtensorA::view(y));
+      r.add_mprod(x,RtensorA::view(y));})
+  .def("add_mprod_back0",[](Ptensors2& x, const Ptensors2& g, at::Tensor& M){
+      x.get_grad().add_mprod_back0(g,RtensorA::view(M));})
+  .def("mprod_back1",[](Ptensors2& x, const Ptensors2& g){
+      RtensorA R=RtensorA::zero({x.nc,g.nc});
+      g.add_mprod_back1_to(R,x);
+      return R.torch();
     })
 
 
@@ -67,3 +80,5 @@ pybind11::class_<Ptensors2>(m,"ptensors2")
   .def("__repr__",&Ptensors2::str,py::arg("indent")="");
 
 
+
+pybind11::class_<loose_ptr<Ptensors2> >(m,"ptensors2_lptr");

@@ -17,3 +17,6 @@ def transfer1(x,_atoms):
 def transfer2(x,_atoms):
     return x.transfer2(_atoms)
 
+
+def cat(x,y):
+    return x.concat(y)
