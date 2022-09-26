@@ -59,15 +59,18 @@ namespace ptens{
 
     AtomsPack(const AtomsPack& x):
       array_pool(x){
+      PTENS_COPY_WARNING();
       //cout<<"AtomsPack copied"<<endl;
     }
 
     AtomsPack(AtomsPack&& x):
       array_pool(std::move(x)){
+      PTENS_MOVE_WARNING();
       //cout<<"AtomsPack moved"<<endl;
     }
 
     AtomsPack& operator=(const AtomsPack& x){
+      PTENS_ASSIGN_WARNING();
       array_pool<int>::operator=(x);
       return *this;
     }
@@ -128,6 +131,11 @@ namespace ptens{
 
 
   public: // ---- I/O ----------------------------------------------------------------------------------------
+
+
+    string classname() const{
+      return "AtomsPack";
+    }
 
 
     /*

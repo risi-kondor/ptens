@@ -15,6 +15,24 @@ namespace ptens{
 
     OBJ* grad=nullptr;
 
+    diff_class(){}
+
+
+  public: // ---- Copying ------------------------------------------------------------------------------------
+
+
+    diff_class(const diff_class& x){
+      grad=new OBJ(*x.grad);
+    }
+
+    diff_class(diff_class&& x){
+      grad=x.grad;
+      x.grad=nullptr;
+    }
+
+
+  public: // ---- Access -------------------------------------------------------------------------------------
+
 
     void add_to_grad(const OBJ& x){
       if(grad) grad->add(x);

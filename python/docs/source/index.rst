@@ -12,6 +12,7 @@ Welcome to ptens's documentation!
 
    ptensork.rst
    ptensorsk.rst
+   graph.rst
    linmaps.rst
    transfer.rst
 

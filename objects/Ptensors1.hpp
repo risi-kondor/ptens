@@ -121,13 +121,19 @@ namespace ptens{
 
     Ptensors1(const Ptensors1& x):
       RtensorPool(x),
+      diff_class<Ptensors1>(x),
       atoms(x.atoms),
-      nc(x.nc){}
+      nc(x.nc){
+      PTENS_COPY_WARNING();
+    }
 	
     Ptensors1(Ptensors1&& x):
       RtensorPool(std::move(x)),
+      diff_class<Ptensors1>(std::move(x)),
       atoms(std::move(x.atoms)),
-      nc(x.nc){}
+      nc(x.nc){
+      PTENS_MOVE_WARNING();
+    }
 
     Ptensors1& operator=(const Ptensors1& x)=delete;
 
@@ -170,14 +176,14 @@ namespace ptens{
 
     Ptensor1_xview view_of(const int i, const vector<int>& ix) const{
       vector<int> v=headers(i);
-      assert(v.size()==3);
+      PTENS_ASSRT(v.size()==3);
       if(dev==1) return Ptensor1_xview(arrg+v[0],v[2],v[2],1,ix,1);
       return Ptensor1_xview(arr+v[0],v[2],v[2],1,ix,0);
     }
 
     Ptensor1_xview view_of(const int i, const vector<int>& ix, const int offs, const int n) const{
       vector<int> v=headers(i);
-      assert(v.size()==3);
+      PTENS_ASSRT(v.size()==3);
       if(dev==1) return Ptensor1_xview(arrg+v[0]+offs,n,v[2],1,ix,1);
       return Ptensor1_xview(arr+v[0]+offs,n,v[2],1,ix,0);
     }
@@ -200,37 +206,34 @@ namespace ptens{
 
     void add_to_channels(const Ptensors1& x, const int offs){
       int N=size();
-      assert(x.size()==N);
+      PTENS_ASSRT(x.size()==N);
       for(int i=0; i<N; i++)
 	view_of(i,offs,x.nc)+=x.view_of(i);
     }
 
     void add_channels(const Ptensors1& x, const int offs){
       int N=size();
-      assert(x.size()==N);
+      PTENS_ASSRT(x.size()==N);
       for(int i=0; i<N; i++)
 	view_of(i)+=x.view_of(i,offs,x.nc);
     }
 
     void add_mprod(const Ptensors1& x, const rtensor& y){
-      assert(x.size()==size());
+      PTENS_ASSRT(x.size()==size());
       for(int i=0; i<size(); i++)
 	view_of(i).add_matmul_AA(x.view_of(i),y.view2());
-	//view_of_tensor(i).add_mprod(x.view_of_tensor(i),y);
     }
 
     void add_mprod_back0(const Ptensors1& g, const rtensor& y){
-      assert(x.size()==size());
+      PTENS_ASSRT(g.size()==size());
       for(int i=0; i<size(); i++)
 	view_of(i).add_matmul_AT(g.view_of(i),y.view2());
-	//view_of_tensor(i).add_Mprod_AT(g.view_of_tensor(i),y);
     }
 
     void add_mprod_back1_to(rtensor& r, const Ptensors1& x) const{
-      assert(x.size()==size());
+      PTENS_ASSRT(x.size()==size());
       for(int i=0; i<size(); i++)
 	r.view2().add_matmul_TA(x.view_of(i),view_of(i));
-	//r.add_Mprod_TA(x.view_of_tensor(i),view_of_tensor(i));
     }
 
  
@@ -266,7 +269,6 @@ namespace ptens{
 	view_of(list.tens(i),list.ix(i),offs,n).sum0_into(R.view1_of(i));
       return R;
     }
-
 
     RtensorPool reduce1() const{
       return *this;
@@ -366,6 +368,10 @@ namespace ptens{
 
   public: // ---- I/O ----------------------------------------------------------------------------------------
 
+
+    string classname() const{
+      return "Ptensors1";
+    }
 
     string str(const string indent="") const{
       ostringstream oss;

@@ -75,7 +75,6 @@ namespace ptens{
       tail=_N*asize;
     }
 
-
     RtensorPool(const array_pool<int>& dimensions, const cnine::fill_zero& dummy, const int _dev=0){
       dev=_dev;
 
@@ -196,6 +195,7 @@ namespace ptens{
 
 
     RtensorPool(const RtensorPool& x){
+      CNINE_COPY_WARNING();
       dev=x.dev;
       tail=x.tail;
       memsize=tail;
@@ -210,6 +210,7 @@ namespace ptens{
     }
 
     RtensorPool(RtensorPool&& x){
+      CNINE_MOVE_WARNING();
       dev=x.dev;
       tail=x.tail; x.tail=0;
       memsize=x.memsize; x.memsize=0; 
@@ -235,17 +236,17 @@ namespace ptens{
 
 
     int addr_of(const int i) const{
-      assert(i<size());
+      CNINE_IN_RANGE(i,size());
       return headers(i)[0];
     }
 
     cnine::Gdims dims_of(const int i) const{
-      assert(i<size());
+      CNINE_IN_RANGE(i,size());
       return cnine::Gdims(headers.subvector_of(i,1));
     }
 
     int dim_of(const int i, const int j) const{
-      assert(i<size());
+      CNINE_IN_RANGE(i,size());
       return headers(i,1+j);
     }
 
@@ -256,15 +257,17 @@ namespace ptens{
 
 
     rtensor operator()(const int i) const{
-      assert(i<size());
+      CNINE_IN_RANGE(i,size());
       return rtensor(dims_of(i),get_arr()+addr_of(i),dev);
     }
 
     rtensor view_of_tensor(const int i){
+      CNINE_IN_RANGE(i,size());
       return rtensor::view_of_blob(dims_of(i),get_arr()+addr_of(i),dev);
     }
 
     const rtensor view_of_tensor(const int i) const{
+      CNINE_IN_RANGE(i,size());
       return rtensor::view_of_blob(dims_of(i),get_arr()+addr_of(i),dev);
     }
 
@@ -274,6 +277,7 @@ namespace ptens{
     //}
 
     Rtensor1_view view1_of(const int i) const{
+      CNINE_IN_RANGE(i,size());
       vector<int> v=headers(i);
       assert(v.size()==2);
       if(dev==1) return Rtensor1_view(arrg+v[0],v[1],1,1);
@@ -281,6 +285,7 @@ namespace ptens{
     }
 
     Rtensor2_view view2_of(const int i) const{
+      CNINE_IN_RANGE(i,size());
       vector<int> v=headers(i);
       assert(v.size()==3);
       if(dev==1) return Rtensor2_view(arrg+v[0],v[1],v[2],v[2],1,1);
@@ -288,6 +293,7 @@ namespace ptens{
     }
 
     Rtensor3_view view3_of(const int i) const{
+      CNINE_IN_RANGE(i,size());
       vector<int> v=headers(i);
       assert(v.size()==4);
       if(dev==1) return Rtensor3_view(arrg+v[0],v[1],v[2],v[3],v[2]*v[3],v[3],1,1);
@@ -345,6 +351,10 @@ namespace ptens{
 
   public: // ---- I/O ----------------------------------------------------------------------------------------
 
+
+    string classname() const{
+      return "RtensorPool";
+    }
 
     string str(const string indent="") const{
       ostringstream oss;

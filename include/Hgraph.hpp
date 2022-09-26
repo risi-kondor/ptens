@@ -77,8 +77,8 @@ namespace ptens{
 
 
     pair<AindexPack,AindexPack> intersects(const AtomsPack& inputs, const AtomsPack& outputs, const bool self=0) const{
-      assert(outputs.size()==n);
-      assert(inputs.size()==m);
+      PTENS_ASSRT(outputs.size()==n);
+      PTENS_ASSRT(inputs.size()==m);
       AindexPack in_indices;
       AindexPack out_indices;
       forall_edges([&](const int i, const int j, const float v){
@@ -91,6 +91,15 @@ namespace ptens{
 	}, self);
       return make_pair(in_indices, out_indices);
     }
+
+
+  public: // ---- I/O -----------------------------------------------------------------------------------------
+
+
+    string classname() const{
+      return "Hgraph";
+    }
+
 
 
   };

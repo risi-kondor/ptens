@@ -13,4 +13,30 @@
 #define PTENS_CHANNELS(cond)
 #endif 
 
+#define PTENS_ASSRT(condition) \
+  if(!(condition)) throw std::runtime_error("Ptens error in "+string(__PRETTY_FUNCTION__)+": failed assertion "+#condition+".");
+
+
+// ---- Copy, assign and convert warnings --------------------------------------------------------------------
+
+
+#ifdef PTENS_COPY_WARNINGS
+#define PTENS_COPY_WARNING() cout<<"\e[1mptens:\e[0m "<<classname()<<" copied."<<endl;
+#else 
+#define PTENS_COPY_WARNING()
+#endif 
+
+#ifdef PTENS_ASSIGN_WARNINGS
+#define PTENS_ASSIGN_WARNING() cout<<"\e[1mptens:\e[0m "<<classname()<<" assigned."<<endl;
+#else
+#define PTENS_ASSIGN_WARNING() 
+#endif
+
+#ifdef PTENS_MOVE_WARNINGS
+#define PTENS_MOVE_WARNING() cout<<"\e[1mptens:\e[0m "<<classname()<<" moved."<<endl;
+#else 
+#define PTENS_MOVE_WARNING()
+#endif 
+
+
 #endif 

@@ -1,14 +1,18 @@
-***********************
+*******
 Linmaps
-***********************
+*******
 
 The neurons in permutation equivariant networks implement learnable equivariant maps between Ptensors. 
 The ``linmaps`` functions described in this section are such equivariant maps that can be 
 applied when the reference domains of the input and output tensors are the *same*. 
 
-========
+========================
+Linmaps between Ptensors
+========================
+
+--------
 linmaps0
-========
+--------
 
 ``linmaps0`` maps a 0'th, 1'st or 2'nd order Ptensor to a 0'th order Ptensor. 
 
@@ -75,9 +79,9 @@ Therefore, when applied to a ``ptensor2``, ``linmaps0` doubles its number of cha
  Ptensor0(1,2,3):
  [ 108 117 126 36 39 42 ]
 
-========
+--------
 linmaps1
-========
+--------
 
 ``linmaps0`` maps a 0'th, 1'st or 2'nd order Ptensor to a 0'th order Ptensor. 
 
@@ -152,9 +156,9 @@ Therefore , this map multiplies the number of channels five-fold.
  [ 108 117 126 36 39 42 45 48 51 63 66 69 24 25 26 ]
 
 
-========
+--------
 linmaps2
-========
+--------
 
 ``linmaps2`` maps a 0'th, 1'st or 2'nd order Ptensor to a 2'nd  order Ptensor. 
 
@@ -343,3 +347,40 @@ Finally, the space of equivariant maps from a second order Ptensor to a second o
    [ 0 117 0 ]
    [ 0 0 117 ]
 
+
+==============================
+Linmaps between Ptensor layers
+==============================
+
+In permutation equivariant nets, linmaps are often applied to an entire layer of Ptensors, i.e., 
+to every Ptensor in the layer individually. `ptens` can accomplish this in a single function call, 
+moreover when working on the GPU, the operation is automatically parallelized across Ptensors. 
+As a simple example:
+
+.. code-block:: python
+
+ >>> A=ptens.ptensors1.randn([[1,2],[2,3],[4]],2)
+ >>> A
+ Ptensor1 [1,2]:
+ [ -0.87019 0.410812 ]
+ [ 0.391992 -0.44689 ] 
+
+ Ptensor1 [2,3]:
+ [ -0.195719 -1.67327 ]
+ [ -1.12695 -2.06142 ]
+ 
+ Ptensor1 [4]:
+ [ -0.576893 -0.397062 ]
+
+ >>> B=ptens.linmaps1(A)
+ >>> B
+ Ptensor1 [1,2]:
+ [ -0.478197 -0.0360771 -0.87019 0.410812 ]
+ [ -0.478197 -0.0360771 0.391992 -0.44689 ]
+ 
+ Ptensor1 [2,3]:
+ [ -1.32267 -3.73469 -0.195719 -1.67327 ]
+ [ -1.32267 -3.73469 -1.12695 -2.06142 ]
+ 
+ Ptensor1 [4]:
+ [ -0.576893 -0.397062 -0.576893 -0.397062 ]

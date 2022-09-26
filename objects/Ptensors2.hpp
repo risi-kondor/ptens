@@ -121,13 +121,19 @@ namespace ptens{
 
     Ptensors2(const Ptensors2& x):
       RtensorPool(x),
+      diff_class<Ptensors2>(x),
       atoms(x.atoms),
-      nc(x.nc){}
+      nc(x.nc){
+      PTENS_COPY_WARNING();
+    }
 	
     Ptensors2(Ptensors2&& x):
       RtensorPool(std::move(x)),
+      diff_class<Ptensors2>(std::move(x)),
       atoms(std::move(x.atoms)),
-      nc(x.nc){}
+      nc(x.nc){
+      PTENS_COPY_WARNING();
+    }
 
     Ptensors2& operator=(const Ptensors2& x)=delete;
 
@@ -170,14 +176,14 @@ namespace ptens{
 
     Ptensor2_xview view_of(const int i, const vector<int>& ix) const{
       vector<int> v=headers(i);
-      assert(v.size()==4);
+      PTENS_ASSRT(v.size()==4);
       if(dev==1) return Ptensor2_xview(arrg+v[0],v[3],v[2]*v[3],v[3],1,ix,1);
       return Ptensor2_xview(arr+v[0],v[3],v[2]*v[3],v[3],1,ix,0);
     }
 
     Ptensor2_xview view_of(const int i, const vector<int>& ix, const int offs, const int n) const{
       vector<int> v=headers(i);
-      assert(v.size()==4);
+      PTENS_ASSRT(v.size()==4);
       if(dev==1) return Ptensor2_xview(arrg+v[0]+offs,n,v[2]*v[3],v[3],1,ix,1);
       return Ptensor2_xview(arr+v[0]+offs,n,v[2]*v[3],v[3],1,ix,0);
     }
@@ -188,7 +194,7 @@ namespace ptens{
 
     int push_back(const Ptensor2& x){
       if(size()==0) nc=x.get_nc();
-      else assert(nc==x.get_nc());
+      else PTENS_ASSRT(nc==x.get_nc());
       RtensorPool::push_back(x);
       atoms.push_back(x.atoms);
       return size()-1;
@@ -200,32 +206,32 @@ namespace ptens{
 
     void add_to_channels(const Ptensors2& x, const int offs){
       int N=size();
-      assert(x.size()==N);
+      PTENS_ASSRT(x.size()==N);
       for(int i=0; i<N; i++)
 	view_of(i,offs,x.nc)+=x.view_of(i);
     }
 
     void add_channels(const Ptensors2& x, const int offs){
       int N=size();
-      assert(x.size()==N);
+      PTENS_ASSRT(x.size()==N);
       for(int i=0; i<N; i++)
 	view_of(i)+=x.view_of(i,offs,x.nc);
     }
 
     void add_mprod(const Ptensors2& x, const rtensor& y){
-      assert(x.size()==size());
+      PTENS_ASSRT(x.size()==size());
       for(int i=0; i<size(); i++)
 	fused_view_of(i).add_matmul_AA(x.fused_view_of(i),y.view2());
     }
 
     void add_mprod_back0(const Ptensors2& g, const rtensor& y){
-      assert(x.size()==size());
+      PTENS_ASSRT(g.size()==size());
       for(int i=0; i<size(); i++)
 	fused_view_of(i).add_matmul_AT(g.fused_view_of(i),y.view2());
     }
 
     void add_mprod_back1_to(rtensor& r, const Ptensors2& x) const{
-      assert(x.size()==size());
+      PTENS_ASSRT(x.size()==size());
       for(int i=0; i<size(); i++)
 	r.view2().add_matmul_TA(x.fused_view_of(i),fused_view_of(i));
     }
@@ -271,7 +277,6 @@ namespace ptens{
       }
       return R;
     }
-
 
     RtensorPool reduce1() const{
       array_pool<int> dims;
@@ -326,8 +331,6 @@ namespace ptens{
       }
       return R;
     }
-
-
 
     RtensorPool reduce2() const{
       return *this;
@@ -406,7 +409,6 @@ namespace ptens{
       }
     }
 
-
     void broadcast1(const RtensorPool& x){
       for(int i=0; i<size(); i++){
 	view_of(i)+=repeat0(x.view2_of(i).block(0,0,-1,nc),k_of(i));
@@ -444,7 +446,6 @@ namespace ptens{
       }
     }
 
-
     void broadcast2(const RtensorPool& x){ // no flipping
       //const int n=x.dim_of(0,2);
       for(int i=0; i<size(); i++){
@@ -480,6 +481,10 @@ namespace ptens{
 
   public: // ---- I/O ----------------------------------------------------------------------------------------
 
+
+    string classname() const{
+      return "Ptensors2";
+    }
 
     string str(const string indent="") const{
       ostringstream oss;

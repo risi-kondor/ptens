@@ -61,6 +61,7 @@ namespace ptens{
 
 
     vector_pool(const vector_pool& x){
+      CNINE_COPY_WARNING();
       dev=x.dev;
       tail=x.tail;
       memsize=tail;
@@ -75,6 +76,7 @@ namespace ptens{
     }
 
     vector_pool(vector_pool&& x){
+      CNINE_MOVE_WARNING();
       dev=x.dev;
       tail=x.tail; x.tail=0;
       memsize=x.memsize; x.memsize=0; 
@@ -85,6 +87,7 @@ namespace ptens{
     }
 
     vector_pool& operator=(const vector_pool& x){
+      CNINE_ASSIGN_WARNING();
       dev=x.dev;
       tail=x.tail;
       memsize=tail;
@@ -169,6 +172,10 @@ namespace ptens{
 
   public: // ---- I/O ----------------------------------------------------------------------------------------
 
+
+    string classname() const{
+      return "vector_pool";
+    }
 
     string str(const string indent="") const{
       ostringstream oss;

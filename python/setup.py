@@ -18,8 +18,8 @@ def main():
     compile_with_cuda = True 
     # compile_with_cuda = False
 
-    copy_warnings = False
-    torch_convert_warnings = False
+    copy_warnings = True
+    torch_convert_warnings = True
 
     # ------------------------------------------------------------------------------------------------------------
     
@@ -74,7 +74,10 @@ def main():
             '-DCNINE_COPY_WARNINGS',
             '-DCNINE_ASSIGN_WARNINGS',
             '-DCNINE_MOVE_WARNINGS',
-            '-DCNINE_MOVEASSIGN_WARNINGS'
+            '-DCNINE_MOVEASSIGN_WARNINGS',
+            '-DPTENS_COPY_WARNINGS',
+            '-DPTENS_ASSIGN_WARNINGS',
+            '-DPTENS_MOVE_WARNINGS',
         ])
 
     if torch_convert_warnings:
@@ -97,16 +100,6 @@ def main():
             '../../cnine/include/Cnine_base.cu',
             '../../cnine/cuda/TensorView_accumulators.cu',
             '../../cnine/cuda/BasicCtensorProducts.cu',
-            # '../cuda/SO3CGproducts_combo.cu',
-            # '../cuda/GElib_base.cu',
-            # '../cuda/SO3partA_CGproduct.cu',
-            # '../cuda/SO3partA_DiagCGproduct.cu',
-            # '../cuda/SO3partB_addCGproduct.cu',
-            # '../cuda/SO3partB_addCGproduct_back0.cu',
-            # '../cuda/SO3partB_addCGproduct_back1.cu',
-            # '../cuda/SO3Fpart_addFproduct.cu',
-            # '../cuda/SO3Fpart_addFproduct_back0.cu',
-            # '../cuda/SO3Fpart_addFproduct_back1.cu',
             'src/ptens/ptens_py.cpp'
         ],
             include_dirs=_include_dirs,

@@ -63,6 +63,7 @@ namespace ptens{
 
 
     array_pool(const array_pool& x){
+      CNINE_COPY_WARNING();
       dev=x.dev;
       tail=x.tail;
       memsize=tail;
@@ -77,6 +78,7 @@ namespace ptens{
     }
 
     array_pool(array_pool&& x){
+      CNINE_MOVE_WARNING();
       dev=x.dev;
       tail=x.tail; x.tail=0;
       memsize=x.memsize; x.memsize=0; 
@@ -88,6 +90,7 @@ namespace ptens{
     }
 
     array_pool<TYPE>& operator=(const array_pool<TYPE>& x){
+      CNINE_ASSIGN_WARNING();
 
       if(is_view){
 	arr=nullptr;
@@ -141,12 +144,12 @@ namespace ptens{
     }
 
     int size_of(const int i) const{
-      assert(i<size());
+      CNINE_ASSRT(i<size());
       return lookup[i].second;
     }
 
     vector<TYPE> operator()(const int i) const{
-      assert(i<size());
+      CNINE_ASSRT(i<size());
       auto& p=lookup[i];
       int addr=p.first;
       int len=p.second;
@@ -220,6 +223,10 @@ namespace ptens{
 
   public: // ---- I/O ----------------------------------------------------------------------------------------
 
+
+    string classname() const{
+      return "array_pool";
+    }
 
     string str(const string indent="") const{
       ostringstream oss;

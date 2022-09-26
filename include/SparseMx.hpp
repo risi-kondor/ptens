@@ -93,19 +93,29 @@ namespace ptens{
       n(_n), m(_m){} 
     
 
-  public:
+  public: // ---- Copying ------------------------------------------------------------------------------------
+
 
     SparseMx(const SparseMx& x){
+      CNINE_COPY_WARNING();
       n=x.n; 
       m=x.m;
       for(auto p:x.lists) 
 	lists[p.first]=new SparseVec(*p.second);
     }
 
+    SparseMx(SparseMx&& x){
+      CNINE_MOVE_WARNING();
+      n=x.n; 
+      m=x.m;
+      lists=std::move(x.lists);
+      x.lists.clear();
+    }
+
     SparseMx& operator=(const SparseMx& x)=delete;
 
 
-  public:
+  public: // ---- Named constructors -------------------------------------------------------------------------
 
 
     static SparseMx random_symmetric(const int _n, const float p=0.5){
@@ -121,8 +131,8 @@ namespace ptens{
     }
 
     static SparseMx from_list(const IntTensor& M){
-      assert(M.ndims()==2);
-      assert(M.dim(1)==2);
+      CNINE_ASSRT(M.ndims()==2);
+      CNINE_ASSRT(M.dim(1)==2);
       int n=0; int m=0;
       for(int i=0; i<M.dim(0); i++){
 	n=std::max(M(i,0),n);
@@ -135,7 +145,7 @@ namespace ptens{
     }
 
     static SparseMx from_matrix(const IntTensor& A){
-      assert(A.ndims()==2);
+      CNINE_ASSRT(A.ndims()==2);
       int n=A.dim(0);
       int m=A.dim(1);
       SparseMx R(n,m); 
@@ -171,8 +181,8 @@ namespace ptens{
  
     void set(const int i, const int j, const float v){
       current=false;
-      assert(i<n);
-      assert(j<m);
+      CNINE_ASSRT(i<n);
+      CNINE_ASSRT(j<m);
       auto it=lists.find(i);
       if(it==lists.end()){
 	SparseVec* lst=new SparseVec(m);
@@ -183,6 +193,7 @@ namespace ptens{
     }
 
     SparseVec& row(const int i){
+      CNINE_ASSRT(i<n);
       if(lists.find(i)==lists.end())
 	lists[i]=new SparseVec(m);
       return *lists[i];
@@ -242,6 +253,10 @@ namespace ptens{
 
     public: // ---- I/O ----------------------------------------------------------------------------------------
 
+
+    string classname() const{
+      return "SparseMx";
+    }
 
     string str(const string indent="") const{
       ostringstream oss;

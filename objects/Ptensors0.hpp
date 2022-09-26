@@ -128,20 +128,26 @@ namespace ptens{
 
     Ptensors0(const Ptensors0& x):
       RtensorPool(x),
+      diff_class<Ptensors0>(x),
       atoms(x.atoms),
       nc(x.nc){
+      PTENS_COPY_WARNING();
+
       #ifdef WITH_FAKE_GRAD
-      if(x.grad) grad=new Ptensors0(*grad);
+      //if(x.grad) grad=new Ptensors0(*grad);
       #endif 
     }
 	
     Ptensors0(Ptensors0&& x):
       RtensorPool(std::move(x)),
+      diff_class<Ptensors0>(std::move(x)),
       atoms(std::move(x.atoms)),
       nc(x.nc){
+      PTENS_MOVE_WARNING();
+
       #ifdef WITH_FAKE_GRAD
-      grad=x.grad;
-      x.grad=nullptr;
+      //grad=x.grad;
+      //x.grad=nullptr;
       #endif 
     }
 
@@ -205,37 +211,34 @@ namespace ptens{
 
     void add_to_channels(const Ptensors0& x, const int offs){
       int N=size();
-      assert(x.size()==N);
+      PTENS_ASSRT(x.size()==N);
       for(int i=0; i<N; i++)
 	view_of(i,offs,x.nc)+=x.view_of(i);
     }
 
     void add_channels(const Ptensors0& x, const int offs){
       int N=size();
-      assert(x.size()==N);
+      PTENS_ASSRT(x.size()==N);
       for(int i=0; i<N; i++)
 	view_of(i)+=x.view_of(i,offs,x.nc);
     }
 
     void add_mprod(const Ptensors0& x, const rtensor& y){
-      assert(x.size()==size());
+      PTENS_ASSRT(x.size()==size());
       for(int i=0; i<size(); i++)
 	add_matmul_Ax_to(view_of(i),y.view2().transp(),x.view_of(i));
-	//view_of_tensor(i).add_mprod(x.view_of_tensor(i),y);
     }
 
     void add_mprod_back0(const Ptensors0& g, const rtensor& y){
-      assert(x.size()==size());
+      PTENS_ASSRT(g.size()==size());
       for(int i=0; i<size(); i++)
 	add_matmul_Ax_to(view_of(i),y.view2(),g.view_of(i));
-	//view_of_tensor(i).add_Mprod_AT(g.view_of_tensor(i),y);
     }
 
     void add_mprod_back1_to(rtensor& r, const Ptensors0& x) const{
-      assert(x.size()==size());
+      PTENS_ASSRT(x.size()==size());
       for(int i=0; i<size(); i++)
 	r.view2().add_outer(x.view_of(i),view_of(i));
-	//r.add_Mprod_TA(x.view_of_tensor(i),view_of_tensor(i));
     }
  
 
@@ -305,6 +308,10 @@ namespace ptens{
 
   public: // ---- I/O ----------------------------------------------------------------------------------------
 
+
+    string classname() const{
+      return "Ptensors0";
+    }
 
     string str(const string indent="") const{
       ostringstream oss;
