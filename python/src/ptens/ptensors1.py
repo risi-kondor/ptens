@@ -10,6 +10,12 @@ import ptens.ptensors2
 class ptensors1(torch.Tensor):
 
     @classmethod
+    def dummy(self):
+        R=ptensors1(1)
+        R.obj=_ptensors1.dummy()
+        return R
+
+    @classmethod
     def raw(self, _atoms, _nc, _dev=0):
         R=ptensors1(1)
         R.obj=_ptensors1.raw(_atoms,_nc,_dev)
@@ -54,9 +60,15 @@ class ptensors1(torch.Tensor):
         return R
 
 
+    def get_dev(self):
+        return self.obj.get_dev()
+
     def get_nc(self):
         return self.obj.get_nc()
 
+    def get_atoms(self):
+        return self.obj.get_atoms()
+    
     def atoms_of(self, i):
         return self.obj.atoms_of(i)
 
@@ -65,6 +77,9 @@ class ptensors1(torch.Tensor):
     
     def push_back(self, x):
         return self.obj.push_back(x)
+
+    def randn_like(self):
+        return ptensors1.randn(self.get_atoms(),self.get_nc(),self.get_dev())
 
 
     # ---- Operations ----------------------------------------------------------------------------------------
@@ -78,6 +93,9 @@ class ptensors1(torch.Tensor):
 
     def concat(self,y):
         return Ptensors1_concatFn.apply(self,y)
+    
+    def inp(self,y):
+        return Ptensors1_inpFn.apply(self,y)
     
 
     def linmaps0(self):
@@ -146,6 +164,21 @@ class Ptensors1_addFn(torch.autograd.Function):
         ctx.x.add_to_grad(ctx.r.get_gradp())
         ctx.y.add_to_grad(ctx.r.get_gradp())
         return ptensors1(1),ptensors1(1)
+
+
+class Ptensors1_inpFn(torch.autograd.Function):
+    
+    @staticmethod
+    def forward(ctx,x,y):
+        ctx.x=x.obj
+        ctx.y=y.obj
+        return torch.tensor(x.obj.inp(y.obj))
+
+    @staticmethod
+    def backward(ctx,g):
+        ctx.x.add_to_grad(ctx.y,g.item())
+        ctx.y.add_to_grad(ctx.x,g.item())
+        return ptensors1.dummy(), ptensors1.dummy()
 
 
 class Ptensors1_concatFn(torch.autograd.Function):

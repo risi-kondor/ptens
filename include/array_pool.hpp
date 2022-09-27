@@ -186,10 +186,16 @@ namespace ptens{
       push_back(vector<TYPE>(v));
     }
 
-    void forall(const std::function<void(const vector<TYPE>&)>& lambda){
+    void forall(const std::function<void(const vector<TYPE>&)>& lambda) const{
       int n=size();
       for(int i=0; i<n; i++)
 	lambda((*this)(i));
+    }
+
+    vector<vector<TYPE> > as_vecs() const{
+      vector<vector<TYPE> > R;
+      forall([&](const vector<TYPE>& x){R.push_back(x);});
+      return R;
     }
 
 

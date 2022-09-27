@@ -148,6 +148,17 @@ namespace ptens{
     r.broadcast1(x.reduce1(xix,offs+4*nc,nc),rix);
     r.broadcast2(x.reduce2(xix,offs+13*nc,nc),rix);
   }
+
+
+  Ptensor0& operator>>(const Ptensor0& x, Ptensor0& r) {add_msg(r,x); return r;}
+  Ptensor0& operator>>(const Ptensor1& x, Ptensor0& r) {add_msg(r,x); return r;}
+  Ptensor0& operator>>(const Ptensor2& x, Ptensor0& r) {add_msg(r,x); return r;}
+  Ptensor1& operator>>(const Ptensor0& x, Ptensor1& r) {add_msg(r,x); return r;}
+  Ptensor1& operator>>(const Ptensor1& x, Ptensor1& r) {add_msg(r,x); return r;}
+  Ptensor1& operator>>(const Ptensor2& x, Ptensor1& r) {add_msg(r,x); return r;}
+  Ptensor2& operator>>(const Ptensor0& x, Ptensor2& r) {add_msg(r,x); return r;}
+  Ptensor2& operator>>(const Ptensor1& x, Ptensor2& r) {add_msg(r,x); return r;}
+  Ptensor2& operator>>(const Ptensor2& x, Ptensor2& r) {add_msg(r,x); return r;}
     
 
   // --------------------------------------------------------------------------------------------------------
@@ -268,15 +279,6 @@ namespace ptens{
     
 
 
-  Ptensor0& operator>>(const Ptensor0& x, Ptensor0& r) {add_msg(r,x); return r;}
-  Ptensor0& operator>>(const Ptensor1& x, Ptensor0& r) {add_msg(r,x); return r;}
-  Ptensor0& operator>>(const Ptensor2& x, Ptensor0& r) {add_msg(r,x); return r;}
-  Ptensor1& operator>>(const Ptensor0& x, Ptensor1& r) {add_msg(r,x); return r;}
-  Ptensor1& operator>>(const Ptensor1& x, Ptensor1& r) {add_msg(r,x); return r;}
-  Ptensor1& operator>>(const Ptensor2& x, Ptensor1& r) {add_msg(r,x); return r;}
-  Ptensor2& operator>>(const Ptensor0& x, Ptensor2& r) {add_msg(r,x); return r;}
-  Ptensor2& operator>>(const Ptensor1& x, Ptensor2& r) {add_msg(r,x); return r;}
-  Ptensor2& operator>>(const Ptensor2& x, Ptensor2& r) {add_msg(r,x); return r;}
   
    
 }

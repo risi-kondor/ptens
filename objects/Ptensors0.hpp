@@ -241,7 +241,7 @@ namespace ptens{
 	r.view2().add_outer(x.view_of(i),view_of(i));
     }
  
-
+ 
   public: // ---- Reductions ---------------------------------------------------------------------------------
 
 

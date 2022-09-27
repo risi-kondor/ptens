@@ -22,7 +22,7 @@ namespace ptens{
 
 
     diff_class(const diff_class& x){
-      grad=new OBJ(*x.grad);
+      if(x.grad) grad=new OBJ(*x.grad);
     }
 
     diff_class(diff_class&& x){
@@ -37,6 +37,11 @@ namespace ptens{
     void add_to_grad(const OBJ& x){
       if(grad) grad->add(x);
       else grad=new OBJ(x);
+    }
+
+    void add_to_grad(const OBJ& x, const float c){
+      if(!grad) grad=OBJ::new_zeros_like(x);
+      grad->add(x,c);
     }
 
     OBJ& get_grad(){

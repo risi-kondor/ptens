@@ -224,6 +224,9 @@ namespace ptens{
 
   public: // ---- Access -------------------------------------------------------------------------------------
 
+    int get_dev() const{
+      return dev;
+    }
 
     int size() const{
       return headers.size();
@@ -346,6 +349,26 @@ namespace ptens{
       assert(x.tail==tail);
       CPUCODE(cnine::stdadd(x.arr,x.arr+tail,arr));
       GPUCODE(const float alpha = 1.0; CUBLAS_SAFE(cublasSaxpy(cnine_cublas, asize, &alpha, x.arrg, 1, arrg, 1)));
+    }
+
+
+    void add(const RtensorPool& x, const float c){
+      assert(x.dev==dev);
+      assert(x.tail==tail);
+      CPUCODE(cnine::stdadd(x.arr,x.arr+tail,arr,c));
+      GPUCODE(const float alpha = c; CUBLAS_SAFE(cublasSaxpy(cnine_cublas, asize, &alpha, x.arrg, 1, arrg, 1)));
+    }
+
+
+  public: // ---- Operations ---------------------------------------------------------------------------------
+
+    
+    float inp(const RtensorPool& y){
+      CNINE_ASSRT(tail==y.tail);
+      float t=0;
+      CNINE_CPUONLY();
+      CPUCODE(for(int i=0; i<tail; i++) t+=arr[i]*y.arr[i];)
+      return t;
     }
 
 

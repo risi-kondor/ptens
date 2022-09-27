@@ -2,6 +2,8 @@ pybind11::class_<Ptensors1,RtensorPool>(m,"ptensors1")
 
   .def(pybind11::init<const Ptensors1&>())
 
+  .def_static("dummy",[]() {return Ptensors1(0,0);})
+
   .def_static("raw",[](const vector<vector<int> >& v, const int _nc, const int _dev){
       return Ptensors1::raw(AtomsPack(v),_nc,_dev);}, py::arg("atoms"),py::arg("nc"),py::arg("device")=0)
   .def_static("zero",[](const vector<vector<int> >& v, const int _nc, const int _dev){
@@ -27,6 +29,7 @@ pybind11::class_<Ptensors1,RtensorPool>(m,"ptensors1")
 
 
   .def("add_to_grad",[](Ptensors1& x, const Ptensors1& y){x.add_to_grad(y);})
+  .def("add_to_grad",[](Ptensors1& x, const Ptensors1& y, const float c){x.add_to_grad(y,c);})
   .def("add_to_grad",[](Ptensors1& x, const loose_ptr<Ptensors1>& y){x.add_to_grad(y);})
   .def("get_grad",&Ptensors1::get_grad)
   .def("get_gradp",&Ptensors1::get_gradp)
@@ -46,7 +49,9 @@ pybind11::class_<Ptensors1,RtensorPool>(m,"ptensors1")
 
 //.def_readwrite("atoms",&Ptensors1::atoms)
 
+  .def("get_dev",&Ptensors1::get_dev)
   .def("get_nc",&Ptensors1::get_nc)
+  .def("get_atoms",[](const Ptensors1& x){return x.atoms.as_vecs();})
   .def("get_atomsref",&Ptensors1::get_atomsref)
   .def("view_of_atoms",&Ptensors1::view_of_atoms)
 
@@ -59,7 +64,7 @@ pybind11::class_<Ptensors1,RtensorPool>(m,"ptensors1")
 // ---- Operations -------------------------------------------------------------------------------------------
 
 
-  .def("add",&Ptensors1::add)
+  .def("add",[](Ptensors1& x, const Ptensors1& y){x.add(y);})
 
   .def("add_concat_back",[](Ptensors1& x, Ptensors1& g, const int offs){
       x.get_grad().add_channels(g.get_grad(),offs);})
@@ -73,6 +78,9 @@ pybind11::class_<Ptensors1,RtensorPool>(m,"ptensors1")
       g.add_mprod_back1_to(R,x);
       return R.torch();
     })
+
+  .def("inp",&Ptensors1::inp)
+
 
 // ---- I/O --------------------------------------------------------------------------------------------------
 

@@ -2,6 +2,8 @@ pybind11::class_<Ptensors2,RtensorPool>(m,"ptensors2")
 
   .def(pybind11::init<const Ptensors2&>())
 
+  .def_static("dummy",[]() {return Ptensors2(0,0);})
+
   .def_static("raw",[](const vector<vector<int> >& v, const int _nc, const int _dev){
       return Ptensors2::raw(AtomsPack(v),_nc,_dev);}, py::arg("atoms"),py::arg("nc"),py::arg("device")=0)
   .def_static("zero",[](const vector<vector<int> >& v, const int _nc, const int _dev){
@@ -27,6 +29,7 @@ pybind11::class_<Ptensors2,RtensorPool>(m,"ptensors2")
 
 
   .def("add_to_grad",[](Ptensors2& x, const Ptensors2& y){x.add_to_grad(y);})
+  .def("add_to_grad",[](Ptensors2& x, const Ptensors2& y, const float c){x.add_to_grad(y,c);})
   .def("add_to_grad",[](Ptensors2& x, const loose_ptr<Ptensors2>& y){x.add_to_grad(y);})
   .def("get_grad",&Ptensors2::get_grad)
   .def("get_gradp",&Ptensors2::get_gradp)
@@ -44,7 +47,10 @@ pybind11::class_<Ptensors2,RtensorPool>(m,"ptensors2")
 
 // ---- Access ----------------------------------------------------------------------------------------------
 
+
+  .def("get_dev",&Ptensors2::get_dev)
   .def("get_nc",&Ptensors2::get_nc)
+  .def("get_atoms",[](const Ptensors2& x){return x.atoms.as_vecs();})
   .def("view_of_atoms",&Ptensors2::view_of_atoms)
 
   .def("__getitem__",[](const Ptensors2& x, const int i){return x(i);})
@@ -56,7 +62,7 @@ pybind11::class_<Ptensors2,RtensorPool>(m,"ptensors2")
 // ---- Operations -------------------------------------------------------------------------------------------
 
 
-  .def("add",&Ptensors2::add)
+  .def("add",[](Ptensors2& x, const Ptensors2& y){x.add(y);})
 
   .def("add_concat_back",[](Ptensors2& x, Ptensors2& g, const int offs){
       x.get_grad().add_channels(g.get_grad(),offs);})
@@ -70,6 +76,8 @@ pybind11::class_<Ptensors2,RtensorPool>(m,"ptensors2")
       g.add_mprod_back1_to(R,x);
       return R.torch();
     })
+
+  .def("inp",&Ptensors2::inp)
 
 
 // ---- I/O --------------------------------------------------------------------------------------------------

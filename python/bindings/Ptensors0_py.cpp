@@ -5,6 +5,8 @@ pybind11::class_<Ptensors0,RtensorPool>(m,"ptensors0")
   .def(pybind11::init<const at::Tensor&>())
   .def(pybind11::init<const Ptensors0&>())
 
+  .def_static("dummy",[]() {return Ptensors0(0,0);})
+
   .def_static("raw",[](const vector<vector<int> >& v, const int _nc, const int _dev){
       return Ptensors0::raw(AtomsPack(v),_nc,_dev);}, py::arg("atoms"),py::arg("nc"),py::arg("device")=0)
   .def_static("zero",[](const vector<vector<int> >& v, const int _nc, const int _dev){
@@ -30,6 +32,7 @@ pybind11::class_<Ptensors0,RtensorPool>(m,"ptensors0")
 
 
   .def("add_to_grad",[](Ptensors0& x, const Ptensors0& y){x.add_to_grad(y);})
+  .def("add_to_grad",[](Ptensors0& x, const Ptensors0& y, const float c){x.add_to_grad(y,c);})
   .def("add_to_grad",[](Ptensors0& x, const loose_ptr<Ptensors0>& y){x.add_to_grad(y);})
 //  .def("add_to_gradp",[](Ptensors0& x, const loose_ptr<Ptensors0>& y){x.add_to_grad(y);})
 //.def("add_to_grad",&Ptensors0::add_to_grad)
@@ -55,7 +58,9 @@ pybind11::class_<Ptensors0,RtensorPool>(m,"ptensors0")
 // ---- Access ----------------------------------------------------------------------------------------------
 
 
+  .def("get_dev",&Ptensors0::get_dev)
   .def("get_nc",&Ptensors0::get_nc)
+  .def("get_atoms",[](const Ptensors0& x){return x.atoms.as_vecs();})
   .def("view_of_atoms",&Ptensors0::view_of_atoms)
 
 
@@ -68,7 +73,7 @@ pybind11::class_<Ptensors0,RtensorPool>(m,"ptensors0")
 // ---- Operations -------------------------------------------------------------------------------------------
 
 
-  .def("add",&Ptensors0::add)
+  .def("add",[](Ptensors0& x, const Ptensors0& y){x.add(y);})
 
   .def("add_concat_back",[](Ptensors0& x, Ptensors0& g, const int offs){
       x.get_grad().add_channels(g.get_grad(),offs);})
@@ -82,6 +87,8 @@ pybind11::class_<Ptensors0,RtensorPool>(m,"ptensors0")
       g->add_mprod_back1_to(R,x);
       return R.torch();
     })
+
+  .def("inp",&Ptensors0::inp)
 
 
 // ---- I/O --------------------------------------------------------------------------------------------------
