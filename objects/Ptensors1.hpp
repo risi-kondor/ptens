@@ -279,9 +279,10 @@ namespace ptens{
       for(int i=0; i<size(); i++)
 	dims.push_back(vector<int>({k_of(i),n}));
       RtensorPool R(dims,cnine::fill_zero());
-      for(int i=0; i<size(); i++)
+      for(int i=0; i<size(); i++){
 	R.view2_of(i)+=view_of(i,offs,n);
-      return *this;
+      }
+      return R;
     }
 
     RtensorPool reduce1(const AindexPack& list) const{

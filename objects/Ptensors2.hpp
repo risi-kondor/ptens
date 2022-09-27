@@ -336,13 +336,15 @@ namespace ptens{
       return *this;
     }
 
-    RtensorPool reduce2(const int offs, const int n) const{
+    RtensorPool reduce2(const int offs, const int n) const{ // flipping 
       array_pool<int> dims;
       for(int i=0; i<size(); i++)
 	dims.push_back(vector<int>({k_of(i),k_of(i),n}));
       RtensorPool R(dims,cnine::fill_zero());
-      for(int i=0; i<size(); i++)
+      for(int i=0; i<size(); i++){
 	R.view3_of(i)+=view_of(i,offs,n);
+	R.view3_of(i)+=view_of(i,offs+n,n).transp01();
+      }
       return R;
     }
 

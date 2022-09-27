@@ -87,7 +87,7 @@ class Ptensor2_Linmaps0Fn(torch.autograd.Function):
         
     @staticmethod
     def backward(ctx,g):
-        R=ptensor2.zeros(x.atoms,x.get_nc()/2)
+        R=ptensor2.zeros(g.atoms,g.get_nc()/2)
         u=_ptensor0.view(g,g.atoms)
         r=_ptensor2.view(R,R.atoms)
         ptens_base.add_linmaps2to0_back(r,u)
@@ -106,7 +106,7 @@ class Ptensor2_Linmaps1Fn(torch.autograd.Function):
         
     @staticmethod
     def backward(ctx,g):
-        R=ptensor2.zeros(x.atoms,x.get_nc()/5)
+        R=ptensor2.zeros(g.atoms,g.get_nc()/5)
         u=_ptensor1.view(g,g.atoms)
         r=_ptensor2.view(R,R.atoms)
         ptens_base.add_linmaps2to1_back(r,u)
@@ -125,7 +125,7 @@ class Ptensor2_Linmaps2Fn(torch.autograd.Function):
         
     @staticmethod
     def backward(ctx,g):
-        R=ptensor2.zeros(x.atoms,x.get_nc()/15)
+        R=ptensor2.zeros(g.atoms,int(g.get_nc()/15)) # !!
         u=_ptensor2.view(g,g.atoms)
         r=_ptensor2.view(R,R.atoms)
         ptens_base.add_linmaps2to2_back(r,u)
