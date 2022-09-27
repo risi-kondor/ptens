@@ -113,7 +113,7 @@ namespace ptens{
   }
   inline void add_linmaps_back(Ptensors1& r, const Ptensors1& x, const int offs=0){
     r.broadcast0(x.reduce0(offs,r.nc));
-    r.broadcast1(x.reduce1(offs+r.nc,r.nc));
+    //r.broadcast1(x.reduce1(offs+r.nc,r.nc));
   }
 
 
@@ -134,7 +134,7 @@ namespace ptens{
     r.broadcast0(x.reduce0(),offs);
   }
   inline void add_linmaps_back(Ptensors2& r, const Ptensors0& x, const int offs=0){
-    r.broadcast0(x.reduce0(offs,r.nc));
+    r.broadcast0(x.reduce0(offs,2*r.nc)); // changed
   }
 
 
@@ -144,8 +144,8 @@ namespace ptens{
     r.broadcast1(x.reduce1(),offs+2*x.nc);
   }
   inline void add_linmaps_back(Ptensors2& r, const Ptensors1& x, const int offs=0){
-    r.broadcast0(x.reduce0(offs,r.nc));
-    r.broadcast1(x.reduce1(offs+2*r.nc,r.nc));
+    r.broadcast0(x.reduce0(offs,2*r.nc)); // changed
+    r.broadcast1(x.reduce1(offs+2*r.nc,3*r.nc)); // changed
   }
 
 
@@ -156,9 +156,9 @@ namespace ptens{
     r.broadcast2(x.reduce2(),offs+13*x.nc);
   }
   inline void add_linmaps_back(Ptensors2& r, const Ptensors2& x, const int offs=0){
-    r.broadcast0(x.reduce0(offs,r.nc));
-    r.broadcast1(x.reduce1(offs+4*r.nc,r.nc));
-    r.broadcast2(x.reduce2(offs+13*x.nc,r.nc));
+    r.broadcast0(x.reduce0(offs,2*r.nc)); // changed 
+    r.broadcast1(x.reduce1(offs+4*r.nc,3*r.nc)); // changed 
+    r.broadcast2(x.reduce2(offs+13*r.nc,r.nc));
   }
 
 

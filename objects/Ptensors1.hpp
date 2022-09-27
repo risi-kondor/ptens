@@ -248,7 +248,7 @@ namespace ptens{
     }
 
     RtensorPool reduce0(const int offs, const int n) const{
-      RtensorPool R(size(),Gdims(nc),cnine::fill_zero());
+      RtensorPool R(size(),Gdims(n),cnine::fill_zero());
       for(int i=0; i<size(); i++)
 	view_of(i,offs,n).sum0_into(R.view1_of(i));
       return R;
