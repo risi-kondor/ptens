@@ -264,7 +264,7 @@ namespace ptens{
 
     RtensorPool reduce0(const AindexPack& list, const int offs, const int n) const{
       int N=list.size();
-      RtensorPool R(N,Gdims(nc),cnine::fill_zero());
+      RtensorPool R(N,Gdims(n),cnine::fill_zero());
       for(int i=0; i<N; i++)
 	view_of(list.tens(i),list.ix(i),offs,n).sum0_into(R.view1_of(i));
       return R;

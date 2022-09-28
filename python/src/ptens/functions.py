@@ -20,3 +20,10 @@ def transfer2(x,_atoms):
 
 def cat(x,y):
     return x.concat(y)
+
+
+def unite1(x,G):
+    return x.unite1(G)
+
+def unite2(x,G):
+    return x.unite2(G)

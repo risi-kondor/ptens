@@ -7,6 +7,15 @@ pybind11::class_<Ptensors0,RtensorPool>(m,"ptensors0")
 
   .def_static("dummy",[]() {return Ptensors0(0,0);})
 
+  .def_static("raw",[](const int n, const int _nc, const int _dev){
+      return Ptensors0::raw(n,_nc,_dev);}, py::arg("atoms"),py::arg("nc"),py::arg("device")=0)
+  .def_static("zero",[](const int n, const int _nc, const int _dev){
+      return Ptensors0::zero(n,_nc,_dev);}, py::arg("atoms"),py::arg("nc"),py::arg("device")=0)
+  .def_static("gaussian",[](const int n, const int _nc, const int _dev){
+      return Ptensors0::gaussian(n,_nc,_dev);}, py::arg("atoms"),py::arg("nc"),py::arg("device")=0)
+  .def_static("sequential",[](const int n, const int _nc, const int _dev){
+      return Ptensors0::sequential(n,_nc,_dev);}, py::arg("atoms"),py::arg("nc"),py::arg("device")=0)
+
   .def_static("raw",[](const vector<vector<int> >& v, const int _nc, const int _dev){
       return Ptensors0::raw(AtomsPack(v),_nc,_dev);}, py::arg("atoms"),py::arg("nc"),py::arg("device")=0)
   .def_static("zero",[](const vector<vector<int> >& v, const int _nc, const int _dev){

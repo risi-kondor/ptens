@@ -17,13 +17,17 @@ namespace ptens{
 
     mutable vector<AtomsPack*> _nhoods; 
 
+    mutable Hgraph* _reverse=nullptr;
+
     ~Hgraph(){
+      // if(_reverse) delete _reverse; // hack!
       for(auto p:_nhoods)
 	delete p;
     }
 
 
-  public:
+  public: // ---- Constructors -------------------------------------------------------------------------------
+
 
     Hgraph(const int _n):
       Hgraph(_n,_n){}
@@ -33,11 +37,22 @@ namespace ptens{
       return SparseMx::random_symmetric(_n,p);
     }
 
+
+  public: // ---- Conversions --------------------------------------------------------------------------------
+
+
     Hgraph(const SparseMx& x):
       SparseMx(x){}
 
 
   public: // ---- Access -------------------------------------------------------------------------------------
+
+
+    const Hgraph& reverse() const{
+      if(!_reverse) _reverse=new Hgraph(transp());
+      //if(_reverse) const_cast<Hgraph&>(*this).make_reverse();
+      return *_reverse;
+    }
 
 
     void forall_edges(std::function<void(const int, const int, const float)> lambda, const bool self=0) const{
@@ -74,6 +89,22 @@ namespace ptens{
 
 
   public: // ---- Operations ---------------------------------------------------------------------------------
+
+
+    AtomsPack merge(const AtomsPack& x) const{
+      PTENS_ASSRT(m==x.size());
+      AtomsPack R;
+      for(int i=0; i<n; i++){
+	std::set<int> w;
+	for(auto q: const_cast<Hgraph&>(*this).row(i)){
+	  auto a=x[q.first];
+	  for(auto p:a)
+	    w.insert(p);
+	}
+	R.push_back(w);
+      }
+      return R;
+    }
 
 
     pair<AindexPack,AindexPack> intersects(const AtomsPack& inputs, const AtomsPack& outputs, const bool self=0) const{

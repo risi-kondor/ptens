@@ -86,8 +86,8 @@ pybind11::class_<Ptensors1,RtensorPool>(m,"ptensors1")
 
 
   .def("str",&Ptensors1::str,py::arg("indent")="")
-  .def("__str__",&Ptensors1::str,py::arg("indent")="")
-  .def("__repr__",&Ptensors1::str,py::arg("indent")="");
+  .def("__str__",&Ptensors1::str,py::arg("indent")="");
+//.def("__repr__",&Ptensors1::str,py::arg("indent")="");
 
 
 

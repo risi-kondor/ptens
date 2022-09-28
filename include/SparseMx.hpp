@@ -35,8 +35,8 @@ namespace ptens{
     
   public:
 
-    void set(const int i, const int j){
-      (*this)[i]=j;
+    void set(const int i, const float v){
+      (*this)[i]=v;
     }
 
     void forall_nonzero(const std::function<void(const int, const float)>& lambda){
@@ -83,7 +83,8 @@ namespace ptens{
     }
 
 
-  public:
+  public: // ---- Constructors -------------------------------------------------------------------------------
+
 
     SparseMx(){} 
 
@@ -211,6 +212,16 @@ namespace ptens{
       auto R=rtensor::zero({n,m});
       forall_nonzero([&](const int i, const int j, const float v){
 	  R.set(i,j,v);});
+      return R;
+    }
+
+
+  public: // ---- Operations -------------------------------------------------------------------------------
+
+
+    SparseMx transp() const{
+      SparseMx R(m,n);
+      forall_nonzero([&](const int i, const int j, const float v){R.set(j,i,v);});
       return R;
     }
 

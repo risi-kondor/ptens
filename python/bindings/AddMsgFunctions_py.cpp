@@ -88,7 +88,7 @@ m.def("add_msg_back",[](Ptensors2& r, const Ptensors2& x, const Hgraph& G, int o
   py::arg("r"), py::arg("x"), py::arg("G"), py::arg("offs")=0);
 
 
-
+// do we need these??
 m.def("msg_layer0",[](Ptensors0& x, const AtomsPack& atoms, const Hgraph& G){
     Ptensors0 R=Ptensors0::zero(atoms,x.nc,x.dev);
     add_msg(R,x,G); return R;});
@@ -120,4 +120,23 @@ m.def("msg_layer2",[](Ptensors2& x, const AtomsPack& atoms, const Hgraph& G){
     add_msg(R,x,G); return R;});
 
 
+m.def("unite1",[](const Ptensors0& x, const Hgraph& G) {return unite1(x,G);});
+m.def("unite2",[](const Ptensors0& x, const Hgraph& G) {return unite2(x,G);});
+m.def("unite1",[](const Ptensors1& x, const Hgraph& G) {return unite1(x,G);});
+m.def("unite2",[](const Ptensors1& x, const Hgraph& G) {return unite2(x,G);});
+m.def("unite1",[](const Ptensors2& x, const Hgraph& G) {return unite1(x,G);});
+m.def("unite2",[](const Ptensors2& x, const Hgraph& G) {return unite2(x,G);});
+  
+m.def("unite0to1_back",[](loose_ptr<Ptensors0>& x, loose_ptr<Ptensors1>& r, const Hgraph& G) {
+    return add_msg_back(x,r,G.reverse());});
+m.def("unite1to1_back",[](loose_ptr<Ptensors1>& x, loose_ptr<Ptensors1>& r, const Hgraph& G) {
+    return add_msg_back(x,r,G.reverse());});
+m.def("unite2to1_back",[](loose_ptr<Ptensors2>& x, loose_ptr<Ptensors1>& r, const Hgraph& G) {
+    return add_msg_back(x,r,G.reverse());});
+m.def("unite0to2_back",[](loose_ptr<Ptensors0>& x, loose_ptr<Ptensors2>& r, const Hgraph& G) {
+    return add_msg_back(x,r,G.reverse());});
+m.def("unite1to2_back",[](loose_ptr<Ptensors1>& x, loose_ptr<Ptensors2>& r, const Hgraph& G) {
+    return add_msg_back(x,r,G.reverse());});
+m.def("unite2to2_back",[](loose_ptr<Ptensors2>& x, loose_ptr<Ptensors2>& r, const Hgraph& G) {
+    return add_msg_back(x,r,G.reverse());});
 

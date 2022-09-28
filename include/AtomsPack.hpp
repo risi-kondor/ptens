@@ -42,6 +42,19 @@ namespace ptens{
 	push_back(p);
     }
 
+    static AtomsPack random(const int n, const float p=0.5){
+      AtomsPack R;
+      uniform_real_distribution<double> distr(0,1);
+      for(int i=0; i<n; i++){
+	vector<int> v;
+	for(int j=0; j<n; j++)
+	  if(distr(rndGen)<p)
+	    v.push_back(j);
+	R.push_back(v);
+      }
+      return R;
+    }
+
     /*
     AtomsPack(const Nhoods& N){
       for(int i=0; i<N.nhoods.size(); i++){
