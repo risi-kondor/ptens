@@ -43,13 +43,15 @@ namespace ptens{
       return arr[s0*ix[i0]+s1*i1];
     }
 
-    /*
+    
     void set(const int i0, const int i1, float x) const{
+      arr[s0*ix[i0]+s1*i1]=x;
     }
 
     void inc(const int i0, const int i1, float x) const{
+      arr[s0*ix[i0]+s1*i1]+=x;
     }
-    */
+
 
   public: // ---- Cumulative operations ----------------------------------------------------------------------
 
@@ -76,7 +78,7 @@ namespace ptens{
 	float t=0; 
 	for(int j=0; j<n0; j++) 
 	  t+=arr[s0*ix[j]+s1*i];
-	r.set(i,t);
+	r.inc(i,t);
       }
     }
 

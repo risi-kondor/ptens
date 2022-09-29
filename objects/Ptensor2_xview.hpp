@@ -40,6 +40,7 @@ namespace ptens{
     //return arr[s0*ix[i0]+s1*i1];
     //}
 
+    // TODO: rewrite to avoid virtual fns
     float operator()(const int i0, const int i1, const int i2) const{
       return arr[s0*ix[i0]+s1*ix[i1]+s2*i2];
     }
@@ -48,13 +49,13 @@ namespace ptens{
       return arr[s0*ix[i0]+s1*ix[i1]+s2*i2];
     }
 
-    /*
-    void set(const int i0, const int i1, float x) const{
+    void set(const int i0, const int i1, const int i2, float x) const{
+      arr[s0*ix[i0]+s1*ix[i1]+s2*i2]=x;
     }
 
-    void inc(const int i0, const int i1, float x) const{
+    void inc(const int i0, const int i1, const int i2, float x) const{
+      arr[s0*ix[i0]+s1*ix[i1]+s2*i2]+=x;
     }
-    */
 
 
   public: // ---- Operations --------------------------------------------------------------------------------
@@ -106,7 +107,9 @@ namespace ptens{
       return Ptensor1_xview(arr,n2,s0+s1,s2,ix,dev);
     }
 
-
+    Ptensor2_xview transp() const{
+      return Ptensor2_xview(arr,n2,s1,s0,s2,ix,dev);
+    }
 
   };
 

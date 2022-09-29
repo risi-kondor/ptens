@@ -257,16 +257,20 @@ namespace ptens{
     RtensorPool reduce0(const AindexPack& list) const{
       int N=list.size();
       RtensorPool R(N,Gdims(nc),cnine::fill_zero());
-      for(int i=0; i<N; i++)
+      for(int i=0; i<N; i++){
+	if(list.nix(i)==0) continue;
 	view_of(list.tens(i),list.ix(i)).sum0_into(R.view1_of(i));
+      }
       return R;
     }
 
     RtensorPool reduce0(const AindexPack& list, const int offs, const int n) const{
       int N=list.size();
       RtensorPool R(N,Gdims(n),cnine::fill_zero());
-      for(int i=0; i<N; i++)
+      for(int i=0; i<N; i++){
+	if(list.nix(i)==0) continue;
 	view_of(list.tens(i),list.ix(i),offs,n).sum0_into(R.view1_of(i));
+      }
       return R;
     }
 
@@ -291,8 +295,10 @@ namespace ptens{
       for(int i=0; i<N; i++)
 	dims.push_back({list.nix(i),nc});
       RtensorPool R(dims,cnine::fill_zero());
-      for(int i=0; i<N; i++)
+      for(int i=0; i<N; i++){
+	if(list.nix(i)==0) continue;
 	R.view2_of(i)+=view_of(list.tens(i),list.ix(i));
+      }
       return R;
     }
 
@@ -302,8 +308,10 @@ namespace ptens{
       for(int i=0; i<N; i++)
 	dims.push_back({list.nix(i),n});
       RtensorPool R(dims,cnine::fill_zero());
-      for(int i=0; i<N; i++)
+      for(int i=0; i<N; i++){
+	if(list.nix(i)==0) continue;
 	R.view2_of(i)+=view_of(list.tens(i),list.ix(i),offs,n);
+      }
       return R;
     }
 
@@ -353,15 +361,19 @@ namespace ptens{
 
     void broadcast1(const RtensorPool& x, const AindexPack& list){
       int N=list.size();
-      for(int i=0; i<N; i++)
+      for(int i=0; i<N; i++){
+	if(x.dim_of(i,0)==0) continue;
 	view_of(list.tens(i),list.ix(i))+=x.view2_of(i);
+      }
     }
 
     void broadcast1(const RtensorPool& x, const AindexPack& list, const int offs){
       int N=list.size();
       const int n=x.dim_of(0,1);
-      for(int i=0; i<N; i++)
+      for(int i=0; i<N; i++){
+	if(x.dim_of(i,0)==0) continue;
 	view_of(list.tens(i),list.ix(i),offs,n)+=x.view2_of(i);
+      }
     }
 
 
