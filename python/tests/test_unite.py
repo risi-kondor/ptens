@@ -12,7 +12,6 @@ class TestUnite(object):
         else:
             atoms=ptens_base.atomspack.random(N,0.3)
             x=src.randn(atoms,_nc)
-        print(789)
         x.requires_grad_()
         G=p.graph.random(N,0.3)
         z=fn(x,G)
@@ -20,14 +19,11 @@ class TestUnite(object):
         testvec=z.randn_like()
         loss=z.inp(testvec)
         loss.backward(torch.tensor(1.0))
-        print(888)
         xgrad=x.get_grad()
 
         xeps=x.randn_like()
         z=fn(x+xeps,G)
         xloss=z.inp(testvec)
-        print(xloss-loss)
-        print(xeps.inp(xgrad))
         assert(torch.allclose(xloss-loss,xeps.inp(xgrad),rtol=1e-3, atol=1e-4))
 
     @pytest.mark.parametrize('nc', [1, 2, 4])
