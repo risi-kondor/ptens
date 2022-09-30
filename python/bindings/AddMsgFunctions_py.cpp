@@ -140,3 +140,7 @@ m.def("unite1to2_back",[](loose_ptr<Ptensors1>& x, loose_ptr<Ptensors2>& r, cons
 m.def("unite2to2_back",[](loose_ptr<Ptensors2>& x, loose_ptr<Ptensors2>& r, const Hgraph& G) {
     return add_msg_back(x,r,G.reverse());});
 
+
+m.def("gather",[](const Ptensors0& x, const Hgraph& G) {return gather(x,G);});
+m.def("gather_back",[](loose_ptr<Ptensors0>& x, loose_ptr<Ptensors0>& r, const Hgraph& G){
+    add_gather(x,r,G.reverse());});

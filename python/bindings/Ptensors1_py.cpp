@@ -79,6 +79,11 @@ pybind11::class_<Ptensors1,RtensorPool>(m,"ptensors1")
       return R.torch();
     })
 
+  .def("add_ReLU",[](Ptensors1& r, const Ptensors1& x, const float alpha){
+      r.add_ReLU(x,alpha);})
+  .def("add_ReLU_back",[](Ptensors1& x, const loose_ptr<Ptensors1>& g, const float alpha){
+      x.get_grad().add_ReLU(g,alpha);}) // forward is same as backward
+
   .def("inp",&Ptensors1::inp)
 
 

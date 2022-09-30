@@ -94,8 +94,17 @@ pybind11::class_<Ptensors0,RtensorPool>(m,"ptensors0")
   .def("mprod_back1",[](Ptensors0& x, const loose_ptr<Ptensors0>& g){
       RtensorA R=RtensorA::zero({x.nc,g->nc});
       g->add_mprod_back1_to(R,x);
-      return R.torch();
-    })
+      return R.torch();})
+
+//.def("add_gather",[](Ptensors0& r const Ptensors0& x, const Hgraph& G){
+//      r.add_gather(x,G);})
+//  .def("add_gather_back",[](Ptensors0& r const Ptensors0& x, const Hgraph& G){
+//      r.add_gather(x,G);})
+
+  .def("add_ReLU",[](Ptensors0& r, const Ptensors0& x, const float alpha){
+      r.add_ReLU(x,alpha);})
+  .def("add_ReLU_back",[](Ptensors0& x, const loose_ptr<Ptensors0>& g, const float alpha){
+      x.get_grad().add_ReLU(g,alpha);}) // forward is same as backward
 
   .def("inp",&Ptensors0::inp)
 
@@ -108,3 +117,10 @@ pybind11::class_<Ptensors0,RtensorPool>(m,"ptensors0")
 
 
 pybind11::class_<loose_ptr<Ptensors0> >(m,"ptensors0_lptr");
+
+
+
+//.def("ReLU",[](const Ptensors0& x, const float alpha){
+//      Ptensors0 R=Ptensors0::zeros_like(x);
+//      R.add_ReLU(x,alpha);
+//      return R;})

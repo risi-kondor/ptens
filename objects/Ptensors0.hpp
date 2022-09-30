@@ -92,6 +92,10 @@ namespace ptens{
   public: // ---- Spawning -----------------------------------------------------------------------------------
 
 
+    static Ptensors0 zeros_like(const Ptensors0& x){
+      return Ptensors0(RtensorPool::zeros_like(x),x.atoms,x.nc);
+    }
+
     static Ptensors0* new_zeros_like(const Ptensors0& x){
       return new Ptensors0(RtensorPool::zeros_like(x),x.atoms,x.nc);
     }
@@ -240,7 +244,7 @@ namespace ptens{
       for(int i=0; i<size(); i++)
 	r.view2().add_outer(x.view_of(i),view_of(i));
     }
- 
+
  
   public: // ---- Reductions ---------------------------------------------------------------------------------
 

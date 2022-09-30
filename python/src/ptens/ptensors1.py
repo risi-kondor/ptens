@@ -94,6 +94,9 @@ class ptensors1(torch.Tensor):
     def concat(self,y):
         return Ptensors1_concatFn.apply(self,y)
     
+    def relu(self,alpha=0.5):
+        return Ptensors1_ReLUFn.apply(self,alpha)
+        
     def inp(self,y):
         return Ptensors1_inpFn.apply(self,y)
     
@@ -171,6 +174,23 @@ class Ptensors1_addFn(torch.autograd.Function):
         ctx.x.add_to_grad(ctx.r.get_gradp())
         ctx.y.add_to_grad(ctx.r.get_gradp())
         return ptensors1(1),ptensors1(1)
+
+
+class Ptensors1_ReLUFn(torch.autograd.Function):
+    
+    @staticmethod
+    def forward(ctx,x,alpha):
+        R=ptens.ptensors1.zeros(x.obj.view_of_atoms(),x.obj.get_nc())
+        R.obj.add_ReLU(x.obj,alpha)
+        ctx.x=x.obj
+        ctx.alpha=alpha
+        ctx.r=R.obj
+        return R
+
+    @staticmethod
+    def backward(ctx,g):
+        ctx.x.add_ReLU_back(ctx.r.gradp(),ctx.alpha)
+        return ptensors0.dummy(), None
 
 
 class Ptensors1_inpFn(torch.autograd.Function):

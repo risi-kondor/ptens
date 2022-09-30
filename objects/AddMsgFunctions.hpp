@@ -318,7 +318,24 @@ namespace ptens{
     add_msg(R,x,G);
     return R;
   }
-  
+
+
+  // --------------------------------------------------------------------------------------------------------
+
+
+  void add_gather(Ptensors0& r, const Ptensors0& x, const Hgraph& G){
+    PTENS_ASSRT(G.n==r.size());
+    PTENS_ASSRT(G.m==x.size());
+    G.forall_edges([&](const int i, const int j, const float v){
+	r.view_of_tensor(i).add(x.view_of_tensor(j),v);
+      });
+  }
+
+  Ptensors0 gather(const Ptensors0& x, const Hgraph& G){
+    Ptensors0 R=Ptensors0::zero(G.n,x.get_nc());
+    add_gather(R,x,G);
+    return R;
+  }
    
 }
 

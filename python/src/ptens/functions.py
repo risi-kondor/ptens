@@ -22,8 +22,16 @@ def cat(x,y):
     return x.concat(y)
 
 
+def relu(x,alpha=0.5):
+    return x.relu(alpha)
+
+
 def unite1(x,G):
     return x.unite1(G)
 
 def unite2(x,G):
     return x.unite2(G)
+
+def gather(x,G):
+    return x.gather(G)
+

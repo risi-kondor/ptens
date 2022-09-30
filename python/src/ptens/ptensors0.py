@@ -102,6 +102,9 @@ class ptensors0(torch.Tensor):
     def concat(self,y):
         return Ptensors0_concatFn.apply(self,y)
 
+    def relu(self,alpha=0.5):
+        return Ptensors0_ReLUFn.apply(self,alpha)
+        
     def inp(self,y):
         return Ptensors0_inpFn.apply(self,y)
     
@@ -131,6 +134,9 @@ class ptensors0(torch.Tensor):
     
     def unite2(self,G):
         return Ptensors0_Unite2Fn.apply(self,G)
+    
+    def gather(self,G):
+        return Ptensors0_GatherFn.apply(self,G)
     
 
     # ---- I/O ----------------------------------------------------------------------------------------------
@@ -256,7 +262,26 @@ class Ptensors0_mprodFn(torch.autograd.Function):
     @staticmethod
     def backward(ctx,g):
         ctx.x.add_mprod_back0(ctx.r.gradp(),ctx.y)
-        return ptensors0(1), ctx.x.mprod_back1(ctx.r.gradp())
+        return ptensors0.dummy(), ctx.x.mprod_back1(ctx.r.gradp())
+
+
+class Ptensors0_ReLUFn(torch.autograd.Function):
+    
+    @staticmethod
+    def forward(ctx,x,alpha):
+        R=ptens.ptensors0.zeros(x.obj.view_of_atoms(),x.obj.get_nc())
+        R.obj.add_ReLU(x.obj,alpha)
+        ctx.x=x.obj
+        ctx.alpha=alpha
+        ctx.r=R.obj
+        return R
+
+    @staticmethod
+    def backward(ctx,g):
+        ctx.x.add_ReLU_back(ctx.r.gradp(),ctx.alpha)
+        return ptensors0.dummy(), None
+
+
 
 
 class Ptensors0_Linmaps0Fn(torch.autograd.Function):
@@ -355,6 +380,24 @@ class Ptensors0_Unite2Fn(torch.autograd.Function):
     def backward(ctx,g):
         ptens_base.unite0to2_back(ctx.x.gradp(),ctx.r.gradp(),ctx.G)
         return ptensors0.dummy(), None
+
+
+class Ptensors0_GatherFn(torch.autograd.Function):
+
+    @staticmethod
+    def forward(ctx,x,G):
+        r=ptens.ptensors1(1)
+        r.obj=ptens_base.gather(x.obj,G.obj)
+        ctx.x=x.obj
+        ctx.r=r.obj
+        ctx.G=G.obj
+        return r
+        
+    @staticmethod
+    def backward(ctx,g):
+        ptens_base.gather_back(ctx.x.gradp(),ctx.r.gradp(),ctx.G)
+        return ptensors0.dummy(), None
+
 
 
 
