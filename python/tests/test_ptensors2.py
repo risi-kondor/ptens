@@ -4,8 +4,7 @@ import pytest
 
 class TestPtensors2(object):
 
-    def backprop(self,fn,_nc):
-        _atoms=[[1],[2],[3]]
+    def backprop(self,fn,_atoms,_nc):
         x=p.ptensors2.randn(_atoms,_nc)
         x.requires_grad_()
         z=fn(x)
@@ -23,13 +22,24 @@ class TestPtensors2(object):
 
     @pytest.mark.parametrize('nc', [1, 2, 4])
     def test_linmaps0(self,nc):
-        self.backprop(p.linmaps0,nc)
+        self.backprop(p.linmaps0,[[1],[2],[3]],nc)
 
     @pytest.mark.parametrize('nc', [1, 2, 4])
     def test_linmaps1(self,nc):
-        self.backprop(p.linmaps1,nc)
+        self.backprop(p.linmaps1,[[1],[2],[3]],nc)
 
     @pytest.mark.parametrize('nc', [1, 2, 4])
     def test_linmaps2(self,nc):
-        self.backprop(p.linmaps2,nc)
+        self.backprop(p.linmaps2,[[1],[2],[3]],nc)
 
+    @pytest.mark.parametrize('atoms', [[[1],[2],[6]],[[1],[2,5],[1,2,6]]])
+    def test_linmaps0(self,atoms):
+        self.backprop(p.linmaps0,atoms, 2)
+
+    @pytest.mark.parametrize('atoms', [[[1],[2],[6]],[[1],[2,3],[2,7,6]]])
+    def test_linmaps1(self,atoms):
+        self.backprop(p.linmaps1,atoms, 4)
+
+    @pytest.mark.parametrize('atoms', [[[1],[2],[6]],[[1],[2],[6,8,9]]])
+    def test_linmaps2(self,atoms):
+        self.backprop(p.linmaps2,atoms, 5)
