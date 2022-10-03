@@ -336,16 +336,54 @@ class Ptensors0_Transfer0Fn(torch.autograd.Function):
 
     @staticmethod
     def forward(ctx,x,atoms,G):
-        r=ptensors(1)
-        r.obj=ptens_base.msg_layer0(x.obj,atoms,G.obj)
+        ctx.x=x
+        R=ptens.ptensors0.zeros(atoms,x.obj.get_nc())
+        ptens_base.add_msg(R.obj,x.obj,G.obj)
         ctx.x=x.obj
-        ctx.r=r.obj
-        return r
+        ctx.r=R.obj
+        ctx.G=G.obj
+        return R
         
     @staticmethod
     def backward(ctx,g):
-        ptens_base.add_msg_back(ctx.x.gradp(),ctx.r.gradp(),G.obj)
-        return ptensors0.dummy()
+        ptens_base.add_msg_back(ctx.x.gradp(),ctx.r.gradp(),ctx.G)
+        return ptensors0.dummy(), None, None
+
+
+class Ptensors0_Transfer1Fn(torch.autograd.Function):
+
+    @staticmethod
+    def forward(ctx,x,atoms,G):
+        ctx.x=x
+        R=ptens.ptensors1.zeros(atoms,x.obj.get_nc())
+        ptens_base.add_msg(R.obj,x.obj,G.obj)
+        ctx.x=x.obj
+        ctx.r=R.obj
+        ctx.G=G.obj
+        return R
+        
+    @staticmethod
+    def backward(ctx,g):
+        ptens_base.add_msg_back(ctx.x.gradp(),ctx.r.gradp(),ctx.G)
+        return ptensors0.dummy(), None, None
+
+
+class Ptensors0_Transfer2Fn(torch.autograd.Function):
+
+    @staticmethod
+    def forward(ctx,x,atoms,G):
+        ctx.x=x
+        R=ptens.ptensors2.zeros(atoms,x.obj.get_nc()*2)
+        ptens_base.add_msg(R.obj,x.obj,G.obj)
+        ctx.x=x.obj
+        ctx.r=R.obj
+        ctx.G=G.obj
+        return R
+        
+    @staticmethod
+    def backward(ctx,g):
+        ptens_base.add_msg_back(ctx.x.gradp(),ctx.r.gradp(),ctx.G)
+        return ptensors0.dummy(), None, None
 
 
 class Ptensors0_Unite1Fn(torch.autograd.Function):

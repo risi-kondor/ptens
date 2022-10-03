@@ -5,14 +5,14 @@ Ptensors
 A :math:`p`'th order *permutationally covariant tensor* or *Ptensor* for short, with  
 reference domain :math:`(a_1,\ldots,a_k)` is a :math:`(p+1)`'th order tensor 
 :math:`A\in\mathbb{R}^{k\times k\times\ldots\times k\times c}`, where :math:`c` is the number 
-of channels. The elements of reference domain are called `atoms`. 
+of channels. The elements of the reference domain are called `atoms`. 
 The defining property of Ptensors is that if :math:`(a_1,\ldots,a_k)` are permuted 
 by a permutation :math:`\sigma`, then :math:`A` transforms to :math:`A'` with 
 
 .. math::
   A'_{i_1,\ldots,i_k,c}=A_{i_{\sigma^{-1}(1)},\ldots,i_{\sigma^{-1}(k)},c}
 
-Currently `ptens` supports zeroth, first and second order Ptensors. thecorresponding classes 
+Currently `ptens` supports zeroth, first and second order Ptensors. The corresponding classes are  
 ``ptensor0``, ``ptensor1`` and ``ptensor2``. Each of these classes is derived  
 ``torch.Tensor``, allowing all the usual PyTorch arithmetic operations to be applied to PTensors. 
 Note, however, that some of these operations might break equivariance. For example, changing 
@@ -91,7 +91,7 @@ Similarly, the following creates and prints out a second order Ptensor over the 
 ..
   Note that for better legibility the `ptensor` classes use their own custom printout methods. 
 
-For debugging purposes `ptens` also provides a ``sequential`` initializer for each of these classes, e.g.:
+For debugging purposes `ptens` also provides a ``sequential`` initializer, e.g.:
 
 .. code-block:: python
 

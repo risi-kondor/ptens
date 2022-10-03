@@ -1,10 +1,8 @@
 .. ptens documentation master file, created by
    sphinx-quickstart on Sun Sep 11 21:20:11 2022.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
 
-Welcome to ptens's documentation!
-=================================
+ptens documentation
+===================
 
 .. toctree::
    :maxdepth: 2
@@ -12,9 +10,11 @@ Welcome to ptens's documentation!
 
    ptensork.rst
    ptensorsk.rst
-   graph.rst
    linmaps.rst
    transfer.rst
+   graph.rst
+   gather.rst 
+   unite.rst
 
 
 Indices and tables

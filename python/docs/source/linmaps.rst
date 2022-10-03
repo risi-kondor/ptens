@@ -3,8 +3,8 @@ Linmaps
 *******
 
 The neurons in permutation equivariant networks implement learnable equivariant maps between Ptensors. 
-The ``linmaps`` functions described in this section are such equivariant maps that can be 
-applied when the reference domains of the input and output tensors are the *same*. 
+The ``linmaps`` functions described in this section are equivariant linear maps between two Ptensors 
+with the *same* reference domain. 
 
 ========================
 Linmaps between Ptensors
@@ -18,7 +18,7 @@ linmaps0
 
 The only possible equivariant linear maps from one 0'th order Ptensor to another 0'th order 
 ptensor are multiples of the identity, 
-Therefore ``linmaps0`` applied to a ``ptensor0``, is just the identity map:
+Therefore ``linmaps0`` applied to a ``ptensor0``, is just the identity mapping:
 
 .. code-block:: python
 
@@ -31,7 +31,7 @@ Therefore ``linmaps0`` applied to a ``ptensor0``, is just the identity map:
  Ptensor0(1,2,3):
  [ 0 1 2 3 4 ]
 
-Similarly, there is only on way to map a 1'st order Ptensor to 0'th order ptensor, and that 
+There is only on way (up to scaling) to map a 1'st order Ptensor to 0'th order ptensor, and that 
 is to sum the input along the atom dimension, i.e., :math:`B_c=\sum_i A_{i,c}`:
 
 .. code-block:: python
@@ -47,9 +47,10 @@ is to sum the input along the atom dimension, i.e., :math:`B_c=\sum_i A_{i,c}`:
  Ptensor0(1,2,3):
  [ 9 12 15 ]
 
-In contrast, there are two distinct ways to map a 2'nd order Ptensor to a 0'th order Ptensor: 
+
+In contrast, there are two linearly independent ways to map a 2'nd order Ptensor to a 0'th order Ptensor: 
 :math:`B^1_{c}=\sum_i \sum_j A_{i,j,c}` and :math:`B^2_{c}=\sum_i A_{i,i,c}`. 
-Therefore, when applied to a ``ptensor2``, ``linmaps0` doubles its number of channels:
+Consequently, when applied to a ``ptensor2``, ``linmaps0`` doubles its number of channels:
 
 ..
   The space of equivariant maps from a second order Ptensor to a zeroth order Ptensor is spanned by 
@@ -162,7 +163,7 @@ linmaps2
 
 ``linmaps2`` maps a 0'th, 1'st or 2'nd order Ptensor to a 2'nd  order Ptensor. 
 
-In the :math:`\mathcal{P}_0\to\mathcal{P}_21 case there are two maps to consider: 
+In the :math:`\mathcal{P}_0\to\mathcal{P}_2` case there are two maps to consider: 
 :math:`C^1_{i,j,c}=A_c` and :math:`C^2_{i,j,c}=\delta_{i,j} A_c`:
 
 .. code-block:: python
@@ -353,9 +354,12 @@ Linmaps between Ptensor layers
 ==============================
 
 In permutation equivariant nets, linmaps are often applied to an entire layer of Ptensors, i.e., 
-to every Ptensor in the layer individually. `ptens` can accomplish this in a single function call, 
-moreover when working on the GPU, the operation is automatically parallelized across Ptensors. 
-As a simple example:
+to every Ptensor in the layer. `ptens` can accomplish this in a single function call. 
+When working on the GPU, the operation is automatically parallelized across Ptensors. 
+
+..
+ As a simple example:
+
 
 .. code-block:: python
 

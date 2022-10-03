@@ -5,7 +5,7 @@ A=p.ptensors0.randn(3,3)
 A.requires_grad_()
 print(A)
 
-B=p.relu(A,0)
+B=p.relu(A,0.1)
 print(B)
 
 

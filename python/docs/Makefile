@@ -21,3 +21,5 @@ help:
 	cp -r $(BUILDDIR)/html/*.html $(BUILDDIR)
 	cp -r $(BUILDDIR)/html/_images $(BUILDDIR)/
 	cp -r $(BUILDDIR)/html/_static $(BUILDDIR)/
+	cp $(BUILDDIR)/html/searchindex.js $(BUILDDIR)/
+	cp $(BUILDDIR)/html/objects.inv $(BUILDDIR)/

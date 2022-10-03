@@ -8,14 +8,14 @@ def linmaps2(x):
     return x.linmaps2()
 
 
-def transfer0(x,_atoms):
-    return x.transfer0(_atoms)
+def transfer0(x,_atoms,G):
+    return x.transfer0(_atoms,G)
     
-def transfer1(x,_atoms):
-    return x.transfer1(_atoms)
+def transfer1(x,_atoms,G):
+    return x.transfer1(_atoms,G)
     
-def transfer2(x,_atoms):
-    return x.transfer2(_atoms)
+def transfer2(x,_atoms,G):
+    return x.transfer2(_atoms,G)
 
 
 def cat(x,y):

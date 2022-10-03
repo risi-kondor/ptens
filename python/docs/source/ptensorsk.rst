@@ -4,15 +4,15 @@ Ptensor layers
 
 In most applications, Ptensors are organized into layers, represented by the 
 ``ptensors0``, ``ptensors1`` and ``tensors2`` classes.  
-One of the keys to efficient message passing is that `ptens` can operate  
+A key feature of `ptens` is that it can operate  
 on all the Ptensors in a given layer *in parallel*, even if their reference domains are of different sizes. 
 
 =======================
 Defining Ptensor layers
 =======================
 
-One way to define Ptensor layers is using the ``zero``, ``randn`` or ``sequential`` constructors, 
-similalry to how individual Ptensors can be constructed.  
+Similarly to individual Ptensors, the Ptensor layers classes also provide  
+``zero``, ``randn`` or ``sequential`` constructors.  
 For example, the following creates a layer consisting of three 
 random first order Ptensors with reference domains :math:`(1,2,3)`, :math:`(3,5)` and :math:`(2)`
 and 3 channels: 
@@ -32,11 +32,6 @@ and 3 channels:
  
  Ptensor1(2):
  [ 0.584898 -0.660558 0.534755 ]
-
-
-===================
-Getters and setters
-===================
 
 
 Unlike individual Ptensors, the ``ptensors0``, ``ptensors1`` and ``tensors2`` classes 
@@ -85,9 +80,9 @@ PyTorch tensor:
          [1., 1., 1., 1., 1.],
          [2., 2., 2., 2., 2.]])
 
-.. 
-  In higher order Ptensor layers, the tensors cannot be jointly converted to/from a single PyTorch tensor, 
-  since their dimensionalities might be different. 
+===================
+Getters and setters
+===================
 
 For higher order tensor layers, the individual tensors have to be accessed one by one if they are to 
 be converted to a Pytorch tensor, for example:
@@ -114,18 +109,20 @@ be converted to a Pytorch tensor, for example:
  [ 1.16493 0.584898 -0.660558 0.534755 -0.607787 ]
  
 
-Note that accessing individual tensors, as well as the constructor and ``torch()`` methods for ``ptensors0`` 
+Accessing individual tensors, as well as the constructor and ``torch()`` methods for ``ptensors0`` 
 described above are differentiable operations.
 
 
-============================
-Operations on Ptensor layers
-============================
+========================================
+Equivariant operations on Ptensor layers
+========================================
 
 Because the Ptensor layers are not subclasses of  ``torch.Tensor``, they do not automatically inherit all the 
 usual arithmetic operations like addition multiplication by scalars, etc.. 
-Currently, three basic operations are implemented for these classes: addition, concatenation and 
-multiplication by matrices. All three of these operations are differentiable. 
+Currently, four basic operations are implemented for these classes: addition, concatenation,  
+multiplication by matrices, and the ReU operator. 
+All three of these operations are equivariant and implemented 
+in a way that supports backpropagating gradients through them. 
 
 --------------------------
 Addition and concatenation
@@ -213,6 +210,37 @@ The following example demostrates this for a ``ptensors1`` object, but the same 
  Ptensor1 [3]:
  [ -2.84689 -1.14514 ]
 
+
+----
+ReLU
+----
+
+The ``relu(x,alpha)`` applies the function :math:`sigma(x)=\textrm{max}(x,\alpha x)` 
+(with :math:`0\leq \alpha<1`) elementwise and  can be applied to Ptensor layers of any order.
+
+.. code-block:: python
+
+ >>> A=p.ptensors0.randn(3,3)
+ >>> print(A)
+ Ptensor0 [0]:
+ [ -1.23974 -0.407472 1.61201 ]
+
+ Ptensor0 [1]:
+ [ 0.399771 1.3828 0.0523187 ]
+
+ Ptensor0 [2]:
+ [ -0.904146 1.87065 -1.66043 ]
+
+ >>> B=p.relu(A,0.1)
+ >>> print(B)
+ Ptensor0 [0]:
+ [ -0.123974 -0.0407472 1.61201 ]
+
+ Ptensor0 [1]:
+ [ 0.399771 1.3828 0.0523187 ]
+
+ Ptensor0 [2]:
+ [ -0.0904147 1.87065 -0.166043 ]
 
 
 

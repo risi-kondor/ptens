@@ -322,6 +322,35 @@ Ptensors to second order Ptensors is 2,5 and 15, respectively:
 Transfer maps between Ptensor layers
 ====================================
 
-When transferring messages between Ptensor layers, we must specify two things: the reference domain 
-of every tensor in the second layer, and the matrix that defines which Ptensors send message to which Ptensors: 
+When transferring messages between Ptensor layers, we must specify two things: the reference domains 
+of every tensor in the second layer, and the graph that defines which Ptensors send messages to which Ptensors 
+(see the section on Graphs): 
+
+
+.. code-block:: python
+
+ >>> A=ptens.ptensors1.randn([[1,2],[3]],3)
+ >>> G=ptens.graph.from_matrix(torch.ones(3,2))
+ >>> print(A)
+
+ Ptensor1 [1,2]:
+ [ -1.23974 -0.407472 1.61201 ]
+ [ 0.399771 1.3828 0.0523187 ]
+
+ Ptensor1 [3]:
+ [ -0.904146 1.87065 -1.66043 ]
+
+ >>> B=ptens.transfer1(A,[[1],[2,3],[1,3]],G)
+ >>> print(B)
+
+ Ptensor1 [1]:
+ [ -1.23974 -0.407472 1.61201 -1.23974 -0.407472 1.61201 ]
+
+ Ptensor1 [2,3]:
+ [ 0.399771 1.3828 0.0523187 0.399771 1.3828 0.0523187 ]
+ [ -0.904146 1.87065 -1.66043 -0.904146 1.87065 -1.66043 ]
+
+ Ptensor1 [1,3]:
+ [ -1.23974 -0.407472 1.61201 -1.23974 -0.407472 1.61201 ]
+ [ -0.904146 1.87065 -1.66043 -0.904146 1.87065 -1.66043 ]
 

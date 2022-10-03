@@ -111,14 +111,14 @@ class ptensors1(torch.Tensor):
         return Ptensors1_Linmaps2Fn.apply(self);
 
 
-    def transfer0(self,_atoms):
-        return Ptensors1_Transfer0Fn.apply(self,_atoms)
+    def transfer0(self,_atoms,G):
+        return Ptensors1_Transfer0Fn.apply(self,_atoms,G)
 
-    def transfer1(self,_atoms):
-        return Ptensors1_Transfer1Fn.apply(self,_atoms)
+    def transfer1(self,_atoms,G):
+        return Ptensors1_Transfer1Fn.apply(self,_atoms,G)
 
-    def transfer2(self,_atoms):
-        return Ptensors1_Transfer2Fn.apply(self,_atoms)
+    def transfer2(self,_atoms,G):
+        return Ptensors1_Transfer2Fn.apply(self,_atoms,G)
 
 
     def unite1(self,G):
@@ -290,6 +290,60 @@ class Ptensors1_Linmaps2Fn(torch.autograd.Function):
     def backward(ctx,g):
         ptens_base.add_linmaps1to2_back(ctx.x.gradp(),ctx.r.gradp())
         return ptensors1(1)
+
+
+class Ptensors1_Transfer0Fn(torch.autograd.Function):
+
+    @staticmethod
+    def forward(ctx,x,atoms,G):
+        ctx.x=x
+        R=ptens.ptensors0.zeros(atoms,x.obj.get_nc())
+        ptens_base.add_msg(R.obj,x.obj,G.obj)
+        ctx.x=x.obj
+        ctx.r=R.obj
+        ctx.G=G.obj
+        return R
+        
+    @staticmethod
+    def backward(ctx,g):
+        ptens_base.add_msg_back(ctx.x.gradp(),ctx.r.gradp(),ctx.G)
+        return ptensors1.dummy(), None, None
+
+
+class Ptensors1_Transfer1Fn(torch.autograd.Function):
+
+    @staticmethod
+    def forward(ctx,x,atoms,G):
+        ctx.x=x
+        R=ptens.ptensors1.zeros(atoms,x.obj.get_nc()*2)
+        ptens_base.add_msg(R.obj,x.obj,G.obj)
+        ctx.x=x.obj
+        ctx.r=R.obj
+        ctx.G=G.obj
+        return R
+        
+    @staticmethod
+    def backward(ctx,g):
+        ptens_base.add_msg_back(ctx.x.gradp(),ctx.r.gradp(),ctx.G)
+        return ptensors1.dummy(), None, None
+
+
+class Ptensors1_Transfer2Fn(torch.autograd.Function):
+
+    @staticmethod
+    def forward(ctx,x,atoms,G):
+        ctx.x=x
+        R=ptens.ptensors2.zeros(atoms,x.obj.get_nc()*5)
+        ptens_base.add_msg(R.obj,x.obj,G.obj)
+        ctx.x=x.obj
+        ctx.r=R.obj
+        ctx.G=G.obj
+        return R
+        
+    @staticmethod
+    def backward(ctx,g):
+        ptens_base.add_msg_back(ctx.x.gradp(),ctx.r.gradp(),ctx.G)
+        return ptensors1.dummy(), None, None
 
 
 class Ptensors1_Unite1Fn(torch.autograd.Function):
