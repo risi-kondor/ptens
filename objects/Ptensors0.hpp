@@ -3,6 +3,7 @@
 
 #include "Cgraph.hpp"
 #include "RtensorPool.hpp"
+#include "RtensorPack.hpp"
 #include "AtomsPack.hpp"
 #include "AindexPack.hpp"
 #include "Ptensor0.hpp"
@@ -11,6 +12,12 @@
 
 
 namespace ptens{
+
+  class Ptensors0;
+
+  #ifdef _WITH_CUDA
+  extern void Ptensors0_reduce0_cu(RtensorPool& R,const Ptensors0& x, int offs, int n);
+  #endif
 
 
   class Ptensors0: public RtensorPool, public diff_class<Ptensors0>{
@@ -82,7 +89,7 @@ namespace ptens{
 
 
     static Ptensors0 concat(const Ptensors0& x, const Ptensors0& y){
-      Ptensors0 R=Ptensors0::zero(x.atoms,x.nc+y.nc);
+      Ptensors0 R=Ptensors0::zero(x.atoms,x.nc+y.nc,x.dev);
       R.add_to_channels(x,0);
       R.add_to_channels(y,x.nc);
       return R;
@@ -203,6 +210,7 @@ namespace ptens{
     }
 
     void push_back(const Ptensor0& x){
+      //PTENS_CPUONLY();
       if(nc==0) nc=x.get_nc();
       else assert(nc==x.get_nc());
       RtensorPool::push_back(x);
@@ -250,23 +258,26 @@ namespace ptens{
 
 
     RtensorPool reduce0() const{
-      RtensorPool R(size(),Gdims(nc),cnine::fill_zero());
+      RtensorPool R(size(),Gdims(nc),cnine::fill_zero(),dev);
       for(int i=0; i<size(); i++)
 	R.view1_of(i).add(view_of(i));
       return R;
     }
 
     RtensorPool reduce0(const int offs, const int n) const{
-      RtensorPool R(size(),Gdims(n),cnine::fill_zero());
-      for(int i=0; i<size(); i++)
-	R.view1_of(i).add(view_of(i,offs,n));
+      RtensorPool R(size(),Gdims(n),cnine::fill_zero(),dev);
+      if(dev==0){
+	for(int i=0; i<size(); i++)
+	  R.view1_of(i).add(view_of(i,offs,n));
+      }
+      GPUCODE(Ptensors0_reduce0_cu(R,*this,offs,n));
       return R;
     }
 
     RtensorPool reduce0(const AindexPack& list) const{
       int N=list.size();
       array_pool<int> dims;
-      RtensorPool R(N,Gdims(nc),cnine::fill_zero());
+      RtensorPool R(N,Gdims(nc),cnine::fill_zero(),dev);
       for(int i=0; i<N; i++){
 	if(list.nix(i)==0) continue;
 	R.view1_of(i)=view_of(list.tix(i)); // OK
@@ -276,7 +287,7 @@ namespace ptens{
 
     RtensorPool reduce0(const AindexPack& list, const int offs, const int n) const{
       int N=list.size();
-      RtensorPool R(N,Gdims(nc),cnine::fill_zero());
+      RtensorPool R(N,Gdims(nc),cnine::fill_zero(),dev);
       for(int i=0; i<N; i++){
 	if(list.nix(i)==0) continue;
 	R.view1_of(i)=view_of(list.tix(i),offs,n); // OK
@@ -303,7 +314,6 @@ namespace ptens{
       int N=list.size();
       for(int i=0; i<N; i++){
 	view_of(list.tens(i),list.ix(i))+=x.view1_of(i);
-	cout<<"zzzzzz"<<view_of(list.tens(i))<<endl;
       }
     }
 

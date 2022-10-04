@@ -7,6 +7,7 @@
 #include "Rtensor1_view.hpp"
 #include "Rtensor2_view.hpp"
 #include "Rtensor3_view.hpp"
+#include "IntTensor.hpp"
 
 
 namespace ptens{
@@ -26,6 +27,9 @@ namespace ptens{
     int memsize=0;
     int tail=0;
     vector_pool<int> headers;
+    //IntTensor dir_mx;
+    //bool dir_current=false;
+
     //bool is_view=false;
 
     ~RtensorPool(){
@@ -122,6 +126,8 @@ namespace ptens{
       if(x.dev==1){}
       R.headers=x.headers;
       R.tail=x.tail;
+      //R.dir_mx=x.dir_mx;
+      //R.dir_current=x.dir_current;
       return R;
     }
 
@@ -132,6 +138,8 @@ namespace ptens{
       if(x.dev==1){}
       R->headers=x.headers;
       R->tail=x.tail;
+      //R.dir_mx=x.dir_mx;
+      //R.dir_current=x.dir_current;
       return R;
     }
 
@@ -199,14 +207,17 @@ namespace ptens{
       dev=x.dev;
       tail=x.tail;
       memsize=tail;
+      headers=x.headers;
       if(dev==0){
 	arr=new float[memsize];
 	std::copy(x.arr,x.arr+memsize,arr);
       }
       if(dev==1){
-	CNINE_UNIMPL();
+	CUDA_SAFE(cudaMalloc((void **)&arrg, memsize*sizeof(float)));
+	CUDA_SAFE(cudaMemcpy(arrg,x.arrg,memsize*sizeof(float),cudaMemcpyDeviceToDevice));  
       }
-      headers=x.headers;
+      //dir_mx=x.dir_mx;
+      //dir_current=x.dir_current;
     }
 
     RtensorPool(RtensorPool&& x){
