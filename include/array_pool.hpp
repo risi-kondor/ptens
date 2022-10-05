@@ -2,12 +2,17 @@
 #define _array_pool
 
 #include "Ptens_base.hpp"
+#include "IntTensor.hpp"
+
 
 namespace ptens{
 
   template<typename TYPE>
   class array_pool{
   public:
+
+   typedef cnine::Gdims Gdims;
+   typedef cnine::IntTensor IntTensor;
 
     TYPE* arr=nullptr;
     TYPE* arrg=nullptr;
@@ -16,7 +21,8 @@ namespace ptens{
     int dev=0;
     bool is_view=false;
 
-    vector<pair<int,int> > lookup;
+    IntTensor dir;
+    //vector<pair<int,int> > lookup;
 
     ~array_pool(){
       if(is_view) return;
@@ -28,7 +34,8 @@ namespace ptens{
   public: // ---- Constructors -------------------------------------------------------------------------------
 
 
-    array_pool(){}
+    array_pool(): 
+      dir(Gdims(0,2),cnine::fill_noalloc()){}
 
 
   public: // ---- Memory management --------------------------------------------------------------------------
@@ -74,7 +81,8 @@ namespace ptens{
       if(dev==1){
 	CNINE_UNIMPL();
       }
-      lookup=x.lookup;
+      //lookup=x.lookup;
+      dir=x.dir;
     }
 
     array_pool(array_pool&& x){
@@ -84,8 +92,9 @@ namespace ptens{
       memsize=x.memsize; x.memsize=0; 
       arr=x.arr; x.arr=nullptr;
       arrg=x.arrg; x.arrg=nullptr;
-      lookup=std::move(x.lookup);
-      x.lookup.clear();
+      //lookup=std::move(x.lookup);
+      //x.lookup.clear();
+      dir=std::move(x.dir);
       is_view=x.is_view;
     }
 
@@ -105,7 +114,8 @@ namespace ptens{
       dev=x.dev;
       tail=x.tail;
       memsize=x.tail;
-      lookup=x.lookup;
+      //lookup=x.lookup;
+      dir=x.dir;
       is_view=false;
 
       if(dev==0){
@@ -120,6 +130,26 @@ namespace ptens{
     }
 
 
+    array_pool<TYPE>& operator=(array_pool<TYPE>&& x){
+      CNINE_MOVEASSIGN_WARNING();
+      if(!is_view){
+	delete arr; 
+	arr=nullptr;
+	if(arrg){CUDA_SAFE(cudaFree(arrg));}
+	arrg=nullptr;
+      }
+      dev=x.dev;
+      arr=x.arr; x.arr=nullptr;
+      arrg=x.arrg; x.arrg=nullptr;
+      tail=x.tail;
+      memsize=x.memsize;
+      //lookup=x.lookup;
+      dir=std::move(x.dir);
+      is_view=x.is_view;
+      return *this;
+    }
+
+
   public: // ---- Views --------------------------------------------------------------------------------------
 
 
@@ -130,7 +160,8 @@ namespace ptens{
       R.memsize=memsize;
       R.arr=arr;
       R.arrg=arrg;
-      R.lookup=lookup;
+      //R.lookup=lookup;
+      R.dir=dir;
       R.is_view=true;
       return R;
     }
@@ -140,19 +171,23 @@ namespace ptens{
 
 
     int size() const{
-      return lookup.size();
+      //return lookup.size();
+      return dir.dim(0);
     }
 
     int size_of(const int i) const{
       CNINE_ASSRT(i<size());
-      return lookup[i].second;
+      //return lookup[i].second;
+      return dir(i,1);
     }
 
     vector<TYPE> operator()(const int i) const{
       CNINE_ASSRT(i<size());
-      auto& p=lookup[i];
-      int addr=p.first;
-      int len=p.second;
+      //auto& p=lookup[i];
+      //int addr=p.first;
+      //int len=p.second;
+      int addr=dir(i,0);
+      int len=dir(i,1);
       vector<TYPE> R(len);
       for(int i=0; i<len; i++)
 	R[i]=arr[addr+i];
@@ -165,7 +200,8 @@ namespace ptens{
 	reserve(std::max(2*memsize,tail+len));
       for(int i=0; i<len; i++)
 	arr[tail+i]=v[i];
-      lookup.push_back(pair<int,int>(tail,len));
+      //lookup.push_back(pair<int,int>(tail,len));
+      dir.push_back(tail,len);
       tail+=len;
     }
 
@@ -178,7 +214,8 @@ namespace ptens{
 	arr[tail+i]=p;
 	i++;
       }
-      lookup.push_back(pair<int,int>(tail,len));
+      //lookup.push_back(pair<int,int>(tail,len));
+      dir.push_back(tail,len);
       tail+=len;
     }
 
