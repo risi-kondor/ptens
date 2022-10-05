@@ -1,4 +1,4 @@
-pybind11::class_<Ptensors1,RtensorPool>(m,"ptensors1")
+pybind11::class_<Ptensors1,RtensorPack>(m,"ptensors1")
 
   .def(pybind11::init<const Ptensors1&>())
 

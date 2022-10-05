@@ -1,6 +1,7 @@
 #ifndef _ptens_Ptensors0
 #define _ptens_Ptensors0
 
+#include "Ptens_base.hpp"
 #include "Cgraph.hpp"
 #include "RtensorPool.hpp"
 #include "RtensorPack.hpp"
@@ -13,14 +14,15 @@
 
 namespace ptens{
 
-  class Ptensors0;
-
   #ifdef _WITH_CUDA
   extern void Ptensors0_reduce0_cu(RtensorPool& R,const Ptensors0& x, int offs, int n);
+  extern void Ptensors0_reduce0_cu(RtensorPack& R, const RtensorPack& x, const AindexPack& list, int offs, int n);
+  extern void Ptensors0_broadcast0_cu(RtensorPack& R, const RtensorPack& x, const int offs);
+  extern void Ptensors0_broadcast0_cu(RtensorPack& R, const RtensorPack& x, const AindexPack& list, const int offs);
   #endif
 
 
-  class Ptensors0: public RtensorPool, public diff_class<Ptensors0>{
+  class Ptensors0: public RtensorPack, public diff_class<Ptensors0>{
   public:
 
     typedef cnine::IntTensor itensor;
@@ -45,15 +47,15 @@ namespace ptens{
 
 
     Ptensors0(const int _nc, const int _dev=0):
-      RtensorPool(_dev), nc(_nc){}
+      RtensorPack(1,_dev), nc(_nc){}
 
     template<typename FILLTYPE, typename = typename std::enable_if<std::is_base_of<cnine::fill_pattern, FILLTYPE>::value, FILLTYPE>::type>
     Ptensors0(const int _n, const int _nc, const FILLTYPE& dummy, const int _dev=0):
-      RtensorPool(_n, cnine::Gdims({_nc}), dummy, _dev), atoms(_n), nc(_nc){}
+      RtensorPack(_n, cnine::Gdims({_nc}), dummy, _dev), atoms(_n), nc(_nc){}
 
     template<typename FILLTYPE, typename = typename std::enable_if<std::is_base_of<cnine::fill_pattern, FILLTYPE>::value, FILLTYPE>::type>
     Ptensors0(const AtomsPack& _atoms, const int _nc, const FILLTYPE& dummy, const int _dev=0):
-      RtensorPool(_atoms.size(), cnine::Gdims({_nc}), dummy, _dev), atoms(_atoms), nc(_nc){
+      RtensorPack(_atoms.size(), cnine::Gdims({_nc}), dummy, _dev), atoms(_atoms), nc(_nc){
     }
 
 
@@ -100,22 +102,22 @@ namespace ptens{
 
 
     static Ptensors0 zeros_like(const Ptensors0& x){
-      return Ptensors0(RtensorPool::zeros_like(x),x.atoms,x.nc);
+      return Ptensors0(RtensorPack::zeros_like(x),x.atoms,x.nc);
     }
 
     static Ptensors0* new_zeros_like(const Ptensors0& x){
-      return new Ptensors0(RtensorPool::zeros_like(x),x.atoms,x.nc);
+      return new Ptensors0(RtensorPack::zeros_like(x),x.atoms,x.nc);
     }
 
     
   public: // ----- Conversions -------------------------------------------------------------------------------
 
 
-    Ptensors0(RtensorPool&& x, const AtomsPack& _atoms, const int _nc):
-      RtensorPool(std::move(x)), atoms(_atoms), nc(_nc){}
+    Ptensors0(RtensorPack&& x, const AtomsPack& _atoms, const int _nc):
+      RtensorPack(std::move(x)), atoms(_atoms), nc(_nc){}
 
     Ptensors0(const rtensor& A):
-      RtensorPool(A), atoms(A.dim(0)){
+      RtensorPack(A), atoms(A.dim(0)){
       nc=A.dim(1);
     }
 
@@ -126,7 +128,7 @@ namespace ptens{
 
     #ifdef _WITH_ATEN
     Ptensors0(const at::Tensor& T):
-      RtensorPool(rtensor(T)){
+      RtensorPack(rtensor(T)){
       assert(size()>0);
       atoms=AtomsPack(size());
       nc=dim_of(0,0);
@@ -138,7 +140,7 @@ namespace ptens{
 
 
     Ptensors0(const Ptensors0& x):
-      RtensorPool(x),
+      RtensorPack(x),
       diff_class<Ptensors0>(x),
       atoms(x.atoms),
       nc(x.nc){
@@ -150,7 +152,7 @@ namespace ptens{
     }
 	
     Ptensors0(Ptensors0&& x):
-      RtensorPool(std::move(x)),
+      RtensorPack(std::move(x)),
       diff_class<Ptensors0>(std::move(x)),
       atoms(std::move(x.atoms)),
       nc(x.nc){
@@ -186,23 +188,23 @@ namespace ptens{
     }
     
     rtensor tensor_of(const int i) const{
-      return RtensorPool::operator()(i);
+      return RtensorPack::operator()(i);
     }
 
     Rtensor1_view view_of(const int i) const{
-      return RtensorPool::view1_of(i);
+      return RtensorPack::view1_of(i);
     }
 
     Rtensor1_view view_of(const int i, const int offs, const int n) const{
-      return RtensorPool::view1_of(i).block(offs,n);
+      return RtensorPack::view1_of(i).block(offs,n);
     }
 
     Rtensor1_view view_of(const int i, const vector<int>& ix) const{
-      return RtensorPool::view1_of(i);
+      return RtensorPack::view1_of(i);
     }
 
     Rtensor1_view view_of(const int i, const vector<int>& ix, const int offs, const int n) const{
-      return RtensorPool::view1_of(i).block(offs,n);
+      return RtensorPack::view1_of(i).block(offs,n);
     }
 
     Ptensor0 operator()(const int i) const{
@@ -213,7 +215,7 @@ namespace ptens{
       //PTENS_CPUONLY();
       if(nc==0) nc=x.get_nc();
       else assert(nc==x.get_nc());
-      RtensorPool::push_back(x);
+      RtensorPack::push_back(x);
       atoms.push_back(x.atoms);
     }
 
@@ -257,15 +259,18 @@ namespace ptens{
   public: // ---- Reductions ---------------------------------------------------------------------------------
 
 
-    RtensorPool reduce0() const{
-      RtensorPool R(size(),Gdims(nc),cnine::fill_zero(),dev);
-      for(int i=0; i<size(); i++)
-	R.view1_of(i).add(view_of(i));
+    RtensorPack reduce0() const{
+      RtensorPack R(size(),Gdims(nc),cnine::fill_zero(),dev);
+      if(dev==0){
+	for(int i=0; i<size(); i++)
+	  R.view1_of(i).add(view_of(i));
+      }
+      GPUCODE(Ptensors0_reduce0_cu(R,*this,0,nc));
       return R;
     }
 
-    RtensorPool reduce0(const int offs, const int n) const{
-      RtensorPool R(size(),Gdims(n),cnine::fill_zero(),dev);
+    RtensorPack reduce0(const int offs, const int n) const{
+      RtensorPack R(size(),Gdims(n),cnine::fill_zero(),dev);
       if(dev==0){
 	for(int i=0; i<size(); i++)
 	  R.view1_of(i).add(view_of(i,offs,n));
@@ -274,24 +279,30 @@ namespace ptens{
       return R;
     }
 
-    RtensorPool reduce0(const AindexPack& list) const{
+    RtensorPack reduce0(const AindexPack& list) const{
       int N=list.size();
       array_pool<int> dims;
-      RtensorPool R(N,Gdims(nc),cnine::fill_zero(),dev);
-      for(int i=0; i<N; i++){
-	if(list.nix(i)==0) continue;
-	R.view1_of(i)=view_of(list.tix(i)); // OK
+      RtensorPack R(N,Gdims(nc),cnine::fill_zero(),dev);
+      if(dev==0){
+	for(int i=0; i<N; i++){
+	  if(list.nix(i)==0) continue;
+	  R.view1_of(i)=view_of(list.tix(i)); // OK
+	}
       }
+      GPUCODE(Ptensors0_reduce0_cu(R,*this,list,0,nc));
       return R;
     }
 
-    RtensorPool reduce0(const AindexPack& list, const int offs, const int n) const{
+    RtensorPack reduce0(const AindexPack& list, const int offs, const int n) const{
       int N=list.size();
-      RtensorPool R(N,Gdims(nc),cnine::fill_zero(),dev);
-      for(int i=0; i<N; i++){
-	if(list.nix(i)==0) continue;
-	R.view1_of(i)=view_of(list.tix(i),offs,n); // OK
+      RtensorPack R(N,Gdims(nc),cnine::fill_zero(),dev);
+      if(dev==0){
+	for(int i=0; i<N; i++){
+	  if(list.nix(i)==0) continue;
+	  R.view1_of(i)=view_of(list.tix(i),offs,n); // OK
+	}
       }
+      GPUCODE(Ptensors0_reduce0_cu(R,*this,list,offs,n));
       return R;
     }
 
@@ -299,29 +310,41 @@ namespace ptens{
   public: // ---- Broadcasting -------------------------------------------------------------------------------
 
     
-    void broadcast0(const RtensorPool& x){
-      for(int i=0; i<size(); i++)
-	view_of(i)+=x.view1_of(i);
-    }
-
-    void broadcast0(const RtensorPool& x, const int offs){
-      const int n=x.dim_of(0,0);
-      for(int i=0; i<size(); i++)
-	view_of(i,offs,n).add(x.view1_of(i));
-    }
-
-    void broadcast0(const RtensorPool& x, const AindexPack& list){
-      int N=list.size();
-      for(int i=0; i<N; i++){
-	view_of(list.tens(i),list.ix(i))+=x.view1_of(i);
+    void broadcast0(const RtensorPack& x){
+      if(dev==0){
+	for(int i=0; i<size(); i++)
+	  view_of(i)+=x.view1_of(i);
       }
+      GPUCODE(Ptensors0_broadcast0_cu(*this,x,0));
     }
 
-    void broadcast0(const RtensorPool& x, const AindexPack& list, const int offs){
-      int N=list.size();
-      const int n=x.dim_of(0,0);
-      for(int i=0; i<N; i++)
-	view_of(list.tens(i),list.ix(i),offs,n)+=x.view1_of(i);
+    void broadcast0(const RtensorPack& x, const int offs){
+      if(dev==0){
+	const int n=x.dim_of(0,0);
+	for(int i=0; i<size(); i++)
+	  view_of(i,offs,n).add(x.view1_of(i));
+      }
+      GPUCODE(Ptensors0_broadcast0_cu(*this,x,offs));
+    }
+
+    void broadcast0(const RtensorPack& x, const AindexPack& list){
+      if(dev==0){
+	int N=list.size();
+	for(int i=0; i<N; i++){
+	  view_of(list.tens(i),list.ix(i))+=x.view1_of(i);
+	}
+      }
+      GPUCODE(Ptensors0_broadcast0_cu(*this,x,list,0));
+    }
+
+    void broadcast0(const RtensorPack& x, const AindexPack& list, const int offs){
+      if(dev==0){
+	int N=list.size();
+	const int n=x.dim_of(0,0);
+	for(int i=0; i<N; i++)
+	  view_of(list.tens(i),list.ix(i),offs,n)+=x.view1_of(i);
+      }
+      GPUCODE(Ptensors0_broadcast0_cu(*this,x,list,offs));
     }
 
 

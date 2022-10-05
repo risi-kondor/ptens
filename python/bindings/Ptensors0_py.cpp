@@ -1,6 +1,6 @@
-pybind11::class_<RtensorPool>(m,"rtensor_pool");
+pybind11::class_<RtensorPack>(m,"rtensor_pack");
 
-pybind11::class_<Ptensors0,RtensorPool>(m,"ptensors0")
+pybind11::class_<Ptensors0,RtensorPack>(m,"ptensors0")
 
   .def(pybind11::init<const at::Tensor&>())
   .def(pybind11::init<const Ptensors0&>())

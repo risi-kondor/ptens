@@ -43,14 +43,14 @@ namespace ptens{
 
     RtensorPack(){}
 
-    RtensorPack(const int _dev):
-      dev(_dev){}
+    RtensorPack(const int ndims, const int _dev):
+      dev(_dev), dir(Gdims(0,ndims+1),cnine::fill_noalloc()){}
 
     RtensorPack(const IntTensor& _dir, const int _dev):
       dev(_dev), dir(_dir){}
 
     RtensorPack(const int _N, const Gdims& _dims, const cnine::fill_raw& dummy, const int _dev=0):
-      RtensorPack(_dev){
+      RtensorPack(_dims.size(),_dev){
       int asize=_dims.asize();
       reserve(_N*asize);
       for(int i=0; i<_N; i++)
@@ -59,7 +59,7 @@ namespace ptens{
     }
 
     RtensorPack(const int _N, const Gdims& _dims, const cnine::fill_zero& dummy, const int _dev=0):
-      RtensorPack(_dev){
+      RtensorPack(_dims.size(),_dev){
       int asize=_dims.asize();
       reserve(_N*asize);
       if(dev==0) std::fill(arr,arr+memsize,0);
@@ -70,19 +70,21 @@ namespace ptens{
     }
 
     RtensorPack(const int _N, const Gdims& _dims, const cnine::fill_gaussian& dummy, const int _dev=0):
-      RtensorPack(_dev){
+      RtensorPack(_dims.size(),_dev){
       CNINE_CPUONLY();
       int asize=_dims.asize();
       reserve(_N*asize);
       normal_distribution<double> distr;
       for(int i=0; i<_N*asize; i++) arr[i]=distr(rndGen);
-      for(int i=0; i<_N; i++)
+      for(int i=0; i<_N; i++){
 	dir.push_back(i*asize,_dims);
+      }
       tail=_N*asize;
     }
 
     RtensorPack(const array_pool<int>& dimensions, const cnine::fill_zero& dummy, const int _dev=0){
       dev=_dev;
+      dir=IntTensor(Gdims(0,dimensions(0).size()+1),cnine::fill_noalloc());
 
       int reserve_size=0;
       for(int i=0; i<dimensions.size(); i++){
@@ -309,6 +311,10 @@ namespace ptens{
       return Rtensor3_view(arr+v[0],v[1],v[2],v[3],v[2]*v[3],v[3],1,0);
     }
 
+
+    vector<int> headers(const int i) const{ // legacy
+      return dir.row(i);
+    }
 
 
     void push_back(const rtensor& x){

@@ -3,7 +3,7 @@
 
 #include "Rtensor3_view.hpp"
 #include "Cgraph.hpp"
-#include "RtensorPool.hpp"
+#include "RtensorPack.hpp"
 #include "AtomsPack.hpp"
 #include "AindexPack.hpp"
 #include "Ptensor2.hpp"
@@ -13,7 +13,7 @@
 namespace ptens{
 
 
-  class Ptensors2: public RtensorPool, public diff_class<Ptensors2>{
+  class Ptensors2: public RtensorPack, public diff_class<Ptensors2>{
   public:
 
     typedef cnine::IntTensor itensor;
@@ -40,11 +40,11 @@ namespace ptens{
     Ptensors2(){}
 
     Ptensors2(const int _nc, const int _dev=0):
-      RtensorPool(_dev), nc(_nc){}
+      RtensorPack(3,_dev), nc(_nc){}
 
-   template<typename FILLTYPE, typename = typename std::enable_if<std::is_base_of<cnine::fill_pattern, FILLTYPE>::value, FILLTYPE>::type>
+    template<typename FILLTYPE, typename = typename std::enable_if<std::is_base_of<cnine::fill_pattern, FILLTYPE>::value, FILLTYPE>::type>
     Ptensors2(const int _n, const int _k, const int _nc, const FILLTYPE& dummy, const int _dev=0):
-      RtensorPool(_n,{_k,_k,_nc},dummy,_dev), atoms(_n,_k), nc(_nc){}
+      RtensorPack(_n,{_k,_k,_nc},dummy,_dev), atoms(_n,_k), nc(_nc){}
 
 
   public: // ----- Named constructors ------------------------------------------------------------------------
@@ -105,22 +105,22 @@ namespace ptens{
 
 
     static Ptensors2* new_zeros_like(const Ptensors2& x){
-      return new Ptensors2(RtensorPool::zeros_like(x),x.atoms,x.nc);
+      return new Ptensors2(RtensorPack::zeros_like(x),x.atoms,x.nc);
     }
 
     
   public: // ----- Conversions -------------------------------------------------------------------------------
 
 
-    Ptensors2(RtensorPool&& x, const AtomsPack& _atoms, const int _nc):
-      RtensorPool(std::move(x)), atoms(_atoms), nc(_nc){}
+    Ptensors2(RtensorPack&& x, const AtomsPack& _atoms, const int _nc):
+      RtensorPack(std::move(x)), atoms(_atoms), nc(_nc){}
 
 
   public: // ----- Copying -----------------------------------------------------------------------------------
 
 
     Ptensors2(const Ptensors2& x):
-      RtensorPool(x),
+      RtensorPack(x),
       diff_class<Ptensors2>(x),
       atoms(x.atoms),
       nc(x.nc){
@@ -128,7 +128,7 @@ namespace ptens{
     }
 	
     Ptensors2(Ptensors2&& x):
-      RtensorPool(std::move(x)),
+      RtensorPack(std::move(x)),
       diff_class<Ptensors2>(std::move(x)),
       atoms(std::move(x.atoms)),
       nc(x.nc){
@@ -159,19 +159,19 @@ namespace ptens{
     }
 
     rtensor tensor_of(const int i) const{
-      return RtensorPool::operator()(i);
+      return RtensorPack::operator()(i);
     }
 
     Rtensor3_view view_of(const int i) const{
-      return RtensorPool::view3_of(i);
+      return RtensorPack::view3_of(i);
     }
 
     Rtensor2_view fused_view_of(const int i) const{
-      return RtensorPool::view3_of(i).fuse01();
+      return RtensorPack::view3_of(i).fuse01();
     }
 
     Rtensor3_view view_of(const int i, const int offs, const int n) const{
-      return RtensorPool::view3_of(i).block(0,0,offs,-1,-1,n);
+      return RtensorPack::view3_of(i).block(0,0,offs,-1,-1,n);
     }
 
     Ptensor2_xview view_of(const int i, const vector<int>& ix) const{
@@ -195,7 +195,7 @@ namespace ptens{
     int push_back(const Ptensor2& x){
       if(size()==0) nc=x.get_nc();
       else PTENS_ASSRT(nc==x.get_nc());
-      RtensorPool::push_back(x);
+      RtensorPack::push_back(x);
       atoms.push_back(x.atoms);
       return size()-1;
     }
@@ -240,8 +240,8 @@ namespace ptens{
   public: // ---- Reductions ---------------------------------------------------------------------------------
 
 
-    RtensorPool reduce0() const{
-      RtensorPool R(size(),Gdims(2*nc),cnine::fill_zero());
+    RtensorPack reduce0() const{
+      RtensorPack R(size(),Gdims(2*nc),cnine::fill_zero());
       for(int i=0; i<size(); i++){
 	view_of(i).sum01_into(R.view1_of(i).block(0,nc));
 	view_of(i).diag01().sum0_into(R.view1_of(i).block(nc,nc));
@@ -249,8 +249,8 @@ namespace ptens{
       return R;
     }
 
-    RtensorPool reduce0(const int offs, const int n) const{
-      RtensorPool R(size(),Gdims(n),cnine::fill_zero());
+    RtensorPack reduce0(const int offs, const int n) const{
+      RtensorPack R(size(),Gdims(n),cnine::fill_zero());
       for(int i=0; i<size(); i++){
 	view_of(i,offs,n).sum01_into(R.view1_of(i));
 	view_of(i,offs+n,n).diag01().sum0_into(R.view1_of(i));
@@ -258,9 +258,9 @@ namespace ptens{
       return R;
     }
 
-    RtensorPool reduce0(const AindexPack& list) const{
+    RtensorPack reduce0(const AindexPack& list) const{
       int N=list.size();
-      RtensorPool R(N,Gdims(2*nc),cnine::fill_zero());
+      RtensorPack R(N,Gdims(2*nc),cnine::fill_zero());
       for(int i=0; i<N; i++){
 	if(list.nix(i)==0) continue;
 	view_of(list.tens(i),list.ix(i)).sum01_into(R.view1_of(i).block(0,nc));
@@ -269,9 +269,9 @@ namespace ptens{
       return R;
     }
 
-    RtensorPool reduce0(const AindexPack& list, const int offs, const int n) const{
+    RtensorPack reduce0(const AindexPack& list, const int offs, const int n) const{
       int N=list.size();
-      RtensorPool R(N,Gdims(n),cnine::fill_zero());
+      RtensorPack R(N,Gdims(n),cnine::fill_zero());
       for(int i=0; i<N; i++){
 	if(list.nix(i)==0) continue;
 	view_of(list.tens(i),list.ix(i),offs,n).sum01_into(R.view1_of(i));
@@ -280,11 +280,11 @@ namespace ptens{
       return R;
     }
 
-    RtensorPool reduce1() const{
+    RtensorPack reduce1() const{
       array_pool<int> dims;
       for(int i=0; i<size(); i++)
 	dims.push_back(vector<int>({k_of(i),3*nc}));
-      RtensorPool R(dims,cnine::fill_zero());
+      RtensorPack R(dims,cnine::fill_zero());
       for(int i=0; i<size(); i++){
 	view_of(i).sum0_into(R.view2_of(i).block(0,0,-1,nc));
 	view_of(i).sum1_into(R.view2_of(i).block(0,nc,-1,nc));
@@ -293,11 +293,11 @@ namespace ptens{
       return R;
     }
 
-    RtensorPool reduce1(const int offs, const int n) const{
+    RtensorPack reduce1(const int offs, const int n) const{
       array_pool<int> dims;
       for(int i=0; i<size(); i++)
 	dims.push_back(vector<int>({k_of(i),n}));
-      RtensorPool R(dims,cnine::fill_zero());
+      RtensorPack R(dims,cnine::fill_zero());
       for(int i=0; i<size(); i++){
 	view_of(i,offs,n).sum0_into(R.view2_of(i));
 	view_of(i,offs+n,n).sum1_into(R.view2_of(i));
@@ -306,12 +306,12 @@ namespace ptens{
       return R;
     }
 
-    RtensorPool reduce1(const AindexPack& list) const{
+    RtensorPack reduce1(const AindexPack& list) const{
       int N=list.size();
       array_pool<int> dims;
       for(int i=0; i<N; i++)
 	dims.push_back(vector<int>({list.nix(i),3*nc}));
-      RtensorPool R(dims,cnine::fill_zero());
+      RtensorPack R(dims,cnine::fill_zero());
       for(int i=0; i<N; i++){
 	if(list.nix(i)==0) continue;
 	view_of(list.tens(i),list.ix(i)).sum0_into(R.view2_of(i).block(0,0,-1,nc));
@@ -321,12 +321,12 @@ namespace ptens{
       return R;
     }
 
-    RtensorPool reduce1(const AindexPack& list, const int offs, const int n) const{
+    RtensorPack reduce1(const AindexPack& list, const int offs, const int n) const{
       int N=list.size();
       array_pool<int> dims;
       for(int i=0; i<N; i++)
 	dims.push_back(vector<int>({list.nix(i),n}));
-      RtensorPool R(dims,cnine::fill_zero());
+      RtensorPack R(dims,cnine::fill_zero());
       for(int i=0; i<N; i++){
 	if(list.nix(i)==0) continue;
 	view_of(list.tens(i),list.ix(i),offs,n).sum0_into(R.view2_of(i));
@@ -336,15 +336,15 @@ namespace ptens{
       return R;
     }
 
-    RtensorPool reduce2() const{
+    RtensorPack reduce2() const{
       return *this;
     }
 
-    RtensorPool reduce2(const int offs, const int n) const{ // flipping 
+    RtensorPack reduce2(const int offs, const int n) const{ // flipping 
       array_pool<int> dims;
       for(int i=0; i<size(); i++)
 	dims.push_back(vector<int>({k_of(i),k_of(i),n}));
-      RtensorPool R(dims,cnine::fill_zero());
+      RtensorPack R(dims,cnine::fill_zero());
       for(int i=0; i<size(); i++){
 	R.view3_of(i)+=view_of(i,offs,n);
 	R.view3_of(i)+=view_of(i,offs+n,n).transp01();
@@ -352,12 +352,12 @@ namespace ptens{
       return R;
     }
 
-    RtensorPool reduce2(const AindexPack& list) const{ // no flipping 
+    RtensorPack reduce2(const AindexPack& list) const{ // no flipping 
       int N=list.size();
       array_pool<int> dims;
       for(int i=0; i<N; i++)
 	dims.push_back(vector<int>({list.nix(i),list.nix(i),nc}));
-      RtensorPool R(dims,cnine::fill_zero());
+      RtensorPack R(dims,cnine::fill_zero());
       for(int i=0; i<N; i++){
 	if(list.nix(i)==0) continue;
 	R.view3_of(i)+=view_of(list.tens(i),list.ix(i));
@@ -365,12 +365,12 @@ namespace ptens{
       return R;
     }
 
-    RtensorPool reduce2(const AindexPack& list, const int offs, const int n) const{
+    RtensorPack reduce2(const AindexPack& list, const int offs, const int n) const{
       int N=list.size();
       array_pool<int> dims;
       for(int i=0; i<N; i++)
 	dims.push_back(vector<int>({list.nix(i),list.nix(i),n}));
-      RtensorPool R(dims,cnine::fill_zero());
+      RtensorPack R(dims,cnine::fill_zero());
       for(int i=0; i<N; i++){
 	if(list.nix(i)==0) continue;
 	R.view3_of(i)+=view_of(list.tens(i),list.ix(i),offs,n);
@@ -383,7 +383,7 @@ namespace ptens{
   public: // ---- Broadcasting -------------------------------------------------------------------------------
 
 
-    void broadcast0(const RtensorPool& x){
+    void broadcast0(const RtensorPack& x){
       const int n=x.dim_of(0,0);
       for(int i=0; i<size(); i++){
 	view_of(i)+=repeat0(repeat0(x.view1_of(i).block(0,nc),k_of(i)),k_of(i));
@@ -391,7 +391,7 @@ namespace ptens{
       }
     }
 
-    void broadcast0(const RtensorPool& x, const int offs){
+    void broadcast0(const RtensorPack& x, const int offs){
       const int n=x.dim_of(0,0);
       for(int i=0; i<size(); i++){
 	view_of(i,offs,n)+=repeat0(repeat0(x.view1_of(i),k_of(i)),k_of(i));
@@ -399,7 +399,7 @@ namespace ptens{
       }
     }
 
-    void broadcast0(const RtensorPool& x, const AindexPack& list){
+    void broadcast0(const RtensorPack& x, const AindexPack& list){
       int N=list.size();
       const int n=x.dim_of(0,0);
       for(int i=0; i<N; i++){
@@ -409,7 +409,7 @@ namespace ptens{
       }
     }
 
-    void broadcast0(const RtensorPool& x, const AindexPack& list, const int offs){
+    void broadcast0(const RtensorPack& x, const AindexPack& list, const int offs){
       int N=list.size();
       const int n=x.dim_of(0,0);
       for(int i=0; i<N; i++){
@@ -419,7 +419,7 @@ namespace ptens{
       }
     }
 
-    void broadcast1(const RtensorPool& x){
+    void broadcast1(const RtensorPack& x){
       for(int i=0; i<size(); i++){
 	view_of(i)+=repeat0(x.view2_of(i).block(0,0,-1,nc),k_of(i));
 	view_of(i)+=repeat1(x.view2_of(i).block(0,nc,-1,nc),k_of(i));
@@ -427,7 +427,7 @@ namespace ptens{
       }
     }
 
-    void broadcast1(const RtensorPool& x, const int offs){
+    void broadcast1(const RtensorPack& x, const int offs){
       const int n=x.dim_of(0,1);
       for(int i=0; i<size(); i++){
 	view_of(i,offs,n)+=repeat0(x.view2_of(i),k_of(i));
@@ -436,7 +436,7 @@ namespace ptens{
       }
     }
 
-    void broadcast1(const RtensorPool& x, const AindexPack& list){
+    void broadcast1(const RtensorPack& x, const AindexPack& list){
       int N=list.size();
       //const int n=x.dim_of(0,1);
       for(int i=0; i<N; i++){
@@ -447,7 +447,7 @@ namespace ptens{
       }
     }
 
-    void broadcast1(const RtensorPool& x, const AindexPack& list, const int offs){
+    void broadcast1(const RtensorPack& x, const AindexPack& list, const int offs){
       int N=list.size();
       const int n=x.dim_of(0,1);
       for(int i=0; i<N; i++){
@@ -458,14 +458,14 @@ namespace ptens{
       }
     }
 
-    void broadcast2(const RtensorPool& x){ // no flipping
+    void broadcast2(const RtensorPack& x){ // no flipping
       //const int n=x.dim_of(0,2);
       for(int i=0; i<size(); i++){
 	view_of(i)+=x.view3_of(i);
       }
     }
 
-    void broadcast2(const RtensorPool& x, const int offs){
+    void broadcast2(const RtensorPack& x, const int offs){
       const int n=x.dim_of(0,2);
       for(int i=0; i<size(); i++){
 	view_of(i,offs,n)+=x.view3_of(i);
@@ -473,7 +473,7 @@ namespace ptens{
       }
     }
 
-    void broadcast2(const RtensorPool& x, const AindexPack& list){
+    void broadcast2(const RtensorPack& x, const AindexPack& list){
       int N=list.size();
       //const int n=x.dim_of(0,2);
       for(int i=0; i<N; i++){
@@ -482,7 +482,7 @@ namespace ptens{
       }
     }
 
-    void broadcast2(const RtensorPool& x, const AindexPack& list, const int offs){
+    void broadcast2(const RtensorPack& x, const AindexPack& list, const int offs){
       int N=list.size();
       const int n=x.dim_of(0,2);
       for(int i=0; i<N; i++){
