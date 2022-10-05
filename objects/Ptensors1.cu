@@ -36,7 +36,7 @@ __global__ void Ptensors1_reduce0_kernel(float* rarr, const int* rdir, const flo
   const int k=xdir[3*q+1];
   const int nc=xdir[3*q+2];
 
-  const float* x=xarr+xdir[3*q]+c
+  const float* x=xarr+xdir[3*q]+c;
   float t=0;
   for(int i=0; i<k; i++)
     t+=x[i*nc];
@@ -49,12 +49,12 @@ __global__ void Ptensors1_reduce0_kernel(float* rarr, const int* rdir, const flo
   float* ix=reinterpret_cast<float*>(_shared);
   const int q=blockIdx.x;
   const int c=threadIdx.x;
-  const int k=load_indices(ix,xidir,xidir,q);
+  const int k=load_indices(ix,xiarr,xidir,q);
   const int nc=xdir[3*q+2];
   if(c>=nc) return;
   __syncthreads();
 
-  const float* x=xarr+xdir[3*ix[0]]+c
+  const float* x=xarr+xdir[3*ix[0]]+c;
   float t=0;
   for(int i=0; i<k; i++)
     t+=x[ix[i+1]*nc];
@@ -68,8 +68,8 @@ __global__ void Ptensors1_reduce1_kernel(float* rarr, const int* rdir, const flo
   const int k=xdir[3*q+1];
   const int nc=xdir[3*q+2];
 
-  const float* x=xarr+xdir[3*q]+c
-  float* r=rarr+rdir[3*q]+c
+  const float* x=xarr+xdir[3*q]+c;
+  float* r=rarr+rdir[3*q]+c;
   for(int i=0; i<k; i++)
     r[i*nc]+=x[i*nc];
 }
@@ -80,13 +80,13 @@ __global__ void Ptensors1_reduce1_kernel(float* rarr, const int* rdir, const flo
   float* ix=reinterpret_cast<float*>(_shared);
   const int q=blockIdx.x;
   const int c=threadIdx.x;
-  const int k=load_indices(ix,xidir,xidir,q);
+  const int k=load_indices(ix,xiarr,xidir,q);
   const int nc=xdir[3*q+2];
   if(c>=nc) return;
   __syncthreads();
 
-  const float* x=xarr+xdir[3*ix[0]]+c
-  float* r=rarr+rdir[3*q]+c
+  const float* x=xarr+xdir[3*ix[0]]+c;
+  float* r=rarr+rdir[3*q]+c;
   for(int i=0; i<k; i++)
     r[i*nc]+=x[ix[i+1]*nc];
 }
@@ -102,7 +102,7 @@ __global__ void Ptensors1_broadcast0_kernel(float* xarr, const int* xdir, const 
   const int nc=xdir[3*q+2];
 
   float* x=xarr+xdir[3*q]+c;
-  const float t=rarr[rdir[2*q]+c]
+  const float t=rarr[rdir[2*q]+c];
   for(int i=0; i<k; i++)
     x[i*nc]+=t;
 }
@@ -111,13 +111,13 @@ __global__ void Ptensors1_broadcast0_kernel(float* xarr, const int* xdir, const 
 __global__ void Ptensors1_broadcast0_kernel(float* xarr, const int* xdir, const int* xiarr, const int* xidir, const float* rarr, const int* rdir){
   const int q=blockIdx.x;
   const int c=threadIdx.x;
-  const int k=load_indices(ix,xidir,xidir,q);
+  const int k=load_indices(ix,xiarr,xidir,q);
   const int nc=xdir[3*q+2];
   if(c>=nc) return;
   __syncthreads();
 
-  float* x=xarr+xdir[3*ix[0]]+c
-  const float t=rarr[rdir[2*q]+c]
+  float* x=xarr+xdir[3*ix[0]]+c;
+  const float t=rarr[rdir[2*q]+c];
   for(int i=0; i<k; i++)
     x[ix[i+1]*nc]+=t;
 }
@@ -130,22 +130,22 @@ __global__ void Ptensors1_broadcast1_kernel(float* xarr, const int* xdir, const 
   const int nc=xdir[3*q+2];
 
   float* x=xarr+xdir[3*q]+c;
-  const float* r=rarr+rdir[3*q]+c
+  const float* r=rarr+rdir[3*q]+c;
   for(int i=0; i<k; i++)
-    x[i*nc]+=r[i*nc];
+    x[i*nc]+=r[i*nc]; // maybe rnc instead of nc?
 }
 
 
 __global__ void Ptensors1_broadcast1_kernel(float* xarr, const int* xdir, const int* xiarr, const int* xidir, const float* rarr, const int* rdir){
   const int q=blockIdx.x;
   const int c=threadIdx.x;
-  const int k=load_indices(ix,xidir,xidir,q);
+  const int k=load_indices(ix,xiarr,xidir,q);
   const int nc=xdir[3*q+2];
   if(c>=nc) return;
   __syncthreads();
 
-  float* x=xarr+xdir[3*ix[0]]+c
-  const float* r=rarr+rdir[3*q]+c
+  float* x=xarr+xdir[3*ix[0]]+c;
+  const float* r=rarr+rdir[3*q]+c;
   for(int i=0; i<k; i++)
     x[ix[i+1]*nc]+=r[i*nc];
 }
