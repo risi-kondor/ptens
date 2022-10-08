@@ -2,7 +2,6 @@
 #define _RtensorPack
 
 #include "array_pool.hpp"
-#include "vector_pool.hpp"
 #include "RtensorA.hpp"
 #include "Rtensor1_view.hpp"
 #include "Rtensor2_view.hpp"
@@ -82,7 +81,7 @@ namespace ptens{
       tail=_N*asize;
     }
 
-    RtensorPack(const array_pool<int>& dimensions, const cnine::fill_zero& dummy, const int _dev=0){
+    RtensorPack(const cnine::array_pool<int>& dimensions, const cnine::fill_zero& dummy, const int _dev=0){
       dev=_dev;
       dir=IntTensor(Gdims(0,dimensions(0).size()+1),cnine::fill_noalloc());
 

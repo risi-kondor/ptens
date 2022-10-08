@@ -380,7 +380,7 @@ namespace ptens{
       GPUCODE();
     }
 
-    void add_ReLU_back(const RtensorPool& x, const float alpha=0.1){
+    void add_ReLU_back(const cnine::RtensorPool& x, const float alpha=0.1){
       CNINE_CPUONLY();
       assert(x.dev==dev);
       assert(x.tail==tail);

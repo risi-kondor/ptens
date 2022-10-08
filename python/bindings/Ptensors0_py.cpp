@@ -1,6 +1,6 @@
-pybind11::class_<RtensorPack>(m,"rtensor_pack");
+pybind11::class_<cnine::RtensorPack>(m,"rtensor_pack");
 
-pybind11::class_<Ptensors0,RtensorPack>(m,"ptensors0")
+pybind11::class_<Ptensors0,cnine::RtensorPack>(m,"ptensors0")
 
   .def(pybind11::init<const at::Tensor&>())
   .def(pybind11::init<const Ptensors0&>())
@@ -42,8 +42,8 @@ pybind11::class_<Ptensors0,RtensorPack>(m,"ptensors0")
 
   .def("add_to_grad",[](Ptensors0& x, const Ptensors0& y){x.add_to_grad(y);})
   .def("add_to_grad",[](Ptensors0& x, const Ptensors0& y, const float c){x.add_to_grad(y,c);})
-  .def("add_to_grad",[](Ptensors0& x, const loose_ptr<Ptensors0>& y){x.add_to_grad(y);})
-//  .def("add_to_gradp",[](Ptensors0& x, const loose_ptr<Ptensors0>& y){x.add_to_grad(y);})
+  .def("add_to_grad",[](Ptensors0& x, const cnine::loose_ptr<Ptensors0>& y){x.add_to_grad(y);})
+//  .def("add_to_gradp",[](Ptensors0& x, const cnine::loose_ptr<Ptensors0>& y){x.add_to_grad(y);})
 //.def("add_to_grad",&Ptensors0::add_to_grad)
   .def("get_grad",&Ptensors0::get_grad)
   .def("get_gradp",&Ptensors0::get_gradp)
@@ -89,9 +89,9 @@ pybind11::class_<Ptensors0,RtensorPack>(m,"ptensors0")
 
   .def("add_mprod",[](Ptensors0& r, const Ptensors0& x, at::Tensor& y){
       r.add_mprod(x,RtensorA::view(y));})
-  .def("add_mprod_back0",[](Ptensors0& x, const loose_ptr<Ptensors0>& g, at::Tensor& M){
+  .def("add_mprod_back0",[](Ptensors0& x, const cnine::loose_ptr<Ptensors0>& g, at::Tensor& M){
       x.get_grad().add_mprod_back0(g,RtensorA::view(M));})
-  .def("mprod_back1",[](Ptensors0& x, const loose_ptr<Ptensors0>& g){
+  .def("mprod_back1",[](Ptensors0& x, const cnine::loose_ptr<Ptensors0>& g){
       RtensorA R=RtensorA::zero({x.nc,g->nc});
       g->add_mprod_back1_to(R,x);
       return R.torch();})
@@ -103,7 +103,7 @@ pybind11::class_<Ptensors0,RtensorPack>(m,"ptensors0")
 
   .def("add_ReLU",[](Ptensors0& r, const Ptensors0& x, const float alpha){
       r.add_ReLU(x,alpha);})
-  .def("add_ReLU_back",[](Ptensors0& x, const loose_ptr<Ptensors0>& g, const float alpha){
+  .def("add_ReLU_back",[](Ptensors0& x, const cnine::loose_ptr<Ptensors0>& g, const float alpha){
       x.get_grad().add_ReLU(g,alpha);}) // forward is same as backward
 
   .def("inp",&Ptensors0::inp)

@@ -9,7 +9,7 @@
 
 namespace ptens{
 
-  class AindexPack: public array_pool<int>{
+  class AindexPack: public cnine::array_pool<int>{
   public:
 
 

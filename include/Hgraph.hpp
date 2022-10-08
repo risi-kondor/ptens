@@ -3,17 +3,17 @@
 
 #include <set>
 #include "Ptens_base.hpp"
-#include "SparseMx.hpp"
+#include "SparseRmatrix.hpp"
 #include "AtomsPack.hpp"
 #include "AindexPack.hpp"
 
 
 namespace ptens{
 
-  class Hgraph: public SparseMx{
+  class Hgraph: public cnine::SparseRmatrix{
   public:
 
-    using SparseMx::SparseMx;
+    using cnine::SparseRmatrix::SparseRmatrix;
 
     mutable vector<AtomsPack*> _nhoods; 
 
@@ -34,15 +34,15 @@ namespace ptens{
 
 
     static Hgraph random(const int _n, const float p=0.5){
-      return SparseMx::random_symmetric(_n,p);
+      return cnine::SparseRmatrix::random_symmetric(_n,p);
     }
 
 
   public: // ---- Conversions --------------------------------------------------------------------------------
 
 
-    Hgraph(const SparseMx& x):
-      SparseMx(x){}
+    Hgraph(const cnine::SparseRmatrix& x):
+      cnine::SparseRmatrix(x){}
 
 
   public: // ---- Access -------------------------------------------------------------------------------------

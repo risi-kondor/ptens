@@ -13,11 +13,13 @@
 namespace ptens{
 
 
-  class Ptensors2: public RtensorPack, public diff_class<Ptensors2>{
+  class Ptensors2: public cnine::RtensorPack, public cnine::diff_class<Ptensors2>{
   public:
 
+    typedef cnine::Gdims Gdims;
     typedef cnine::IntTensor itensor;
     typedef cnine::RtensorA rtensor;
+    typedef cnine::RtensorPack RtensorPack;
     typedef cnine::Rtensor1_view Rtensor1_view;
     typedef cnine::Rtensor2_view Rtensor2_view;
     typedef cnine::Rtensor3_view Rtensor3_view;
@@ -121,7 +123,7 @@ namespace ptens{
 
     Ptensors2(const Ptensors2& x):
       RtensorPack(x),
-      diff_class<Ptensors2>(x),
+      cnine::diff_class<Ptensors2>(x),
       atoms(x.atoms),
       nc(x.nc){
       PTENS_COPY_WARNING();
@@ -129,7 +131,7 @@ namespace ptens{
 	
     Ptensors2(Ptensors2&& x):
       RtensorPack(std::move(x)),
-      diff_class<Ptensors2>(std::move(x)),
+      cnine::diff_class<Ptensors2>(std::move(x)),
       atoms(std::move(x.atoms)),
       nc(x.nc){
       PTENS_COPY_WARNING();
@@ -281,7 +283,7 @@ namespace ptens{
     }
 
     RtensorPack reduce1() const{
-      array_pool<int> dims;
+      cnine::array_pool<int> dims;
       for(int i=0; i<size(); i++)
 	dims.push_back(vector<int>({k_of(i),3*nc}));
       RtensorPack R(dims,cnine::fill_zero());
@@ -294,7 +296,7 @@ namespace ptens{
     }
 
     RtensorPack reduce1(const int offs, const int n) const{
-      array_pool<int> dims;
+      cnine::array_pool<int> dims;
       for(int i=0; i<size(); i++)
 	dims.push_back(vector<int>({k_of(i),n}));
       RtensorPack R(dims,cnine::fill_zero());
@@ -308,7 +310,7 @@ namespace ptens{
 
     RtensorPack reduce1(const AindexPack& list) const{
       int N=list.size();
-      array_pool<int> dims;
+      cnine::array_pool<int> dims;
       for(int i=0; i<N; i++)
 	dims.push_back(vector<int>({list.nix(i),3*nc}));
       RtensorPack R(dims,cnine::fill_zero());
@@ -323,7 +325,7 @@ namespace ptens{
 
     RtensorPack reduce1(const AindexPack& list, const int offs, const int n) const{
       int N=list.size();
-      array_pool<int> dims;
+      cnine::array_pool<int> dims;
       for(int i=0; i<N; i++)
 	dims.push_back(vector<int>({list.nix(i),n}));
       RtensorPack R(dims,cnine::fill_zero());
@@ -341,7 +343,7 @@ namespace ptens{
     }
 
     RtensorPack reduce2(const int offs, const int n) const{ // flipping 
-      array_pool<int> dims;
+      cnine::array_pool<int> dims;
       for(int i=0; i<size(); i++)
 	dims.push_back(vector<int>({k_of(i),k_of(i),n}));
       RtensorPack R(dims,cnine::fill_zero());
@@ -354,7 +356,7 @@ namespace ptens{
 
     RtensorPack reduce2(const AindexPack& list) const{ // no flipping 
       int N=list.size();
-      array_pool<int> dims;
+      cnine::array_pool<int> dims;
       for(int i=0; i<N; i++)
 	dims.push_back(vector<int>({list.nix(i),list.nix(i),nc}));
       RtensorPack R(dims,cnine::fill_zero());
@@ -367,7 +369,7 @@ namespace ptens{
 
     RtensorPack reduce2(const AindexPack& list, const int offs, const int n) const{
       int N=list.size();
-      array_pool<int> dims;
+      cnine::array_pool<int> dims;
       for(int i=0; i<N; i++)
 	dims.push_back(vector<int>({list.nix(i),list.nix(i),n}));
       RtensorPack R(dims,cnine::fill_zero());
@@ -517,279 +519,3 @@ namespace ptens{
 
 
 #endif 
-
-
-    /*
-    void add_messages0(const RtensorPool& messages, const AindexPack& dest_list, const int coffs){
-      int N=dest_list.size();
-      assert(messages.size()==N);
-
-      for(int i=0; i<N; i++){
-	Rtensor1_view source=messages.view1_of(i);
-	Rtensor2_view dest=view2_of(dest_list.tix(i));
-	vector<int> ix=dest_list.indices(i);
-	int n=ix.size();
-	int nc=source.n0;
-
-	for(int c=0; c<nc; c++){
-	  float v=source(c);
-	  for(int j=0; j<n; j++) 
-	    dest.inc(ix[j],c+coffs,v);
-	}
-      }
-    }
-
-
-    void add_messages1(const RtensorPool& messages, const AindexPack& dest_list, const int coffs){
-      int N=dest_list.size();
-      assert(messages.size()==N);
-
-      for(int i=0; i<N; i++){
-	Rtensor2_view source=messages.view2_of(i);
-	Rtensor2_view dest=view2_of(dest_list.tix(i));
-	vector<int> ix=dest_list.indices(i);
-	int n=ix.size();
-	int nc=source.n1;
-
-	for(int c=0; c<nc; c++){
-	  for(int j=0; j<n; j++) 
-	    dest.inc(ix[j],c+coffs,source(j,c));
-	}
-      }
-    }
-    */
-    /*
-    RtensorPool messages0(const AindexPack& src_list) const{
-      int N=src_list.size();
-
-      array_pool<int> msg_dims;
-      for(int i=0; i<N; i++)
-	msg_dims.push_back({dims_of(src_list.tix(i)).back()});
-      RtensorPool R(msg_dims,cnine::fill_zero());
-
-      for(int i=0; i<N; i++){
-	Rtensor3_view source=view3_of(src_list.tix(i));
-	Rtensor1_view dest=R.view1_of(i);
-	vector<int> ix=src_list.indices(i);
-	int n=ix.size();
-	int nc=source.n2;
-	assert(dest.n0==2*nc);
-
-	for(int c=0; c<nc; c++){
-	  float t=0; 
-	  for(int j0=0; j0<n; j0++) 
-	    for(int j1=0; j1<n; j1++) 
-	      t+=source(ix[j0],ix[j1],c);
-	  dest.set(c,t);
-	}
-
-	for(int c=0; c<nc; c++){
-	  float t=0; 
-	  for(int j0=0; j0<n; j0++) 
-	    t+=source(ix[j0],ix[j0],c);
-	  dest.set(c+nc,t);
-	}
-      }
-
-      return R;
-    }
-
-
-    RtensorPool messages1(const AindexPack& src_list) const{
-      int N=src_list.size();
-
-      array_pool<int> msg_dims;
-      for(int i=0; i<N; i++)
-	msg_dims.push_back({src_list.nindices(i),dims_of(src_list.tix(i)).back()});
-      RtensorPool R(msg_dims,cnine::fill_zero());
-
-      for(int i=0; i<N; i++){
-	Rtensor3_view source=view3_of(src_list.tix(i));
-	Rtensor2_view dest=R.view2_of(i);
-	vector<int> ix=src_list.indices(i);
-	int n=ix.size();
-	int nc=source.n2;
-	assert(dest.n1==3*nc);
-
-	for(int c=0; c<nc; c++){
-	  for(int j0=0; j0<n; j0++){
-	    float t=0; 
-	    for(int j1=0; j1<n; j1++) 
-	      t+=source(ix[j0],ix[j1],c);
-	    dest.set(j0,c,t);
-	  }
-	}
-
-	for(int c=0; c<nc; c++){
-	  for(int j0=0; j0<n; j0++){
-	    float t=0; 
-	    for(int j1=0; j1<n; j1++) 
-	      t+=source(ix[j1],ix[j0],c);
-	    dest.set(j0,c+nc,t);
-	  }
-	}
-
-	for(int c=0; c<nc; c++){
-	  for(int j0=0; j0<n; j0++){
-	    dest.set(j0,c+2*nc,source(ix[j0],ix[j0],c));
-	  }
-	}
-      }
-
-      return R;
-    }
-
-
-    RtensorPool messages2(const AindexPack& src_list) const{
-      int N=src_list.size();
-
-      array_pool<int> msg_dims;
-      for(int i=0; i<N; i++)
-	msg_dims.push_back({src_list.nindices(i),dims_of(src_list.tix(i)).back()});
-      RtensorPool R(msg_dims,cnine::fill_zero());
-
-      for(int i=0; i<N; i++){
-	Rtensor3_view source=view3_of(src_list.tix(i));
-	Rtensor3_view dest=R.view3_of(i);
-	vector<int> ix=src_list.indices(i);
-	int n=ix.size();
-	int nc=source.n2;
-	assert(dest.n2==nc);
-
-
-	for(int c=0; c<nc; c++){
-	  for(int j0=0; j0<n; j0++){
-	    for(int j1=0; j1<n; j1++){
-	      dest.set(j0,j1,c,source(ix[j1],ix[j0],c));
-	    }
-	  }
-	}
-      }
-
-      return R;
-    }
-    */
-    /*
-    Ptensors2 fwd(const Cgraph& graph) const{
-      Ptensors2 R;
-      for(int i=0; i<graph.maxj; i++) //TODO
-	R.push_back(Ptensor2::zero(atoms_of(i),5*2));
-      R.forwardMP(*this,graph);
-      return R;
-    }
-
-
-    void forwardMP(const Ptensors2& x, const Cgraph& graph){
-      AindexPack src_indices;
-      AindexPack dest_indices;
-
-      graph.forall_edges([&](const int i, const int j){
-	  Atoms atoms0=atoms_of(i);
-	  Atoms atoms1=atoms_of(j);
-	  Atoms intersect=atoms0.intersect(atoms1);
-	  src_indices.push_back(i,atoms0(intersect));
-	  dest_indices.push_back(j,atoms1(intersect));
-	});
-
-      RtensorPool messages0=x.messages0(src_indices);
-      add_messages0(messages0,dest_indices,0);
-      //cout<<messages0<<endl;
-
-      RtensorPool messages1=x.messages1(src_indices);
-      add_messages1(messages1,dest_indices,5); // TODO 
-      //cout<<messages1<<endl;
-
-    }
-    */
-    /*
-    void add_linmaps(const Ptensors0& x, const int offs=0){
-      assert(x.size()==size());
-      assert(offs+x.nc<=nc);
-      int _nc=x.nc;
-      for(int i=0; i<size(); i++){
-	for(int c=0; c<_nc; c++)
-	  view3_of(i).slice2(offs+c).add(x.view1_of(i)(c));
-	}
-    }
-
-    void add_linmaps(const Ptensors1& x, const int offs=0){
-      assert(x.size()==size());
-      assert(offs+3*x.nc<=nc);
-      int _nc=x.nc;
-      for(int i=0; i<size(); i++){
-	int k=k_of(i);
-	assert(x.k_of(i)==k);
-	auto src=x.view2_of(i);
-	auto dest=view3_of(i);
-	for(int c=0; c<_nc; c++){
-
-	  for(int a=0; a<k; a++)
-	    for(int b=0; b<k; b++){
-	      dest.inc(a,b,offs+c,src(a,c));
-	      dest.inc(a,b,offs+_nc+c,src(b,c));
-	    }
-
-	  for(int a=0; a<k; a++)
-	    dest.inc(a,a,offs+2*_nc+c,src(a,c));
-	}
-      }
-    }
-
-    void add_linmaps(const Ptensors2& x, const int offs=0){
-      assert(x.size()==size());
-      int _nc=x.nc;
-      assert(offs+3*_nc<=nc);
-
-      for(int i=0; i<size(); i++){
-	auto src=x.view3_of(i);
-	auto dest=view3_of(i);
-	int k=dest.n0;
-
-	dest.block(0,0,offs,k,k,_nc).add(src);
-	dest.block(0,0,offs+_nc,k,k,_nc).add(src.transp01());
-
-	//auto r=(*this)(i).reductions1()
-
-	  
-	for(int c=0; c<_nc; c++){
-
-	  for(int a=0; a<k; a++)
-	    for(int b=0; b<k; b++){
-	      dest.inc(a,b,offs+c,src(a,b,c));
-	      dest.inc(a,b,offs+_nc+c,src(b,a,c));
-	    }
-
-	  for(int a=0; a<k; a++)
-	    dest.inc(a,a,offs+2*_nc+c,src(a,a,c));
-	}
-      }
-    }
-    */
-
-    /*
-    void add_linmaps_to(Ptensors0& x, const int offs=0) const{
-      assert(x.size()==size());
-      assert(offs+x.nc<=nc);
-      int _nc=x.nc;
-      for(int i=0; i<size(); i++){
-	for(int c=0; c<_nc; c++)
-	  x.view1_of(i).inc(c,view2_of(i).slice1(c).sum());
-	}
-    }
-    */
-    /*
-    void add_to_grad(const Ptensors2& x){
-      if(grad) grad->add(x);
-      else grad=new Ptensors2(x);
-    }
-
-    Ptensors2& get_grad(){
-      if(!grad) grad=Ptensors2::new_zeros_like(*this);
-      return *grad;
-    }
-
-    loose_ptr<Ptensors2> get_gradp(){
-      if(!grad) grad=Ptensors2::new_zeros_like(*this);
-      return grad;
-    }
-    */

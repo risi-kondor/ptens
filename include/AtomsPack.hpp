@@ -5,12 +5,11 @@
 
 #include "array_pool.hpp"
 #include "Atoms.hpp"
-//#include "GraphNhoods.hpp"
 
 
 namespace ptens{
 
-  class AtomsPack: public array_pool<int>{
+  class AtomsPack: public cnine::array_pool<int>{
   public:
 
 
@@ -84,7 +83,7 @@ namespace ptens{
 
     AtomsPack& operator=(const AtomsPack& x){
       PTENS_ASSIGN_WARNING();
-      array_pool<int>::operator=(x);
+      cnine::array_pool<int>::operator=(x);
       return *this;
     }
 
@@ -93,15 +92,15 @@ namespace ptens{
   public: // ---- Views --------------------------------------------------------------------------------------
 
 
-    AtomsPack(array_pool<int>&& x):
-      array_pool<int>(std::move(x)){}
+    AtomsPack(cnine::array_pool<int>&& x):
+      cnine::array_pool<int>(std::move(x)){}
 
 
   public: // ---- Views --------------------------------------------------------------------------------------
 
 
     AtomsPack view(){
-      return AtomsPack(array_pool<int>::view());
+      return AtomsPack(cnine::array_pool<int>::view());
     }
 
 
@@ -109,7 +108,7 @@ namespace ptens{
 
 
     Atoms operator[](const int i) const{
-      return Atoms(array_pool<int>::operator()(i));
+      return Atoms(cnine::array_pool<int>::operator()(i));
     }
 
     int tsize0(){

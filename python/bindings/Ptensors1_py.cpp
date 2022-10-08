@@ -1,4 +1,4 @@
-pybind11::class_<Ptensors1,RtensorPack>(m,"ptensors1")
+pybind11::class_<Ptensors1,cnine::RtensorPack>(m,"ptensors1")
 
   .def(pybind11::init<const Ptensors1&>())
 
@@ -30,7 +30,7 @@ pybind11::class_<Ptensors1,RtensorPack>(m,"ptensors1")
 
   .def("add_to_grad",[](Ptensors1& x, const Ptensors1& y){x.add_to_grad(y);})
   .def("add_to_grad",[](Ptensors1& x, const Ptensors1& y, const float c){x.add_to_grad(y,c);})
-  .def("add_to_grad",[](Ptensors1& x, const loose_ptr<Ptensors1>& y){x.add_to_grad(y);})
+  .def("add_to_grad",[](Ptensors1& x, const cnine::loose_ptr<Ptensors1>& y){x.add_to_grad(y);})
   .def("get_grad",&Ptensors1::get_grad)
   .def("get_gradp",&Ptensors1::get_gradp)
   .def("gradp",&Ptensors1::get_gradp)
@@ -81,7 +81,7 @@ pybind11::class_<Ptensors1,RtensorPack>(m,"ptensors1")
 
   .def("add_ReLU",[](Ptensors1& r, const Ptensors1& x, const float alpha){
       r.add_ReLU(x,alpha);})
-  .def("add_ReLU_back",[](Ptensors1& x, const loose_ptr<Ptensors1>& g, const float alpha){
+  .def("add_ReLU_back",[](Ptensors1& x, const cnine::loose_ptr<Ptensors1>& g, const float alpha){
       x.get_grad().add_ReLU(g,alpha);}) // forward is same as backward
 
   .def("inp",&Ptensors1::inp)

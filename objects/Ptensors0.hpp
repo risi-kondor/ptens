@@ -3,7 +3,6 @@
 
 #include "Ptens_base.hpp"
 #include "Cgraph.hpp"
-#include "RtensorPool.hpp"
 #include "RtensorPack.hpp"
 #include "AtomsPack.hpp"
 #include "AindexPack.hpp"
@@ -15,18 +14,20 @@
 namespace ptens{
 
   #ifdef _WITH_CUDA
-  extern void Ptensors0_reduce0_cu(RtensorPool& R,const Ptensors0& x, int offs, int n);
+  extern void Ptensors0_reduce0_cu(RtensorPack& R,const Ptensors0& x, int offs, int n);
   extern void Ptensors0_reduce0_cu(RtensorPack& R, const RtensorPack& x, const AindexPack& list, int offs, int n);
   extern void Ptensors0_broadcast0_cu(RtensorPack& R, const RtensorPack& x, const int offs);
   extern void Ptensors0_broadcast0_cu(RtensorPack& R, const RtensorPack& x, const AindexPack& list, const int offs);
   #endif
 
 
-  class Ptensors0: public RtensorPack, public diff_class<Ptensors0>{
+  class Ptensors0: public cnine::RtensorPack, public cnine::diff_class<Ptensors0>{
   public:
 
+    typedef cnine::Gdims Gdims;
     typedef cnine::IntTensor itensor;
     typedef cnine::RtensorA rtensor;
+    typedef cnine::RtensorPack RtensorPack;
     typedef cnine::Rtensor1_view Rtensor1_view;
     typedef cnine::Rtensor2_view Rtensor2_view;
     typedef cnine::Rtensor3_view Rtensor3_view;
@@ -141,7 +142,7 @@ namespace ptens{
 
     Ptensors0(const Ptensors0& x):
       RtensorPack(x),
-      diff_class<Ptensors0>(x),
+      cnine::diff_class<Ptensors0>(x),
       atoms(x.atoms),
       nc(x.nc){
       PTENS_COPY_WARNING();
@@ -153,7 +154,7 @@ namespace ptens{
 	
     Ptensors0(Ptensors0&& x):
       RtensorPack(std::move(x)),
-      diff_class<Ptensors0>(std::move(x)),
+      cnine::diff_class<Ptensors0>(std::move(x)),
       atoms(std::move(x.atoms)),
       nc(x.nc){
       PTENS_MOVE_WARNING();
@@ -281,7 +282,7 @@ namespace ptens{
 
     RtensorPack reduce0(const AindexPack& list) const{
       int N=list.size();
-      array_pool<int> dims;
+      cnine::array_pool<int> dims;
       RtensorPack R(N,Gdims(nc),cnine::fill_zero(),dev);
       if(dev==0){
 	for(int i=0; i<N; i++){
