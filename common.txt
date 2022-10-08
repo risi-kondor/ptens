@@ -1,0 +1,32 @@
+include $(ROOTDIR)/config.txt
+
+CNINE_INCLUDES=-I$(CNINE_ROOT)/include 
+CNINE_INCLUDES+=-I$(CNINE_ROOT)/objects/scalar -I$(CNINE_ROOT)/objects/tensor 
+CNINE_INCLUDES+=-I$(CNINE_ROOT)/objects/tensor_views -I$(CNINE_ROOT)/objects/tensor_array 
+CNINE_INCLUDES+=-I$(CNINE_ROOT)/objects/backendA -I$(CNINE_ROOT)/objects/backendB 
+CNINE_INCLUDES+=-I$(CNINE_ROOT)/objects/tensor_array/cell_maps -I$(CNINE_ROOT)/objects/tensor_array/cell_ops 
+
+CNINE_CUDADIR=$(CNINE_ROOT)/cuda
+
+INCLUDEDIR=$(ROOTDIR)/include
+OBJECTSDIR=$(ROOTDIR)/objects
+
+CFLAGS= -std=c++11 -O3 # -ferror-limit=1  
+INCLUDE= -I $(ROOTDIR)/include 
+LIBS= -lstdc++ -lm -lpthread 
+
+
+
+MACROS=
+
+ifdef GELIB_SO3CG_DEBUG
+MACROS+=-D_GELIB_SO3CG_DEBUG
+endif
+
+ifdef WITH_CUDA
+MACROS+=-D_WITH_CUDA
+endif 
+
+ifdef WITH_CUBLAS
+MACROS+=-D_WITH_CUBLAS
+endif 
