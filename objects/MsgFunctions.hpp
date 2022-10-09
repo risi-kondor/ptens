@@ -1,5 +1,5 @@
-#ifndef _AddMsgFunctions
-#define _AddMsgFunctions
+#ifndef _MsgFunctions
+#define _MsgFunctions
 
 #include "Ptensors0.hpp"
 #include "Ptensors1.hpp"

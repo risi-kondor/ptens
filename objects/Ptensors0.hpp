@@ -34,12 +34,13 @@ namespace ptens{
 
     int nc=0;
     AtomsPack atoms;
-    bool is_view=false;
+    //bool is_view=false;
 
 
     ~Ptensors0(){
 #ifdef WITH_FAKE_GRAD
-      if(!is_view && grad) delete grad;
+      //if(!is_view && grad) delete grad;
+      if(grad) delete grad;
 #endif 
     }
 
@@ -70,9 +71,9 @@ namespace ptens{
       return Ptensors0(_n,_nc,cnine::fill_zero(),_dev);}
 
     static Ptensors0 sequential(const int _n, const int _nc, const int _dev=0){
-      Ptensors0 R(_n,_nc,cnine::fill_raw(),_dev);
+      Ptensors0 R(_n,_nc,cnine::fill_raw());
       for(int i=0; i<_n; i++) R.view1_of(i).set(i);
-      return R;
+      return R.to_device(_dev);
     }
 
     static Ptensors0 raw(const AtomsPack& _atoms, const int _nc, const int _dev=0){
@@ -85,9 +86,9 @@ namespace ptens{
       return Ptensors0(_atoms,_nc,cnine::fill_gaussian(),_dev);}
 
     static Ptensors0 sequential(const AtomsPack& _atoms, const int _nc, const int _dev=0){
-      Ptensors0 R(_atoms,_nc,cnine::fill_raw(),_dev);
+      Ptensors0 R(_atoms,_nc,cnine::fill_raw());
       for(int i=0; i<R.size(); i++) R.view1_of(i).set(i);
-      return R;
+      return R.to_device(_dev);
     }
 
 
@@ -111,6 +112,35 @@ namespace ptens{
     }
 
     
+  public: // ----- Copying -----------------------------------------------------------------------------------
+
+
+    Ptensors0(const Ptensors0& x):
+      RtensorPack(x),
+      cnine::diff_class<Ptensors0>(x),
+      atoms(x.atoms),
+      nc(x.nc){
+      PTENS_COPY_WARNING();
+      //#ifdef WITH_FAKE_GRAD
+      //if(x.grad) grad=new Ptensors0(*grad);
+      //#endif 
+    }
+	
+    Ptensors0(Ptensors0&& x):
+      RtensorPack(std::move(x)),
+      cnine::diff_class<Ptensors0>(std::move(x)),
+      atoms(std::move(x.atoms)),
+      nc(x.nc){
+      PTENS_MOVE_WARNING();
+      //#ifdef WITH_FAKE_GRAD
+      //grad=x.grad;
+      //x.grad=nullptr;
+      //#endif 
+    }
+
+    Ptensors0& operator=(const Ptensors0& x)=delete;
+
+
   public: // ----- Conversions -------------------------------------------------------------------------------
 
 
@@ -137,38 +167,21 @@ namespace ptens{
     #endif 
 
 
-  public: // ----- Copying -----------------------------------------------------------------------------------
+  public: // ---- Transport ----------------------------------------------------------------------------------
 
 
-    Ptensors0(const Ptensors0& x):
-      RtensorPack(x),
-      cnine::diff_class<Ptensors0>(x),
+    Ptensors0(const Ptensors0& x, const int _dev):
+      RtensorPack(x,_dev),
       atoms(x.atoms),
-      nc(x.nc){
-      PTENS_COPY_WARNING();
+      nc(x.nc){}
 
-      #ifdef WITH_FAKE_GRAD
-      //if(x.grad) grad=new Ptensors0(*grad);
-      #endif 
-    }
-	
-    Ptensors0(Ptensors0&& x):
-      RtensorPack(std::move(x)),
-      cnine::diff_class<Ptensors0>(std::move(x)),
-      atoms(std::move(x.atoms)),
-      nc(x.nc){
-      PTENS_MOVE_WARNING();
-
-      #ifdef WITH_FAKE_GRAD
-      //grad=x.grad;
-      //x.grad=nullptr;
-      #endif 
+    Ptensors0& to_device(const int _dev){
+      RtensorPack::to_device(_dev);
+      return *this;
     }
 
-    Ptensors0& operator=(const Ptensors0& x)=delete;
 
-
-  public: // ----- Access ------------------------------------------------------------------------------------
+  public: // ---- Access -------------------------------------------------------------------------------------
 
 
     int get_nc() const{
@@ -213,7 +226,7 @@ namespace ptens{
     }
 
     void push_back(const Ptensor0& x){
-      //PTENS_CPUONLY();
+      PTENS_CPUONLY();
       if(nc==0) nc=x.get_nc();
       else assert(nc==x.get_nc());
       RtensorPack::push_back(x);
@@ -239,18 +252,21 @@ namespace ptens{
     }
 
     void add_mprod(const Ptensors0& x, const rtensor& y){
+      PTENS_CPUONLY();
       PTENS_ASSRT(x.size()==size());
       for(int i=0; i<size(); i++)
 	add_matmul_Ax_to(view_of(i),y.view2().transp(),x.view_of(i));
     }
 
     void add_mprod_back0(const Ptensors0& g, const rtensor& y){
+      PTENS_CPUONLY();
       PTENS_ASSRT(g.size()==size());
       for(int i=0; i<size(); i++)
 	add_matmul_Ax_to(view_of(i),y.view2(),g.view_of(i));
     }
 
     void add_mprod_back1_to(rtensor& r, const Ptensors0& x) const{
+      PTENS_CPUONLY();
       PTENS_ASSRT(x.size()==size());
       for(int i=0; i<size(); i++)
 	r.view2().add_outer(x.view_of(i),view_of(i));
@@ -358,6 +374,10 @@ namespace ptens{
     }
 
     string str(const string indent="") const{
+      if(dev>0){
+	Ptensors0 y(*this,0);
+	return y.str();
+      }
       ostringstream oss;
       for(int i=0; i<size(); i++){
 	oss<<indent<<(*this)(i)<<endl;

@@ -81,6 +81,9 @@ class ptensors1(torch.Tensor):
     def randn_like(self):
         return ptensors1.randn(self.get_atoms(),self.get_nc(),self.get_dev())
 
+    def to(self, _device='cpu'):
+        self.obj.move_to(ptens.device_id(_device))
+
 
     # ---- Operations ----------------------------------------------------------------------------------------
 
@@ -248,7 +251,7 @@ class Ptensors1_Linmaps0Fn(torch.autograd.Function):
     @staticmethod
     def forward(ctx,x):
         ctx.x=x
-        R=ptens.ptensors0.zeros(x.obj.view_of_atoms(),x.obj.get_nc())
+        R=ptens.ptensors0.zeros(x.obj.view_of_atoms(),x.obj.get_nc(),x.obj.get_dev())
         ptens_base.add_linmaps1to0(R.obj,x.obj)
         ctx.x=x.obj
         ctx.r=R.obj
@@ -264,7 +267,7 @@ class Ptensors1_Linmaps1Fn(torch.autograd.Function):
 
     @staticmethod
     def forward(ctx,x):
-        R=ptens.ptensors1.zeros(x.obj.view_of_atoms(),x.obj.get_nc()*2)
+        R=ptens.ptensors1.zeros(x.obj.view_of_atoms(),x.obj.get_nc()*2,x.obj.get_dev())
         ptens_base.add_linmaps1to1(R.obj,x.obj)
         ctx.x=x.obj
         ctx.r=R.obj
@@ -280,7 +283,7 @@ class Ptensors1_Linmaps2Fn(torch.autograd.Function):
 
     @staticmethod
     def forward(ctx,x):
-        R=ptens.ptensors2.zeros(x.obj.view_of_atoms(),x.obj.get_nc()*5)
+        R=ptens.ptensors2.zeros(x.obj.view_of_atoms(),x.obj.get_nc()*5,x.obj.get_dev())
         ptens_base.add_linmaps1to2(R.obj,x.obj)
         ctx.x=x.obj
         ctx.r=R.obj
@@ -297,7 +300,7 @@ class Ptensors1_Transfer0Fn(torch.autograd.Function):
     @staticmethod
     def forward(ctx,x,atoms,G):
         ctx.x=x
-        R=ptens.ptensors0.zeros(atoms,x.obj.get_nc())
+        R=ptens.ptensors0.zeros(atoms,x.obj.get_nc(),x.obj.get_dev())
         ptens_base.add_msg(R.obj,x.obj,G.obj)
         ctx.x=x.obj
         ctx.r=R.obj
@@ -315,7 +318,7 @@ class Ptensors1_Transfer1Fn(torch.autograd.Function):
     @staticmethod
     def forward(ctx,x,atoms,G):
         ctx.x=x
-        R=ptens.ptensors1.zeros(atoms,x.obj.get_nc()*2)
+        R=ptens.ptensors1.zeros(atoms,x.obj.get_nc()*2,x.obj.get_dev())
         ptens_base.add_msg(R.obj,x.obj,G.obj)
         ctx.x=x.obj
         ctx.r=R.obj
@@ -333,7 +336,7 @@ class Ptensors1_Transfer2Fn(torch.autograd.Function):
     @staticmethod
     def forward(ctx,x,atoms,G):
         ctx.x=x
-        R=ptens.ptensors2.zeros(atoms,x.obj.get_nc()*5)
+        R=ptens.ptensors2.zeros(atoms,x.obj.get_nc()*5,x.obj.get_dev())
         ptens_base.add_msg(R.obj,x.obj,G.obj)
         ctx.x=x.obj
         ctx.r=R.obj

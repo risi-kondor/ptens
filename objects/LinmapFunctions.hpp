@@ -1,5 +1,5 @@
-#ifndef _ptens_LinMaps
-#define _ptens_LinMaps
+#ifndef _ptens_LinmapFunctions
+#define _ptens_LinmapFunctions
 
 #include "Ptensor0.hpp"
 #include "Ptensor1.hpp"
@@ -225,35 +225,3 @@ namespace ptens{
 
 #endif 
 
-  /*
-  inline Ptensors1 linmaps1(const Ptensors0& x){
-    Ptensors1 R=Ptensors1::zero(x.atoms,x.nc,x.dev);
-    R.add_linmaps(x);
-    return R;
-  }
-
-  inline Ptensors1 linmaps1(const Ptensors1& x){
-    Ptensors1 R=Ptensors1::zero(x.atoms,2*x.nc,x.dev);
-    R.add_linmaps(x);
-    return R;
-  }
-
-
-  inline Ptensors2 linmaps2(const Ptensors0& x){
-    Ptensors2 R=Ptensors2::zero(x.atoms,x.nc,x.dev);
-    R.add_linmaps(x);
-    return R;
-  }
-
-  inline Ptensors2 linmaps2(const Ptensors1& x){
-    Ptensors2 R=Ptensors2::zero(x.atoms,x.nc*3,x.dev);
-    R.add_linmaps(x);
-    return R;
-  }
-
-  inline Ptensors2 linmaps2(const Ptensors2& x){
-    Ptensors2 R=Ptensors2::zero(x.atoms,x.nc*15,x.dev);
-    //R.add_linmaps(x);
-    return R;
-  }
-  */

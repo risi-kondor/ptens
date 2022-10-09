@@ -103,21 +103,6 @@ namespace ptens{
     }
 
 
-  public: // ---- Spawning -----------------------------------------------------------------------------------
-
-
-    static Ptensors2* new_zeros_like(const Ptensors2& x){
-      return new Ptensors2(RtensorPack::zeros_like(x),x.atoms,x.nc);
-    }
-
-    
-  public: // ----- Conversions -------------------------------------------------------------------------------
-
-
-    Ptensors2(RtensorPack&& x, const AtomsPack& _atoms, const int _nc):
-      RtensorPack(std::move(x)), atoms(_atoms), nc(_nc){}
-
-
   public: // ----- Copying -----------------------------------------------------------------------------------
 
 
@@ -138,6 +123,35 @@ namespace ptens{
     }
 
     Ptensors2& operator=(const Ptensors2& x)=delete;
+
+
+  public: // ---- Spawning -----------------------------------------------------------------------------------
+
+
+    static Ptensors2* new_zeros_like(const Ptensors2& x){
+      return new Ptensors2(RtensorPack::zeros_like(x),x.atoms,x.nc);
+    }
+
+    
+  public: // ----- Conversions -------------------------------------------------------------------------------
+
+
+    Ptensors2(RtensorPack&& x, const AtomsPack& _atoms, const int _nc):
+      RtensorPack(std::move(x)), atoms(_atoms), nc(_nc){}
+
+
+  public: // ---- Transport ----------------------------------------------------------------------------------
+
+
+    Ptensors2(const Ptensors2& x, const int _dev):
+      RtensorPack(x,_dev),
+      atoms(x.atoms),
+      nc(x.nc){}
+
+    Ptensors2& to_device(const int _dev){
+      RtensorPack::to_device(_dev);
+      return *this;
+    }
 
 
   public: // ----- Access ------------------------------------------------------------------------------------
@@ -221,18 +235,21 @@ namespace ptens{
     }
 
     void add_mprod(const Ptensors2& x, const rtensor& y){
+      PTENS_CPUONLY();
       PTENS_ASSRT(x.size()==size());
       for(int i=0; i<size(); i++)
 	fused_view_of(i).add_matmul_AA(x.fused_view_of(i),y.view2());
     }
 
     void add_mprod_back0(const Ptensors2& g, const rtensor& y){
+      PTENS_CPUONLY();
       PTENS_ASSRT(g.size()==size());
       for(int i=0; i<size(); i++)
 	fused_view_of(i).add_matmul_AT(g.fused_view_of(i),y.view2());
     }
 
     void add_mprod_back1_to(rtensor& r, const Ptensors2& x) const{
+      PTENS_CPUONLY();
       PTENS_ASSRT(x.size()==size());
       for(int i=0; i<size(); i++)
 	r.view2().add_matmul_TA(x.fused_view_of(i),fused_view_of(i));
@@ -503,6 +520,10 @@ namespace ptens{
     }
 
     string str(const string indent="") const{
+      if(dev>0){
+	Ptensors2 y(*this,0);
+	return y.str();
+      }
       ostringstream oss;
       for(int i=0; i<size(); i++){
 	oss<<indent<<(*this)(i)<<endl;

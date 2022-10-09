@@ -1,7 +1,7 @@
 #include "Cnine_base.cpp"
 #include "CnineSession.hpp"
-#include "LinMaps.hpp"
-#include "AddMsgFunctions.hpp"
+#include "LinmapFunctions.hpp"
+#include "MsgFunctions.hpp"
 
 using namespace ptens;
 using namespace cnine;

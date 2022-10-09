@@ -1,7 +1,7 @@
 #include "Cnine_base.cpp"
 #include "CnineSession.hpp"
-#include "LinMaps.hpp"
-#include "AddMsgFunctions.hpp"
+#include "LinmapFunctions.hpp"
+#include "MsgFunctions.hpp"
 
 using namespace ptens;
 using namespace cnine;
@@ -18,6 +18,12 @@ int main(int argc, char** argv){
   cout<<linmaps2(A)<<endl;
   cout<<"-----"<<endl;
 
+  #ifdef _WITH_CUDA
+  Ptensors0 Ag(a,1);
+  cout<<linmaps0(A)<<endl;
+  cout<<linmaps1(A)<<endl;
+  cout<<linmaps2(A)<<endl;
+  #endif
   //Ptensors1 B=Ptensors1::sequential(5,3,3);
   //cout<<B<<endl;
   //cout<<linmaps0(B)<<endl;

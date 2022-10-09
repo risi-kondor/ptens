@@ -42,7 +42,7 @@
 // ---- Other -------------------------------------------------------------------------------------------------
 
 
-#define PTENS_CPUONLY() if(dev!=0) {throw std::runtime_error("Ptens error: no CUDA code for "+string(__PRETTY_FUNCTION__)+".\n",);}
+#define PTENS_CPUONLY() if(dev!=0) {throw std::runtime_error("Ptens error: no CUDA code for "+string(__PRETTY_FUNCTION__)+".\n");}
 
 
 #endif 

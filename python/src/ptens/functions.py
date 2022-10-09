@@ -35,3 +35,16 @@ def unite2(x,G):
 def gather(x,G):
     return x.gather(G)
 
+
+def device_id(device):
+    if device==0:
+        return 0
+    if device==1:
+        return 1
+    if device=='cpu':
+        return 0
+    if device=='cuda':
+        return 1
+    if device=='cuda:0':
+        return 1
+    return 0

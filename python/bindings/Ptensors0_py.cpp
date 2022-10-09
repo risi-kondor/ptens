@@ -77,6 +77,7 @@ pybind11::class_<Ptensors0,cnine::RtensorPack>(m,"ptensors0")
   .def("atoms_of",[](const Ptensors0& x, const int i){return vector<int>(x.atoms_of(i));})
   .def("push_back",&Ptensors0::push_back)
 
+  .def("to_device",&Ptensors0::to_device)
 
 
 // ---- Operations -------------------------------------------------------------------------------------------
