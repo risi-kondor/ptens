@@ -19,10 +19,10 @@ int main(int argc, char** argv){
   cout<<"-----"<<endl;
 
   #ifdef _WITH_CUDA
-  Ptensors0 Ag(a,1);
-  cout<<linmaps0(A)<<endl;
-  cout<<linmaps1(A)<<endl;
-  cout<<linmaps2(A)<<endl;
+  Ptensors0 Ag(A,1);
+  cout<<linmaps0(Ag)<<endl;
+  cout<<linmaps1(Ag)<<endl;
+  cout<<linmaps2(Ag)<<endl;
   #endif
   //Ptensors1 B=Ptensors1::sequential(5,3,3);
   //cout<<B<<endl;

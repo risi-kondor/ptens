@@ -12,6 +12,7 @@
 
 #include "Ptens_base.hpp"
 #include <map>
+#include <algorithm>
 
 #include "Gdims.hpp"
 #include "IntTensor.hpp"
