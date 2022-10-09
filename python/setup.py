@@ -100,6 +100,9 @@ def main():
             '../../cnine/include/Cnine_base.cu',
             '../../cnine/cuda/TensorView_accumulators.cu',
             '../../cnine/cuda/BasicCtensorProducts.cu',
+            '../cuda/Ptensors0.cu',
+            '../cuda/Ptensors1.cu',
+            '../cuda/Ptensors2.cu',
             'src/ptens/ptens_py.cpp'
         ],
             include_dirs=_include_dirs,
