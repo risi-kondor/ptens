@@ -47,4 +47,4 @@ def device_id(device):
         return 1
     if device=='cuda:0':
         return 1
-    return 0
+    d return 0
