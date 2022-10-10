@@ -13,11 +13,27 @@
 namespace ptens{
 
 
+  #ifdef _WITH_CUDA
+  extern void Ptensors2_reduce0_cu(cnine::RtensorPack& R,const cnine::RtensorPack& x, int offs, int n, const cudaStream_t& stream);
+  extern void Ptensors2_reduce0_cu(cnine::RtensorPack& R, const cnine::RtensorPack& x, const AindexPack& list, int offs, int n, const cudaStream_t& stream);
+  extern void Ptensors2_reduce1_cu(cnine::RtensorPack& R,const cnine::RtensorPack& x, int offs, int n, const cudaStream_t& stream);
+  extern void Ptensors2_reduce1_cu(cnine::RtensorPack& R, const cnine::RtensorPack& x, const AindexPack& list, int offs, int n, const cudaStream_t& stream);
+  extern void Ptensors2_reduce2_cu(cnine::RtensorPack& R,const cnine::RtensorPack& x, int offs, int n, const cudaStream_t& stream);
+  extern void Ptensors2_reduce2_cu(cnine::RtensorPack& R, const cnine::RtensorPack& x, const AindexPack& list, int offs, int n, const cudaStream_t& stream);
+  extern void Ptensors2_broadcast0_cu(cnine::RtensorPack& R, const cnine::RtensorPack& x, const int offs, const cudaStream_t& stream);
+  extern void Ptensors2_broadcast0_cu(cnine::RtensorPack& R, const cnine::RtensorPack& x, const AindexPack& list, const int offs, const cudaStream_t& stream);
+  extern void Ptensors2_broadcast1_cu(cnine::RtensorPack& R, const cnine::RtensorPack& x, const int offs, const cudaStream_t& stream);
+  extern void Ptensors2_broadcast1_cu(cnine::RtensorPack& R, const cnine::RtensorPack& x, const AindexPack& list, const int offs, const cudaStream_t& stream);
+  extern void Ptensors2_broadcast2_cu(cnine::RtensorPack& R, const cnine::RtensorPack& x, const int offs, const cudaStream_t& stream);
+  extern void Ptensors2_broadcast2_cu(cnine::RtensorPack& R, const cnine::RtensorPack& x, const AindexPack& list, const int offs, const cudaStream_t& stream);
+  #endif
+
   class Ptensors2: public cnine::RtensorPack, public cnine::diff_class<Ptensors2>{
   public:
 
     typedef cnine::Gdims Gdims;
     typedef cnine::IntTensor itensor;
+    typedef cnine::IntTensor IntTensor;
     typedef cnine::RtensorA rtensor;
     typedef cnine::RtensorPack RtensorPack;
     typedef cnine::Rtensor1_view Rtensor1_view;
@@ -44,6 +60,9 @@ namespace ptens{
     Ptensors2(const int _nc, const int _dev=0):
       RtensorPack(3,_dev), nc(_nc){}
 
+    Ptensors2(const AtomsPack& _atoms, const int _nc, const int _dev=0):
+      RtensorPack(3,_dev), nc(_nc), atoms(_atoms){}
+
     template<typename FILLTYPE, typename = typename std::enable_if<std::is_base_of<cnine::fill_pattern, FILLTYPE>::value, FILLTYPE>::type>
     Ptensors2(const int _n, const int _k, const int _nc, const FILLTYPE& dummy, const int _dev=0):
       RtensorPack(_n,{_k,_k,_nc},dummy,_dev), atoms(_n,_k), nc(_nc){}
@@ -59,39 +78,49 @@ namespace ptens{
       return Ptensors2(_n,_k,_nc,cnine::fill_zero(),_dev);}
 
     static Ptensors2 sequential(const int _n, const int _k, const int _nc, const int _dev=0){
-      Ptensors2 R(_n,_k,_nc,cnine::fill_raw(),_dev);
+      Ptensors2 R(_n,_k,_nc,cnine::fill_raw(),0);
       for(int i=0; i<_n; i++)
 	R.view3_of(i).set(i); 
-      return R;
+      return R.to_device(_dev);
     }
 
 
     static Ptensors2 raw(const AtomsPack& _atoms, const int _nc, const int _dev=0){
-      Ptensors2 R(_nc,_dev);
-      for(int i=0; i<_atoms.size(); i++)
-	R.push_back(Ptensor2::raw(_atoms(i),_nc));
+     Ptensors2 R(_atoms,_nc,_dev);
+      R.reserve(_atoms.tsize2()*_nc);
+      R.dir=IntTensor::raw({_atoms.size(),4});
+      R.tail=0;
+      for(int i=0; i<_atoms.size(); i++){
+	R.dir.set_row(i,{R.tail,_atoms.size_of(i),_atoms.size_of(i),_nc});
+	R.tail+=_atoms.size_of(i)*_atoms.size_of(i)*_nc;
+      }
       return R;
     }
 
     static Ptensors2 zero(const AtomsPack& _atoms, const int _nc, const int _dev=0){
-      Ptensors2 R(_nc,_dev);
-      for(int i=0; i<_atoms.size(); i++)
-	R.push_back(Ptensor2::zero(_atoms(i),_nc));
+     Ptensors2 R(_atoms,_nc,_dev);
+      R.reserve_zero(_atoms.tsize2()*_nc);
+      R.dir=IntTensor::raw({_atoms.size(),4});
+      R.tail=0;
+      for(int i=0; i<_atoms.size(); i++){
+	R.dir.set_row(i,{R.tail,_atoms.size_of(i),_atoms.size_of(i),_nc});
+	R.tail+=_atoms.size_of(i)*_atoms.size_of(i)*_nc;
+      }
       return R;
     }
 
     static Ptensors2 gaussian(const AtomsPack& _atoms, const int _nc, const int _dev=0){
-      Ptensors2 R(_nc,_dev);
+      Ptensors2 R(_nc,0);
       for(int i=0; i<_atoms.size(); i++)
 	R.push_back(Ptensor2::gaussian(_atoms(i),_nc));
-      return R;
+      return R.to_device(_dev);
     }
 
     static Ptensors2 sequential(const AtomsPack& _atoms, const int _nc, const int _dev=0){
-      Ptensors2 R(_nc,_dev);
+      Ptensors2 R(_nc,0);
       for(int i=0; i<_atoms.size(); i++)
 	R.push_back(Ptensor2::sequential(_atoms(i),_nc));
-      return R;
+      return R.to_device(_dev);
     }
 
 
@@ -260,42 +289,52 @@ namespace ptens{
 
 
     RtensorPack reduce0() const{
-      RtensorPack R(size(),Gdims(2*nc),cnine::fill_zero());
-      for(int i=0; i<size(); i++){
-	view_of(i).sum01_into(R.view1_of(i).block(0,nc));
-	view_of(i).diag01().sum0_into(R.view1_of(i).block(nc,nc));
+      RtensorPack R(size(),Gdims(2*nc),cnine::fill_zero(),dev);
+      if(dev==0){
+	for(int i=0; i<size(); i++){
+	  view_of(i).sum01_into(R.view1_of(i).block(0,nc));
+	  view_of(i).diag01().sum0_into(R.view1_of(i).block(nc,nc));
+	}
       }
+      GPUCODE(CUDA_STREAM(Ptensors2_reduce0_cu(R,*this,0,nc,stream)));
       return R;
     }
 
     RtensorPack reduce0(const int offs, const int n) const{
-      RtensorPack R(size(),Gdims(n),cnine::fill_zero());
-      for(int i=0; i<size(); i++){
-	view_of(i,offs,n).sum01_into(R.view1_of(i));
-	view_of(i,offs+n,n).diag01().sum0_into(R.view1_of(i));
+      RtensorPack R(size(),Gdims(n),cnine::fill_zero(),dev);
+      if(dev==0){
+	for(int i=0; i<size(); i++){
+	  view_of(i,offs,n).sum01_into(R.view1_of(i));
+	  view_of(i,offs+n,n).diag01().sum0_into(R.view1_of(i));
+	}
       }
+      GPUCODE(CUDA_STREAM(Ptensors2_reduce0_cu(R,*this,offs,n,stream)));
       return R;
     }
 
     RtensorPack reduce0(const AindexPack& list) const{
       int N=list.size();
-      RtensorPack R(N,Gdims(2*nc),cnine::fill_zero());
+      RtensorPack R(N,Gdims(2*nc),cnine::fill_zero(),dev);
       for(int i=0; i<N; i++){
 	if(list.nix(i)==0) continue;
 	view_of(list.tens(i),list.ix(i)).sum01_into(R.view1_of(i).block(0,nc));
 	view_of(list.tens(i),list.ix(i)).diag01().sum0_into(R.view1_of(i).block(nc,nc));
       }
+      GPUCODE(CUDA_STREAM(Ptensors2_reduce0_cu(R,*this,list,0,nc,stream)));
       return R;
     }
 
     RtensorPack reduce0(const AindexPack& list, const int offs, const int n) const{
       int N=list.size();
-      RtensorPack R(N,Gdims(n),cnine::fill_zero());
-      for(int i=0; i<N; i++){
-	if(list.nix(i)==0) continue;
-	view_of(list.tens(i),list.ix(i),offs,n).sum01_into(R.view1_of(i));
-	view_of(list.tens(i),list.ix(i),offs+n,n).diag01().sum0_into(R.view1_of(i));
+      RtensorPack R(N,Gdims(n),cnine::fill_zero(),dev);
+      if(dev==0){
+	for(int i=0; i<N; i++){
+	  if(list.nix(i)==0) continue;
+	  view_of(list.tens(i),list.ix(i),offs,n).sum01_into(R.view1_of(i));
+	  view_of(list.tens(i),list.ix(i),offs+n,n).diag01().sum0_into(R.view1_of(i));
+	}
       }
+      GPUCODE(CUDA_STREAM(Ptensors1_reduce0_cu(R,*this,list,offs,n,stream)));
       return R;
     }
 
@@ -303,12 +342,15 @@ namespace ptens{
       cnine::array_pool<int> dims;
       for(int i=0; i<size(); i++)
 	dims.push_back(vector<int>({k_of(i),3*nc}));
-      RtensorPack R(dims,cnine::fill_zero());
-      for(int i=0; i<size(); i++){
-	view_of(i).sum0_into(R.view2_of(i).block(0,0,-1,nc));
-	view_of(i).sum1_into(R.view2_of(i).block(0,nc,-1,nc));
-	R.view2_of(i).block(0,2*nc,-1,nc)+=view_of(i).diag01();
+      RtensorPack R(dims,cnine::fill_zero(),dev);
+      if(dev==0){
+	for(int i=0; i<size(); i++){
+	  view_of(i).sum0_into(R.view2_of(i).block(0,0,-1,nc));
+	  view_of(i).sum1_into(R.view2_of(i).block(0,nc,-1,nc));
+	  R.view2_of(i).block(0,2*nc,-1,nc)+=view_of(i).diag01();
+	}
       }
+      GPUCODE(CUDA_STREAM(Ptensors2_reduce1_cu(R,*this,0,nc,stream)));
       return R;
     }
 
@@ -316,12 +358,13 @@ namespace ptens{
       cnine::array_pool<int> dims;
       for(int i=0; i<size(); i++)
 	dims.push_back(vector<int>({k_of(i),n}));
-      RtensorPack R(dims,cnine::fill_zero());
+      RtensorPack R(dims,cnine::fill_zero(),dev);
       for(int i=0; i<size(); i++){
 	view_of(i,offs,n).sum0_into(R.view2_of(i));
 	view_of(i,offs+n,n).sum1_into(R.view2_of(i));
 	R.view2_of(i)+=view_of(i,offs+2*n,n).diag01();
       }
+      GPUCODE(CUDA_STREAM(Ptensors2_reduce1_cu(R,*this,offs,n,stream)));
       return R;
     }
 
@@ -330,13 +373,16 @@ namespace ptens{
       cnine::array_pool<int> dims;
       for(int i=0; i<N; i++)
 	dims.push_back(vector<int>({list.nix(i),3*nc}));
-      RtensorPack R(dims,cnine::fill_zero());
-      for(int i=0; i<N; i++){
-	if(list.nix(i)==0) continue;
-	view_of(list.tens(i),list.ix(i)).sum0_into(R.view2_of(i).block(0,0,-1,nc));
-	view_of(list.tens(i),list.ix(i)).sum1_into(R.view2_of(i).block(0,nc,-1,nc));
-	R.view2_of(i).block(0,2*nc,-1,nc)+=view_of(list.tens(i),list.ix(i)).diag01();
+      RtensorPack R(dims,cnine::fill_zero(),dev);
+      if(dev==0){
+	for(int i=0; i<N; i++){
+	  if(list.nix(i)==0) continue;
+	  view_of(list.tens(i),list.ix(i)).sum0_into(R.view2_of(i).block(0,0,-1,nc));
+	  view_of(list.tens(i),list.ix(i)).sum1_into(R.view2_of(i).block(0,nc,-1,nc));
+	  R.view2_of(i).block(0,2*nc,-1,nc)+=view_of(list.tens(i),list.ix(i)).diag01();
+	}
       }
+      GPUCODE(CUDA_STREAM(Ptensors2_reduce1_cu(R,*this,list,0,nc,stream)));
       return R;
     }
 
@@ -345,13 +391,16 @@ namespace ptens{
       cnine::array_pool<int> dims;
       for(int i=0; i<N; i++)
 	dims.push_back(vector<int>({list.nix(i),n}));
-      RtensorPack R(dims,cnine::fill_zero());
-      for(int i=0; i<N; i++){
-	if(list.nix(i)==0) continue;
-	view_of(list.tens(i),list.ix(i),offs,n).sum0_into(R.view2_of(i));
-	view_of(list.tens(i),list.ix(i),offs+n,n).sum1_into(R.view2_of(i));
-	R.view2_of(i)+=view_of(list.tens(i),list.ix(i),offs+2*n,n).diag01();
+      RtensorPack R(dims,cnine::fill_zero(),dev);
+      if(dev==0){
+	for(int i=0; i<N; i++){
+	  if(list.nix(i)==0) continue;
+	  view_of(list.tens(i),list.ix(i),offs,n).sum0_into(R.view2_of(i));
+	  view_of(list.tens(i),list.ix(i),offs+n,n).sum1_into(R.view2_of(i));
+	  R.view2_of(i)+=view_of(list.tens(i),list.ix(i),offs+2*n,n).diag01();
+	}
       }
+      GPUCODE(CUDA_STREAM(Ptensors2_reduce1_cu(R,*this,list,offs,n,stream)));
       return R;
     }
 
@@ -363,11 +412,14 @@ namespace ptens{
       cnine::array_pool<int> dims;
       for(int i=0; i<size(); i++)
 	dims.push_back(vector<int>({k_of(i),k_of(i),n}));
-      RtensorPack R(dims,cnine::fill_zero());
-      for(int i=0; i<size(); i++){
-	R.view3_of(i)+=view_of(i,offs,n);
-	R.view3_of(i)+=view_of(i,offs+n,n).transp01();
+	RtensorPack R(dims,cnine::fill_zero(),dev);
+      if(dev==0){
+	for(int i=0; i<size(); i++){
+	  R.view3_of(i)+=view_of(i,offs,n);
+	  R.view3_of(i)+=view_of(i,offs+n,n).transp01();
+	}
       }
+      GPUCODE(CUDA_STREAM(Ptensors2_reduce1_cu(R,*this,offs,n,stream)));
       return R;
     }
 
@@ -376,11 +428,14 @@ namespace ptens{
       cnine::array_pool<int> dims;
       for(int i=0; i<N; i++)
 	dims.push_back(vector<int>({list.nix(i),list.nix(i),nc}));
-      RtensorPack R(dims,cnine::fill_zero());
-      for(int i=0; i<N; i++){
-	if(list.nix(i)==0) continue;
-	R.view3_of(i)+=view_of(list.tens(i),list.ix(i));
+      RtensorPack R(dims,cnine::fill_zero(),dev);
+      if(dev==0){
+	for(int i=0; i<N; i++){
+	  if(list.nix(i)==0) continue;
+	  R.view3_of(i)+=view_of(list.tens(i),list.ix(i));
+	}
       }
+      GPUCODE(CUDA_STREAM(Ptensors2_reduce2_cu(R,*this,list,0,nc,stream)));
       return R;
     }
 
@@ -389,12 +444,15 @@ namespace ptens{
       cnine::array_pool<int> dims;
       for(int i=0; i<N; i++)
 	dims.push_back(vector<int>({list.nix(i),list.nix(i),n}));
-      RtensorPack R(dims,cnine::fill_zero());
-      for(int i=0; i<N; i++){
-	if(list.nix(i)==0) continue;
-	R.view3_of(i)+=view_of(list.tens(i),list.ix(i),offs,n);
-	R.view3_of(i)+=view_of(list.tens(i),list.ix(i),offs+n,n).transp();
+      RtensorPack R(dims,cnine::fill_zero(),dev);
+      if(dev==0){
+	for(int i=0; i<N; i++){
+	  if(list.nix(i)==0) continue;
+	  R.view3_of(i)+=view_of(list.tens(i),list.ix(i),offs,n);
+	  R.view3_of(i)+=view_of(list.tens(i),list.ix(i),offs+n,n).transp();
+	}
       }
+      GPUCODE(CUDA_STREAM(Ptensors2_reduce2_cu(R,*this,list,offs,n,stream)));
       return R;
     }
 
@@ -404,76 +462,92 @@ namespace ptens{
 
     void broadcast0(const RtensorPack& x){
       const int n=x.dim_of(0,0);
-      for(int i=0; i<size(); i++){
-	view_of(i)+=repeat0(repeat0(x.view1_of(i).block(0,nc),k_of(i)),k_of(i));
-	view_of(i).diag01()+=repeat0(x.view1_of(i).block(nc,nc),k_of(i));
+      if(dev==0){
+	for(int i=0; i<size(); i++){
+	  view_of(i)+=repeat0(repeat0(x.view1_of(i).block(0,nc),k_of(i)),k_of(i));
+	  view_of(i).diag01()+=repeat0(x.view1_of(i).block(nc,nc),k_of(i));
+	}
       }
     }
 
     void broadcast0(const RtensorPack& x, const int offs){
       const int n=x.dim_of(0,0);
-      for(int i=0; i<size(); i++){
-	view_of(i,offs,n)+=repeat0(repeat0(x.view1_of(i),k_of(i)),k_of(i));
-	view_of(i,offs+n,n).diag01()+=repeat0(x.view1_of(i),k_of(i));
+      if(dev==0){
+	for(int i=0; i<size(); i++){
+	  view_of(i,offs,n)+=repeat0(repeat0(x.view1_of(i),k_of(i)),k_of(i));
+	  view_of(i,offs+n,n).diag01()+=repeat0(x.view1_of(i),k_of(i));
+	}
       }
     }
 
     void broadcast0(const RtensorPack& x, const AindexPack& list){
       int N=list.size();
       const int n=x.dim_of(0,0);
-      for(int i=0; i<N; i++){
-	if(x.dim_of(i,0)==0) continue;
-	view_of(list.tens(i),list.ix(i))+=repeat0(repeat0(x.view1_of(i).block(0,nc),list.nix(i)),list.nix(i));
-	view_of(list.tens(i),list.ix(i)).diag01()+=repeat0(x.view1_of(i).block(nc,nc),list.nix(i));
+      if(dev==0){
+	for(int i=0; i<N; i++){
+	  if(x.dim_of(i,0)==0) continue;
+	  view_of(list.tens(i),list.ix(i))+=repeat0(repeat0(x.view1_of(i).block(0,nc),list.nix(i)),list.nix(i));
+	  view_of(list.tens(i),list.ix(i)).diag01()+=repeat0(x.view1_of(i).block(nc,nc),list.nix(i));
+	}
       }
     }
 
     void broadcast0(const RtensorPack& x, const AindexPack& list, const int offs){
       int N=list.size();
       const int n=x.dim_of(0,0);
-      for(int i=0; i<N; i++){
-	if(x.dim_of(i,0)==0) continue; // probably redundant
-	view_of(list.tens(i),list.ix(i),offs,n)+=repeat0(repeat0(x.view1_of(i),list.nix(i)),list.nix(i));
-	view_of(list.tens(i),list.ix(i),offs+n,n).diag01()+=repeat0(x.view1_of(i),list.nix(i));
+      if(dev==0){
+	for(int i=0; i<N; i++){
+	  if(x.dim_of(i,0)==0) continue; // probably redundant
+	  view_of(list.tens(i),list.ix(i),offs,n)+=repeat0(repeat0(x.view1_of(i),list.nix(i)),list.nix(i));
+	  view_of(list.tens(i),list.ix(i),offs+n,n).diag01()+=repeat0(x.view1_of(i),list.nix(i));
+	}
       }
     }
 
     void broadcast1(const RtensorPack& x){
-      for(int i=0; i<size(); i++){
-	view_of(i)+=repeat0(x.view2_of(i).block(0,0,-1,nc),k_of(i));
-	view_of(i)+=repeat1(x.view2_of(i).block(0,nc,-1,nc),k_of(i));
-	view_of(i).diag01()+=x.view2_of(i).block(0,2*nc,-1,nc);
+      if(dev==0){
+	for(int i=0; i<size(); i++){
+	  view_of(i)+=repeat0(x.view2_of(i).block(0,0,-1,nc),k_of(i));
+	  view_of(i)+=repeat1(x.view2_of(i).block(0,nc,-1,nc),k_of(i));
+	  view_of(i).diag01()+=x.view2_of(i).block(0,2*nc,-1,nc);
+	}
       }
     }
 
     void broadcast1(const RtensorPack& x, const int offs){
       const int n=x.dim_of(0,1);
-      for(int i=0; i<size(); i++){
-	view_of(i,offs,n)+=repeat0(x.view2_of(i),k_of(i));
-	view_of(i,offs+n,n)+=repeat1(x.view2_of(i),k_of(i));
-	view_of(i,offs+2*n,n).diag01()+=x.view2_of(i);
+      if(dev==0){
+	for(int i=0; i<size(); i++){
+	  view_of(i,offs,n)+=repeat0(x.view2_of(i),k_of(i));
+	  view_of(i,offs+n,n)+=repeat1(x.view2_of(i),k_of(i));
+	  view_of(i,offs+2*n,n).diag01()+=x.view2_of(i);
+	}
       }
     }
 
     void broadcast1(const RtensorPack& x, const AindexPack& list){
       int N=list.size();
       //const int n=x.dim_of(0,1);
-      for(int i=0; i<N; i++){
-	if(x.dim_of(i,0)==0) continue;
-	view_of(list.tens(i),list.ix(i))+=repeat0(x.view2_of(i).block(0,0,-1,nc),list.nix(i));
-	view_of(list.tens(i),list.ix(i))+=repeat1(x.view2_of(i).block(0,nc,-1,nc),list.nix(i));
-	view_of(list.tens(i),list.ix(i)).diag01()+=x.view2_of(i).block(0,2*nc,-1,nc);
+      if(dev==0){
+	for(int i=0; i<N; i++){
+	  if(x.dim_of(i,0)==0) continue;
+	  view_of(list.tens(i),list.ix(i))+=repeat0(x.view2_of(i).block(0,0,-1,nc),list.nix(i));
+	  view_of(list.tens(i),list.ix(i))+=repeat1(x.view2_of(i).block(0,nc,-1,nc),list.nix(i));
+	  view_of(list.tens(i),list.ix(i)).diag01()+=x.view2_of(i).block(0,2*nc,-1,nc);
+	}
       }
     }
 
     void broadcast1(const RtensorPack& x, const AindexPack& list, const int offs){
       int N=list.size();
       const int n=x.dim_of(0,1);
-      for(int i=0; i<N; i++){
-	if(x.dim_of(i,0)==0) continue;
-	view_of(list.tens(i),list.ix(i),offs,n)+=repeat0(x.view2_of(i),list.nix(i));
-	view_of(list.tens(i),list.ix(i),offs+n,n)+=repeat1(x.view2_of(i),list.nix(i));
-	view_of(list.tens(i),list.ix(i),offs+2*n,n).diag01()+=x.view2_of(i);
+      if(dev==0){
+	for(int i=0; i<N; i++){
+	  if(x.dim_of(i,0)==0) continue;
+	  view_of(list.tens(i),list.ix(i),offs,n)+=repeat0(x.view2_of(i),list.nix(i));
+	  view_of(list.tens(i),list.ix(i),offs+n,n)+=repeat1(x.view2_of(i),list.nix(i));
+	  view_of(list.tens(i),list.ix(i),offs+2*n,n).diag01()+=x.view2_of(i);
+	}
       }
     }
 
@@ -486,28 +560,34 @@ namespace ptens{
 
     void broadcast2(const RtensorPack& x, const int offs){
       const int n=x.dim_of(0,2);
-      for(int i=0; i<size(); i++){
-	view_of(i,offs,n)+=x.view3_of(i);
-	view_of(i,offs+n,n)+=x.view3_of(i).transp01();
+      if(dev==0){
+	for(int i=0; i<size(); i++){
+	  view_of(i,offs,n)+=x.view3_of(i);
+	  view_of(i,offs+n,n)+=x.view3_of(i).transp01();
+	}
       }
     }
 
     void broadcast2(const RtensorPack& x, const AindexPack& list){
       int N=list.size();
       //const int n=x.dim_of(0,2);
-      for(int i=0; i<N; i++){
-	if(x.dim_of(i,0)==0) continue;
-	view_of(list.tens(i),list.ix(i))+=x.view3_of(i);
+      if(dev==0){
+	for(int i=0; i<N; i++){
+	  if(x.dim_of(i,0)==0) continue;
+	  view_of(list.tens(i),list.ix(i))+=x.view3_of(i);
+	}
       }
     }
 
     void broadcast2(const RtensorPack& x, const AindexPack& list, const int offs){
       int N=list.size();
       const int n=x.dim_of(0,2);
-      for(int i=0; i<N; i++){
-	if(x.dim_of(i,0)==0) continue;
-	view_of(list.tens(i),list.ix(i),offs,n)+=x.view3_of(i);
-	view_of(list.tens(i),list.ix(i),offs+n,n)+=x.view3_of(i).transp01();
+      if(dev==0){
+	for(int i=0; i<N; i++){
+	  if(x.dim_of(i,0)==0) continue;
+	  view_of(list.tens(i),list.ix(i),offs,n)+=x.view3_of(i);
+	  view_of(list.tens(i),list.ix(i),offs+n,n)+=x.view3_of(i).transp01();
+	}
       }
     }
 

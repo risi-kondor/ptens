@@ -111,18 +111,18 @@ namespace ptens{
       return Atoms(cnine::array_pool<int>::operator()(i));
     }
 
-    int tsize0(){
+    int tsize0() const{
       return size();
     }
 
-    int tsize1(){
+    int tsize1() const{
       int t=0;
       for(int i=0; i<size(); i++)
-	t+=sizeof(i);
+	t+=size_of(i);
       return t;
     }
 
-    int tsize2(){
+    int tsize2() const{
       int t=0;
       for(int i=0; i<size(); i++)
 	t+=size_of(i)*size_of(i);

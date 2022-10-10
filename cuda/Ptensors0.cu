@@ -53,31 +53,35 @@ __global__ void Ptensors0_broadcast0_kernel(float* xarr, const int* xdir, const 
 namespace ptens{
 
   void Ptensors0_reduce0_cu(cnine::RtensorPack& R, const cnine::RtensorPack& x, int offs, int n, const cudaStream_t& stream){
+    int dev=R.dev;
     PTENS_ASSRT(R.dev==1);
     PTENS_ASSRT(x.dev==1);
     int N=R.size();
-    Ptensors0_reduce0_kernel<<<N,n,0,stream>>>(R.arrg,R.dir.arrg,x.arrg+offs,x.dir.arrg);
+    Ptensors0_reduce0_kernel<<<N,n,0,stream>>>(R.arrg,R.dir.garr(dev),x.arrg+offs,x.dir.garr(dev));
   }
 
   void Ptensors0_reduce0_cu(cnine::RtensorPack& R, const cnine::RtensorPack& x, const AindexPack& list, int offs, int n, const cudaStream_t& stream){
+    int dev=R.dev;
     PTENS_ASSRT(R.dev==1);
     PTENS_ASSRT(x.dev==1);
     PTENS_ASSRT(list.dev==1);
     int N=R.size();
-    Ptensors0_reduce0_kernel<<<N,n,0,stream>>>(R.arrg,R.dir.arrg,x.arrg+offs,x.dir.arrg,list.arrg,list.dir.arrg);
+    Ptensors0_reduce0_kernel<<<N,n,0,stream>>>(R.arrg,R.dir.garr(dev),x.arrg+offs,x.dir.garr(dev),list.arrg,list.dir.garr(dev));
   }
 
   void Ptensors0_broadcast0_cu(cnine::RtensorPack& x, const cnine::RtensorPack& R, const int offs, const cudaStream_t& stream){
+    int dev=R.dev;
     PTENS_ASSRT(R.dev==1);
     PTENS_ASSRT(x.dev==1);
-    Ptensors0_broadcast0_kernel<<<R.size(),std::max(32,x.dim_of(0,0)),0,stream>>>(x.arrg+offs,x.dir.arrg,R.arrg,R.dir.arrg);
+    Ptensors0_broadcast0_kernel<<<R.size(),std::max(32,x.dim_of(0,0)),0,stream>>>(x.arrg+offs,x.dir.garr(dev),R.arrg,R.dir.garr(dev));
   }
 
   void Ptensors0_broadcast0_cu(cnine::RtensorPack& R, const cnine::RtensorPack& x, const AindexPack& list, const int offs, const cudaStream_t& stream){
+    int dev=R.dev;
     PTENS_ASSRT(R.dev==1);
     PTENS_ASSRT(x.dev==1);
     PTENS_ASSRT(list.dev==1);
-    Ptensors0_broadcast0_kernel<<<R.size(),std::max(32,x.dim_of(0,0)),0,stream>>>(x.arrg+offs,x.dir.arrg,list.arrg,list.dir.arrg,R.arrg,R.dir.arrg);
+    Ptensors0_broadcast0_kernel<<<R.size(),std::max(32,x.dim_of(0,0)),0,stream>>>(x.arrg+offs,x.dir.garr(dev),list.arrg,list.dir.garr(dev),R.arrg,R.dir.garr(dev));
   }
 
 }
