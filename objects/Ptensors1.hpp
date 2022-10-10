@@ -44,7 +44,7 @@ namespace ptens{
 
     ~Ptensors1(){
 #ifdef WITH_FAKE_GRAD
-      if(!is_view) delete grad;
+      if(grad) delete grad;
 #endif 
     }
 

@@ -85,6 +85,7 @@ pybind11::class_<Ptensors2,cnine::RtensorPack>(m,"ptensors2")
       x.get_grad().add_ReLU(g,alpha);}) // forward is same as backward
 
   .def("inp",&Ptensors2::inp)
+  .def("diff2",&Ptensors2::diff2)
 
 
 // ---- I/O --------------------------------------------------------------------------------------------------
