@@ -235,6 +235,20 @@ class Ptensors0_inpFn(torch.autograd.Function):
         ctx.y.add_to_grad(ctx.x,g.item())
         return ptensors0.dummy(), ptensors0.dummy()
 
+class Ptensors0_diff2Fn(torch.autograd.Function):
+    
+    @staticmethod
+    def forward(ctx,x,y):
+        ctx.x=x.obj
+        ctx.y=y.obj
+        return torch.tensor(x.obj.inp(y.obj))
+
+    @staticmethod
+    def backward(ctx,g):
+        ctx.x.add_to_grad(ctx.y,g.item())
+        ctx.y.add_to_grad(ctx.x,g.item())
+        return ptensors0.dummy(), ptensors0.dummy()
+
 
 class Ptensors0_concatFn(torch.autograd.Function):
     
