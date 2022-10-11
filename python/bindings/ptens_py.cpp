@@ -13,7 +13,7 @@
 #include "Ptensors2.hpp"
 #include "LinmapFunctions.hpp"
 #include "MsgFunctions.hpp"
-
+#include "OuterFunctions.hpp"
 
 //std::default_random_engine rndGen;
 
@@ -44,5 +44,6 @@ PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
 
   #include "LinmapFunctions_py.cpp"
   #include "MsgFunctions_py.cpp"
+  #include "OuterFunctions_py.cpp"
 
 }

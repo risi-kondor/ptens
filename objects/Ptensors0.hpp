@@ -234,6 +234,15 @@ namespace ptens{
       atoms.push_back(x.atoms);
     }
 
+    template<typename OBJ1, typename OBJ2, typename FN>
+    void for_each_view(const OBJ1& x, const OBJ2& y, FN lambda){
+      int N=size();
+      PTENS_ASSRT(x.size()==N);
+      PTENS_ASSRT(y.size()==N);
+      for(int i=0; i<N; i++)
+	lambda(view_of(i),x.view_of(i),y.view_of(i));
+    }
+
 
   public: // ---- Cumulative operations ----------------------------------------------------------------------
 

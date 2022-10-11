@@ -134,6 +134,11 @@ class ptensors2(torch.Tensor):
         return Ptensors2_Unite2Fn.apply(self,G)
     
 
+    def outer(self,y):
+        if isinstance(y,ptensors0):
+            return Ptensors2_Outer0Fn.apply(self,y)
+
+
     # ---- I/O ----------------------------------------------------------------------------------------------
 
 
@@ -212,6 +217,23 @@ class Ptensors2_inpFn(torch.autograd.Function):
     def backward(ctx,g):
         ctx.x.add_to_grad(ctx.y,g.item())
         ctx.y.add_to_grad(ctx.x,g.item())
+        return ptensors2.dummy(), ptensors2.dummy()
+
+
+class Ptensors0_diff2Fn(torch.autograd.Function):
+    
+    @staticmethod
+    def forward(ctx,x,y):
+        ctx.x=x.obj
+        ctx.y=y.obj
+        return torch.tensor(x.obj.diff2(y.obj))
+
+    @staticmethod
+    def backward(ctx,g):
+        ctx.x.add_to_grad(ctx.x,g.item()*2.0)
+        ctx.x.add_to_grad(ctx.y,-g.item()*2.0)
+        ctx.y.add_to_grad(ctx.y,g.item()*2.0)
+        ctx.y.add_to_grad(ctx.x,-g.item()*2.0)
         return ptensors2.dummy(), ptensors2.dummy()
 
 
@@ -384,6 +406,26 @@ class Ptensors2_Unite2Fn(torch.autograd.Function):
     def backward(ctx,g):
         ptens_base.unite2to2_back(ctx.x.gradp(),ctx.r.gradp(),ctx.G)
         return ptensors2.dummy(), None
+
+
+class Ptensors2_Outer0Fn(torch.autograd.Function):
+
+    @staticmethod
+    def forward(ctx,x,y):
+        r=ptens.ptensors2(1)
+        r.obj=ptens_base.outer(x.obj,y.obj)
+        ctx.x=x.obj
+        ctx.y=y.obj
+        ctx.r=r.obj
+        return r
+        
+    @staticmethod
+    def backward(ctx,g):
+        ptens_base.add_outer_back0(ctx.x.gradp(),ctx.r.gradp(),ctx.y)
+        ptens_base.add_outer_back1(ctx.y.gradp(),ctx.r.gradp(),ctx.x)
+        return ptensors2.dummy(), ptensors0.dummy()
+
+
 
 
 

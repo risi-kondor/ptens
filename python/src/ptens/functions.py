@@ -35,6 +35,9 @@ def unite2(x,G):
 def gather(x,G):
     return x.gather(G)
 
+def outer(x,y):
+    return x.outer(y)
+
 
 def device_id(device):
     if device==0:
@@ -47,4 +50,4 @@ def device_id(device):
         return 1
     if device=='cuda:0':
         return 1
-    d return 0
+    return 0
