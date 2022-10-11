@@ -421,7 +421,7 @@ namespace ptens{
       cnine::array_pool<int> dims;
       for(int i=0; i<size(); i++)
 	dims.push_back(vector<int>({k_of(i),k_of(i),n}));
-	RtensorPack R(dims,cnine::fill_zero(),dev);
+      RtensorPack R(dims,cnine::fill_zero(),dev);
       if(dev==0){
 	for(int i=0; i<size(); i++){
 	  R.view3_of(i)+=view_of(i,offs,n);
