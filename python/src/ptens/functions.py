@@ -46,6 +46,8 @@ def device_id(device):
         return 1
     if device=='cpu':
         return 0
+    if device=='gpu':
+        return 1
     if device=='cuda':
         return 1
     if device=='cuda:0':

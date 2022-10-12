@@ -11,6 +11,16 @@ int main(int argc, char** argv){
 
   cnine_session session;
 
+  if(true){
+    Ptensors0 A=Ptensors0::randn(3,2);
+    cout<<A<<endl;
+    auto Ag=A.to_device(1);
+    cout<<Ag<<endl;
+    auto B=A.to_device(0);
+    cout<<B<<endl;
+    exit(0);
+  }
+
   Ptensors0 A=Ptensors0::sequential(2,3);
   cout<<A<<endl;
   cout<<linmaps0(A)<<endl;

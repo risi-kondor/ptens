@@ -82,7 +82,7 @@ class ptensors2(torch.Tensor):
         return self.obj.push_back(x)
 
     def to(self, _device='cpu'):
-        self.obj.move_to(ptens.device_id(_device))
+        self.obj.to_device(ptens.device_id(_device))
 
 
     # ---- Operations ----------------------------------------------------------------------------------------

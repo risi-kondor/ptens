@@ -82,7 +82,7 @@ class ptensors1(torch.Tensor):
         return ptensors1.randn(self.get_atoms(),self.get_nc(),self.get_dev())
 
     def to(self, _device='cpu'):
-        self.obj.move_to(ptens.device_id(_device))
+        self.obj.to_device(ptens.device_id(_device))
 
 
     # ---- Operations ----------------------------------------------------------------------------------------
@@ -149,6 +149,7 @@ class ptensors1(torch.Tensor):
 
     def __str__(self):
         return self.obj.__str__()
+
 
 # ------------------------------------------------------------------------------------------------------------
 

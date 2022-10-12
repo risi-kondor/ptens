@@ -55,11 +55,6 @@ pybind11::class_<Ptensors0,cnine::RtensorPack>(m,"ptensors0")
 
 //  .def("view_of_grad",&Ptensors0::view_of_grad)
 
-//.def("device",&Ptensors0::get_device)
-//.def("to",&Ptensors0::to_device)
-//.def("to_device",&Ptensors0::to_device)
-//.def("move_to",[](Ptensors0& x, const int _dev){x.move_to_device(_dev);})
-
   .def("__getitem__",[](const Ptensors0& x, const int i){return x(i);})
   .def("torch",[](const Ptensors0& x){return x.tensor().torch();})
 

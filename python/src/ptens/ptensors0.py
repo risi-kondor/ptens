@@ -90,7 +90,7 @@ class ptensors0(torch.Tensor):
         return Ptensors0_toMxFn.apply(self)
 
     def to(self, _device='cpu'):
-        self.obj.move_to(ptens.device_id(_device))
+        self.obj.to_device(ptens.device_id(_device))
         
 
     # ---- Operations ----------------------------------------------------------------------------------------

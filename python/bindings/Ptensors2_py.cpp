@@ -92,8 +92,8 @@ pybind11::class_<Ptensors2,cnine::RtensorPack>(m,"ptensors2")
 
 
   .def("str",&Ptensors2::str,py::arg("indent")="")
-  .def("__str__",&Ptensors2::str,py::arg("indent")="");
-//.def("__repr__",&Ptensors2::str,py::arg("indent")="");
+  .def("__str__",&Ptensors2::str,py::arg("indent")="")
+  .def("__repr__",&Ptensors2::str,py::arg("indent")="");
 
 
 

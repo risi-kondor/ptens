@@ -2,8 +2,11 @@
 #include <pybind11/stl.h>
 #include <pybind11/complex.h>
 
+#include "Cnine_base.cpp"
+
 //#include "Cgraph.hpp"
 //#include "GraphNhoods.hpp"
+#include "PtensSession.hpp"
 #include "Hgraph.hpp"
 #include "Ptensor0.hpp"
 #include "Ptensor1.hpp"
@@ -15,13 +18,8 @@
 #include "MsgFunctions.hpp"
 #include "OuterFunctions.hpp"
 
-//std::default_random_engine rndGen;
 
-//GElib::GElibSession session;
-
-
-#include "Cnine_base.cpp"
-
+ptens::PtensSession session;
 
 PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
 

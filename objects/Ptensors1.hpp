@@ -75,6 +75,12 @@ namespace ptens{
     static Ptensors1 zero(const int _n, const int _k, const int _nc, const int _dev=0){
       return Ptensors1(_n,_k,_nc,cnine::fill_zero(),_dev);}
 
+    static Ptensors1 gaussian(const int _n, const int _k, const int _nc, const int _dev=0){
+      return Ptensors1(_n,_k,_nc,cnine::fill_gaussian(),_dev);}
+
+    static Ptensors1 randn(const int _n, const int _k, const int _nc, const int _dev=0){
+      return Ptensors1(_n,_k,_nc,cnine::fill_gaussian(),_dev);}
+
     static Ptensors1 sequential(const int _n, const int _k, const int _nc, const int _dev=0){
       Ptensors1 R(_n,_k,_nc,cnine::fill_raw(),0);
       for(int i=0; i<_n; i++)
@@ -114,6 +120,10 @@ namespace ptens{
 	R.push_back(Ptensor1::gaussian(_atoms(i),_nc));
       R.to_device(_dev);
       return R;
+    }
+
+    static Ptensors1 randn(const AtomsPack& _atoms, const int _nc, const int _dev=0){
+      return Ptensors1::gaussian(_atoms,_nc,_dev);
     }
 
     static Ptensors1 sequential(const AtomsPack& _atoms, const int _nc, const int _dev=0){

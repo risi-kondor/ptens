@@ -23,8 +23,11 @@ def main():
 
     # ------------------------------------------------------------------------------------------------------------
     
-    if 'CUDAHOME' in os.environ:
-        print("CUDA found at "+os.environ['CUDAHOME'])
+    #if 'CUDAHOME' in os.environ:
+        #print("CUDA found at "+os.environ['CUDAHOME'])
+
+    if compile_with_cuda:
+        print("Installing with CUDA support")
     else:
         print("No CUDA found, installing without GPU support.")
         compile_with_cuda=False
@@ -100,10 +103,11 @@ def main():
             '../../cnine/include/Cnine_base.cu',
             '../../cnine/cuda/TensorView_accumulators.cu',
             '../../cnine/cuda/BasicCtensorProducts.cu',
+            '../../cnine/cuda/RtensorUtils.cu',
             '../cuda/Ptensors0.cu',
             '../cuda/Ptensors1.cu',
             '../cuda/Ptensors2.cu',
-            'src/ptens/ptens_py.cpp'
+            'bindings/ptens_py.cpp'
         ],
             include_dirs=_include_dirs,
             extra_compile_args={

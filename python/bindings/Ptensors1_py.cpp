@@ -41,8 +41,6 @@ pybind11::class_<Ptensors1,cnine::RtensorPack>(m,"ptensors1")
 
 //.def("device",&Ptensors1::get_device)
 //.def("to",&Ptensors1::to_device)
-//.def("to_device",&Ptensors1::to_device)
-//.def("move_to",[](Ptensors1& x, const int _dev){x.move_to_device(_dev);})
 
 
 // ---- Access ----------------------------------------------------------------------------------------------
@@ -94,8 +92,8 @@ pybind11::class_<Ptensors1,cnine::RtensorPack>(m,"ptensors1")
 
 
   .def("str",&Ptensors1::str,py::arg("indent")="")
-  .def("__str__",&Ptensors1::str,py::arg("indent")="");
-//.def("__repr__",&Ptensors1::str,py::arg("indent")="");
+  .def("__str__",&Ptensors1::str,py::arg("indent")="")
+  .def("__repr__",&Ptensors1::str,py::arg("indent")="");
 
 
 

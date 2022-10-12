@@ -71,6 +71,12 @@ namespace ptens{
     static Ptensors0 zero(const int _n, const int _nc, const int _dev=0){
       return Ptensors0(_n,_nc,cnine::fill_zero(),_dev);}
 
+    static Ptensors0 gaussian(const int _n, const int _nc, const int _dev=0){
+      return Ptensors0(_n,_nc,cnine::fill_gaussian(),_dev);}
+
+    static Ptensors0 randn(const int _n, const int _nc, const int _dev=0){
+      return Ptensors0(_n,_nc,cnine::fill_gaussian(),_dev);}
+
     static Ptensors0 sequential(const int _n, const int _nc, const int _dev=0){
       Ptensors0 R(_n,_nc,cnine::fill_raw());
       for(int i=0; i<_n; i++) R.view1_of(i).set(i);
@@ -84,6 +90,9 @@ namespace ptens{
       return Ptensors0(_atoms,_nc,cnine::fill_zero(),_dev);}
 
     static Ptensors0 gaussian(const AtomsPack& _atoms, const int _nc, const int _dev=0){
+      return Ptensors0(_atoms,_nc,cnine::fill_gaussian(),_dev);}
+
+    static Ptensors0 randn(const AtomsPack& _atoms, const int _nc, const int _dev=0){
       return Ptensors0(_atoms,_nc,cnine::fill_gaussian(),_dev);}
 
     static Ptensors0 sequential(const AtomsPack& _atoms, const int _nc, const int _dev=0){

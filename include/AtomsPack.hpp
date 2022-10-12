@@ -41,6 +41,11 @@ namespace ptens{
 	push_back(p);
     }
 
+    AtomsPack(const initializer_list<initializer_list<int> >& x){
+      for(auto& p:x)
+	push_back(p);
+    }
+
     static AtomsPack random(const int n, const float p=0.5){
       AtomsPack R;
       uniform_real_distribution<double> distr(0,1);
