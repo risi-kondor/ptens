@@ -101,7 +101,6 @@ namespace ptens{
       return R.to_device(_dev);
     }
 
-
     static Ptensors0 concat(const Ptensors0& x, const Ptensors0& y){
       Ptensors0 R=Ptensors0::zero(x.atoms,x.nc+y.nc,x.dev);
       R.add_to_channels(x,0);
@@ -257,6 +256,7 @@ namespace ptens{
 
 
     void add_to_channels(const Ptensors0& x, const int offs){
+      PTENS_CPUONLY();
       int N=size();
       PTENS_ASSRT(x.size()==N);
       for(int i=0; i<N; i++)
@@ -264,6 +264,7 @@ namespace ptens{
     }
 
     void add_channels(const Ptensors0& x, const int offs){
+      PTENS_CPUONLY();
       int N=size();
       PTENS_ASSRT(x.size()==N);
       for(int i=0; i<N; i++)

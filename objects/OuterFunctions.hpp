@@ -16,6 +16,7 @@ namespace ptens{
 
 
   void add_outer(Ptensors0& r, const Ptensors0& x, const Ptensors0& y){
+    CNINE_CPUONLY1(r);
     using namespace cnine;
     int xc=x.nc;
     int yc=y.nc;
@@ -31,6 +32,7 @@ namespace ptens{
 
 
   void add_outer_back0(Ptensors0& xg, const Ptensors0& g, const Ptensors0& y){
+    CNINE_CPUONLY1(g);
     using namespace cnine;
     int xc=xg.nc;
     int yc=y.nc;
@@ -46,6 +48,7 @@ namespace ptens{
 
 
   void add_outer_back1(Ptensors0& yg, const Ptensors0& g, const Ptensors0& x){
+    CNINE_CPUONLY1(g);
     using namespace cnine;
     int xc=x.nc;
     int yc=yg.nc;
@@ -64,6 +67,7 @@ namespace ptens{
 
 
   void add_outer(Ptensors1& r, const Ptensors0& x, const Ptensors1& y){
+    CNINE_CPUONLY1(r);
     using namespace cnine;
     int xc=x.nc;
     int yc=y.nc;
@@ -81,6 +85,7 @@ namespace ptens{
   }
 
   void add_outer_back0(Ptensors0& xg, const Ptensors1& g, const Ptensors1& y){
+    CNINE_CPUONLY1(g);
     using namespace cnine;
     int xc=xg.nc;
     int yc=y.nc;
@@ -98,6 +103,7 @@ namespace ptens{
   }
 
   void add_outer_back1(Ptensors1& yg, const Ptensors1& g, const Ptensors0& x){
+    CNINE_CPUONLY1(g);
     using namespace cnine;
     int xc=x.nc;
     int yc=yg.nc;
@@ -119,6 +125,7 @@ namespace ptens{
 
 
   void add_outer(Ptensors1& r, const Ptensors1& x, const Ptensors0& y){
+    CNINE_CPUONLY1(r);
     using namespace cnine;
     int xc=x.nc;
     int yc=y.nc;
@@ -136,6 +143,7 @@ namespace ptens{
   }
 
   void add_outer_back0(Ptensors1& xg, const Ptensors1& g, const Ptensors0& y){
+    CNINE_CPUONLY1(g);
     using namespace cnine;
     int xc=xg.nc;
     int yc=y.nc;
@@ -154,6 +162,7 @@ namespace ptens{
 
 
   void add_outer_back1(Ptensors0& yg, const Ptensors1& g, const Ptensors1& x){
+    CNINE_CPUONLY1(g);
     using namespace cnine;
     int xc=x.nc;
     int yc=yg.nc;
@@ -175,6 +184,7 @@ namespace ptens{
 
 
   void add_outer(Ptensors2& r, const Ptensors1& x, const Ptensors1& y){
+    CNINE_CPUONLY1(r);
     using namespace cnine;
     int xc=x.nc;
     int yc=y.nc;
@@ -194,6 +204,7 @@ namespace ptens{
   }
 
   void add_outer_back0(Ptensors1& xg, const Ptensors2& g, const Ptensors1& y){
+    CNINE_CPUONLY1(g);
     using namespace cnine;
     int xc=xg.nc;
     int yc=y.nc;
@@ -213,6 +224,7 @@ namespace ptens{
   }
 
   void add_outer_back1(Ptensors1& yg, const Ptensors2& g, const Ptensors1& x){
+    CNINE_CPUONLY1(g);
     using namespace cnine;
     int xc=x.nc;
     int yc=yg.nc;
@@ -236,6 +248,7 @@ namespace ptens{
 
 
   void add_outer(Ptensors2& r, const Ptensors0& x, const Ptensors2& y){
+    CNINE_CPUONLY1(r);
     using namespace cnine;
     int xc=x.nc;
     int yc=y.nc;
@@ -255,6 +268,7 @@ namespace ptens{
 
 
   void add_outer_back0(Ptensors0& xg, const Ptensors2& g, const Ptensors2& y){
+    CNINE_CPUONLY1(g);
     using namespace cnine;
     int xc=xg.nc;
     int yc=y.nc;
@@ -273,6 +287,7 @@ namespace ptens{
   }
 
   void add_outer_back1(Ptensors2& yg, const Ptensors2& g, const Ptensors0& x){
+    CNINE_CPUONLY1(g);
     using namespace cnine;
     int xc=x.nc;
     int yc=yg.nc;
@@ -295,6 +310,7 @@ namespace ptens{
 
 
   void add_outer(Ptensors2& r, const Ptensors2& x, const Ptensors0& y){
+    CNINE_CPUONLY1(r);
     using namespace cnine;
     int xc=x.nc;
     int yc=y.nc;
@@ -313,6 +329,7 @@ namespace ptens{
   }
 
   void add_outer_back0(Ptensors2& xg, const Ptensors2& g, const Ptensors0& y){
+    CNINE_CPUONLY1(g);
     using namespace cnine;
     int xc=xg.nc;
     int yc=y.nc;
@@ -331,6 +348,7 @@ namespace ptens{
   }
 
   void add_outer_back1(Ptensors0& yg, const Ptensors2& g, const Ptensors2& x){
+    CNINE_CPUONLY1(g);
     using namespace cnine;
     int xc=x.nc;
     int yc=yg.nc;

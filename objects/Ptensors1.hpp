@@ -270,6 +270,7 @@ namespace ptens{
 
 
     void add_to_channels(const Ptensors1& x, const int offs){
+      PTENS_CPUONLY();
       int N=size();
       PTENS_ASSRT(x.size()==N);
       for(int i=0; i<N; i++)
@@ -277,6 +278,7 @@ namespace ptens{
     }
 
     void add_channels(const Ptensors1& x, const int offs){
+      PTENS_CPUONLY();
       int N=size();
       PTENS_ASSRT(x.size()==N);
       for(int i=0; i<N; i++)
@@ -414,6 +416,7 @@ namespace ptens{
 	  view_of(i)+=repeat0(x.view1_of(i),k_of(i));
 	}
       }
+      GPUCODE(CUDA_STREAM(Ptensors1_broadcast0_cu(*this,x,0,stream)));
     }
 
     void broadcast0(const RtensorPack& x, const int offs){
@@ -423,6 +426,7 @@ namespace ptens{
 	  view_of(i,offs,n)+=repeat0(x.view1_of(i),k_of(i));
 	}
       }
+      GPUCODE(CUDA_STREAM(Ptensors1_broadcast0_cu(*this,x,offs,stream)));
     }
 
     void broadcast0(const RtensorPack& x, const AindexPack& list){
@@ -431,6 +435,7 @@ namespace ptens{
 	for(int i=0; i<N; i++)
 	  view_of(list.tens(i))+=repeat0(x.view1_of(i),list.nix(i));
       }
+      GPUCODE(CUDA_STREAM(Ptensors1_broadcast0_cu(*this,x,list,0,stream)));
     }
 
     void broadcast0(const RtensorPack& x, const AindexPack& list, const int offs){
@@ -440,6 +445,7 @@ namespace ptens{
 	for(int i=0; i<N; i++)
 	  view_of(list.tens(i),list.ix(i),offs,n)+=repeat0(x.view1_of(i),list.nix(i));
       }
+      GPUCODE(CUDA_STREAM(Ptensors1_broadcast0_cu(*this,x,list,offs,stream)));
     }
 
 
@@ -449,6 +455,7 @@ namespace ptens{
 	  view_of(i)+=x.view2_of(i);
 	}
       }
+      GPUCODE(CUDA_STREAM(Ptensors1_broadcast1_cu(*this,x,0,stream)));
     }
 
     void broadcast1(const RtensorPack& x, const int offs){
@@ -456,6 +463,7 @@ namespace ptens{
       for(int i=0; i<size(); i++){
 	view_of(i,offs,n)+=x.view2_of(i);
       }
+      GPUCODE(CUDA_STREAM(Ptensors1_broadcast1_cu(*this,x,offs,stream)));
     }
 
     void broadcast1(const RtensorPack& x, const AindexPack& list){
@@ -466,6 +474,7 @@ namespace ptens{
 	  view_of(list.tens(i),list.ix(i))+=x.view2_of(i);
 	}
       }
+      GPUCODE(CUDA_STREAM(Ptensors1_broadcast1_cu(*this,x,list,0,stream)));
     }
 
     void broadcast1(const RtensorPack& x, const AindexPack& list, const int offs){
@@ -477,6 +486,7 @@ namespace ptens{
 	  view_of(list.tens(i),list.ix(i),offs,n)+=x.view2_of(i);
 	}
       }
+      GPUCODE(CUDA_STREAM(Ptensors1_broadcast1_cu(*this,x,list,offs,stream)));
     }
 
 
