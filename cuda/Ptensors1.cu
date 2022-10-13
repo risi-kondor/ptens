@@ -28,6 +28,56 @@ __forceinline__ __device__ int load_indices(int* ix, const int* xiarr, const int
 }
 
 
+// ---- mprod ------------------------------------------------------------------------------------------------
+
+
+__global__ void Ptensors1_add_mprod(float* rarr, const int* rdir, const float* xarr, const int* xdir, const float* yarr){
+  const int q=blockIdx.x;
+  const int c=threadIdx.x;
+  const int k=xdir[3*q+1];
+  const int ncx=xdir[3*q+2];
+  const int ncr=rdir[3*q+2];
+
+  const float* x=xarr+xdir[3*q];
+  const float* r=rarr+rdir[3*q];
+
+  for(int i=0; i<k; i++){
+    float t=0;
+    float* xrow=x+i*ncx;
+    float* ycol=yarr+c;
+    for(int j=0; j<ncx; j++)
+      t+=xrow[j]*ycol[j*ncr];
+    r[i*ncr+c]+=t;
+  }
+}
+
+
+/*
+__global__ void Ptensors1_add_mprod_back0(float* rarr, const int* rdir, const float* rarr, const int* rdir, const float* yarr){
+  const int q=blockIdx.x;
+  const int c=threadIdx.x;
+  const int k=xdir[3*q+1];
+  const int ncx=xdir[3*q+2];
+  const int ncr=rdir[3*q+2];
+
+  const float* x=xarr+xdir[3*q];
+  const float* r=rarr+rdir[3*q];
+
+  for(int i=0; i<k; i++){
+    float t=0;
+    float* xrow=x+i*ncx;
+    float* yrow=yarr+c*ncx;
+    for(int j=0; j<ncx; j++)
+      t+=xrow[j]*yrow[j];
+    r[i*ncr+c]+=t;
+  }
+}
+
+
+__global__ void Ptensors1_add_mprod_back1(float* rarr, const int* rdir, const float* rarr, const int* rdir, const float* yarr){
+}
+*/
+
 // ---- Reduce -----------------------------------------------------------------------------------------------
 
 

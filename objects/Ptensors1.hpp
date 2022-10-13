@@ -179,6 +179,10 @@ namespace ptens{
     Ptensors1(RtensorPack&& x, const AtomsPack& _atoms, const int _nc):
       RtensorPack(std::move(x)), atoms(_atoms), nc(_nc){}
 
+    rtensor view_as_matrix() const{
+      return rtensor::view_of_blob({tail/nc,nc},get_arr(),dev);
+    }
+
 
   public: // ---- Transport ----------------------------------------------------------------------------------
 
@@ -288,22 +292,34 @@ namespace ptens{
     void add_mprod(const Ptensors1& x, const rtensor& y){
       PTENS_CPUONLY();
       PTENS_ASSRT(x.size()==size());
-      for(int i=0; i<size(); i++)
-	view_of(i).add_matmul_AA(x.view_of(i),y.view2());
+      if(dev==0){
+	for(int i=0; i<size(); i++)
+	  view_of(i).add_matmul_AA(x.view_of(i),y.view2());
+      }else{
+	view_as_matrix().add_mprod(x.view_as_matrix(),y);
+      }
     }
 
     void add_mprod_back0(const Ptensors1& g, const rtensor& y){
       PTENS_CPUONLY();
       PTENS_ASSRT(g.size()==size());
-      for(int i=0; i<size(); i++)
-	view_of(i).add_matmul_AT(g.view_of(i),y.view2());
+      if(dev==0){
+	for(int i=0; i<size(); i++)
+	  view_of(i).add_matmul_AT(g.view_of(i),y.view2());
+      }else{
+	view_as_matrix().add_Mprod_AT(g.view_as_matrix(),y);
+      }
     }
 
     void add_mprod_back1_to(rtensor& r, const Ptensors1& x) const{
       PTENS_CPUONLY();
       PTENS_ASSRT(x.size()==size());
-      for(int i=0; i<size(); i++)
-	r.view2().add_matmul_TA(x.view_of(i),view_of(i));
+      if(dev==0){
+	for(int i=0; i<size(); i++)
+	  r.view2().add_matmul_TA(x.view_of(i),view_of(i));
+      }else{
+	r.add_Mprod_TA(x.view_as_matrix(),view_as_matrix());
+      }
     }
 
  

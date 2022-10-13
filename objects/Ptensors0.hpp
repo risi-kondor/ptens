@@ -166,7 +166,7 @@ namespace ptens{
       return rtensor({size(),nc},arr,0);
     }
 
-    rtensor tensor_view() const{
+    rtensor view_as_matrix() const{
       return rtensor::view_of_blob({size(),nc},get_arr(),dev);
     }
 
@@ -282,7 +282,7 @@ namespace ptens{
 	for(int i=0; i<size(); i++)
 	  add_matmul_Ax_to(view_of(i),y.view2().transp(),x.view_of(i));
       }else{
-	view_as_tensor(*this).add_Mprod_AT(view_as_tensor(x),y);
+	view_as_matrix().add_mprod(x.view_as_matrix(),y);
       }
     }
 
@@ -290,21 +290,25 @@ namespace ptens{
       PTENS_CPUONLY();
       PTENS_ASSRT(g.size()==size());
       if(dev==0){
-      for(int i=0; i<size(); i++)
-	add_matmul_Ax_to(view_of(i),y.view2(),g.view_of(i));
+	for(int i=0; i<size(); i++)
+	  add_matmul_Ax_to(view_of(i),y.view2(),g.view_of(i));
       }else{
-	view_as_tensor(*this).add_mprod(view_as_tensor(x),y);
+	view_as_matrix().add_Mprod_AT(g.view_as_matrix(),y);
       }
-     }
+    }
 
     void add_mprod_back1_to(rtensor& r, const Ptensors0& x) const{
       PTENS_CPUONLY();
       PTENS_ASSRT(x.size()==size());
-      for(int i=0; i<size(); i++)
-	r.view2().add_outer(x.view_of(i),view_of(i));
+      if(dev==0){
+	for(int i=0; i<size(); i++)
+	  r.view2().add_outer(x.view_of(i),view_of(i));
+      }else{
+	r.add_Mprod_TA(x.view_as_matrix(),view_as_matrix());
+      }    
     }
 
- 
+
   public: // ---- Reductions ---------------------------------------------------------------------------------
 
 
