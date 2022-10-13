@@ -455,7 +455,7 @@ class Ptensors0_GatherFn(torch.autograd.Function):
 
     @staticmethod
     def forward(ctx,x,G):
-        r=ptens.ptensors1(1)
+        r=ptens.ptensors0(1)
         r.obj=ptens_base.gather(x.obj,G.obj)
         ctx.x=x.obj
         ctx.r=r.obj

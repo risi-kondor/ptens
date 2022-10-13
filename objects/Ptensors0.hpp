@@ -146,7 +146,7 @@ namespace ptens{
       //x.grad=nullptr;
       //#endif 
     }
-
+    
     Ptensors0& operator=(const Ptensors0& x)=delete;
 
 
@@ -164,6 +164,10 @@ namespace ptens{
     rtensor tensor() const{
       CNINE_CPUONLY();
       return rtensor({size(),nc},arr,0);
+    }
+
+    rtensor tensor_view() const{
+      return rtensor::view_of_blob({size(),nc},get_arr(),dev);
     }
 
     #ifdef _WITH_ATEN
@@ -274,16 +278,24 @@ namespace ptens{
     void add_mprod(const Ptensors0& x, const rtensor& y){
       PTENS_CPUONLY();
       PTENS_ASSRT(x.size()==size());
-      for(int i=0; i<size(); i++)
-	add_matmul_Ax_to(view_of(i),y.view2().transp(),x.view_of(i));
+      if(dev==0){
+	for(int i=0; i<size(); i++)
+	  add_matmul_Ax_to(view_of(i),y.view2().transp(),x.view_of(i));
+      }else{
+	view_as_tensor(*this).add_Mprod_AT(view_as_tensor(x),y);
+      }
     }
 
     void add_mprod_back0(const Ptensors0& g, const rtensor& y){
       PTENS_CPUONLY();
       PTENS_ASSRT(g.size()==size());
+      if(dev==0){
       for(int i=0; i<size(); i++)
 	add_matmul_Ax_to(view_of(i),y.view2(),g.view_of(i));
-    }
+      }else{
+	view_as_tensor(*this).add_mprod(view_as_tensor(x),y);
+      }
+     }
 
     void add_mprod_back1_to(rtensor& r, const Ptensors0& x) const{
       PTENS_CPUONLY();
