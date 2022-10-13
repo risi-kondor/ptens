@@ -188,7 +188,7 @@ class Ptensors0_toMxFn(torch.autograd.Function):
     @staticmethod
     def backward(ctx,g):
        R=ptensors0(1)
-       R.obj=_ptensors0(x)
+       R.obj=_ptensors0(g)
        return R
     
 
