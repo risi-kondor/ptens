@@ -21,6 +21,8 @@ def transfer2(x,_atoms,G):
 def cat(x,y):
     return x.concat(y)
 
+def linear(x,y,b):
+    return x.linear(y,b)
 
 def relu(x,alpha=0.5):
     return x.relu(alpha)

@@ -11,7 +11,7 @@ int main(int argc, char** argv){
 
   cnine_session session;
 
-  if(true){
+  if(false){
     Ptensors0 A=Ptensors0::randn(3,2);
     cout<<A<<endl;
     auto Ag=A.to_device(1);

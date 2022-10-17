@@ -3,7 +3,7 @@
 
 #include "Rtensor3_view.hpp"
 #include "Cgraph.hpp"
-#include "RtensorPack.hpp"
+#include "RtensorPackB.hpp"
 #include "AtomsPack.hpp"
 #include "AindexPack.hpp"
 #include "Ptensor2.hpp"
@@ -28,14 +28,14 @@ namespace ptens{
   extern void Ptensors2_broadcast2_cu(cnine::RtensorPack& R, const cnine::RtensorPack& x, const AindexPack& list, const int offs, const cudaStream_t& stream);
   #endif
 
-  class Ptensors2: public cnine::RtensorPack, public cnine::diff_class<Ptensors2>{
+  class Ptensors2: public cnine::RtensorPackB, public cnine::diff_class<Ptensors2>{
   public:
 
     typedef cnine::Gdims Gdims;
     typedef cnine::IntTensor itensor;
     typedef cnine::IntTensor IntTensor;
     typedef cnine::RtensorA rtensor;
-    typedef cnine::RtensorPack RtensorPack;
+    typedef cnine::RtensorPackB RtensorPack;
     typedef cnine::Rtensor1_view Rtensor1_view;
     typedef cnine::Rtensor2_view Rtensor2_view;
     typedef cnine::Rtensor3_view Rtensor3_view;
@@ -58,10 +58,10 @@ namespace ptens{
     Ptensors2(){}
 
     Ptensors2(const int _nc, const int _dev=0):
-      RtensorPack(3,_dev), nc(_nc){}
+      RtensorPack(3,_nc,_dev), nc(_nc){}
 
     Ptensors2(const AtomsPack& _atoms, const int _nc, const int _dev=0):
-      RtensorPack(3,_dev), nc(_nc), atoms(_atoms){}
+      RtensorPack(3,_nc,_dev), nc(_nc), atoms(_atoms){}
 
     template<typename FILLTYPE, typename = typename std::enable_if<std::is_base_of<cnine::fill_pattern, FILLTYPE>::value, FILLTYPE>::type>
     Ptensors2(const int _n, const int _k, const int _nc, const FILLTYPE& dummy, const int _dev=0):
@@ -176,9 +176,21 @@ namespace ptens{
     Ptensors2(RtensorPack&& x, const AtomsPack& _atoms, const int _nc):
       RtensorPack(std::move(x)), atoms(_atoms), nc(_nc){}
 
-    rtensor view_as_matrix() const{
-      return rtensor::view_of_blob({tail/nc,nc},get_arr(),dev);
+    Ptensors2(const rtensor& A, const AtomsPack& _atoms):
+      RtensorPack(A), atoms(_atoms){
+      nc=A.dim(1);
     }
+
+    #ifdef _WITH_ATEN
+    Ptensors2(const at::Tensor& T, const AtomsPack& _atoms):
+      RtensorPack(rtensor(T)), atoms(_atoms){
+      nc=dim_of(0,0);
+    }
+    #endif 
+
+    //rtensor view_as_matrix() const{
+    //return rtensor::view_of_blob({tail/nc,nc},get_arr(),dev);
+    //}
 
 
   public: // ---- Transport ----------------------------------------------------------------------------------
@@ -286,40 +298,7 @@ namespace ptens{
 	view_of(i)+=x.view_of(i,offs,x.nc);
     }
 
-    void add_mprod(const Ptensors2& x, const rtensor& y){
-      PTENS_CPUONLY();
-      PTENS_ASSRT(x.size()==size());
-      if(dev==0){
-	for(int i=0; i<size(); i++)
-	  fused_view_of(i).add_matmul_AA(x.fused_view_of(i),y.view2());
-      }else{
-	view_as_matrix().add_mprod(x.view_as_matrix(),y);
-      }
-    }
 
-    void add_mprod_back0(const Ptensors2& g, const rtensor& y){
-      PTENS_CPUONLY();
-      PTENS_ASSRT(g.size()==size());
-      if(dev==0){
-	for(int i=0; i<size(); i++)
-	  fused_view_of(i).add_matmul_AT(g.fused_view_of(i),y.view2());
-      }else{
-	view_as_matrix().add_Mprod_AT(g.view_as_matrix(),y);
-      }
-    }
-
-    void add_mprod_back1_to(rtensor& r, const Ptensors2& x) const{
-      PTENS_CPUONLY();
-      PTENS_ASSRT(x.size()==size());
-      if(dev==0){
-	for(int i=0; i<size(); i++)
-	  r.view2().add_matmul_TA(x.fused_view_of(i),fused_view_of(i));
-      }else{
-	r.add_Mprod_TA(x.view_as_matrix(),view_as_matrix());
-      }
-    }
-
- 
   public: // ---- Reductions ---------------------------------------------------------------------------------
 
 
@@ -669,3 +648,38 @@ namespace ptens{
 
 
 #endif 
+    /*
+    void add_mprod(const Ptensors2& x, const rtensor& y){
+      PTENS_CPUONLY();
+      PTENS_ASSRT(x.size()==size());
+      if(dev==0){
+	for(int i=0; i<size(); i++)
+	  fused_view_of(i).add_matmul_AA(x.fused_view_of(i),y.view2());
+      }else{
+	view_as_matrix().add_mprod(x.view_as_matrix(),y);
+      }
+    }
+
+    void add_mprod_back0(const Ptensors2& g, const rtensor& y){
+      PTENS_CPUONLY();
+      PTENS_ASSRT(g.size()==size());
+      if(dev==0){
+	for(int i=0; i<size(); i++)
+	  fused_view_of(i).add_matmul_AT(g.fused_view_of(i),y.view2());
+      }else{
+	view_as_matrix().add_Mprod_AT(g.view_as_matrix(),y);
+      }
+    }
+
+    void add_mprod_back1_to(rtensor& r, const Ptensors2& x) const{
+      PTENS_CPUONLY();
+      PTENS_ASSRT(x.size()==size());
+      if(dev==0){
+	for(int i=0; i<size(); i++)
+	  r.view2().add_matmul_TA(x.fused_view_of(i),fused_view_of(i));
+      }else{
+	r.add_Mprod_TA(x.view_as_matrix(),view_as_matrix());
+      }
+    }
+    */
+ 

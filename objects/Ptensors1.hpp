@@ -3,7 +3,7 @@
 
 #include "Ptens_base.hpp"
 #include "Cgraph.hpp"
-#include "RtensorPack.hpp"
+#include "RtensorPackB.hpp"
 #include "AtomsPack.hpp"
 #include "AindexPack.hpp"
 #include "Ptensor1.hpp"
@@ -25,17 +25,19 @@ namespace ptens{
   extern void Ptensors1_broadcast1_cu(cnine::RtensorPack& R, const cnine::RtensorPack& x, const AindexPack& list, const int offs, const cudaStream_t& stream);
   #endif
 
-  class Ptensors1: public cnine::RtensorPack, public cnine::diff_class<Ptensors1>{
+  class Ptensors1: public cnine::RtensorPackB, public cnine::diff_class<Ptensors1>{
   public:
 
     typedef cnine::Gdims Gdims;
     typedef cnine::IntTensor itensor;
     typedef cnine::IntTensor IntTensor;
     typedef cnine::RtensorA rtensor;
-    typedef cnine::RtensorPack RtensorPack;
+    typedef cnine::RtensorPackB RtensorPack;
     typedef cnine::Rtensor1_view Rtensor1_view;
     typedef cnine::Rtensor2_view Rtensor2_view;
     typedef cnine::Rtensor3_view Rtensor3_view;
+
+    //typedef cnine::RtensorPackB RtensorPack;
 
     int nc;
     AtomsPack atoms;
@@ -55,10 +57,10 @@ namespace ptens{
     Ptensors1(){}
 
     Ptensors1(const int _nc, const int _dev=0):
-      RtensorPack(2,_dev), nc(_nc){}
+      RtensorPack(2,_nc,_dev), nc(_nc){}
 
     Ptensors1(const AtomsPack& _atoms, const int _nc, const int _dev=0):
-      RtensorPack(2,_dev), nc(_nc), atoms(_atoms){
+      RtensorPack(2,_nc,_dev), nc(_nc), atoms(_atoms){
     }
 
     template<typename FILLTYPE, typename = typename std::enable_if<std::is_base_of<cnine::fill_pattern, FILLTYPE>::value, FILLTYPE>::type>
@@ -179,9 +181,21 @@ namespace ptens{
     Ptensors1(RtensorPack&& x, const AtomsPack& _atoms, const int _nc):
       RtensorPack(std::move(x)), atoms(_atoms), nc(_nc){}
 
-    rtensor view_as_matrix() const{
-      return rtensor::view_of_blob({tail/nc,nc},get_arr(),dev);
+    //rtensor view_as_matrix() const{
+    //return rtensor::view_of_blob({tail/nc,nc},get_arr(),dev);
+    //}
+
+    Ptensors1(const rtensor& A, const AtomsPack& _atoms):
+      RtensorPack(A), atoms(_atoms){
+      nc=A.dim(1);
     }
+
+    #ifdef _WITH_ATEN
+    Ptensors1(const at::Tensor& T, const AtomsPack& _atoms):
+      RtensorPack(rtensor(T)), atoms(_atoms){
+      nc=dim_of(0,0);
+    }
+    #endif 
 
 
   public: // ---- Transport ----------------------------------------------------------------------------------
@@ -289,6 +303,7 @@ namespace ptens{
 	view_of(i)+=x.view_of(i,offs,x.nc);
     }
 
+    /*
     void add_mprod(const Ptensors1& x, const rtensor& y){
       PTENS_CPUONLY();
       PTENS_ASSRT(x.size()==size());
@@ -321,6 +336,7 @@ namespace ptens{
 	r.add_Mprod_TA(x.view_as_matrix(),view_as_matrix());
       }
     }
+    */
 
  
   public: // ---- Reductions ---------------------------------------------------------------------------------

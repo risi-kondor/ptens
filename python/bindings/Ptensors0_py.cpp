@@ -92,6 +92,21 @@ pybind11::class_<Ptensors0,cnine::RtensorPack>(m,"ptensors0")
       g->add_mprod_back1_to(R,x);
       return R.torch();})
 
+  .def("add_linear",[](Ptensors0& r, const Ptensors0& x, at::Tensor& y, at::Tensor& b){
+      r.add_linear(x,RtensorA::view(y),RtensorA::view(b));})
+  .def("add_linear_back0",[](Ptensors0& x, const cnine::loose_ptr<Ptensors0>& g, at::Tensor& y){
+      x.get_grad().add_mprod_back0(g,RtensorA::view(y));})
+  .def("linear_back1",[](Ptensors0& x, const cnine::loose_ptr<Ptensors0>& g){
+      RtensorA R=RtensorA::zero({x.nc,g->nc});
+      g->add_linear_back1_to(R,x);
+      return R.torch();})
+  .def("linear_back2",[](const cnine::loose_ptr<Ptensors0>& g){
+      RtensorA R=RtensorA::zero({g->nc});
+      g->add_linear_back2_to(R);
+      return R.torch();})
+
+  
+
 //.def("add_gather",[](Ptensors0& r const Ptensors0& x, const Hgraph& G){
 //      r.add_gather(x,G);})
 //  .def("add_gather_back",[](Ptensors0& r const Ptensors0& x, const Hgraph& G){

@@ -94,6 +94,9 @@ class ptensors1(torch.Tensor):
     def __mul__(self,y):
         return Ptensors1_mprodFn.apply(self,y)
 
+    def linear(self,y,b):
+        return Ptensors1_linearFn.apply(self,y,b)
+
     def concat(self,y):
         return Ptensors1_concatFn.apply(self,y)
     
@@ -272,6 +275,23 @@ class Ptensors1_mprodFn(torch.autograd.Function):
     def backward(ctx,g):
         ctx.x.add_mprod_back0(ctx.r.gradp(),ctx.y)
         return ptensors1(1), ctx.x.mprod_back1(ctx.r.gradp())
+
+
+class Ptensors1_linearFn(torch.autograd.Function):
+    
+    @staticmethod
+    def forward(ctx,x,y,b):
+        R=ptens.ptensors1.zeros(x.obj.view_of_atoms(),y.size(1),x.obj.get_dev())
+        R.obj.add_linear(x.obj,y,b)
+        ctx.x=x.obj
+        ctx.y=y
+        ctx.r=R.obj
+        return R
+
+    @staticmethod
+    def backward(ctx,g):
+        ctx.x.add_linear_back0(ctx.r.gradp(),ctx.y)
+        return ptensors0.dummy(), ctx.x.linear_back1(ctx.r.gradp()), ctx.x.linear_back2(ctx.r.gradp())
 
 
 class Ptensors1_Linmaps0Fn(torch.autograd.Function):

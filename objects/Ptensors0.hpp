@@ -3,7 +3,7 @@
 
 #include "Ptens_base.hpp"
 #include "Cgraph.hpp"
-#include "RtensorPack.hpp"
+#include "RtensorPackB.hpp"
 #include "AtomsPack.hpp"
 #include "AindexPack.hpp"
 #include "Ptensor0.hpp"
@@ -22,13 +22,13 @@ namespace ptens{
   #endif
 
 
-  class Ptensors0: public cnine::RtensorPack, public cnine::diff_class<Ptensors0>{
+  class Ptensors0: public cnine::RtensorPackB, public cnine::diff_class<Ptensors0>{
   public:
 
     typedef cnine::Gdims Gdims;
     typedef cnine::IntTensor itensor;
     typedef cnine::RtensorA rtensor;
-    typedef cnine::RtensorPack RtensorPack;
+    typedef cnine::RtensorPackB RtensorPack;
     typedef cnine::Rtensor1_view Rtensor1_view;
     typedef cnine::Rtensor2_view Rtensor2_view;
     typedef cnine::Rtensor3_view Rtensor3_view;
@@ -50,7 +50,7 @@ namespace ptens{
 
 
     Ptensors0(const int _nc, const int _dev=0):
-      RtensorPack(1,_dev), nc(_nc){}
+      RtensorPack(1,_nc,_dev), nc(_nc){}
 
     template<typename FILLTYPE, typename = typename std::enable_if<std::is_base_of<cnine::fill_pattern, FILLTYPE>::value, FILLTYPE>::type>
     Ptensors0(const int _n, const int _nc, const FILLTYPE& dummy, const int _dev=0):
@@ -161,14 +161,14 @@ namespace ptens{
       nc=A.dim(1);
     }
 
-    rtensor tensor() const{
-      CNINE_CPUONLY();
-      return rtensor({size(),nc},arr,0);
-    }
+    //rtensor tensor() const{
+    //CNINE_CPUONLY();
+    //return rtensor({size(),nc},arr,0);
+    //}
 
-    rtensor view_as_matrix() const{
-      return rtensor::view_of_blob({size(),nc},get_arr(),dev);
-    }
+    //rtensor view_as_matrix() const{
+    //return rtensor::view_of_blob({size(),nc},get_arr(),dev);
+    //}
 
     #ifdef _WITH_ATEN
     Ptensors0(const at::Tensor& T):
@@ -275,6 +275,7 @@ namespace ptens{
 	view_of(i)+=x.view_of(i,offs,x.nc);
     }
 
+    /*
     void add_mprod(const Ptensors0& x, const rtensor& y){
       PTENS_CPUONLY();
       PTENS_ASSRT(x.size()==size());
@@ -307,6 +308,7 @@ namespace ptens{
 	r.add_Mprod_TA(x.view_as_matrix(),view_as_matrix());
       }    
     }
+    */
 
 
   public: // ---- Reductions ---------------------------------------------------------------------------------
