@@ -96,7 +96,8 @@ namespace ptens{
     string str(const string indent="") const{
       ostringstream oss;
       oss<<"[";
-      for(int i=0; i<size()-1; i++)
+      int k=size(); //why?
+      for(int i=0; i<k-1; i++)
 	oss<<(*this)[i]<<",";
       if(size()>0) oss<<(*this)[size()-1];
       oss<<"]";

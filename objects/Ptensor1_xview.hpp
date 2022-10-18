@@ -24,8 +24,8 @@ namespace ptens{
     Ptensor1_xview(float* _arr, const int _nc, const int _s0, const int _s1, 
       const vector<int>& _ix, const int _dev=0): 
       Rtensor2_view(_arr,_ix.size(),_nc,_s0,_s1,_dev),
-      ix(_ix){}
-    //arr(_arr), n0(_n0), n1(_n1), s0(_s0), s1(_s1), ix(_ix), dev(_dev){}
+      ix(_ix){
+    }
 
 
   public: // ---- Access -------------------------------------------------------------------------------------
@@ -59,8 +59,11 @@ namespace ptens{
     void add(const Rtensor2_view& x) const{
       CNINE_CPUONLY();
       for(int i0=0; i0<n0; i0++)
-	for(int i1=0; i1<n1; i1++)
+	for(int i1=0; i1<n1; i1++){
+	  //arr[0]+=1.0;
+	  //arr[s0*0+s1*i1]+=1.0; 
 	  arr[s0*ix[i0]+s1*i1]+=x.arr[x.s0*i0+x.s1*i1];
+	}
     }
 
     void operator+=(const Rtensor2_view& x) const{

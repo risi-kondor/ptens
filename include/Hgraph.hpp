@@ -38,6 +38,18 @@ namespace ptens{
     }
 
 
+  public: // ---- Copying ------------------------------------------------------------------------------------
+
+
+    Hgraph(const Hgraph& x):
+      SparseRmatrix(x){}
+
+    Hgraph(Hgraph&& x):
+      SparseRmatrix(std::move(x)){}
+
+    Hgraph& operator=(const Hgraph& x)=delete;
+
+
   public: // ---- Conversions --------------------------------------------------------------------------------
 
 
@@ -96,6 +108,7 @@ namespace ptens{
       AtomsPack R;
       for(int i=0; i<n; i++){
 	std::set<int> w;
+	w.insert(i);
 	for(auto q: const_cast<Hgraph&>(*this).row(i)){
 	  auto a=x[q.first];
 	  for(auto p:a)
@@ -116,7 +129,7 @@ namespace ptens{
 	  Atoms in=inputs[j];
 	  Atoms out=outputs[i];
 	  Atoms common=out.intersect(in);
-	  //cout<<j<<"->"<<i<<" "<<in<<" "<<out<<" "<<common<<" "<<Atoms(in(common))<<" "<<Atoms(out(common))<<endl;
+	  auto p=out(common);
 	  in_indices.push_back(j,in(common));
 	  out_indices.push_back(i,out(common));
 	}, self);

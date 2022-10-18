@@ -475,8 +475,9 @@ namespace ptens{
       if(dev==0){
 	int N=list.size();
 	const int n=x.dim_of(0,0);
-	for(int i=0; i<N; i++)
+	for(int i=0; i<N; i++){
 	  view_of(list.tens(i),list.ix(i),offs,n)+=repeat0(x.view1_of(i),list.nix(i));
+	}
       }
       GPUCODE(CUDA_STREAM(Ptensors1_broadcast0_cu(*this,x,list,offs,stream)));
     }

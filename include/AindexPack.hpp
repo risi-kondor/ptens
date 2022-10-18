@@ -22,6 +22,14 @@ namespace ptens{
   public: // ---- Constructors ------------------------------------------------------------------------------
 
 
+    AindexPack(const AindexPack& x):
+      array_pool<int>(x){}
+
+    AindexPack(AindexPack&& x):
+      array_pool<int>(std::move(x)){}
+
+    AindexPack& operator=(const AindexPack& x)=delete;
+
   public: // ---- Access -------------------------------------------------------------------------------------
 
 
@@ -31,7 +39,8 @@ namespace ptens{
       return arr[dir(i,0)];
     }
 
-    vector<int> indices(const int i) const{
+    /*
+    vector<int> indices(const int i) const{ // ????
       assert(i<size());
       //auto& p=lookup[i];
       //int addr=p.first+1;
@@ -44,6 +53,7 @@ namespace ptens{
 	R[i]=arr[addr+i];
       return R;
     }
+    ***/
 
     int tens(const int i) const{
       assert(i<size());
@@ -57,11 +67,12 @@ namespace ptens{
       //int addr=p.first+1;
       //int len=p.second-1;
       int addr=dir(i,0);
-      int len=dir(i,1);
-      assert(len>=0);
+      int len=dir(i,1)-1;
+      PTENS_ASSRT(len>=0);
       vector<int> R(len);
-      for(int i=0; i<len; i++)
-	R[i]=arr[addr+i];
+      for(int i=0; i<len; i++){
+	R[i]=arr[addr+i+1];
+      }
       return R;
     }
 
