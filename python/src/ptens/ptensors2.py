@@ -240,7 +240,7 @@ class Ptensors2_ReLUFn(torch.autograd.Function):
     @staticmethod
     def backward(ctx,g):
         ctx.x.add_ReLU_back(ctx.r.gradp(),ctx.alpha)
-        return ptensors0.dummy(), None
+        return ptensors2.dummy(), None
 
 
 class Ptensors2_inpFn(torch.autograd.Function):
