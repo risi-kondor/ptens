@@ -194,7 +194,7 @@ class Ptensors1_ReLUFn(torch.autograd.Function):
     
     @staticmethod
     def forward(ctx,x,alpha):
-        R=ptens.ptensors1.zeros(x.obj.view_of_atoms(),x.obj.get_nc().x.obj.get_dev())
+        R=ptens.ptensors1.zeros(x.obj.view_of_atoms(),x.obj.get_nc(),x.obj.get_dev())
         R.obj.add_ReLU(x.obj,alpha)
         ctx.x=x.obj
         ctx.alpha=alpha
@@ -204,7 +204,7 @@ class Ptensors1_ReLUFn(torch.autograd.Function):
     @staticmethod
     def backward(ctx,g):
         ctx.x.add_ReLU_back(ctx.r.gradp(),ctx.alpha)
-        return ptensors0.dummy(), None
+        return ptensors1.dummy(), None
 
 
 class Ptensors1_inpFn(torch.autograd.Function):
