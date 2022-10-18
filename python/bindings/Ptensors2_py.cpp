@@ -10,8 +10,8 @@ pybind11::class_<Ptensors2,cnine::RtensorPack>(m,"ptensors2")
       return Ptensors2::raw(AtomsPack(v),_nc,_dev);}, py::arg("atoms"),py::arg("nc"),py::arg("device")=0)
   .def_static("zero",[](const vector<vector<int> >& v, const int _nc, const int _dev){
       return Ptensors2::zero(AtomsPack(v),_nc,_dev);}, py::arg("atoms"),py::arg("nc"),py::arg("device")=0)
-  .def_static("gaussian",[](const vector<vector<int> >& v, const int _nc, const int _dev){
-      return Ptensors2::gaussian(AtomsPack(v),_nc,_dev);}, py::arg("atoms"),py::arg("nc"),py::arg("device")=0)
+  .def_static("gaussian",[](const vector<vector<int> >& v, const int _nc, const float sigma, const int _dev){
+      return Ptensors2::gaussian(AtomsPack(v),_nc,sigma,_dev);}, py::arg("atoms"),py::arg("nc"),py::arg("sigma"),py::arg("device")=0)
   .def_static("sequential",[](const vector<vector<int> >& v, const int _nc, const int _dev){
       return Ptensors2::sequential(AtomsPack(v),_nc,_dev);}, py::arg("atoms"),py::arg("nc"),py::arg("device")=0)
 
@@ -19,8 +19,8 @@ pybind11::class_<Ptensors2,cnine::RtensorPack>(m,"ptensors2")
       return Ptensors2::raw(_atoms,_nc,_dev);}, py::arg("atoms"),py::arg("nc"),py::arg("device")=0)
   .def_static("zero",[](const AtomsPack& _atoms, const int _nc, const int _dev){
       return Ptensors2::zero(_atoms,_nc,_dev);}, py::arg("atoms"),py::arg("nc"),py::arg("device")=0)
-  .def_static("gaussian",[](const AtomsPack& _atoms, const int _nc, const int _dev){
-      return Ptensors2::gaussian(_atoms,_nc,_dev);}, py::arg("atoms"),py::arg("nc"),py::arg("device")=0)
+  .def_static("gaussian",[](const AtomsPack& _atoms, const int _nc, const float sigma, const int _dev){
+      return Ptensors2::gaussian(_atoms,_nc,sigma,_dev);}, py::arg("atoms"),py::arg("nc"),py::arg("sigma"),py::arg("device")=0)
   .def_static("sequential",[](const AtomsPack& _atoms, const int _nc, const int _dev){
       return Ptensors2::sequential(_atoms,_nc,_dev);}, py::arg("atoms"),py::arg("nc"),py::arg("device")=0)
 

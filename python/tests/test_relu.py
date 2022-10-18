@@ -15,7 +15,7 @@ class TestReLU(object):
         loss.backward(torch.tensor(1.0))
         xgrad=x.get_grad()
 
-        xeps = x.randn_like()
+        xeps = x.randn_like(0.01)
         z = fn(x+xeps,_alpha)
         xloss = z.inp(testvec)
         assert(torch.allclose(xloss-loss,xeps.inp(xgrad),rtol=1e-3, atol=1e-4))

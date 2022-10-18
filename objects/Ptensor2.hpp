@@ -45,6 +45,9 @@ namespace ptens{
     static Ptensor2 gaussian(const Atoms& _atoms, const int nc, const int _dev=0){
       return Ptensor2(_atoms,nc,cnine::fill_gaussian(),_dev);}
 
+    static Ptensor2 gaussian(const Atoms& _atoms, const int nc, const float sigma, const int _dev){
+      return Ptensor2(_atoms,nc,cnine::fill_gaussian(sigma),_dev);}
+
     static Ptensor2 sequential(const Atoms& _atoms, const int nc, const int _dev=0){
       return Ptensor2(_atoms,nc,cnine::fill_sequential(),_dev);}
 

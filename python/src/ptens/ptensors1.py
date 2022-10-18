@@ -32,9 +32,9 @@ class ptensors1(torch.Tensor):
         return R
 
     @classmethod
-    def randn(self, _atoms, _nc, _dev=0):
+    def randn(self, _atoms, _nc, _sigma=1.0, _device=0):
         R=ptensors1(1)
-        R.obj=_ptensors1.gaussian(_atoms,_nc,_dev)
+        R.obj=_ptensors1.gaussian(_atoms,_nc,_sigma,ptens.device_id(_device))
         return R
 
     @classmethod
@@ -82,8 +82,8 @@ class ptensors1(torch.Tensor):
     def push_back(self, x):
         return self.obj.push_back(x)
 
-    def randn_like(self):
-        return ptensors1.randn(self.get_atoms(),self.get_nc(),self.get_dev())
+    def randn_like(self,sigma=1.0):
+        return ptensors1.randn(self.get_atoms(),self.get_nc(),sigma,self.get_dev())
 
     def torch(self):
         return Ptensors1_toMxFn.apply(self)

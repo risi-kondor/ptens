@@ -80,8 +80,14 @@ namespace ptens{
     static Ptensors1 gaussian(const int _n, const int _k, const int _nc, const int _dev=0){
       return Ptensors1(_n,_k,_nc,cnine::fill_gaussian(),_dev);}
 
+    static Ptensors1 gaussian(const int _n, const int _k, const int _nc, const float sigma, const int _dev){
+      return Ptensors1(_n,_k,_nc,cnine::fill_gaussian(sigma),_dev);}
+
     static Ptensors1 randn(const int _n, const int _k, const int _nc, const int _dev=0){
       return Ptensors1(_n,_k,_nc,cnine::fill_gaussian(),_dev);}
+
+    static Ptensors1 randn(const int _n, const int _k, const int _nc, const float sigma, const int _dev){
+      return Ptensors1(_n,_k,_nc,cnine::fill_gaussian(sigma),_dev);}
 
     static Ptensors1 sequential(const int _n, const int _k, const int _nc, const int _dev=0){
       Ptensors1 R(_n,_k,_nc,cnine::fill_raw(),0);
@@ -124,8 +130,20 @@ namespace ptens{
       return R;
     }
 
+    static Ptensors1 gaussian(const AtomsPack& _atoms, const int _nc, const float sigma, const int _dev){
+      Ptensors1 R(_nc,0);
+      for(int i=0; i<_atoms.size(); i++)
+	R.push_back(Ptensor1::gaussian(_atoms(i),_nc,sigma,0));
+      R.to_device(_dev);
+      return R;
+    }
+
     static Ptensors1 randn(const AtomsPack& _atoms, const int _nc, const int _dev=0){
       return Ptensors1::gaussian(_atoms,_nc,_dev);
+    }
+
+    static Ptensors1 randn(const AtomsPack& _atoms, const int _nc, const float sigma, const int _dev){
+      return Ptensors1::gaussian(_atoms,_nc,sigma,_dev);
     }
 
     static Ptensors1 sequential(const AtomsPack& _atoms, const int _nc, const int _dev=0){

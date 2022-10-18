@@ -32,9 +32,9 @@ class ptensors2(torch.Tensor):
         return R
 
     @classmethod
-    def randn(self, _atoms, _nc, _dev=0):
+    def randn(self, _atoms, _nc, _sigma=1.0, _device=0):
         R=ptensors2(1)
-        R.obj=_ptensors2.gaussian(_atoms,_nc,_dev)
+        R.obj=_ptensors2.gaussian(_atoms,_nc,_sigma,ptens.device_id(_device))
         return R
 
     @classmethod
@@ -43,8 +43,8 @@ class ptensors2(torch.Tensor):
         R.obj=_ptensors2.sequential(_atoms,_nc,_dev)
         return R
 
-    def randn_like(self):
-        return ptensors2.randn(self.get_atoms(),self.get_nc(),self.get_dev())
+    def randn_like(self,sigma=1.0):
+        return ptensors2.randn(self.get_atoms(),self.get_nc(),sigma,self.get_dev())
 
 
     # ----- Access -------------------------------------------------------------------------------------------
