@@ -1,6 +1,8 @@
 pybind11::class_<Ptensors1,cnine::RtensorPack>(m,"ptensors1")
 
   .def(pybind11::init<const Ptensors1&>())
+  .def(pybind11::init<const at::Tensor&, const AtomsPack&>())
+  .def(pybind11::init<const at::Tensor&, const vector<vector<int> >& >())
 
   .def_static("dummy",[]() {return Ptensors1(0,0);})
 
@@ -54,6 +56,7 @@ pybind11::class_<Ptensors1,cnine::RtensorPack>(m,"ptensors1")
   .def("view_of_atoms",&Ptensors1::view_of_atoms)
 
   .def("__getitem__",[](const Ptensors1& x, const int i){return x(i);})
+  .def("torch",[](const Ptensors1& x){return x.tensor().torch();})
 
   .def("atoms_of",[](const Ptensors1& x, const int i){return vector<int>(x.atoms_of(i));})
   .def("push_back",&Ptensors1::push_back)

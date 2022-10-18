@@ -177,15 +177,16 @@ namespace ptens{
       RtensorPack(std::move(x)), atoms(_atoms), nc(_nc){}
 
     Ptensors2(const rtensor& A, const AtomsPack& _atoms):
-      RtensorPack(A), atoms(_atoms){
+      RtensorPack(A,_atoms.dims2(A.dim(1))), atoms(_atoms){
       nc=A.dim(1);
     }
 
     #ifdef _WITH_ATEN
     Ptensors2(const at::Tensor& T, const AtomsPack& _atoms):
-      RtensorPack(rtensor(T)), atoms(_atoms){
-      nc=dim_of(0,0);
-    }
+      Ptensors2(rtensor(T),_atoms){}
+    //RtensorPack(rtensor(T),_atoms.dims1(A.dim(1))), atoms(_atoms){
+    //nc=dim_of(0,0);
+    //}
     #endif 
 
     //rtensor view_as_matrix() const{

@@ -133,7 +133,21 @@ namespace ptens{
 	t+=size_of(i)*size_of(i);
       return t;
     }
-    
+
+    cnine::array_pool<int> dims1(const int nc) const{
+      array_pool<int> R;
+      for(int i=0; i<size(); i++)
+	R.push_back({size_of(i),nc});
+      return R;
+    }
+
+    cnine::array_pool<int> dims2(const int nc) const{
+      array_pool<int> R;
+      for(int i=0; i<size(); i++)
+	R.push_back({size_of(i),size_of(i),nc});
+      return R;
+    }
+
 
   public: // ---- Operations ---------------------------------------------------------------------------------
 

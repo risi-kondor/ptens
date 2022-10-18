@@ -10,6 +10,10 @@ import ptens.ptensors2
 class ptensors1(torch.Tensor):
 
     @classmethod
+    def from_matrix(self,T,atoms):
+        return Ptensors1_fromMxFn.apply(T,atoms)
+
+    @classmethod
     def dummy(self):
         R=ptensors1(1)
         R.obj=_ptensors1.dummy()
@@ -80,6 +84,9 @@ class ptensors1(torch.Tensor):
 
     def randn_like(self):
         return ptensors1.randn(self.get_atoms(),self.get_nc(),self.get_dev())
+
+    def torch(self):
+        return Ptensors1_toMxFn.apply(self)
 
     def to(self, _device='cpu'):
         self.obj.to_device(ptens.device_id(_device))
@@ -156,6 +163,34 @@ class ptensors1(torch.Tensor):
 
 # ------------------------------------------------------------------------------------------------------------
 
+
+class Ptensors1_fromMxFn(torch.autograd.Function):
+
+    @staticmethod
+    def forward(ctx,x,atoms):
+        R=ptensors1(1)
+        R.obj=_ptensors1(x,atoms)
+        ctx.r=R.obj
+        return R
+
+    @staticmethod
+    def backward(ctx,g):
+        return ctx.r.get_grad().torch(), None
+
+
+class Ptensors1_toMxFn(torch.autograd.Function):
+
+    @staticmethod
+    def forward(ctx,x):
+        ctx.x=x.obj
+        return x.obj.torch()
+ 
+    @staticmethod
+    def backward(ctx,g):
+       R=ptensors1(1)
+       ctx.x.add_to_grad(_ptensors1(g,ctx.x.get_atoms()))
+       return R
+    
 
 class Ptensors1_getFn(torch.autograd.Function):
 

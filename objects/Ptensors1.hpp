@@ -186,15 +186,16 @@ namespace ptens{
     //}
 
     Ptensors1(const rtensor& A, const AtomsPack& _atoms):
-      RtensorPack(A), atoms(_atoms){
+      RtensorPack(A,_atoms.dims1(A.dim(1))), atoms(_atoms){
       nc=A.dim(1);
     }
 
     #ifdef _WITH_ATEN
     Ptensors1(const at::Tensor& T, const AtomsPack& _atoms):
-      RtensorPack(rtensor(T)), atoms(_atoms){
-      nc=dim_of(0,0);
-    }
+      Ptensors1(rtensor(T),_atoms){}
+    //RtensorPack(rtensor(T),_atoms.dims1(A.dim(1))), atoms(_atoms){
+    //nc=dim_of(0,0);
+    //}
     #endif 
 
 
