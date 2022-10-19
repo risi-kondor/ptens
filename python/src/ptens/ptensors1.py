@@ -326,7 +326,7 @@ class Ptensors1_linearFn(torch.autograd.Function):
     @staticmethod
     def backward(ctx,g):
         ctx.x.add_linear_back0(ctx.r.gradp(),ctx.y)
-        return ptensors0.dummy(), ctx.x.linear_back1(ctx.r.gradp()), ctx.x.linear_back2(ctx.r.gradp())
+        return ptensors1.dummy(), ctx.x.linear_back1(ctx.r.gradp()), ctx.x.linear_back2(ctx.r.gradp())
 
 
 class Ptensors1_Linmaps0Fn(torch.autograd.Function):

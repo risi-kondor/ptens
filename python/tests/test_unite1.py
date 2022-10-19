@@ -4,7 +4,7 @@ import ptens_base
 import pytest
 
 
-class TestUnite(object):
+class TestUnite1(object):
 
     def backprop(self,src,fn,N,_atoms,_nc):
         x=src.randn(_atoms,_nc)
