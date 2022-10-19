@@ -2,7 +2,8 @@
 #define _ptens_Ptensors2
 
 #include "Rtensor3_view.hpp"
-#include "Cgraph.hpp"
+
+//#include "Cgraph.hpp"
 #include "RtensorPackB.hpp"
 #include "AtomsPack.hpp"
 #include "AindexPack.hpp"

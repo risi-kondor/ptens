@@ -1,5 +1,7 @@
 #include "Cnine_base.cpp"
 #include "CnineSession.hpp"
+
+#include "LinmapFunctions.hpp"
 #include "MsgFunctions.hpp"
 
 using namespace ptens;
@@ -10,14 +12,10 @@ int main(int argc, char** argv){
 
   cnine_session session;
 
-  const int n=8;
-  Hgraph G=Hgraph::random(n,0.3);
-  cout<<G<<endl;
-
-  Ptensors0 x=Ptensors0::sequential(n,2);
-  cout<<x<<endl;
-
-  cout<<unite1(x,G)<<endl;
-  
+  auto A=Ptensor0::gaussian({0,1,2,3},3);
+  cout<<A<<endl;
+  cout<<linmaps0(A)<<endl;
+  cout<<linmaps1(A)<<endl;
+  cout<<linmaps2(A)<<endl;
 
 }

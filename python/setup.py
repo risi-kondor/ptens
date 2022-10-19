@@ -46,7 +46,8 @@ def main():
                      cwd + cnine_folder + '/objects/tensor_array/cell_maps',
                      cwd + cnine_folder + '/objects/tensor_array/cell_ops',
                      cwd + '/../include',
-                     cwd + '/../objects'
+                     cwd + '/../tensors',
+                     cwd + '/../layers'
                      ]
 
 

@@ -11,7 +11,8 @@ CNINE_CUDADIR=$(CNINE_ROOT)/cuda
 
 INCLUDEDIR=$(ROOTDIR)/include
 CUDADIR=$(ROOTDIR)/cuda
-OBJECTSDIR=$(ROOTDIR)/objects
+TENSORSDIR=$(ROOTDIR)/tensors
+LAYERSDIR=$(ROOTDIR)/layers
 
 CFLAGS= -std=c++14 -O3 # -ferror-limit=1  
 INCLUDE= -I $(ROOTDIR)/include 

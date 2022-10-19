@@ -1,5 +1,5 @@
-#ifndef _ptens_OuterFunctions
-#define _ptens_OuterFunctions
+#ifndef _ptens_OuterLayers
+#define _ptens_OuterLayers
 
 #include "Ptensor0.hpp"
 #include "Ptensor1.hpp"

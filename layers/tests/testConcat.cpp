@@ -1,7 +1,8 @@
 #include "Cnine_base.cpp"
 #include "CnineSession.hpp"
 #include "Hgraph.hpp"
-#include "ConcatFunctions.hpp"
+
+#include "ConcatLayers.hpp"
 
 
 using namespace ptens;

@@ -4,9 +4,8 @@
 
 #include "Cnine_base.cpp"
 
-//#include "Cgraph.hpp"
-//#include "GraphNhoods.hpp"
 #include "PtensSession.hpp"
+
 #include "Hgraph.hpp"
 #include "Ptensor0.hpp"
 #include "Ptensor1.hpp"
@@ -14,9 +13,15 @@
 #include "Ptensors0.hpp"
 #include "Ptensors1.hpp"
 #include "Ptensors2.hpp"
+
 #include "LinmapFunctions.hpp"
 #include "MsgFunctions.hpp"
-#include "OuterFunctions.hpp"
+
+#include "GatherLayers.hpp"
+#include "LinmapLayers.hpp"
+#include "EMPlayers.hpp"
+#include "OuterLayers.hpp"
+#include "ConcatLayers.hpp"
 
 
 ptens::PtensSession session;
