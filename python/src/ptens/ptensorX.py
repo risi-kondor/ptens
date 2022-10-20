@@ -9,20 +9,21 @@ def _ptensorX(order: int):
     return [_ptensor0,_ptensor1,_ptensor2][order]
 
 class ptensorX(torch.Tensor):
-    def __init__(self, value: torch.Tensor, atoms):
+    def __init__(self, order: int, value: torch.Tensor, atoms):
         super().__init__(value)
         self.atoms = atoms
+        self.order = order
     @staticmethod
-    def zeros(_atoms, _nc):
-        return ptensorX(torch.zeros(len(_atoms),len(_atoms),_nc),_atoms)
+    def zeros(order: int, _atoms, _nc):
+        return ptensorX(order, torch.zeros(len(_atoms),len(_atoms),_nc),_atoms)
     
     @staticmethod
-    def randn(_atoms, _nc):
-        return ptensorX(torch.randn(len(_atoms),len(_atoms),_nc),_atoms)
+    def randn(order: int, _atoms, _nc):
+        return ptensorX(order, torch.randn(len(_atoms),len(_atoms),_nc),_atoms)
 
     @staticmethod
-    def sequential(_atoms, _nc):
-        return ptensorX(torch.randn(len(_atoms),len(_atoms),_nc),_atoms)
+    def sequential(order: int, _atoms, _nc):
+        return ptensorX(order, torch.randn(len(_atoms),len(_atoms),_nc),_atoms)
 
 
     # ---- Access --------------------------------------------------------------------------------------------
@@ -67,7 +68,7 @@ class PtensorX_LinmapsYFn(torch.autograd.Function):
             [ 1, 2,  5],
             [ 2, 5, 15],
         ][x.order,target_order]
-        R = ptensorX.zeros(x.atoms,mult_factor*x.get_nc())
+        R = ptensorX.zeros(target_order,x.atoms,mult_factor*x.get_nc())
         u=_ptensorX(x.order).view(x,x.atoms)
         r=_ptensorX(target_order).view(R,R.atoms)
         [
@@ -80,7 +81,7 @@ class PtensorX_LinmapsYFn(torch.autograd.Function):
         
     @staticmethod
     def backward(ctx,g):
-        R = ptensorX.zeros(g.atoms,g.get_nc()/ctx.mult_factor)
+        R = ptensorX.zeros(target_order,g.atoms,g.get_nc()/ctx.mult_factor)
         u=_ptensorX(g.order).view(g,g.atoms)
         r=_ptensorX(ctx.order).view(R,R.atoms)
         ptens_base.add_linmaps2to0_back(r,u)
