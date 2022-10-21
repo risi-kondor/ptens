@@ -10,19 +10,23 @@
 
 namespace ptens{
 
+
   class Hgraph: public cnine::SparseRmatrix{
   public:
 
+    typedef cnine::CSRmatrix GatherMap;
+
     using cnine::SparseRmatrix::SparseRmatrix;
 
+    mutable GatherMap* gmap=nullptr; 
     mutable vector<AtomsPack*> _nhoods; 
-
     mutable Hgraph* _reverse=nullptr;
 
     ~Hgraph(){
       // if(_reverse) delete _reverse; // hack!
       for(auto p:_nhoods)
 	delete p;
+      if(gmap) delete gmap;
     }
 
 
@@ -66,6 +70,10 @@ namespace ptens{
       return *_reverse;
     }
 
+    const GatherMap& get_gmap() const{
+      if(!gmap) gmap=new GatherMap(CSRmatrix());
+      return *gmap;
+    }
 
     void forall_edges(std::function<void(const int, const int, const float)> lambda, const bool self=0) const{
       for(auto& p: lists){

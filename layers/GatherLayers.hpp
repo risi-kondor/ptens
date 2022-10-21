@@ -9,12 +9,20 @@
 
 namespace ptens{
 
+  #ifdef _WITH_CUDA
+  extern void Ptensors0_gather_cu(cnine::RtensorPack& R,const cnine::RtensorPack& x, cnine::CSRmatrix& gmap, const cudaStream_t& stream);
+  #endif 
+
+
   void add_gather(Ptensors0& r, const Ptensors0& x, const Hgraph& G){
     PTENS_ASSRT(G.n==r.size());
     PTENS_ASSRT(G.m==x.size());
-    G.forall_edges([&](const int i, const int j, const float v){
-	r.view_of_tensor(i).add(x.view_of_tensor(j),v);
-      });
+    if(dev==0){
+      G.forall_edges([&](const int i, const int j, const float v){
+	  r.view_of_tensor(i).add(x.view_of_tensor(j),v);
+	});
+    }
+    GPUCODE(CUDA_STREAM(Ptensors0_gather_cu(r,x,G.get_gmap(),stream)));
   }
 
   Ptensors0 gather(const Ptensors0& x, const Hgraph& G){
