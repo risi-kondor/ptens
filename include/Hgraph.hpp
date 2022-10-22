@@ -6,6 +6,7 @@
 #include "SparseRmatrix.hpp"
 #include "AtomsPack.hpp"
 #include "AindexPack.hpp"
+#include "GatherMap.hpp"
 
 
 namespace ptens{
@@ -14,19 +15,20 @@ namespace ptens{
   class Hgraph: public cnine::SparseRmatrix{
   public:
 
-    typedef cnine::CSRmatrix GatherMap;
 
     using cnine::SparseRmatrix::SparseRmatrix;
 
-    mutable GatherMap* gmap=nullptr; 
-    mutable vector<AtomsPack*> _nhoods; 
     mutable Hgraph* _reverse=nullptr;
+    mutable cnine::CSRmatrix<float>* gmap=nullptr; 
+    mutable cnine::GatherMap* bmap=nullptr;
+    mutable vector<AtomsPack*> _nhoods; 
 
     ~Hgraph(){
       // if(_reverse) delete _reverse; // hack!
       for(auto p:_nhoods)
 	delete p;
       if(gmap) delete gmap;
+      if(bmap) delete bmap;
     }
 
 
@@ -70,10 +72,16 @@ namespace ptens{
       return *_reverse;
     }
 
-    const GatherMap& get_gmap() const{
-      if(!gmap) gmap=new GatherMap(CSRmatrix());
+    const cnine::CSRmatrix<float>& get_gmap() const{
+      if(!gmap) gmap=new cnine::CSRmatrix<float>(CSRmatrix());
       return *gmap;
     }
+
+    const cnine::GatherMap& get_bmap() const{
+      if(!bmap) bmap=new cnine::GatherMap(broadcast_map());
+      return *bmap;
+    }
+
 
     void forall_edges(std::function<void(const int, const int, const float)> lambda, const bool self=0) const{
       for(auto& p: lists){
@@ -141,7 +149,39 @@ namespace ptens{
 	  in_indices.push_back(j,in(common));
 	  out_indices.push_back(i,out(common));
 	}, self);
+      out_indices.bmap=&get_bmap();
       return make_pair(in_indices, out_indices);
+    }
+
+
+    cnine::GatherMap broadcast_map() const{
+      int nlists=0;
+      int nedges=0;
+      for(auto q:lists)
+	if(q.second->size()>0){
+	  nlists++;
+	  nedges+=q.second->size();
+	}
+
+      cnine::GatherMap R(nlists,nedges);
+      int i=0;
+      int tail=3*nlists;
+      for(auto q:lists){
+	int len=q.second->size();
+	if(len==0) continue;
+	R.arr[3*i]=tail;
+	R.arr[3*i+1]=len;
+	R.arr[3*i+2]=q.first;
+	int j=0;
+	for(auto p:*q.second){
+	  R.arr[tail+2*j]=p.first;
+	  *reinterpret_cast<float*>(R.arr+tail+2*j+1)=p.second;
+	  j++;
+	}
+	tail+=2*len;
+	i++;
+      }
+      return R;
     }
 
 

@@ -20,6 +20,8 @@ int main(int argc, char** argv){
   CSRmatrix<float> Md=M.CSRmatrix();
   cout<<Md<<endl;
 
+  GatherMap Mg=M.broadcast_map();
+  cout<<Mg<<endl;
   //for(int i=0; i<5; i++)
   //cout<<M.nhoods(i)<<endl;
 

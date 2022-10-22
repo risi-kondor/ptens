@@ -39,15 +39,25 @@ __global__ void Ptensors0_broadcast0_kernel(float* xarr, const int* xdir, const 
 }
 
 
-__global__ void Ptensors0_broadcast0_kernel(float* xarr, const int* xdir, const int* xiarr, const int* xidir, const float* rarr, const int* rdir){
-  const int i=blockIdx.x;
+__global__ void Ptensors0_broadcast0_kernel(float* xarr, const int* xdir, const int* xiarr, const int* xidir, const float* rarr, const int* rdir, const int* bmap){
+  const int b=blockIdx.x;
   const int c=threadIdx.x;
-  //const int tix=xiarr[xidir[2*i]];
-  xarr[xdir[2*i]+c]+=rarr[rdir[2*i]+c];
+
+  const int boffs=bmap[3*b];
+  const int N=bmap[3*b+1];
+  const int target=bmap[3*b+2];
+
+  float t=0;
+  for(int j=0; j<N; j++){
+    const int src=bmap[boffs+2*j];
+    const float w=*reinterpret_cast<float*>(bmap+boffs+2*j+1);
+    t+=w*rarr[rdir[2*src]+c];
+  }
+  xarr[xdir[2*target]+c]+=t;
 }
 
 
-__global__ void Ptensors0_gather_kernel(float* rarr, const int* rdir, const float* xarr, const int* xdir, const float* marr, const int* mdir){
+__global__ void Ptensors0_gather_kernel(float* arr, const int* rdir, const float* xarr, const int* xdir, const float* marr, const int* mdir){
   const int i=blockIdx.x;
   const int c=threadIdx.x;
 
@@ -89,15 +99,17 @@ namespace ptens{
     int dev=R.dev;
     PTENS_ASSRT(R.dev==1);
     PTENS_ASSRT(x.dev==1);
-    Ptensors0_broadcast0_kernel<<<R.size(),std::max(32,x.dim_of(0,0)),0,stream>>>(x.arrg+offs,x.dir.garr(dev),R.arrg,R.dir.garr(dev));
+    Ptensors0_broadcast0_kernel<<<R.size(),std::max(32,x.dim_of(0,0)),0,stream>>>
+      (x.arrg+offs,x.dir.garr(dev),R.arrg,R.dir.garr(dev));
   }
 
-  void Ptensors0_broadcast0_cu(cnine::RtensorPack& R, const cnine::RtensorPack& x, const AindexPack& list, const int offs, const cudaStream_t& stream){
+  void Ptensors0_broadcast0_cu(cnine::RtensorPack& x, const cnine::RtensorPack& R, const AindexPack& list, const int offs, const cudaStream_t& stream){
     int dev=R.dev;
     PTENS_ASSRT(R.dev==1);
     PTENS_ASSRT(x.dev==1);
     PTENS_ASSRT(list.dev==1); // why the order??
-    Ptensors0_broadcast0_kernel<<<R.size(),std::max(32,x.dim_of(0,0)),0,stream>>>(x.arrg+offs,x.dir.garr(dev),list.arrg,list.dir.garr(dev),R.arrg,R.dir.garr(dev));
+    Ptensors0_broadcast0_kernel<<<R.size(),std::max(32,x.dim_of(0,0)),0,stream>>>
+      (x.arrg+offs,x.dir.garr(dev),list.arrg,list.dir.garr(dev),R.arrg,R.dir.garr(dev),list.get_barr(1));
   }
 
   void Ptensors0_gather_cu(cnine::RtensorPack& r, const cnine::RtensorPack& x, const cnine::RtensorPack& gmap, const cudaStream_t& stream){
@@ -105,7 +117,7 @@ namespace ptens{
     PTENS_ASSRT(r.dev==1);
     PTENS_ASSRT(x.dev==1);
     gmap.to_device(1);
-    Ptensors0_gather_kernel<<<R.size(),std::max(32,x.dim_of(0,0)),0,stream>>>
+    Ptensors0_gather_kernel<<<R.size(),x.dim_of(0,0),0,stream>>>
       (r.arrg,r.dir.garr(dev),x.arrg,x.dir.garr(dev),gmap.arrg,gmap.dir.garr(dev));
   }
 

@@ -89,6 +89,7 @@ namespace cnine{
 	oss<<"("<<*reinterpret_cast<int*>(arr+2*i)<<","<<arr[2*i+1]<<")";
 	if(i<n-1) oss<<",";
       }
+      oss<<")";
       return oss.str();
     }
     
@@ -127,6 +128,7 @@ namespace cnine{
 
     CSRmatrix& operator=(const CSRmatrix<TYPE>& x){
       array_pool<TYPE>::operator=(x);
+      return *this;
     }
 
   
