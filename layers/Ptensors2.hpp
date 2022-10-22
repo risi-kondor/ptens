@@ -609,7 +609,7 @@ namespace ptens{
 	  view_of(i,offs+n,n)+=x.view3_of(i).transp01();
 	}
       }
-      GPUCODE(CUDA_STREAM(Ptensors2_broadcast2_cu(*this,x,list,stream)));
+      GPUCODE(CUDA_STREAM(Ptensors2_broadcast2_cu(*this,x,offs,stream)));
     }
 
     void broadcast2(const RtensorPack& x, const AindexPack& list){

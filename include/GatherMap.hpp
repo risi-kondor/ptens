@@ -141,7 +141,7 @@ namespace cnine{
 	std::copy(x.arr,x.arr+memsize,arr);
       }
       if(dev==1){
-	CUDA_SAFE(cudaMemcpy(arrg,x.arrg,asize*sizeof(float),cudaMemcpyDeviceToDevice));
+	CUDA_SAFE(cudaMemcpy(arrg,x.arrg,memsize*sizeof(float),cudaMemcpyDeviceToDevice));
       }
     }
 
@@ -169,7 +169,7 @@ namespace cnine{
       }
       if(dev==1){
 	CUDA_SAFE(cudaMalloc((void **)&arrg, (memsize)*sizeof(int)));
-	CUDA_SAFE(cudaMemcpy(arrg,x.arrg,asize*sizeof(float),cudaMemcpyDeviceToDevice));
+	CUDA_SAFE(cudaMemcpy(arrg,x.arrg,memsize*sizeof(float),cudaMemcpyDeviceToDevice));
       }
       return *this;
     }

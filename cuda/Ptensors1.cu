@@ -39,12 +39,12 @@ __global__ void Ptensors1_add_mprod(float* rarr, const int* rdir, const float* x
   const int ncr=rdir[3*q+2];
 
   const float* x=xarr+xdir[3*q];
-  const float* r=rarr+rdir[3*q];
+  float* r=rarr+rdir[3*q];
 
   for(int i=0; i<k; i++){
     float t=0;
-    float* xrow=x+i*ncx;
-    float* ycol=yarr+c;
+    const float* xrow=x+i*ncx;
+    const float* ycol=yarr+c;
     for(int j=0; j<ncx; j++)
       t+=xrow[j]*ycol[j*ncr];
     r[i*ncr+c]+=t;
@@ -171,15 +171,14 @@ __global__ void Ptensors1_broadcast0_kernel(float* xarr, const int* xdir, const 
   const int N=bmap[3*b+1];
   const int target=bmap[3*b+2];
 
-  const int k=load_indices(ix,xiarr,xidir,q);
+  const int k=load_indices(ix,xiarr,xidir,target);
   const int nc=xdir[3*target+2];
   if(c>=nc) return;
   __syncthreads();
 
-  const float t=0;
-  for(int s=0; s<N; s++){
-    float t+=rarr[rdir[2*bmap[boffs+2*s]]+c];
-  }
+  float t=0;
+  for(int s=0; s<N; s++)
+    t+=rarr[rdir[2*bmap[boffs+2*s]]+c];
 
   float* x=xarr+xdir[3*target]+c;
   for(int i=0; i<k; i++)

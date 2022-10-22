@@ -73,7 +73,7 @@ namespace ptens{
     }
 
     const cnine::CSRmatrix<float>& get_gmap() const{
-      if(!gmap) gmap=new cnine::CSRmatrix<float>(CSRmatrix());
+      if(!gmap) gmap=new cnine::CSRmatrix<float>(csrmatrix());
       return *gmap;
     }
 

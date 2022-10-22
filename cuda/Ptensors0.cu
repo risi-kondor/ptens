@@ -50,14 +50,14 @@ __global__ void Ptensors0_broadcast0_kernel(float* xarr, const int* xdir, const 
   float t=0;
   for(int j=0; j<N; j++){
     const int src=bmap[boffs+2*j];
-    const float w=*reinterpret_cast<float*>(bmap+boffs+2*j+1);
+    const float w=*reinterpret_cast<const float*>(bmap+boffs+2*j+1);
     t+=w*rarr[rdir[2*src]+c];
   }
   xarr[xdir[2*target]+c]+=t;
 }
 
 
-__global__ void Ptensors0_gather_kernel(float* arr, const int* rdir, const float* xarr, const int* xdir, const float* marr, const int* mdir){
+__global__ void Ptensors0_gather_kernel(float* rarr, const int* rdir, const float* xarr, const int* xdir, const float* marr, const int* mdir){
   const int i=blockIdx.x;
   const int c=threadIdx.x;
 
@@ -65,7 +65,7 @@ __global__ void Ptensors0_gather_kernel(float* arr, const int* rdir, const float
   const int N=mdir[2*i+1];
   float t=0;
   for(int j=0; j<N; j++){
-    const int jix=*reinterpret_cast<int*>(marr+moffs+2*j);
+    const int jix=*reinterpret_cast<const int*>(marr+moffs+2*j);
     const int jweight=marr[moffs+2*j+1];
     t+=jweight*xarr[xdir[2*jix]+c];
   }
@@ -116,8 +116,8 @@ namespace ptens{
     int dev=r.dev;
     PTENS_ASSRT(r.dev==1);
     PTENS_ASSRT(x.dev==1);
-    gmap.to_device(1);
-    Ptensors0_gather_kernel<<<R.size(),x.dim_of(0,0),0,stream>>>
+    const_cast<cnine::RtensorPack&>(gmap).to_device(1);
+    Ptensors0_gather_kernel<<<r.size(),x.dim_of(0,0),0,stream>>>
       (r.arrg,r.dir.garr(dev),x.arrg,x.dir.garr(dev),gmap.arrg,gmap.dir.garr(dev));
   }
 
