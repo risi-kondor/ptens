@@ -1,26 +1,25 @@
 import torch
 import ptens as p
-import ptens_base 
 import pytest
 
 
 class TestUnite1(object):
 
     def backprop(self,src,fn,N,_atoms,_nc):
-        x=src.randn(_atoms,_nc).to('cuda')
+        x=src.randn(_atoms,_nc)
 
         x.requires_grad_()
         G=p.graph.random(N,0.6)
-        z=fn(x,G).to('cuda')
+        z=fn(x,G)
         
-        testvec=z.randn_like().to('cuda')
-        loss=z.inp(testvec).to('cuda')
+        testvec=z.randn_like()
+        loss=z.inp(testvec).cuda()
         loss.backward(torch.tensor(1.0))
         xgrad=x.get_grad()
 
-        xeps=x.randn_like().to('cuda')
-        z=fn(x+xeps,G).to('cuda')
-        xloss=z.inp(testvec).to('cuda')
+        xeps=x.randn_like()
+        z=fn(x+xeps,G).cuda()
+        xloss=z.inp(testvec).cuda()
         assert(torch.allclose(xloss-loss,xeps.inp(xgrad),rtol=1e-3, atol=1e-4))
 
 

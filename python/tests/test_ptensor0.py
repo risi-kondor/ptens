@@ -10,14 +10,15 @@ class TestPtensor0(object):
         z=fn(x)
         
         testvec=fn(pt.randn(_atoms,_nc))
-        loss=z.inp(testvec)
+        
+        loss=torch.dot(torch.tensor(z), torch.tensor(testvec))
         loss.backward(torch.tensor(1.0))
         xgrad=x.get_grad()
 
         xeps=pt.randn(_atoms,_nc)
         z=fn(x+xeps)
-        xloss=z.inp(testvec)
-        assert(torch.allclose(xloss-loss,xeps.inp(xgrad),rtol=1e-3, atol=1e-4))
+        xloss=torch.dot(torch.tensor(z), torch.tensor(testvec))
+        assert(torch.allclose(xloss-loss,torch.dot(torch.tensor(xeps), torch.tensor(xgrad)),rtol=1e-3, atol=1e-4))
 
 
     @pytest.mark.parametrize('nc', [1, 2, 4])

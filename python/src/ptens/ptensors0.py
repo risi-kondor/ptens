@@ -148,11 +148,11 @@ class ptensors0(torch.Tensor):
         return Ptensors0_GatherFn.apply(self,G)
 
     def outer(self,y):
-        if isinstance(y,ptensors0):
+        if isinstance(y,ptens.ptensors0):
             return Ptensors0_Outer0Fn.apply(self,y)
-        if isinstance(y,ptensors1):
+        if isinstance(y,ptens.ptensors1):
             return Ptensors0_Outer1Fn.apply(self,y)
-        if isinstance(y,ptensors2):
+        if isinstance(y,ptens.ptensors2):
             return Ptensors0_Outer2Fn.apply(self,y)
 
 
