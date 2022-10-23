@@ -9,6 +9,7 @@
 #include "Ptens_base.hpp"
 #include "RtensorPack.hpp"
 #include "AindexPack.hpp"
+#include "CSRmatrix.hpp"
 //#include "Ptensors0.hpp"
 //#include "Rtensor2_view.hpp"
 //#include "Rtensor3_view.hpp"
@@ -62,7 +63,7 @@ __global__ void Ptensors0_gather_kernel(float* rarr, const int* rdir, const floa
   const int c=threadIdx.x;
 
   const int moffs=mdir[2*i];
-  const int N=mdir[2*i+1];
+  const int N=mdir[2*i+1]/2;
   float t=0;
   for(int j=0; j<N; j++){
     const int jix=*reinterpret_cast<const int*>(marr+moffs+2*j);
@@ -99,7 +100,7 @@ namespace ptens{
     int dev=R.dev;
     PTENS_ASSRT(R.dev==1);
     PTENS_ASSRT(x.dev==1);
-    Ptensors0_broadcast0_kernel<<<R.size(),std::max(32,x.dim_of(0,0)),0,stream>>>
+    Ptensors0_broadcast0_kernel<<<R.size(),x.dim_of(0,0),0,stream>>>
       (x.arrg+offs,x.dir.garr(dev),R.arrg,R.dir.garr(dev));
   }
 
@@ -107,16 +108,16 @@ namespace ptens{
     int dev=R.dev;
     PTENS_ASSRT(R.dev==1);
     PTENS_ASSRT(x.dev==1);
-    PTENS_ASSRT(list.dev==1); // why the order??
-    Ptensors0_broadcast0_kernel<<<R.size(),std::max(32,x.dim_of(0,0)),0,stream>>>
+    PTENS_ASSRT(list.dev==1);
+    Ptensors0_broadcast0_kernel<<<R.size(),x.dim_of(0,0),0,stream>>>
       (x.arrg+offs,x.dir.garr(dev),list.arrg,list.dir.garr(dev),R.arrg,R.dir.garr(dev),list.get_barr(1));
   }
 
-  void Ptensors0_gather_cu(cnine::RtensorPack& r, const cnine::RtensorPack& x, const cnine::RtensorPack& gmap, const cudaStream_t& stream){
+  void Ptensors0_gather_cu(cnine::RtensorPack& r, const cnine::RtensorPack& x, const cnine::CSRmatrix<float>& gmap, const cudaStream_t& stream){
     int dev=r.dev;
     PTENS_ASSRT(r.dev==1);
     PTENS_ASSRT(x.dev==1);
-    const_cast<cnine::RtensorPack&>(gmap).to_device(1);
+    const_cast<cnine::CSRmatrix<float>&>(gmap).to_device(dev);
     Ptensors0_gather_kernel<<<r.size(),x.dim_of(0,0),0,stream>>>
       (r.arrg,r.dir.garr(dev),x.arrg,x.dir.garr(dev),gmap.arrg,gmap.dir.garr(dev));
   }

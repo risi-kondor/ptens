@@ -512,9 +512,11 @@ namespace ptens{
     }
 
     void broadcast1(const RtensorPack& x, const int offs){
-      const int n=x.dim_of(0,1);
-      for(int i=0; i<size(); i++){
-	view_of(i,offs,n)+=x.view2_of(i);
+      if(dev==0){
+	const int n=x.dim_of(0,1);
+	for(int i=0; i<size(); i++){
+	  view_of(i,offs,n)+=x.view2_of(i);
+	}
       }
       GPUCODE(CUDA_STREAM(Ptensors1_broadcast1_cu(*this,x,offs,stream)));
     }

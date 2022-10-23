@@ -151,6 +151,8 @@ __global__ void Ptensors1_broadcast0_kernel(float* xarr, const int* xdir, const 
   const int c=threadIdx.x;
   const int k=xdir[3*q+1];
   const int nc=xdir[3*q+2];
+  const int rnc=rdir[2*q+1];
+  if(c>=rnc) return;
 
   float* x=xarr+xdir[3*q]+c;
   const float t=rarr[rdir[2*q]+c];
@@ -191,11 +193,13 @@ __global__ void Ptensors1_broadcast1_kernel(float* xarr, const int* xdir, const 
   const int c=threadIdx.x;
   const int k=xdir[3*q+1];
   const int nc=xdir[3*q+2];
+  const int rnc=rdir[3*q+2];
+  if(c>=rnc) return;
 
   float* x=xarr+xdir[3*q]+c;
   const float* r=rarr+rdir[3*q]+c;
   for(int i=0; i<k; i++)
-    x[i*nc]+=r[i*nc]; // maybe rnc instead of nc?
+    x[i*nc]+=r[i*rnc];
 }
 
 
@@ -219,16 +223,19 @@ __global__ void Ptensors1_broadcast1_kernel(float* xarr, const int* xdir, const 
 
 // -----------------------------------------------------------------------------------------------------------
 
+
 namespace ptens{
 
-  void Ptensors1_reduce0_cu(cnine::RtensorPack& R, const cnine::RtensorPack& x, int offs, int n, const cudaStream_t& stream){
+  void Ptensors1_reduce0_cu(cnine::RtensorPack& R, const cnine::RtensorPack& x, 
+    int offs, int n, const cudaStream_t& stream){
     int dev=R.dev;
     PTENS_ASSRT(R.dev==1);
     PTENS_ASSRT(x.dev==1);
-    Ptensors1_reduce0_kernel<<<R.size(),std::max(32,n),0,stream>>>(R.arrg,R.dir.garr(dev),x.arrg+offs,x.dir.garr(dev));
+    Ptensors1_reduce0_kernel<<<R.size(),n,0,stream>>>(R.arrg,R.dir.garr(dev),x.arrg+offs,x.dir.garr(dev));
   }
 
-  void Ptensors1_reduce0_cu(cnine::RtensorPack& R, const cnine::RtensorPack& x, const AindexPack& list, int offs, int n, const cudaStream_t& stream){
+  void Ptensors1_reduce0_cu(cnine::RtensorPack& R, const cnine::RtensorPack& x, const AindexPack& list, 
+    int offs, int n, const cudaStream_t& stream){
     int dev=R.dev;
     PTENS_ASSRT(R.dev==1);
     PTENS_ASSRT(x.dev==1);
@@ -236,14 +243,16 @@ namespace ptens{
     Ptensors1_reduce0_kernel<<<R.size(),std::max(n,32),32,stream>>>(R.arrg,R.dir.garr(dev),x.arrg+offs,x.dir.garr(dev),list.arrg,list.dir.garr(dev));
   }
 
-  void Ptensors1_reduce1_cu(cnine::RtensorPack& R, const cnine::RtensorPack& x, int offs, int n, const cudaStream_t& stream){
+  void Ptensors1_reduce1_cu(cnine::RtensorPack& R, const cnine::RtensorPack& x, 
+    int offs, int n, const cudaStream_t& stream){
     int dev=R.dev;
     PTENS_ASSRT(R.dev==1);
     PTENS_ASSRT(x.dev==1);
-    Ptensors1_reduce1_kernel<<<R.size(),std::max(n,32),0,stream>>>(R.arrg,R.dir.garr(dev),x.arrg+offs,x.dir.garr(dev));
+    Ptensors1_reduce1_kernel<<<R.size(),n,0,stream>>>(R.arrg,R.dir.garr(dev),x.arrg+offs,x.dir.garr(dev));
   }
 
-  void Ptensors1_reduce1_cu(cnine::RtensorPack& R, const cnine::RtensorPack& x, const AindexPack& list, int offs, int n, const cudaStream_t& stream){
+  void Ptensors1_reduce1_cu(cnine::RtensorPack& R, const cnine::RtensorPack& x, const AindexPack& list, 
+    int offs, int n, const cudaStream_t& stream){
     int dev=R.dev;
     PTENS_ASSRT(R.dev==1);
     PTENS_ASSRT(x.dev==1);
@@ -252,7 +261,8 @@ namespace ptens{
   }
 
 
-  void Ptensors1_broadcast0_cu(cnine::RtensorPack& x, const cnine::RtensorPack& R, const int offs, const cudaStream_t& stream){
+  void Ptensors1_broadcast0_cu(cnine::RtensorPack& x, const cnine::RtensorPack& R, 
+    const int offs, const cudaStream_t& stream){
     int dev=R.dev;
     PTENS_ASSRT(R.dev==1);
     PTENS_ASSRT(x.dev==1);
@@ -260,7 +270,8 @@ namespace ptens{
     Ptensors1_broadcast0_kernel<<<R.size(),n,0,stream>>>(x.arrg+offs,x.dir.garr(dev),R.arrg,R.dir.garr(dev));
   }
 
-  void Ptensors1_broadcast0_cu(cnine::RtensorPack& x, const cnine::RtensorPack& R, const AindexPack& list, const int offs, const cudaStream_t& stream){
+  void Ptensors1_broadcast0_cu(cnine::RtensorPack& x, const cnine::RtensorPack& R, const AindexPack& list, 
+    const int offs, const cudaStream_t& stream){
     int dev=R.dev;
     PTENS_ASSRT(R.dev==1);
     PTENS_ASSRT(x.dev==1);
@@ -270,7 +281,8 @@ namespace ptens{
       (x.arrg+offs,x.dir.garr(dev),list.arrg,list.dir.garr(dev),R.arrg,R.dir.garr(dev),list.get_barr(1));
   }
 
-  void Ptensors1_broadcast1_cu(cnine::RtensorPack& x, const cnine::RtensorPack& R, const int offs, const cudaStream_t& stream){
+  void Ptensors1_broadcast1_cu(cnine::RtensorPack& x, const cnine::RtensorPack& R, 
+    const int offs, const cudaStream_t& stream){
     int dev=R.dev;
     PTENS_ASSRT(R.dev==1);
     PTENS_ASSRT(x.dev==1);
@@ -278,7 +290,8 @@ namespace ptens{
     Ptensors1_broadcast1_kernel<<<R.size(),n,0,stream>>>(x.arrg+offs,x.dir.garr(dev),R.arrg,R.dir.garr(dev));
   }
 
-  void Ptensors1_broadcast1_cu(cnine::RtensorPack& x, const cnine::RtensorPack& R, const AindexPack& list, const int offs, const cudaStream_t& stream){
+  void Ptensors1_broadcast1_cu(cnine::RtensorPack& x, const cnine::RtensorPack& R, const AindexPack& list, 
+    const int offs, const cudaStream_t& stream){
     int dev=R.dev;
     PTENS_ASSRT(R.dev==1);
     PTENS_ASSRT(x.dev==1);
