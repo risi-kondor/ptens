@@ -1,7 +1,8 @@
 #from ptens.ptensors0 import ptensors0
 #from ptens.ptensors1 import ptensors1
 #from ptens.ptensors2 import ptensors2
-from typing import Callable, Optional, Tuple, Union
+from turtle import back, forward
+from typing import Any, Callable, Optional, Tuple, Union
 import torch
 
 import ptens_base
@@ -210,93 +211,121 @@ class PtensorsX_ReLUFn(torch.autograd.Function):
         return ptensorsX.dummy(ctx.order), None
 
 # ----------------------- Binary Operators ---------------------------------- #
-class PtensorsX_addFn(torch.autograd.Function):
+class PtensorsX_BOP(torch.autograd.Function):
+    @staticmethod
+    def forward_helper(ctx, left_op : ptensorsX, right_op : ptensorsX, result : ptensorsX = None) -> Union[ptensorsX,None]:
+        ctx.left_op, ctx.right_op, ctx.order \
+            = left_op.obj, right_op.obj, left_op.order
+        ctx.result = None if result is None else result.obj
+        return result
+    @staticmethod
+    def backward_helper(ctx, back_op : Callable[[Union[_ptensors0,_ptensors1,_ptensors2],Union[_ptensors0,_ptensors1,_ptensors2],Union[_ptensors0,_ptensors1,_ptensors2]],Union[None,Any]]):
+        ret = back_op(ctx.left_op, ctx.right_op, ctx.r)
+        return (ptensorsX.dummy(ctx.order), ptensorsX.dummy(ctx.order)) \
+            if ret is None else ret 
+
+class PtensorsX_addFn(PtensorsX_BOP):
     
     @staticmethod
     def forward(ctx,x,y):
         R = ptensorsX(x.order,_ptensorsX(x)(x.obj))
         R.obj.add(y.obj)
-        ctx.x, ctx.y, ctx.r, ctx.order = x.obj, y.obj, R.obj, x.order
-        return R
+        return PtensorsX_BOP.forward_helper(ctx,x,y,R)
 
     @staticmethod
     def backward(ctx,g):
-        grad = ctx.r.get_gradp()
-        ctx.x.add_to_grad(grad)
-        ctx.y.add_to_grad(grad)
-        return ptensorsX.dummy(ctx.order), ptensorsX.dummy(ctx.order)
+        def back_op(x, y, r):
+            grad = r.get_gradp()
+            x.add_to_grad(grad)
+            y.add_to_grad(grad)
+        return PtensorsX_BOP.backward_helper(ctx,back_op)
 
-class PtensorsX_diff2Fn(torch.autograd.Function):
+class PtensorsX_diff2Fn(PtensorsX_BOP):
     
     @staticmethod
     def forward(ctx,x,y):
         ctx.x, ctx.y = x.obj, y.obj
+        PtensorsX_BOP.forward_helper(ctx,x,y)
         return torch.tensor(x.obj.diff2(y.obj))
+        
 
     @staticmethod
     def backward(ctx,g):
-        ctx.x.add_to_grad(ctx.x,g.item()*2.0)
-        ctx.x.add_to_grad(ctx.y,-g.item()*2.0)
-        ctx.y.add_to_grad(ctx.y,g.item()*2.0)
-        ctx.y.add_to_grad(ctx.x,-g.item()*2.0)
-        return ptensorsX.dummy(ctx.order), ptensorsX.dummy(ctx.order)
+        def back_op(x, y, r):
+            nonlocal g
+            g = g.item() * 2.0
+            x.add_to_grad(x,g)
+            y.add_to_grad(y,g)
+            g = -g
+            x.add_to_grad(y,g)
+            y.add_to_grad(x,g)
+        return PtensorsX_BOP.backward_helper(ctx,back_op)
 
-class PtensorsX_concatFn(torch.autograd.Function):
+class PtensorsX_concatFn(PtensorsX_BOP):
     
     @staticmethod
     def forward(ctx,x,y):
-        R = ptensorsX(x.order,_ptensorsX(x.order)(x.obj,y.obj))
-        ctx.x, ctx.y, ctx.r, ctx.order = x.obj, y.obj, R.obj, x.order
-        return R
+        return PtensorsX_BOP.forward_helper(ctx,x,y, \
+            ptensorsX(x.order,_ptensorsX(x.order).concat(x.obj,y.obj)))
 
     @staticmethod
     def backward(ctx,g):
-        ctx.x.add_concat_back(ctx.r,0)
-        ctx.y.add_concat_back(ctx.r,ctx.x.get_nc())
-        return ptensorsX.dummy(ctx.order), ptensorsX.dummy(ctx.order)
+        def back_op(x,y,r):
+            x.add_concat_back(r,0)
+            y.add_concat_back(r,x.get_nc())
+        return PtensorsX_BOP.backward_helper(ctx,back_op)
 
-class PtensorsX_mprodFn(torch.autograd.Function):
+class PtensorsX_mprodFn(PtensorsX_BOP):
     
     @staticmethod
     def forward(ctx,x,y):
         R = ptensorsX.zeros(x.order,x.obj.view_of_atoms(),y.size(1),x.obj.get_dev())
         R.obj.add_mprod(x.obj,y)
-        ctx.x, ctx.y, ctx.r, ctx.order = x.obj, y.obj, R.obj, x.order
-        return R
+        return PtensorsX_BOP.forward_helper(ctx,x,y,R)
 
     @staticmethod
     def backward(ctx,g):
-        ctx.x.add_mprod_back0(ctx.r.gradp(),ctx.y)
-        return ptensorsX.dummy(ctx.order), ctx.x.mprod_back1(ctx.r.gradp())
+        order = ctx.order
+        def back_op(x, y, r):
+            nonlocal order
+            r = r.gradp()
+            x.add_mprod_back0(r,y)
+            x.add_mprod_back1(r)
+            return ptensorsX.dummy(order), x
+        return PtensorsX_BOP.backward_helper(ctx, back_op)
 
-class PtensorsX_OuterFn(torch.autograd.Function):
+class PtensorsX_OuterFn(PtensorsX_BOP):
 
     @staticmethod
     def forward(ctx,x,y):
         # TODO: check if the order is correctly calculated.
         R = ptensorsX((x.order + 1) * (y.order + 1),ptens_base.outer(x.obj,y.obj))
-        ctx.x, ctx.y, ctx.r, ctx.order = x.obj, y.obj, R.obj, x.order
-        return R
+        return PtensorsX_BOP.forward_helper(ctx,x,y,R)
         
     @staticmethod
     def backward(ctx,g):
-        ptens_base.add_outer_back0(ctx.x.gradp(),ctx.r.gradp(),ctx.y)
-        ptens_base.add_outer_back1(ctx.y.gradp(),ctx.r.gradp(),ctx.x)
-        return ptensorsX.dummy(ctx.order), ptensorsX.dummy(ctx.order)
+        def back_op(x,y,r):
+            r = r.gradp()
+            ptens_base.add_outer_back0(x.gradp(),r,y)
+            ptens_base.add_outer_back1(y.gradp(),r,x)
+        return PtensorsX_BOP.backward_helper(ctx,back_op)
 
 
-class PtensorsX_inpFn(torch.autograd.Function):
+class PtensorsX_inpFn(PtensorsX_BOP):
     
     @staticmethod
     def forward(ctx,x,y):
-        ctx.x, ctx.y, ctx.order =x.obj, y.obj, x.order 
+        PtensorsX_BOP.forward_helper(ctx,x,y)
         return torch.tensor(x.obj.inp(y.obj))
 
     @staticmethod
     def backward(ctx,g):
-        ctx.x.add_to_grad(ctx.y,g.item())
-        ctx.y.add_to_grad(ctx.x,g.item())
-        return ptensorsX.dummy(ctx.order), ptensorsX.dummy(ctx.order)
+        def back_op(x,y,r):
+            nonlocal g
+            g = g.item()
+            x.add_to_grad(y,g)
+            y.add_to_grad(x,g)
+        return PtensorsX_BOP.backward_helper(ctx,back_op)
 
 
 # ----------------------- Ternary Operators --------------------------------- #
