@@ -118,11 +118,12 @@ __global__ void Ptensors1_reduce1_kernel(float* rarr, const int* rdir, const flo
   const int c=threadIdx.x;
   const int k=xdir[3*q+1];
   const int nc=xdir[3*q+2];
+  const int rnc=rdir[3*q+2];
 
   const float* x=xarr+xdir[3*q]+c;
   float* r=rarr+rdir[3*q]+c;
   for(int i=0; i<k; i++)
-    r[i*nc]+=x[i*nc];
+    r[i*rnc]+=x[i*nc];
 }
 
 
@@ -266,7 +267,7 @@ namespace ptens{
     int dev=R.dev;
     PTENS_ASSRT(R.dev==1);
     PTENS_ASSRT(x.dev==1);
-    int n=std::max(32,x.dim_of(0,1));
+    int n=R.dim_of(0,0);
     Ptensors1_broadcast0_kernel<<<R.size(),n,0,stream>>>(x.arrg+offs,x.dir.garr(dev),R.arrg,R.dir.garr(dev));
   }
 
@@ -286,7 +287,7 @@ namespace ptens{
     int dev=R.dev;
     PTENS_ASSRT(R.dev==1);
     PTENS_ASSRT(x.dev==1);
-    int n=std::max(32,x.dim_of(0,1));
+    int n=R.dim_of(0,1);
     Ptensors1_broadcast1_kernel<<<R.size(),n,0,stream>>>(x.arrg+offs,x.dir.garr(dev),R.arrg,R.dir.garr(dev));
   }
 

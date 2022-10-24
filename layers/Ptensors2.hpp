@@ -16,14 +16,18 @@ namespace ptens{
 
   #ifdef _WITH_CUDA
   extern void Ptensors2_reduce0_cu(cnine::RtensorPack& R,const cnine::RtensorPack& x, int offs, int n, const cudaStream_t& stream);
+  extern void Ptensors2_reduce0B_cu(cnine::RtensorPack& R,const cnine::RtensorPack& x, int offs, int n, const cudaStream_t& stream);
   extern void Ptensors2_reduce0_cu(cnine::RtensorPack& R, const cnine::RtensorPack& x, const AindexPack& list, int offs, int n, const cudaStream_t& stream);
   extern void Ptensors2_reduce1_cu(cnine::RtensorPack& R,const cnine::RtensorPack& x, int offs, int n, const cudaStream_t& stream);
+  extern void Ptensors2_reduce1B_cu(cnine::RtensorPack& R,const cnine::RtensorPack& x, int offs, int n, const cudaStream_t& stream);
   extern void Ptensors2_reduce1_cu(cnine::RtensorPack& R, const cnine::RtensorPack& x, const AindexPack& list, int offs, int n, const cudaStream_t& stream);
   extern void Ptensors2_reduce2_cu(cnine::RtensorPack& R,const cnine::RtensorPack& x, int offs, int n, const cudaStream_t& stream);
   extern void Ptensors2_reduce2_cu(cnine::RtensorPack& R, const cnine::RtensorPack& x, const AindexPack& list, int offs, int n, const cudaStream_t& stream);
   extern void Ptensors2_broadcast0_cu(cnine::RtensorPack& R, const cnine::RtensorPack& x, const int offs, const cudaStream_t& stream);
+  extern void Ptensors2_broadcast0B_cu(cnine::RtensorPack& R, const cnine::RtensorPack& x, const int offs, const cudaStream_t& stream);
   extern void Ptensors2_broadcast0_cu(cnine::RtensorPack& R, const cnine::RtensorPack& x, const AindexPack& list, const int offs, const cudaStream_t& stream);
   extern void Ptensors2_broadcast1_cu(cnine::RtensorPack& R, const cnine::RtensorPack& x, const int offs, const cudaStream_t& stream);
+  extern void Ptensors2_broadcast1B_cu(cnine::RtensorPack& R, const cnine::RtensorPack& x, const int offs, const cudaStream_t& stream);
   extern void Ptensors2_broadcast1_cu(cnine::RtensorPack& R, const cnine::RtensorPack& x, const AindexPack& list, const int offs, const cudaStream_t& stream);
   extern void Ptensors2_broadcast2_cu(cnine::RtensorPack& R, const cnine::RtensorPack& x, const int offs, const cudaStream_t& stream);
   extern void Ptensors2_broadcast2_cu(cnine::RtensorPack& R, const cnine::RtensorPack& x, const AindexPack& list, const int offs, const cudaStream_t& stream);
@@ -182,8 +186,24 @@ namespace ptens{
   public: // ---- Spawning -----------------------------------------------------------------------------------
 
 
+    static Ptensors2 zeros_like(const Ptensors2& x){
+      return Ptensors2(RtensorPack::zeros_like(x),x.atoms,x.nc);
+    }
+
     static Ptensors2* new_zeros_like(const Ptensors2& x){
       return new Ptensors2(RtensorPack::zeros_like(x),x.atoms,x.nc);
+    }
+
+   static Ptensors2 gaussian_like(const Ptensors2& x){
+      return Ptensors2(RtensorPack::gaussian_like(x),x.atoms,x.nc);
+    }
+
+    static Ptensors2 randn_like(const Ptensors2& x){
+      return Ptensors2(RtensorPack::gaussian_like(x),x.atoms,x.nc);
+    }
+
+    static Ptensors2 sequential_like(const Ptensors2& x){
+      return Ptensors2(RtensorPack::sequential_like(x),x.atoms,x.nc);
     }
 
     
@@ -340,17 +360,19 @@ namespace ptens{
 	  view_of(i,offs+n,n).diag01().sum0_into(R.view1_of(i));
 	}
       }
-      GPUCODE(CUDA_STREAM(Ptensors2_reduce0_cu(R,*this,offs,n,stream)));
+      GPUCODE(CUDA_STREAM(Ptensors2_reduce0B_cu(R,*this,offs,n,stream)));
       return R;
     }
 
     RtensorPack reduce0(const AindexPack& list) const{
       int N=list.size();
       RtensorPack R(N,Gdims(2*nc),cnine::fill_zero(),dev);
-      for(int i=0; i<N; i++){
-	if(list.nix(i)==0) continue;
-	view_of(list.tens(i),list.ix(i)).sum01_into(R.view1_of(i).block(0,nc));
-	view_of(list.tens(i),list.ix(i)).diag01().sum0_into(R.view1_of(i).block(nc,nc));
+      if(dev==0){
+	for(int i=0; i<N; i++){
+	  if(list.nix(i)==0) continue;
+	  view_of(list.tens(i),list.ix(i)).sum01_into(R.view1_of(i).block(0,nc));
+	  view_of(list.tens(i),list.ix(i)).diag01().sum0_into(R.view1_of(i).block(nc,nc));
+	}
       }
       GPUCODE(CUDA_STREAM(Ptensors2_reduce0_cu(R,*this,list,0,nc,stream)));
       return R;
@@ -391,12 +413,14 @@ namespace ptens{
       for(int i=0; i<size(); i++)
 	dims.push_back(vector<int>({k_of(i),n}));
       RtensorPack R(dims,cnine::fill_zero(),dev);
-      for(int i=0; i<size(); i++){
-	view_of(i,offs,n).sum0_into(R.view2_of(i));
-	view_of(i,offs+n,n).sum1_into(R.view2_of(i));
-	R.view2_of(i)+=view_of(i,offs+2*n,n).diag01();
+      if(dev==0){
+	for(int i=0; i<size(); i++){
+	  view_of(i,offs,n).sum0_into(R.view2_of(i));
+	  view_of(i,offs+n,n).sum1_into(R.view2_of(i));
+	  R.view2_of(i)+=view_of(i,offs+2*n,n).diag01();
+	}
       }
-      GPUCODE(CUDA_STREAM(Ptensors2_reduce1_cu(R,*this,offs,n,stream)));
+      GPUCODE(CUDA_STREAM(Ptensors2_reduce1B_cu(R,*this,offs,n,stream)));
       return R;
     }
 
@@ -500,7 +524,7 @@ namespace ptens{
 	  view_of(i).diag01()+=repeat0(x.view1_of(i).block(nc,nc),k_of(i));
 	}
       }
-      GPUCODE(CUDA_STREAM(Ptensors2_broadcast0_cu(*this,x,0,stream)));
+      GPUCODE(CUDA_STREAM(Ptensors2_broadcast0B_cu(*this,x,0,stream)));
     }
 
     void broadcast0(const RtensorPack& x, const int offs){
@@ -548,7 +572,7 @@ namespace ptens{
 	  view_of(i).diag01()+=x.view2_of(i).block(0,2*nc,-1,nc);
 	}
       }
-      GPUCODE(CUDA_STREAM(Ptensors2_broadcast1_cu(*this,x,0,stream)));
+      GPUCODE(CUDA_STREAM(Ptensors2_broadcast1B_cu(*this,x,0,stream)));
     }
 
     void broadcast1(const RtensorPack& x, const int offs){

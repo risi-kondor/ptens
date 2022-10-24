@@ -50,6 +50,27 @@ __global__ void Ptensors2_reduce0_kernel(float* rarr, const int* rdir, const flo
 }
 
 
+// contracting version
+__global__ void Ptensors2_reduce0B_kernel(float* rarr, const int* rdir, const float* xarr, const int* xdir){
+  const int q=blockIdx.x;
+  const int c=threadIdx.x;
+  const int k=xdir[4*q+1];
+  const int nc=xdir[4*q+3]; // changed 
+  const int rnc=rdir[2*q+1];
+
+  const float* x=xarr+xdir[4*q]+c;
+  float t=0;
+  for(int i=0; i<k; i++)
+    for(int j=0; j<k; j++)
+      t+=x[(i*k+j)*nc];
+  rarr[rdir[2*q]+c]+=t;
+  t=0;
+  for(int i=0; i<k; i++)
+    t+=x[(i*(k+1))*nc+rnc];
+  rarr[rdir[2*q]+c]+=t;
+}
+
+
 __global__ void Ptensors2_reduce0_kernel(float* rarr, const int* rdir, const float* xarr, const int* xdir, const int* xiarr, const int* xidir){
   extern __shared__ unsigned char _shared[]; 
   int* ix=reinterpret_cast<int*>(_shared);
@@ -96,6 +117,35 @@ __global__ void Ptensors2_reduce1_kernel(float* rarr, const int* rdir, const flo
   }
   for(int i=0; i<k; i++)
     r[i*rnc+2*nc]+=x[i*(k+1)*nc];
+}
+
+
+// contracting version
+__global__ void Ptensors2_reduce1B_kernel(float* rarr, const int* rdir, const float* xarr, const int* xdir){
+  const int q=blockIdx.x;
+  const int c=threadIdx.x;
+  const int k=xdir[4*q+1];
+  const int nc=xdir[4*q+3]; // changed
+  const int rnc=rdir[3*q+2]; // changed
+
+  const float* x=xarr+xdir[4*q]+c;
+  float* r=rarr+rdir[3*q]+c;
+  for(int i=0; i<k; i++){
+    float t=0;
+    for(int j=0; j<k; j++)
+      t+=x[(j*k+i)*nc];
+    r[i*rnc]+=t;
+  }
+  x+=rnc;
+  for(int i=0; i<k; i++){
+    float t=0;
+    for(int j=0; j<k; j++)
+      t+=x[(i*k+j)*nc];
+    r[i*rnc]+=t;
+  }
+  x+=rnc;
+  for(int i=0; i<k; i++)
+    r[i*rnc]+=x[i*(k+1)*nc];
 }
 
 
@@ -183,6 +233,26 @@ __global__ void Ptensors2_broadcast0_kernel(float* xarr, const int* xdir, const 
 }
 
 
+// contracting version
+__global__ void Ptensors2_broadcast0B_kernel(float* xarr, const int* xdir, const float* rarr, const int* rdir){
+  const int q=blockIdx.x;
+  const int c=threadIdx.x;
+  const int k=xdir[4*q+1];
+  const int nc=xdir[4*q+3];
+  const int rnc=rdir[2*q+1];
+  if(c>=rnc) return; // change elsewhere too!
+
+  float* x=xarr+xdir[4*q]+c;
+  float t=rarr[rdir[2*q]+c];
+  for(int i=0; i<k; i++)
+    for(int j=0; j<k; j++)
+      x[(i*k+j)*nc]+=t;
+  t=rarr[rdir[2*q]+nc+c];
+  for(int i=0; i<k; i++)
+    x[i*(k+1)*nc]+=t;
+}
+
+
 __global__ void Ptensors2_broadcast0_kernel(float* xarr, const int* xdir, const int* xiarr, const int* xidir, 
   const float* rarr, const int* rdir, const int* bmap){
   extern __shared__ unsigned char _shared[]; 
@@ -212,7 +282,7 @@ __global__ void Ptensors2_broadcast1_kernel(float* xarr, const int* xdir, const 
   const int k=xdir[4*q+1];
   const int nc=xdir[4*q+3];
   const int rnc=rdir[3*q+2];
-  if(c>=rnc) return; // redundant here
+  //if(c>=nc) return; // redundant here
 
   float* x=xarr+xdir[4*q]+c;
   const float* r=rarr+rdir[3*q]+c;
@@ -228,6 +298,34 @@ __global__ void Ptensors2_broadcast1_kernel(float* xarr, const int* xdir, const 
   }
   for(int i=0; i<k; i++)
     x[i*(k+1)*nc+2*rnc]+=r[i*rnc];
+}
+
+
+// contracting version
+__global__ void Ptensors2_broadcast1B_kernel(float* xarr, const int* xdir, const float* rarr, const int* rdir){
+  const int q=blockIdx.x;
+  const int c=threadIdx.x;
+  const int k=xdir[4*q+1];
+  const int nc=xdir[4*q+3];
+  const int rnc=rdir[3*q+2];
+  //if(c>=nc) return; // redundant here
+
+  float* x=xarr+xdir[4*q]+c;
+  const float* r=rarr+rdir[3*q]+c;
+  for(int i=0; i<k; i++){
+    float t=r[i*rnc];
+    for(int j=0; j<k; j++)
+      x[(j*k+i)*nc]+=t;
+  }
+  //r+=nc;
+  for(int i=0; i<k; i++){
+    float t=r[i*rnc+nc];
+    for(int j=0; j<k; j++)
+      x[(i*k+j)*nc]+=t;
+  }
+  //r+=nc;
+  for(int i=0; i<k; i++)
+    x[i*(k+1)*nc]+=r[i*rnc+2*nc];
 }
 
 
@@ -273,10 +371,10 @@ __global__ void Ptensors2_broadcast2_kernel(float* xarr, const int* xdir, const 
   const float* r=rarr+rdir[4*q]+c;
   for(int i=0; i<k; i++)
     for(int j=0; j<k; j++)
-      x[(j*k+i)*nc]+=r[(i*k+j)*rnc];
+      x[(i*k+j)*nc]+=r[(i*k+j)*rnc];
   for(int i=0; i<k; i++)
     for(int j=0; j<k; j++)
-      x[(j*k+i)*nc+rnc]+=r[(j*k+i)*rnc];
+      x[(j*k+i)*nc+rnc]+=r[(i*k+j)*rnc];
 }
 
 
@@ -315,6 +413,13 @@ namespace ptens{
     Ptensors2_reduce0_kernel<<<R.size(),n,0,stream>>>(R.arrg,R.dir.garr(dev),x.arrg+offs,x.dir.garr(dev));
   }
 
+  void Ptensors2_reduce0B_cu(cnine::RtensorPack& R, const cnine::RtensorPack& x, int offs, int n, const cudaStream_t& stream){
+    int dev=R.dev;
+    PTENS_ASSRT(R.dev==1);
+    PTENS_ASSRT(x.dev==1);
+    Ptensors2_reduce0B_kernel<<<R.size(),n,0,stream>>>(R.arrg,R.dir.garr(dev),x.arrg+offs,x.dir.garr(dev));
+  }
+
   void Ptensors2_reduce0_cu(cnine::RtensorPack& R, const cnine::RtensorPack& x, const AindexPack& list, int offs, int n, const cudaStream_t& stream){
     int dev=R.dev;
     PTENS_ASSRT(R.dev==1);
@@ -328,6 +433,13 @@ namespace ptens{
     PTENS_ASSRT(R.dev==1);
     PTENS_ASSRT(x.dev==1);
     Ptensors2_reduce1_kernel<<<R.size(),n,0,stream>>>(R.arrg,R.dir.garr(dev),x.arrg+offs,x.dir.garr(dev));
+  }
+
+  void Ptensors2_reduce1B_cu(cnine::RtensorPack& R, const cnine::RtensorPack& x, int offs, int n, const cudaStream_t& stream){
+    int dev=R.dev;
+    PTENS_ASSRT(R.dev==1);
+    PTENS_ASSRT(x.dev==1);
+    Ptensors2_reduce1B_kernel<<<R.size(),n,0,stream>>>(R.arrg,R.dir.garr(dev),x.arrg+offs,x.dir.garr(dev));
   }
 
   void Ptensors2_reduce1_cu(cnine::RtensorPack& R, const cnine::RtensorPack& x, const AindexPack& list, int offs, int n, const cudaStream_t& stream){
@@ -359,8 +471,17 @@ namespace ptens{
     int dev=R.dev;
     PTENS_ASSRT(R.dev==1);
     PTENS_ASSRT(x.dev==1);
-    int n=std::max(32,x.dim_of(0,2));
+    int n=R.dim_of(0,0);
     Ptensors2_broadcast0_kernel<<<R.size(),n,0,stream>>>(x.arrg+offs,x.dir.garr(dev),R.arrg,R.dir.garr(dev));
+  }
+
+  void Ptensors2_broadcast0B_cu(cnine::RtensorPack& x, const cnine::RtensorPack& R, 
+    const int offs, const cudaStream_t& stream){
+    int dev=R.dev;
+    PTENS_ASSRT(R.dev==1);
+    PTENS_ASSRT(x.dev==1);
+    int n=x.dim_of(0,2);
+    Ptensors2_broadcast0B_kernel<<<R.size(),n,0,stream>>>(x.arrg+offs,x.dir.garr(dev),R.arrg,R.dir.garr(dev));
   }
 
   void Ptensors2_broadcast0_cu(cnine::RtensorPack& R, const cnine::RtensorPack& x, const AindexPack& list, 
@@ -383,6 +504,15 @@ namespace ptens{
     Ptensors2_broadcast1_kernel<<<R.size(),n,0,stream>>>(x.arrg+offs,x.dir.garr(dev),R.arrg,R.dir.garr(dev));
   }
 
+  void Ptensors2_broadcast1B_cu(cnine::RtensorPack& x, const cnine::RtensorPack& R, 
+    const int offs, const cudaStream_t& stream){
+    int dev=R.dev;
+    PTENS_ASSRT(R.dev==1);
+    PTENS_ASSRT(x.dev==1);
+    int n=x.dim_of(0,2);
+    Ptensors2_broadcast1B_kernel<<<R.size(),n,0,stream>>>(x.arrg+offs,x.dir.garr(dev),R.arrg,R.dir.garr(dev));
+  }
+
   void Ptensors2_broadcast1_cu(cnine::RtensorPack& R, const cnine::RtensorPack& x, const AindexPack& list, 
     const int offs, const cudaStream_t& stream){
     int dev=R.dev;
@@ -399,7 +529,7 @@ namespace ptens{
     int dev=R.dev;
     PTENS_ASSRT(R.dev==1);
     PTENS_ASSRT(x.dev==1);
-    int n=std::max(32,x.dim_of(0,2));
+    int n=R.dim_of(0,2);
     Ptensors2_broadcast2_kernel<<<R.size(),n,0,stream>>>
       (x.arrg+offs,x.dir.garr(dev),R.arrg,R.dir.garr(dev));
   }

@@ -133,6 +133,19 @@ namespace ptens{
       return new Ptensors0(RtensorPack::zeros_like(x),x.atoms,x.nc);
     }
 
+    static Ptensors0 gaussian_like(const Ptensors0& x){
+      return Ptensors0(RtensorPack::gaussian_like(x),x.atoms,x.nc);
+    }
+
+    static Ptensors0 randn_like(const Ptensors0& x){
+      return Ptensors0(RtensorPack::gaussian_like(x),x.atoms,x.nc);
+    }
+
+    static Ptensors0 sequential_like(const Ptensors0& x){
+      return Ptensors0(RtensorPack::gaussian_like(x),x.atoms,x.nc);
+    }
+
+
     
   public: // ----- Copying -----------------------------------------------------------------------------------
 

@@ -189,8 +189,24 @@ namespace ptens{
   public: // ---- Spawning -----------------------------------------------------------------------------------
 
 
+   static Ptensors1 zeros_like(const Ptensors1& x){
+      return Ptensors1(RtensorPack::zeros_like(x),x.atoms,x.nc);
+    }
+
     static Ptensors1* new_zeros_like(const Ptensors1& x){
       return new Ptensors1(RtensorPack::zeros_like(x),x.atoms,x.nc);
+    }
+
+   static Ptensors1 gaussian_like(const Ptensors1& x){
+      return Ptensors1(RtensorPack::gaussian_like(x),x.atoms,x.nc);
+    }
+
+    static Ptensors1 randn_like(const Ptensors1& x){
+      return Ptensors1(RtensorPack::gaussian_like(x),x.atoms,x.nc);
+    }
+
+    static Ptensors1 sequential_like(const Ptensors1& x){
+      return Ptensors1(RtensorPack::sequential_like(x),x.atoms,x.nc);
     }
 
     
