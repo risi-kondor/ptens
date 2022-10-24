@@ -43,6 +43,13 @@ namespace ptens{
       return cnine::SparseRmatrix::random_symmetric(_n,p);
     }
 
+    static Hgraph randomd(const int _n, const float p=0.5){
+      auto R=cnine::SparseRmatrix::random_symmetric(_n,p);
+      for(int i=0; i<_n; i++)
+	R.set(i,i,1.0);
+      return R;
+    }
+
 
   public: // ---- Copying ------------------------------------------------------------------------------------
 
@@ -124,7 +131,8 @@ namespace ptens{
       AtomsPack R;
       for(int i=0; i<n; i++){
 	std::set<int> w;
-	w.insert(i);
+	//for(auto p:x[i]) // diagonal 
+	  //w.insert(p);
 	for(auto q: const_cast<Hgraph&>(*this).row(i)){
 	  auto a=x[q.first];
 	  for(auto p:a)

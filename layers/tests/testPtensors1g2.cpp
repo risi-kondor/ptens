@@ -9,11 +9,19 @@
 using namespace ptens;
 using namespace cnine;
 
+
 template<typename TYPE>
-Ptensors1 backward_linmap(const Ptensors1& x, const TYPE& G){
-  Ptensors1 R=Ptensors1::zeros_like(x);
-  add_linmaps_back(R,G);
-  return R;
+Ptensors1 backward_linmap(const Ptensors1& x, const TYPE& g){
+  Ptensors1 r=Ptensors1::zeros_like(x);
+  add_linmaps_back(r,g);
+  return r;
+}
+
+template<typename TYPE>
+Ptensors1 backward_unite(const Ptensors1& x, const TYPE& g, const Hgraph& G){
+  Ptensors1 r=Ptensors1::zeros_like(x);
+  add_msg_back(r,g,G);
+  return r;
 }
 
 
@@ -24,7 +32,10 @@ int main(int argc, char** argv){
 
   Ptensors1 A=Ptensors1::randn({{1,2,3},{3,5},{2}},2);
   Ptensors1 Ag(A,1);
-  //cout<<A<<endl;
+  cout<<A<<endl;
+
+  Hgraph G=Hgraph::randomd(3,0.3);
+  cout<<G<<endl;
 
   {
     auto B=linmaps0(A);
@@ -53,7 +64,18 @@ int main(int argc, char** argv){
     cout<<Aback.diff2(Abackg)<<endl;
   }
 
-  #endif
 
+  {
+    auto B=unite1(A,G);
+    cout<<"unite1:"<<B.diff2(unite1(Ag,G))<<endl;
+    Ptensors1 g=Ptensors1::gaussian_like(B);
+    auto Aback=backward_linmap(A,g,G);
+    auto Abackg=backward_linmap(Ag,g.to_device(1),G);
+    cout<<Aback.diff2(Abackg)<<endl;
+  }
+
+
+
+  #endif
 
 }
