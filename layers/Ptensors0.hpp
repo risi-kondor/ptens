@@ -133,6 +133,19 @@ namespace ptens{
       return new Ptensors0(RtensorPack::zeros_like(x),x.atoms,x.nc);
     }
 
+    static Ptensors0 gaussian_like(const Ptensors0& x){
+      return Ptensors0(RtensorPack::gaussian_like(x),x.atoms,x.nc);
+    }
+
+    static Ptensors0 randn_like(const Ptensors0& x){
+      return Ptensors0(RtensorPack::gaussian_like(x),x.atoms,x.nc);
+    }
+
+    static Ptensors0 sequential_like(const Ptensors0& x){
+      return Ptensors0(RtensorPack::gaussian_like(x),x.atoms,x.nc);
+    }
+
+
     
   public: // ----- Copying -----------------------------------------------------------------------------------
 
@@ -173,15 +186,6 @@ namespace ptens{
       RtensorPack(A), atoms(A.dim(0)){
       nc=A.dim(1);
     }
-
-    //rtensor tensor() const{
-    //CNINE_CPUONLY();
-    //return rtensor({size(),nc},arr,0);
-    //}
-
-    //rtensor view_as_matrix() const{
-    //return rtensor::view_of_blob({size(),nc},get_arr(),dev);
-    //}
 
     #ifdef _WITH_ATEN
     Ptensors0(const at::Tensor& T):
@@ -287,41 +291,6 @@ namespace ptens{
       for(int i=0; i<N; i++)
 	view_of(i)+=x.view_of(i,offs,x.nc);
     }
-
-    /*
-    void add_mprod(const Ptensors0& x, const rtensor& y){
-      PTENS_CPUONLY();
-      PTENS_ASSRT(x.size()==size());
-      if(dev==0){
-	for(int i=0; i<size(); i++)
-	  add_matmul_Ax_to(view_of(i),y.view2().transp(),x.view_of(i));
-      }else{
-	view_as_matrix().add_mprod(x.view_as_matrix(),y);
-      }
-    }
-
-    void add_mprod_back0(const Ptensors0& g, const rtensor& y){
-      PTENS_CPUONLY();
-      PTENS_ASSRT(g.size()==size());
-      if(dev==0){
-	for(int i=0; i<size(); i++)
-	  add_matmul_Ax_to(view_of(i),y.view2(),g.view_of(i));
-      }else{
-	view_as_matrix().add_Mprod_AT(g.view_as_matrix(),y);
-      }
-    }
-
-    void add_mprod_back1_to(rtensor& r, const Ptensors0& x) const{
-      PTENS_CPUONLY();
-      PTENS_ASSRT(x.size()==size());
-      if(dev==0){
-	for(int i=0; i<size(); i++)
-	  r.view2().add_outer(x.view_of(i),view_of(i));
-      }else{
-	r.add_Mprod_TA(x.view_as_matrix(),view_as_matrix());
-      }    
-    }
-    */
 
 
   public: // ---- Reductions ---------------------------------------------------------------------------------
@@ -479,5 +448,39 @@ namespace ptens{
     loose_ptr<Ptensors0> get_gradp(){
       if(!grad) grad=Ptensors0::new_zeros_like(*this);
       return grad;
+    }
+    */
+    /*
+    void add_mprod(const Ptensors0& x, const rtensor& y){
+      PTENS_CPUONLY();
+      PTENS_ASSRT(x.size()==size());
+      if(dev==0){
+	for(int i=0; i<size(); i++)
+	  add_matmul_Ax_to(view_of(i),y.view2().transp(),x.view_of(i));
+      }else{
+	view_as_matrix().add_mprod(x.view_as_matrix(),y);
+      }
+    }
+
+    void add_mprod_back0(const Ptensors0& g, const rtensor& y){
+      PTENS_CPUONLY();
+      PTENS_ASSRT(g.size()==size());
+      if(dev==0){
+	for(int i=0; i<size(); i++)
+	  add_matmul_Ax_to(view_of(i),y.view2(),g.view_of(i));
+      }else{
+	view_as_matrix().add_Mprod_AT(g.view_as_matrix(),y);
+      }
+    }
+
+    void add_mprod_back1_to(rtensor& r, const Ptensors0& x) const{
+      PTENS_CPUONLY();
+      PTENS_ASSRT(x.size()==size());
+      if(dev==0){
+	for(int i=0; i<size(); i++)
+	  r.view2().add_outer(x.view_of(i),view_of(i));
+      }else{
+	r.add_Mprod_TA(x.view_as_matrix(),view_as_matrix());
+      }    
     }
     */

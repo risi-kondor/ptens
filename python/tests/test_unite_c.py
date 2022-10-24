@@ -17,13 +17,13 @@ class TestUnite(object):
         z=fn(x,G)
         
         testvec=z.randn_like()
-        loss=z.inp(testvec)
+        loss=z.inp(testvec).to('cuda')
         loss.backward(torch.tensor(1.0))
         xgrad=x.get_grad()
 
         xeps=x.randn_like()
         z=fn(x+xeps,G)
-        xloss=z.inp(testvec)
+        xloss=z.inp(testvec).to('cuda')
         assert(torch.allclose(xloss-loss,xeps.inp(xgrad),rtol=1e-3, atol=1e-4))
 
     @pytest.mark.parametrize('nc', [1, 2, 4])

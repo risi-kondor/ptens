@@ -189,8 +189,24 @@ namespace ptens{
   public: // ---- Spawning -----------------------------------------------------------------------------------
 
 
+   static Ptensors1 zeros_like(const Ptensors1& x){
+      return Ptensors1(RtensorPack::zeros_like(x),x.atoms,x.nc);
+    }
+
     static Ptensors1* new_zeros_like(const Ptensors1& x){
       return new Ptensors1(RtensorPack::zeros_like(x),x.atoms,x.nc);
+    }
+
+   static Ptensors1 gaussian_like(const Ptensors1& x){
+      return Ptensors1(RtensorPack::gaussian_like(x),x.atoms,x.nc);
+    }
+
+    static Ptensors1 randn_like(const Ptensors1& x){
+      return Ptensors1(RtensorPack::gaussian_like(x),x.atoms,x.nc);
+    }
+
+    static Ptensors1 sequential_like(const Ptensors1& x){
+      return Ptensors1(RtensorPack::sequential_like(x),x.atoms,x.nc);
     }
 
     
@@ -512,9 +528,11 @@ namespace ptens{
     }
 
     void broadcast1(const RtensorPack& x, const int offs){
-      const int n=x.dim_of(0,1);
-      for(int i=0; i<size(); i++){
-	view_of(i,offs,n)+=x.view2_of(i);
+      if(dev==0){
+	const int n=x.dim_of(0,1);
+	for(int i=0; i<size(); i++){
+	  view_of(i,offs,n)+=x.view2_of(i);
+	}
       }
       GPUCODE(CUDA_STREAM(Ptensors1_broadcast1_cu(*this,x,offs,stream)));
     }

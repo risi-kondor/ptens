@@ -145,9 +145,9 @@ class ptensors1(torch.Tensor):
 
     
     def outer(self,y):
-        if isinstance(y,ptensors0):
+        if isinstance(y,ptens.ptensors0):
             return Ptensors1_Outer0Fn.apply(self,y)
-        if isinstance(y,ptensors1):
+        if isinstance(y,ptens.ptensors1):
             return Ptensors1_Outer1Fn.apply(self,y)
 
 

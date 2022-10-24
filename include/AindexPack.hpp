@@ -5,12 +5,16 @@
 
 #include "array_pool.hpp"
 #include "Atoms.hpp"
+#include "GatherMap.hpp"
 
 
 namespace ptens{
 
+
   class AindexPack: public cnine::array_pool<int>{
   public:
+
+    cnine::GatherMap const* bmap=nullptr; // hack
 
 
   public: // ---- Constructors ------------------------------------------------------------------------------
@@ -19,16 +23,20 @@ namespace ptens{
     AindexPack(){}
 
 
-  public: // ---- Constructors ------------------------------------------------------------------------------
+  public: // ---- Copying -----------------------------------------------------------------------------------
 
 
     AindexPack(const AindexPack& x):
-      array_pool<int>(x){}
+      array_pool<int>(x){
+      bmap=x.bmap;}
 
     AindexPack(AindexPack&& x):
-      array_pool<int>(std::move(x)){}
+      array_pool<int>(std::move(x)){
+      bmap=x.bmap; x.bmap=nullptr;
+    }
 
     AindexPack& operator=(const AindexPack& x)=delete;
+
 
   public: // ---- Access -------------------------------------------------------------------------------------
 
@@ -39,22 +47,6 @@ namespace ptens{
       return arr[dir(i,0)];
     }
 
-    /*
-    vector<int> indices(const int i) const{ // ????
-      assert(i<size());
-      //auto& p=lookup[i];
-      //int addr=p.first+1;
-      //int len=p.second-1;
-      int addr=dir(i,0);
-      int len=dir(i,1);
-      assert(len>=0);
-      vector<int> R(len);
-      for(int i=0; i<len; i++)
-	R[i]=arr[addr+i];
-      return R;
-    }
-    ***/
-
     int tens(const int i) const{
       assert(i<size());
       return arr[dir(i,0)];
@@ -63,9 +55,6 @@ namespace ptens{
 
     vector<int> ix(const int i) const{
       assert(i<size());
-      //auto& p=lookup[i];
-      //int addr=p.first+1;
-      //int len=p.second-1;
       int addr=dir(i,0);
       int len=dir(i,1)-1;
       PTENS_ASSRT(len>=0);
@@ -78,9 +67,6 @@ namespace ptens{
 
     int ix(const int i, const int j) const{
       assert(i<size());
-      //auto& p=lookup[i];
-      //int addr=p.first+1;
-      //int len=p.second-1;
       int addr=dir(i,0);
       int len=dir(i,1);
       assert(len>=0);
@@ -89,14 +75,27 @@ namespace ptens{
 
     int nix(const int i) const{
       assert(i<size());
-      //return lookup[i].second-1;
       return dir(i,1)-1;
     }
 
+    /*
     int nindices(const int i) const{
       assert(i<size());
       //return lookup[i].second-1;
       return dir(i,1)-1;
+    }
+    */
+
+    const cnine::GatherMap& get_bmap() const{
+      assert(bmap);
+      return *bmap;
+    }
+
+    int* get_barr(const int _dev=0) const{
+      assert(bmap);
+      const_cast<cnine::GatherMap*>(bmap)->to_device(_dev);
+      if(_dev==0) return bmap->arr;
+      return bmap->arrg;
     }
 
     void push_back(const int tix, vector<int> indices){
@@ -139,3 +138,19 @@ namespace ptens{
 
 
 #endif 
+    /*
+    vector<int> indices(const int i) const{ // ????
+      assert(i<size());
+      //auto& p=lookup[i];
+      //int addr=p.first+1;
+      //int len=p.second-1;
+      int addr=dir(i,0);
+      int len=dir(i,1);
+      assert(len>=0);
+      vector<int> R(len);
+      for(int i=0; i<len; i++)
+	R[i]=arr[addr+i];
+      return R;
+    }
+    */
+

@@ -82,6 +82,7 @@ namespace ptens{
   inline void add_linmaps_back(Ptensors2& r, const Ptensors1& x, const int offs=0){
     r.broadcast0(x.reduce0(offs,2*r.nc)); // changed
     r.broadcast1(x.reduce1(offs+2*r.nc,3*r.nc)); // changed
+    //cout<<x.reduce1(offs+2*r.nc,3*r.nc)<<endl;
   }
 
 
