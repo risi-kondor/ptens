@@ -101,9 +101,9 @@ __global__ void Ptensors1_reduce0_kernel(float* rarr, const int* rdir, const flo
   const int q=blockIdx.x;
   const int c=threadIdx.x;
   const int k=load_indices(ix,xiarr,xidir,q);
-  const int nc=xdir[3*q+2];
-  if(c>=nc) return;
   __syncthreads();
+  const int nc=xdir[2]; // inelegant
+  if(c>=nc) return;
 
   const float* x=xarr+xdir[3*ix[0]]+c;
   float t=0;
@@ -133,9 +133,9 @@ __global__ void Ptensors1_reduce1_kernel(float* rarr, const int* rdir, const flo
   const int q=blockIdx.x;
   const int c=threadIdx.x;
   const int k=load_indices(ix,xiarr,xidir,q);
-  const int nc=xdir[3*q+2];
-  if(c>=nc) return;
   __syncthreads();
+  const int nc=xdir[2]; // hack
+  if(c>=nc) return;
 
   const float* x=xarr+xdir[3*ix[0]]+c;
   float* r=rarr+rdir[3*q]+c;
@@ -169,23 +169,28 @@ __global__ void Ptensors1_broadcast0_kernel(float* xarr, const int* xdir, const 
 
   const int b=blockIdx.x;
   const int c=threadIdx.x;
-
   const int boffs=bmap[3*b];
   const int N=bmap[3*b+1];
   const int target=bmap[3*b+2];
+  //if(c==0) printf("target=%d\n",target);
 
-  const int k=load_indices(ix,xiarr,xidir,target);
-  const int nc=xdir[3*target+2];
-  if(c>=nc) return;
-  __syncthreads();
+  const int nc=xdir[2]; //xdir[3*target+2];
+  const int rnc=rdir[1]; //xdir[3*target+2];
 
-  float t=0;
-  for(int s=0; s<N; s++)
-    t+=rarr[rdir[2*bmap[boffs+2*s]]+c];
 
   float* x=xarr+xdir[3*target]+c;
-  for(int i=0; i<k; i++)
-    x[ix[i+1]*nc]+=t;
+  for(int s=0; s<N; s++){
+    const int src=bmap[boffs+2*s];
+    const int k=load_indices(ix,xiarr,xidir,src);
+    __syncthreads();
+    if(c>=rnc) return;
+    float t=rarr[rdir[2*src]+c];
+    for(int i=0; i<k; i++){
+      x[ix[i+1]*nc]+=t;
+    }
+  }
+
+  return;
 }
 
 
@@ -208,17 +213,27 @@ __global__ void Ptensors1_broadcast1_kernel(float* xarr, const int* xdir, const 
   const float* rarr, const int* rdir, const int* bmap){
   extern __shared__ unsigned char _shared[]; 
   int* ix=reinterpret_cast<int*>(_shared);
-  const int q=blockIdx.x;
+  const int b=blockIdx.x;
   const int c=threadIdx.x;
-  const int k=load_indices(ix,xiarr,xidir,q);
-  const int nc=xdir[3*q+2];
-  if(c>=nc) return;
-  __syncthreads();
+  const int boffs=bmap[3*b];
+  const int N=bmap[3*b+1];
+  const int target=bmap[3*b+2];
+  //if(c==0) printf("target=%d\n",target);
 
-  float* x=xarr+xdir[3*ix[0]]+c;
-  const float* r=rarr+rdir[3*q]+c;
-  for(int i=0; i<k; i++)
-    x[ix[i+1]*nc]+=r[i*nc];
+  const int nc=xdir[2]; //xdir[3*target+2];
+  const int rnc=rdir[2]; //xdir[3*target+2];
+
+  float* x=xarr+xdir[3*target]+c;
+  for(int s=0; s<N; s++){
+    const int src=bmap[boffs+2*s];
+    const int k=load_indices(ix,xiarr,xidir,src);
+    __syncthreads();
+    if(c>=rnc) return;
+
+    const float* r=rarr+rdir[3*src]+c;
+    for(int i=0; i<k; i++)
+      x[ix[i+1]*nc]+=r[i*rnc];
+  }
 }
 
 
@@ -226,6 +241,7 @@ __global__ void Ptensors1_broadcast1_kernel(float* xarr, const int* xdir, const 
 
 
 namespace ptens{
+
 
   void Ptensors1_reduce0_cu(cnine::RtensorPack& R, const cnine::RtensorPack& x, 
     int offs, int n, const cudaStream_t& stream){
@@ -240,9 +256,12 @@ namespace ptens{
     int dev=R.dev;
     PTENS_ASSRT(R.dev==1);
     PTENS_ASSRT(x.dev==1);
+    const_cast<AindexPack&>(list).to_device(1);
     PTENS_ASSRT(list.dev==1);
-    Ptensors1_reduce0_kernel<<<R.size(),std::max(n,32),32,stream>>>(R.arrg,R.dir.garr(dev),x.arrg+offs,x.dir.garr(dev),list.arrg,list.dir.garr(dev));
+    Ptensors1_reduce0_kernel<<<list.size(),std::max(n,32),32,stream>>>(R.arrg,R.dir.garr(dev),x.arrg+offs,x.dir.garr(dev),list.arrg,list.dir.garr(dev));
   }
+
+
 
   void Ptensors1_reduce1_cu(cnine::RtensorPack& R, const cnine::RtensorPack& x, 
     int offs, int n, const cudaStream_t& stream){
@@ -257,9 +276,11 @@ namespace ptens{
     int dev=R.dev;
     PTENS_ASSRT(R.dev==1);
     PTENS_ASSRT(x.dev==1);
+    const_cast<AindexPack&>(list).to_device(1);
     PTENS_ASSRT(list.dev==1);
-    Ptensors1_reduce1_kernel<<<R.size(),std::max(n,32),32,stream>>>(R.arrg,R.dir.garr(dev),x.arrg+offs,x.dir.garr(dev),list.arrg,list.dir.garr(dev));
+    Ptensors1_reduce1_kernel<<<list.size(),std::max(n,32),32,stream>>>(R.arrg,R.dir.garr(dev),x.arrg+offs,x.dir.garr(dev),list.arrg,list.dir.garr(dev));
   }
+
 
 
   void Ptensors1_broadcast0_cu(cnine::RtensorPack& x, const cnine::RtensorPack& R, 
@@ -276,11 +297,14 @@ namespace ptens{
     int dev=R.dev;
     PTENS_ASSRT(R.dev==1);
     PTENS_ASSRT(x.dev==1);
+    const_cast<AindexPack&>(list).to_device(1);
     PTENS_ASSRT(list.dev==1);
-    int n=std::max(32,x.dim_of(0,1));
-    Ptensors1_broadcast0_kernel<<<R.size(),n,32,stream>>>
-      (x.arrg+offs,x.dir.garr(dev),list.arrg,list.dir.garr(dev),R.arrg,R.dir.garr(dev),list.get_barr(1));
+    int n=std::max(32,R.dim_of(0,0));
+    Ptensors1_broadcast0_kernel<<<list.get_bmap().n,n,128,stream>>> 
+      (x.arrg+offs,x.dir.garr(dev),list.arrg,list.dir.garr(dev),R.arrg,R.dir.garr(dev),list.get_barr(1)); // 32 or 128
   }
+
+
 
   void Ptensors1_broadcast1_cu(cnine::RtensorPack& x, const cnine::RtensorPack& R, 
     const int offs, const cudaStream_t& stream){
@@ -296,9 +320,10 @@ namespace ptens{
     int dev=R.dev;
     PTENS_ASSRT(R.dev==1);
     PTENS_ASSRT(x.dev==1);
+    const_cast<AindexPack&>(list).to_device(1);
     PTENS_ASSRT(list.dev==1);
-    int n=std::max(32,x.dim_of(0,1));
-    Ptensors1_broadcast1_kernel<<<R.size(),std::max(n,32),32,stream>>>
+    int n=std::max(32,R.dim_of(0,1));
+    Ptensors1_broadcast1_kernel<<<list.get_bmap().n,n,32,stream>>>
       (x.arrg+offs,x.dir.garr(dev),list.arrg,list.dir.garr(dev),R.arrg,R.dir.garr(dev),list.get_barr(1));
   }
 

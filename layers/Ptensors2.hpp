@@ -396,7 +396,7 @@ namespace ptens{
 	  view_of(list.tens(i),list.ix(i),offs+n,n).diag01().sum0_into(R.view1_of(i));
 	}
       }
-      GPUCODE(CUDA_STREAM(Ptensors1_reduce0B_cu(R,*this,list,offs,n,stream)));
+      GPUCODE(CUDA_STREAM(Ptensors2_reduce0B_cu(R,*this,list,offs,n,stream)));
       return R;
     }
 

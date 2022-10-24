@@ -61,7 +61,8 @@ namespace ptens{
     int nc=r.get_nc();
     auto indices=G.intersects(x.atoms,r.atoms);
     r.broadcast0(x.reduce0(indices.first,offs,nc),indices.second);
-    r.broadcast1(x.reduce1(indices.first,offs+nc,nc),indices.second);
+    cout<<x.reduce0(indices.first,offs,nc)<<endl;
+    //r.broadcast1(x.reduce1(indices.first,offs+nc,nc),indices.second);
   }
 
 

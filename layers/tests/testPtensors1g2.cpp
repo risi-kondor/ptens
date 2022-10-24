@@ -67,10 +67,13 @@ int main(int argc, char** argv){
 
   {
     auto B=unite1(A,G);
+    //cout<<B<<endl;
+    //cout<<"------"<<endl;
+    //cout<<unite1(Ag,G)<<endl;
     cout<<"unite1:"<<B.diff2(unite1(Ag,G))<<endl;
     Ptensors1 g=Ptensors1::gaussian_like(B);
-    auto Aback=backward_linmap(A,g,G);
-    auto Abackg=backward_linmap(Ag,g.to_device(1),G);
+    auto Aback=backward_unite(A,g,G);
+    auto Abackg=backward_unite(Ag,g.to_device(1),G);
     cout<<Aback.diff2(Abackg)<<endl;
   }
 

@@ -157,7 +157,8 @@ namespace ptens{
 	  in_indices.push_back(j,in(common));
 	  out_indices.push_back(i,out(common));
 	}, self);
-      out_indices.bmap=&get_bmap();
+      out_indices.bmap=new cnine::GatherMap(get_bmap());
+      //cout<<22<<get_bmap()<<endl;
       return make_pair(in_indices, out_indices);
     }
 

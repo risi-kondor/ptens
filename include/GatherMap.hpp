@@ -192,12 +192,17 @@ namespace cnine{
   public: // ---- Transport ----------------------------------------------------------------------------------
 
 
+    GatherMap(const GatherMap& x, const int _dev):
+      GatherMap(x){
+      to_device(_dev);
+    }
+
     GatherMap& to_device(const int _dev){
       if(dev==_dev) return *this;
 
       if(_dev==0){
 	if(dev==1){
-	  cout<<"Moving GatherMap to host "<<endl;
+	  //cout<<"Moving GatherMap to host "<<endl;
 	  delete[] arr;
 	  arr=new int[memsize];
 	  CUDA_SAFE(cudaMemcpy(arr,arrg,memsize*sizeof(int),cudaMemcpyDeviceToHost));  
@@ -209,7 +214,7 @@ namespace cnine{
 
       if(_dev>0){
 	if(dev==0){
-	  cout<<"Moving GatherMap to device "<<endl;
+	  //cout<<"Moving GatherMap to device "<<memsize<<endl;
 	  if(arrg) CUDA_SAFE(cudaFree(arrg));
 	  CUDA_SAFE(cudaMalloc((void **)&arrg, memsize*sizeof(int)));
 	  CUDA_SAFE(cudaMemcpy(arrg,arr,memsize*sizeof(int),cudaMemcpyHostToDevice));  

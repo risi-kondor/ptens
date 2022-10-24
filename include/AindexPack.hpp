@@ -14,7 +14,7 @@ namespace ptens{
   class AindexPack: public cnine::array_pool<int>{
   public:
 
-    cnine::GatherMap const* bmap; // hack
+    cnine::GatherMap const* bmap=nullptr; // hack
 
 
   public: // ---- Constructors ------------------------------------------------------------------------------
@@ -23,16 +23,20 @@ namespace ptens{
     AindexPack(){}
 
 
-  public: // ---- Constructors ------------------------------------------------------------------------------
+  public: // ---- Copying -----------------------------------------------------------------------------------
 
 
     AindexPack(const AindexPack& x):
-      array_pool<int>(x){}
+      array_pool<int>(x){
+      bmap=x.bmap;}
 
     AindexPack(AindexPack&& x):
-      array_pool<int>(std::move(x)){}
+      array_pool<int>(std::move(x)){
+      bmap=x.bmap; x.bmap=nullptr;
+    }
 
     AindexPack& operator=(const AindexPack& x)=delete;
+
 
   public: // ---- Access -------------------------------------------------------------------------------------
 
@@ -81,6 +85,11 @@ namespace ptens{
       return dir(i,1)-1;
     }
     */
+
+    const cnine::GatherMap& get_bmap() const{
+      assert(bmap);
+      return *bmap;
+    }
 
     int* get_barr(const int _dev=0) const{
       assert(bmap);
