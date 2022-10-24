@@ -1,6 +1,5 @@
 import torch
 import ptens as p
-import ptens_base
 import pytest
 
 class TestOuter(object):
@@ -26,9 +25,23 @@ class TestOuter(object):
 
     @pytest.mark.parametrize('nc', [1, 2, 4])
     @pytest.mark.parametrize('atoms', [[[1],[2],[6]],[[1],[2,5],[1,2,6]]])
-    @pytest.mark.parametrize('pts_1', [p.ptensors0, p.ptensors1, p.ptensors2])
+    @pytest.mark.parametrize('pts_1', [p.ptensors0])
     @pytest.mark.parametrize('pts_2', [p.ptensors0, p.ptensors1, p.ptensors2])
     def test_outer0(self, pts_1, pts_2, nc, atoms):
-        self.backprop(pts_1, pts_2, p.cat, atoms, nc)
+        self.backprop(pts_1, pts_2, p.outer, atoms, nc)
+
+    @pytest.mark.parametrize('nc', [1, 2, 4])
+    @pytest.mark.parametrize('atoms', [[[1],[2],[6]],[[1],[2,5],[1,2,6]]])
+    @pytest.mark.parametrize('pts_1', [p.ptensors1])
+    @pytest.mark.parametrize('pts_2', [p.ptensors0, p.ptensors1])
+    def test_outer1(self, pts_1, pts_2, nc, atoms):
+        self.backprop(pts_1, pts_2, p.outer, atoms, nc)
+
+    @pytest.mark.parametrize('nc', [1, 2, 4])
+    @pytest.mark.parametrize('atoms', [[[1],[2],[6]],[[1],[2,5],[1,2,6]]])
+    @pytest.mark.parametrize('pts_1', [p.ptensors2])
+    @pytest.mark.parametrize('pts_2', [p.ptensors0])
+    def test_outer2(self, pts_1, pts_2, nc, atoms):
+        self.backprop(pts_1, pts_2, p.outer, atoms, nc)
 
 
