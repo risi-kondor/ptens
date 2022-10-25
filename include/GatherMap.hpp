@@ -99,8 +99,8 @@ namespace cnine{
   public:
 
     int n=0;
-    int* arr;
-    int* arrg;
+    int* arr=nullptr;
+    int* arrg=nullptr;
     int dev=0;
     int memsize=0;
     bool is_view=false;

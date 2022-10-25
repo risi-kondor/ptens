@@ -174,6 +174,7 @@ namespace ptens{
 
       cnine::GatherMap R(nlists,nedges);
       int i=0;
+      int m=0;
       int tail=3*nlists;
       for(auto q:lists){
 	int len=q.second->size();
@@ -183,7 +184,7 @@ namespace ptens{
 	R.arr[3*i+2]=q.first;
 	int j=0;
 	for(auto p:*q.second){
-	  R.arr[tail+2*j]=p.first;
+	  R.arr[tail+2*j]=m++;
 	  *reinterpret_cast<float*>(R.arr+tail+2*j+1)=p.second;
 	  j++;
 	}
