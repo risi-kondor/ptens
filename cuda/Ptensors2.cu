@@ -74,24 +74,50 @@ __global__ void Ptensors2_reduce0B_kernel(float* rarr, const int* rdir, const fl
 __global__ void Ptensors2_reduce0_kernel(float* rarr, const int* rdir, const float* xarr, const int* xdir, const int* xiarr, const int* xidir, const int n){
   extern __shared__ unsigned char _shared[]; 
   int* ix=reinterpret_cast<int*>(_shared);
-  const int q=blockIdx.x;
+  const int b=blockIdx.x;
   const int c=threadIdx.x;
-  const int k=load_indices(ix,xiarr,xidir,q);
-  const int _k=xdir[4*q+1];
+  const int k=load_indices(ix,xiarr,xidir,b);
+  __syncthreads();
+  const int _k=xdir[4*ix[0]+1];
   const int nc=xdir[3];
   if(c>=n) return;
-  __syncthreads();
 
   const float* x=xarr+xdir[4*ix[0]]+c;
   float t=0;
   for(int i=0; i<k; i++)
     for(int j=0; j<k; j++)
       t+=x[(ix[i+1]*_k+ix[j+1])*nc];
-  rarr[rdir[2*q]+c]+=t;
+  rarr[rdir[2*b]+c]+=t;
+  t=0;
   for(int i=0; i<k; i++)
     t+=x[(ix[i+1]*(_k+1))*nc];
-  rarr[rdir[2*q]+c+nc]+=t;
+  rarr[rdir[2*b]+c+nc]+=t;
 }
+
+
+// contracting version
+__global__ void Ptensors2_reduce0B_kernel(float* rarr, const int* rdir, const float* xarr, const int* xdir, const int* xiarr, const int* xidir, const int n){
+  extern __shared__ unsigned char _shared[]; 
+  int* ix=reinterpret_cast<int*>(_shared);
+  const int b=blockIdx.x;
+  const int c=threadIdx.x;
+  const int k=load_indices(ix,xiarr,xidir,b);
+  __syncthreads();
+  const int _k=xdir[4*ix[0]+1];
+  const int nc=xdir[3];
+  if(c>=n) return;
+
+  const float* x=xarr+xdir[4*ix[0]]+c;
+  float t=0;
+  for(int i=0; i<k; i++){
+    for(int j=0; j<k; j++)
+      t+=x[(ix[i+1]*_k+ix[j+1])*nc];
+    t+=x[(ix[i+1]*(_k+1))*nc+n];
+  }  
+  rarr[rdir[2*b]+c]+=t;
+}
+
+
 
 
 __global__ void Ptensors2_reduce1_kernel(float* rarr, const int* rdir, const float* xarr, const int* xdir){
@@ -152,31 +178,68 @@ __global__ void Ptensors2_reduce1B_kernel(float* rarr, const int* rdir, const fl
 __global__ void Ptensors2_reduce1_kernel(float* rarr, const int* rdir, const float* xarr, const int* xdir, const int* xiarr, const int* xidir, const int n){
   extern __shared__ unsigned char _shared[]; 
   int* ix=reinterpret_cast<int*>(_shared);
-  const int q=blockIdx.x;
+  const int b=blockIdx.x;
   const int c=threadIdx.x;
-  const int k=load_indices(ix,xiarr,xidir,q);
-  const int _k=xdir[4*q+1];
-  const int nc=xdir[3];
-  if(c>=n) return;
+  const int k=load_indices(ix,xiarr,xidir,b);
   __syncthreads();
+  const int _k=xdir[4*ix[0]+1];
+  const int nc=xdir[3];
+  const int rnc=rdir[2];
+  if(c>=n) return;
 
   const float* x=xarr+xdir[4*ix[0]]+c;
-  float* r=rarr+rdir[3*q]+c;
-  for(int i=0; i<k; i++){
-    float t=0;
-    for(int j=0; j<k; j++)
-      t+=x[(ix[i+1]*_k+ix[j+1])*nc];
-    r[i*nc]+=t;
-  }
+  float* r=rarr+rdir[3*b]+c;
   for(int i=0; i<k; i++){
     float t=0;
     for(int j=0; j<k; j++)
       t+=x[(ix[j+1]*_k+ix[i+1])*nc];
-    r[i*nc+nc]+=t;
+    r[i*rnc]+=t;
+  }
+  for(int i=0; i<k; i++){
+    float t=0;
+    for(int j=0; j<k; j++)
+      t+=x[(ix[i+1]*_k+ix[j+1])*nc];
+    r[i*rnc+nc]+=t;
   }
   for(int i=0; i<k; i++)
-    r[i*nc+2*nc]+=x[ix[i+1]*(_k+1)*nc];
+    r[i*rnc+2*nc]+=x[ix[i+1]*(_k+1)*nc];
 }
+
+
+// contracting version
+__global__ void Ptensors2_reduce1B_kernel(float* rarr, const int* rdir, const float* xarr, const int* xdir, const int* xiarr, const int* xidir, const int n){
+  extern __shared__ unsigned char _shared[]; 
+  int* ix=reinterpret_cast<int*>(_shared);
+  const int b=blockIdx.x;
+  const int c=threadIdx.x;
+  const int k=load_indices(ix,xiarr,xidir,b);
+  __syncthreads();
+  const int _k=xdir[4*ix[0]+1];
+  const int nc=xdir[3];
+  const int rnc=rdir[2];
+  if(c>=n) return;
+
+  const float* x=xarr+xdir[4*ix[0]]+c;
+  float* r=rarr+rdir[3*b]+c;
+  for(int i=0; i<k; i++){
+    float t=0;
+    for(int j=0; j<k; j++)
+      t+=x[(ix[j+1]*_k+ix[i+1])*nc];
+    r[i*rnc]+=t;
+  }
+  x+=n;
+  for(int i=0; i<k; i++){
+    float t=0;
+    for(int j=0; j<k; j++)
+      t+=x[(ix[i+1]*_k+ix[j+1])*nc];
+    r[i*rnc]+=t;
+  }
+  x+=n;
+  for(int i=0; i<k; i++)
+    r[i*rnc]+=x[ix[i+1]*(_k+1)*nc];
+}
+
+
 
 
 __global__ void Ptensors2_reduce2_kernel(float* rarr, const int* rdir, const float* xarr, const int* xdir){
@@ -216,16 +279,38 @@ __global__ void Ptensors2_reduce2_kernel(float* rarr, const int* rdir, const flo
   const int q=blockIdx.x;
   const int c=threadIdx.x;
   const int k=load_indices(ix,xiarr,xidir,q);
-  const int _k=xdir[4*q+1];
-  const int nc=xdir[3];
-  if(c>=n) return;
   __syncthreads();
+  const int _k=xdir[4*ix[0]+1];
+  const int nc=xdir[3];
+  const int rnc=rdir[3];
+  if(c>=n) return;
 
   const float* x=xarr+xdir[4*ix[0]]+c;
   float* r=rarr+rdir[4*q]+c;
   for(int i=0; i<k; i++)
     for(int j=0; j<k; j++)
-      r[(i*k+j)*nc]+=x[(ix[i+1]*_k+ix[j+1])*nc];
+      r[(i*k+j)*rnc]+=x[(ix[i+1]*_k+ix[j+1])*nc];
+}
+
+
+// contracting version and flipping
+__global__ void Ptensors2_reduce2B_kernel(float* rarr, const int* rdir, const float* xarr, const int* xdir, const int* xiarr, const int* xidir, const int n){
+  extern __shared__ unsigned char _shared[]; 
+  int* ix=reinterpret_cast<int*>(_shared);
+  const int q=blockIdx.x;
+  const int c=threadIdx.x;
+  const int k=load_indices(ix,xiarr,xidir,q);
+  __syncthreads();
+  const int _k=xdir[4*ix[0]+1];
+  const int nc=xdir[3];
+  const int rnc=rdir[3];
+  if(c>=n) return;
+
+  const float* x=xarr+xdir[4*ix[0]]+c;
+  float* r=rarr+rdir[4*q]+c;
+  for(int i=0; i<k; i++)
+    for(int j=0; j<k; j++)
+      r[(i*k+j)*rnc]+=x[(ix[i+1]*_k+ix[j+1])*nc]+x[(ix[j+1]*_k+ix[i+1])*nc+n];
 }
 
 
@@ -239,7 +324,7 @@ __global__ void Ptensors2_broadcast0_kernel(float* xarr, const int* xdir, const 
   const int k=xdir[4*q+1];
   const int nc=xdir[4*q+3];
   const int rnc=rdir[2*q+1];
-  if(c>=rnc) return; // change elsewhere too!
+  //if(c>=rnc) return; // change elsewhere too!
 
   float* x=xarr+xdir[4*q]+c;
   const float t=rarr[rdir[2*q]+c];
@@ -257,8 +342,8 @@ __global__ void Ptensors2_broadcast0B_kernel(float* xarr, const int* xdir, const
   const int c=threadIdx.x;
   const int k=xdir[4*q+1];
   const int nc=xdir[4*q+3];
-  const int rnc=rdir[2*q+1];
-  if(c>=rnc) return; // change elsewhere too!
+  //const int rnc=rdir[2*q+1];
+  //if(c>=nc) return; // change elsewhere too!
 
   float* x=xarr+xdir[4*q]+c;
   float t=rarr[rdir[2*q]+c];
@@ -301,13 +386,47 @@ __global__ void Ptensors2_broadcast0_kernel(float* xarr, const int* xdir, const 
 }
 
 
+// contracting version
+__global__ void Ptensors2_broadcast0B_kernel(float* xarr, const int* xdir, const int* xiarr, const int* xidir, 
+  const float* rarr, const int* rdir, const int* bmap){
+  extern __shared__ unsigned char _shared[]; 
+  int* ix=reinterpret_cast<int*>(_shared);
+  const int b=blockIdx.x;
+  const int c=threadIdx.x;
+  const int boffs=bmap[3*b];
+  const int N=bmap[3*b+1];
+  const int target=bmap[3*b+2];
+  const int nc=xdir[3];
+  //const int rnc=rdir[1];
+
+  float* x=xarr+xdir[4*target]+c;
+  for(int s=0; s<N; s++){
+    const int src=bmap[boffs+2*s];
+    const int k=load_indices(ix,xiarr,xidir,src);
+    const int _k=xdir[4*target+1];
+    __syncthreads();
+    if(c>=nc) continue; 
+
+    float t=rarr[rdir[2*src]+c];
+    for(int i=0; i<k; i++)
+      for(int j=0; j<k; j++)
+	x[(ix[i+1]*_k+ix[j+1])*nc]+=t;
+    t=rarr[rdir[2*src]+c+nc];
+    for(int i=0; i<k; i++)
+      x[(ix[i+1]*(_k+1))*nc]+=t;
+  }
+}
+
+
+
+
 __global__ void Ptensors2_broadcast1_kernel(float* xarr, const int* xdir, const float* rarr, const int* rdir){
   const int q=blockIdx.x;
   const int c=threadIdx.x;
   const int k=xdir[4*q+1];
   const int nc=xdir[4*q+3];
   const int rnc=rdir[3*q+2];
-  //if(c>=nc) return; // redundant here
+  //if(c>=rnc) return; // redundant here
 
   float* x=xarr+xdir[4*q]+c;
   const float* r=rarr+rdir[3*q]+c;
@@ -391,6 +510,46 @@ __global__ void Ptensors2_broadcast1_kernel(float* xarr, const int* xdir, const 
 }
 
 
+// contracting version
+__global__ void Ptensors2_broadcast1B_kernel(float* xarr, const int* xdir, const int* xiarr, const int* xidir, 
+  const float* rarr, const int* rdir, const int* bmap){
+  extern __shared__ unsigned char _shared[]; 
+  int* ix=reinterpret_cast<int*>(_shared);
+  const int b=blockIdx.x;
+  const int c=threadIdx.x;
+  const int boffs=bmap[3*b];
+  const int N=bmap[3*b+1];
+  const int target=bmap[3*b+2];
+  const int nc=xdir[3];
+  const int rnc=rdir[2];
+
+  float* x=xarr+xdir[4*target]+c;
+  for(int s=0; s<N; s++){
+    const int src=bmap[boffs+2*s];
+    const int k=load_indices(ix,xiarr,xidir,src);
+    const int _k=xdir[4*target+1];
+    __syncthreads();
+    if(c>=nc) return;
+
+    const float* r=rarr+rdir[3*src]+c;
+    for(int i=0; i<k; i++){
+      float t=r[i*rnc];
+      for(int j=0; j<k; j++)
+	x[(ix[j+1]*_k+ix[i+1])*nc]+=t;
+    }
+    for(int i=0; i<k; i++){
+      float t=r[i*rnc+nc];
+      for(int j=0; j<k; j++)
+	x[(ix[i+1]*_k+ix[j+1])*nc]+=t;
+    }
+    for(int i=0; i<k; i++)
+      x[ix[i+1]*(_k+1)*nc]+=r[i*rnc+2*nc];
+  }
+}
+
+
+
+
 __global__ void Ptensors2_broadcast2_kernel(float* xarr, const int* xdir, const float* rarr, const int* rdir){
   const int q=blockIdx.x;
   const int c=threadIdx.x;
@@ -458,6 +617,37 @@ __global__ void Ptensors2_broadcast2_kernel(float* xarr, const int* xdir, const 
 }
 
 
+// contracting version and without flipping
+__global__ void Ptensors2_broadcast2B_kernel(float* xarr, const int* xdir, const int* xiarr, const int* xidir, 
+  const float* rarr, const int* rdir, const int* bmap){
+  extern __shared__ unsigned char _shared[]; 
+  int* ix=reinterpret_cast<int*>(_shared);
+  const int b=blockIdx.x;
+  const int c=threadIdx.x;
+  const int boffs=bmap[3*b];
+  const int N=bmap[3*b+1];
+  const int target=bmap[3*b+2];
+  const int nc=xdir[3];
+  const int rnc=rdir[3];
+
+  float* x=xarr+xdir[4*target]+c;
+  for(int s=0; s<N; s++){
+    const int src=bmap[boffs+2*s];
+    const int k=load_indices(ix,xiarr,xidir,src);
+    const int _k=xdir[4*target+1];
+    __syncthreads();
+    if(c>=nc) return;
+
+    const float* r=rarr+rdir[4*src]+c;
+    for(int i=0; i<k; i++)
+      for(int j=0; j<k; j++)
+	x[(ix[i+1]*_k+ix[j+1])*nc]+=r[(i*k+j)*rnc];
+  }
+}
+
+
+
+
 // -----------------------------------------------------------------------------------------------------------
 
 namespace ptens{
@@ -496,7 +686,7 @@ namespace ptens{
     PTENS_ASSRT(R.dev==1);
     PTENS_ASSRT(x.dev==1);
     const_cast<AindexPack&>(list).to_device(1);
-    Ptensors2_reduce0_kernel<<<R.size(),std::max(n,32),32,stream>>>
+    Ptensors2_reduce0B_kernel<<<R.size(),std::max(n,32),32,stream>>>
       (R.arrg,R.dir.garr(dev),x.arrg+offs,x.dir.garr(dev),list.arrg,list.dir.garr(dev),n);
   }
 
@@ -534,7 +724,7 @@ namespace ptens{
     PTENS_ASSRT(R.dev==1);
     PTENS_ASSRT(x.dev==1);
     const_cast<AindexPack&>(list).to_device(1);
-    Ptensors2_reduce1_kernel<<<R.size(),std::max(n,32),32,stream>>>
+    Ptensors2_reduce1B_kernel<<<R.size(),std::max(n,32),32,stream>>>
       (R.arrg,R.dir.garr(dev),x.arrg+offs,x.dir.garr(dev),list.arrg,list.dir.garr(dev),n);
   }
 
@@ -570,7 +760,7 @@ namespace ptens{
     PTENS_ASSRT(R.dev==1);
     PTENS_ASSRT(x.dev==1);
     const_cast<AindexPack&>(list).to_device(1);
-    Ptensors2_reduce2_kernel<<<R.size(),std::max(n,32),32,stream>>>
+    Ptensors2_reduce2B_kernel<<<R.size(),std::max(n,32),32,stream>>>
       (R.arrg,R.dir.garr(dev),x.arrg+offs,x.dir.garr(dev),list.arrg,list.dir.garr(dev),n);
   }
 
@@ -612,7 +802,7 @@ namespace ptens{
     PTENS_ASSRT(x.dev==1);
     const_cast<AindexPack&>(list).to_device(1);
     int n=std::max(32,x.dim_of(0,2));
-    Ptensors2_broadcast0_kernel<<<list.get_bmap().n,std::max(n,32),32,stream>>>
+    Ptensors2_broadcast0B_kernel<<<list.get_bmap().n,std::max(n,32),32,stream>>>
       (x.arrg+offs,x.dir.garr(dev),list.arrg,list.dir.garr(dev),R.arrg,R.dir.garr(dev),list.get_barr(1));
   }
 
@@ -654,7 +844,7 @@ namespace ptens{
     PTENS_ASSRT(x.dev==1);
     const_cast<AindexPack&>(list).to_device(1);
     int n=std::max(32,x.dim_of(0,2));
-    Ptensors2_broadcast1_kernel<<<list.get_bmap().n,std::max(n,32),32,stream>>>
+    Ptensors2_broadcast1B_kernel<<<list.get_bmap().n,std::max(n,32),32,stream>>>
       (x.arrg+offs,x.dir.garr(dev),list.arrg,list.dir.garr(dev),R.arrg,R.dir.garr(dev),list.get_barr(1));
   }
 
@@ -697,7 +887,7 @@ namespace ptens{
     PTENS_ASSRT(x.dev==1);
     const_cast<AindexPack&>(list).to_device(1);
     int n=std::max(32,x.dim_of(0,2));
-    Ptensors2_broadcast2_kernel<<<list.get_bmap().n,std::max(n,32),32,stream>>>
+    Ptensors2_broadcast2B_kernel<<<list.get_bmap().n,std::max(n,32),32,stream>>>
       (x.arrg+offs,x.dir.garr(dev),list.arrg,list.dir.garr(dev),R.arrg,R.dir.garr(dev),list.get_barr(1));
   }
 

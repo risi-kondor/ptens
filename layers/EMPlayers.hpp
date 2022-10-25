@@ -95,7 +95,7 @@ namespace ptens{
   void add_msg(Ptensors1& r, const Ptensors2& x, const Hgraph& G, int offs=0){
     int nc=x.get_nc();
     auto indices=G.intersects(x.atoms,r.atoms);
-    r.broadcast0(x.reduce0(indices.first),indices.second,offs); // !!
+    r.broadcast0(x.reduce0(indices.first),indices.second,offs);
     r.broadcast1(x.reduce1(indices.first),indices.second,offs+2*nc);
   }
   void add_msg_back(Ptensors2& r, const Ptensors1& x, const Hgraph& G, int offs=0){
