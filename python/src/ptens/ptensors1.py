@@ -481,7 +481,7 @@ class Ptensors1_Outer0Fn(torch.autograd.Function):
     def backward(ctx,g):
         ptens_base.add_outer_back0(ctx.x.gradp(),ctx.r.gradp(),ctx.y)
         ptens_base.add_outer_back1(ctx.y.gradp(),ctx.r.gradp(),ctx.x)
-        return ptensors1.dummy(), ptensors0.dummy()
+        return ptensors1.dummy(), ptens.ptensors0.dummy()
 
 
 class Ptensors1_Outer1Fn(torch.autograd.Function):
