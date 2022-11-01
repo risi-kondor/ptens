@@ -89,7 +89,8 @@ class ptensors2(torch.Tensor):
         return Ptensors2_toMxFn.apply(self)
 
     def to(self, _device='cpu'):
-        self.obj.to_device(ptens.device_id(_device))
+        return Ptensors2_toFn.apply(self,_device)
+        #self.obj.to_device(ptens.device_id(_device))
 
 
     # ---- Operations ----------------------------------------------------------------------------------------
@@ -206,7 +207,25 @@ class Ptensors2_getFn(torch.autograd.Function):
         ctx.x.add_to_grad(ctx.i,g)
         return R, None
 
-    
+
+class Ptensors2_toFn(torch.autograd.Function):
+
+    @staticmethod
+    def forward(ctx,x,_dev):
+        dev=ptens.device_id(_dev)
+        R=ptensors2(1)
+        R.obj=_ptensors2(x.obj,dev)
+        ctx.x=x.obj
+        ctx.r=R.obj
+        ctx.dev=dev
+        return R
+
+    @staticmethod
+    def backward(ctx,g):
+        ctx.x.move_to_back(ctx.r.get_gradp(),ctx.dev)
+        return ptensors2.dummy(), None
+        
+
 class Ptensors2_addFn(torch.autograd.Function):
     
     @staticmethod

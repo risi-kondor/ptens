@@ -60,7 +60,8 @@ pybind11::class_<Ptensors1,cnine::RtensorPack>(m,"ptensors1")
   .def("to_device",&Ptensors1::to_device)
 //.def("move_to_device",&Ptensors1::to_device)
   .def("move_to_device_back",[](Ptensors1& x, const cnine::loose_ptr<Ptensors1>& g, const int dev){
-      x.set_grad(new Ptensors1(g,dev));})
+      if(!x.grad) x.grad=new Ptensors1(g,dev);
+      else x.grad->add(Ptensors1(g,dev));})
 
 
 // ---- Operations -------------------------------------------------------------------------------------------

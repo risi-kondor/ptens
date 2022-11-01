@@ -1,6 +1,7 @@
 pybind11::class_<Ptensors2,cnine::RtensorPack>(m,"ptensors2")
 
   .def(pybind11::init<const Ptensors2&>())
+  .def(pybind11::init<const Ptensors2&, const int>())
   .def(pybind11::init<const at::Tensor&, const AtomsPack&>())
   .def(pybind11::init<const at::Tensor&, const vector<vector<int> >&>())
 
@@ -62,6 +63,9 @@ pybind11::class_<Ptensors2,cnine::RtensorPack>(m,"ptensors2")
   .def("push_back",&Ptensors2::push_back)
 
   .def("to_device",&Ptensors2::to_device)
+  .def("move_to_device_back",[](Ptensors2& x, const cnine::loose_ptr<Ptensors2>& g, const int dev){
+      if(!x.grad) x.grad=new Ptensors2(g,dev);
+      else x.grad->add(Ptensors2(g,dev));})
 
 
 // ---- Operations -------------------------------------------------------------------------------------------

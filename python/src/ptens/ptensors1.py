@@ -89,7 +89,7 @@ class ptensors1(torch.Tensor):
         return Ptensors1_toMxFn.apply(self)
 
     def to(self, _device='cpu'):
-        return Ptensors1_toFn(self,_device)
+        return Ptensors1_toFn.apply(self,_device)
         #self.obj.to_device(ptens.device_id(_device))
 
 
@@ -214,11 +214,12 @@ class Ptensors1_toFn(torch.autograd.Function):
 
     @staticmethod
     def forward(ctx,x,_dev):
-        ctx.dev=ptens.device_id(_dev)
+        dev=ptens.device_id(_dev)
         R=ptensors1(1)
         R.obj=_ptensors1(x.obj,dev)
         ctx.x=x.obj
         ctx.r=R.obj
+        ctx.dev=dev
         return R
 
     @staticmethod
