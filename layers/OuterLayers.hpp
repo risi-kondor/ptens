@@ -11,6 +11,9 @@
 
 namespace ptens{
 
+  #ifdef _WITH_CUDA
+  extern void Ptensors1_outer10_cu(cnine::RtensorPack& r, const cnine::RtensorPack& x, const cnine::RtensorPack& y, cudaStream_t& stream);
+  #endif
 
   // ---- 0,0 -> 0 
 
@@ -125,7 +128,7 @@ namespace ptens{
 
 
   void add_outer(Ptensors1& r, const Ptensors1& x, const Ptensors0& y){
-    CNINE_CPUONLY1(r);
+    //CNINE_CPUONLY1(r);
     using namespace cnine;
     int xc=x.nc;
     int yc=y.nc;
@@ -140,7 +143,9 @@ namespace ptens{
 		r.inc(a,i*yc+j,x(a,i)*y(j));
 	});
     }
+    GPUCODE(CUDA_STREAM(r,x,y,stream));
   }
+
 
   void add_outer_back0(Ptensors1& xg, const Ptensors1& g, const Ptensors0& y){
     CNINE_CPUONLY1(g);

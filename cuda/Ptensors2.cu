@@ -646,6 +646,24 @@ __global__ void Ptensors2_broadcast2B_kernel(float* xarr, const int* xdir, const
 }
 
 
+// ---- Outer ------------------------------------------------------------------------------------------------
+
+/*
+__global__ void Ptensors2_outer20_kernel(float* rarr, const int* rdir, const float* xarr, const float* xdir, const float* yarr, const int* ydir){
+  const int q=blockIdx.x;
+  const int c=threadIdx.x;
+  const int k=xdir[4*q+1];
+  const int nc=xdir[4*q+3];
+
+
+  float* r=rarr+rdir[4*q]+c;
+  const float* x=xarr+xdir[4*q]+c;
+  const float* y=yarr+ydir[2*q]+c;
+  for(int i=0; i<k; i++)
+    for(int j=0; j<k; j++)
+      r[(i*k+j)*nc]+=x[(i*k+j)*nc];
+}
+*/
 
 
 // -----------------------------------------------------------------------------------------------------------

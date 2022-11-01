@@ -240,6 +240,26 @@ __global__ void Ptensors1_broadcast1_kernel(float* xarr, const int* xdir, const 
 }
 
 
+// ---- Outer -----------------------------------------------------------------------------------------------
+
+
+__global__ void Ptensors1_outer10_kernel(float* rarr, const int* rdir, const float* xarr, const int* xdir, const float* yarr, const int* ydir){
+  const int q=blockIdx.x;
+  const int xc=threadIdx.x;
+  const int yc=threadIdx.y;
+  const int rc=xc*ydir[2*q+1]+yc;
+  const int k=xdir[3*q+1];
+  const int nxc=xdir[3*q+2];
+  const int nrc=rdir[3*q+2];
+
+  float* r=rarr+rdir[3*q]+rc;
+  const float* x=xarr+xdir[3*q]+xc;
+  const float t=yarr[ydir[3*q]+yc];
+  for(int i=0; i<k; i++)
+    r[i*nrc]=t*x[i*nxc];
+}
+
+
 // -----------------------------------------------------------------------------------------------------------
 
 
@@ -331,6 +351,20 @@ namespace ptens{
     Ptensors1_broadcast1_kernel<<<list.get_bmap().n,n,32,stream>>>
       (x.arrg+offs,x.dir.garr(dev),list.arrg,list.dir.garr(dev),R.arrg,R.dir.garr(dev),list.get_barr(1));
   }
+
+
+
+  void Ptensors1_outer10_cu(cnine::RtensorPack& r, const cnine::RtensorPack& x, const cnine::RtensorPack& y, 
+    const cudaStream_t& stream){
+    int dev=r.dev;
+    PTENS_ASSRT(r.dev==1);
+    PTENS_ASSRT(x.dev==1);
+    PTENS_ASSRT(y.dev==1);
+    dim3 threads(x.dim_of(0,1),y.dim_of(0,0));
+    Ptensors1_outer10_kernel<<<R.size(),threads,0,stream>>>
+      (r.arrg,r.dir.garr(dev),x.arrg,x.dir.garr(dev),y.arrg,y.dir.garr(dev));
+  }
+
 
 }
 
