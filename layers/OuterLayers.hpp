@@ -12,7 +12,9 @@
 namespace ptens{
 
   #ifdef _WITH_CUDA
-  extern void Ptensors1_outer10_cu(cnine::RtensorPack& r, const cnine::RtensorPack& x, const cnine::RtensorPack& y, cudaStream_t& stream);
+  extern void Ptensors1_add_outer10_cu(cnine::RtensorPack& r, const cnine::RtensorPack& x, const cnine::RtensorPack& y, const cudaStream_t& stream);
+  extern void Ptensors1_add_outer10_back0_cu(cnine::RtensorPack& x, const cnine::RtensorPack& r, const cnine::RtensorPack& y, const cudaStream_t& stream);
+  extern void Ptensors1_add_outer10_back1_cu(cnine::RtensorPack& y, const cnine::RtensorPack& r, const cnine::RtensorPack& x, const cudaStream_t& stream);
   #endif
 
   // ---- 0,0 -> 0 
@@ -143,12 +145,11 @@ namespace ptens{
 		r.inc(a,i*yc+j,x(a,i)*y(j));
 	});
     }
-    GPUCODE(CUDA_STREAM(r,x,y,stream));
+    if(r.dev==1) CUDA_STREAM(Ptensors1_add_outer10_cu(r,x,y,stream));
   }
 
 
   void add_outer_back0(Ptensors1& xg, const Ptensors1& g, const Ptensors0& y){
-    CNINE_CPUONLY1(g);
     using namespace cnine;
     int xc=xg.nc;
     int yc=y.nc;
@@ -163,11 +164,11 @@ namespace ptens{
 		xg.inc(a,i,g(a,i*yc+j)*y(j));
 	});
     }
+    if(g.dev==1) CUDA_STREAM(Ptensors1_add_outer10_back0_cu(xg,g,y,stream));
   }
 
 
   void add_outer_back1(Ptensors0& yg, const Ptensors1& g, const Ptensors1& x){
-    CNINE_CPUONLY1(g);
     using namespace cnine;
     int xc=x.nc;
     int yc=yg.nc;
@@ -182,6 +183,7 @@ namespace ptens{
 		yg.inc(j,g(a,i*yc+j)*x(a,i));
 	});
     }
+    if(g.dev==1) CUDA_STREAM(Ptensors1_add_outer10_back0_cu(yg,g,x,stream));
   }
 
 
