@@ -8,17 +8,15 @@ class TestOuter(object):
         x = pts_1.randn(_atoms, _nc)
         y = pts_2.randn(_atoms, _nc)
         x.requires_grad_()
-        y.requires_grad_()
-        z=fn(x,y).to('cuda')
+        z=fn(x,y)
 
-        testvec=z.randn_like().to('cuda')
+        testvec=z.randn_like()
         loss=z.inp(testvec).to('cuda')
         loss.backward(torch.tensor(1.0))
         xgrad=x.get_grad() 
 
-        xeps = x.randn_like(0.01).to('cuda')
-        yeps = y.randn_like(0.01).to('cuda')
-        z = fn(x+xeps,y+yeps).to('cuda')
+        xeps = x.randn_like(0.01)
+        z = fn(x+xeps,y)
         xloss = z.inp(testvec).to('cuda')
         assert(torch.allclose(xloss-loss,xeps.inp(xgrad),rtol=1e-3, atol=1e-4))
 
