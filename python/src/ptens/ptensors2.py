@@ -115,7 +115,7 @@ class ptensors2(torch.Tensor):
         return Ptensors2_inpFn.apply(self,y)
     
     def diff2(self,y):
-        return Ptensors2_diff2Fn.apply(self,y)
+        return ptens.Ptensors2_diff2Fn.apply(self,y)
 
 
     def linmaps0(self):
@@ -326,7 +326,7 @@ class Ptensors2_mprodFn(torch.autograd.Function):
     @staticmethod
     def backward(ctx,g):
         ctx.x.add_mprod_back0(ctx.r.gradp(),ctx.y)
-        return ptensors1(2), ctx.x.mprod_back1(ctx.r.gradp())
+        return ptens.ptensors1(2), ctx.x.mprod_back1(ctx.r.gradp())
 
 
 class Ptensors2_linearFn(torch.autograd.Function):
@@ -497,7 +497,7 @@ class Ptensors2_Outer0Fn(torch.autograd.Function):
     def backward(ctx,g):
         ptens_base.add_outer_back0(ctx.x.gradp(),ctx.r.gradp(),ctx.y)
         ptens_base.add_outer_back1(ctx.y.gradp(),ctx.r.gradp(),ctx.x)
-        return ptensors2.dummy(), ptensors0.dummy()
+        return ptensors2.dummy(), ptens.ptensors0.dummy()
 
 
 
