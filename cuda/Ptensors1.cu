@@ -323,7 +323,8 @@ namespace ptens{
     PTENS_ASSRT(x.dev==1);
     const_cast<AindexPack&>(list).to_device(1);
     PTENS_ASSRT(list.dev==1);
-    Ptensors1_reduce0_kernel<<<list.size(),std::max(n,32),32,stream>>>
+    const int nthrd=roundup(std::max(n,list.max_nix()+1),32);
+    Ptensors1_reduce0_kernel<<<list.size(),nthrd,(list.max_nix()+1)*4,stream>>>
       (R.arrg,R.dir.garr(dev),x.arrg+offs,x.dir.garr(dev),list.arrg,list.dir.garr(dev),n);
   }
 
@@ -344,7 +345,8 @@ namespace ptens{
     PTENS_ASSRT(x.dev==1);
     const_cast<AindexPack&>(list).to_device(1);
     PTENS_ASSRT(list.dev==1);
-    Ptensors1_reduce1_kernel<<<list.size(),std::max(n,32),32,stream>>>
+    const int nthrd=roundup(std::max(n,list.max_nix()+1),32);
+    Ptensors1_reduce1_kernel<<<list.size(),nthrd,(list.max_nix()+1)*4,stream>>>
       (R.arrg,R.dir.garr(dev),x.arrg+offs,x.dir.garr(dev),list.arrg,list.dir.garr(dev),n);
   }
 
@@ -366,8 +368,8 @@ namespace ptens{
     PTENS_ASSRT(x.dev==1);
     const_cast<AindexPack&>(list).to_device(1);
     PTENS_ASSRT(list.dev==1);
-    int n=std::max(32,R.dim_of(0,0));
-    Ptensors1_broadcast0_kernel<<<list.get_bmap().n,n,128,stream>>> 
+    int n=roundup(std::max(R.dim_of(0,0),list.max_nix()+1),32);
+    Ptensors1_broadcast0_kernel<<<list.get_bmap().n,n,(list.max_nix()+1)*4,stream>>> 
       (x.arrg+offs,x.dir.garr(dev),list.arrg,list.dir.garr(dev),R.arrg,R.dir.garr(dev),list.get_barr(1)); // 32 or 128
   }
 
@@ -390,7 +392,8 @@ namespace ptens{
     const_cast<AindexPack&>(list).to_device(1);
     PTENS_ASSRT(list.dev==1);
     int n=std::max(32,R.dim_of(0,1));
-    Ptensors1_broadcast1_kernel<<<list.get_bmap().n,n,32,stream>>>
+    int n=roundup(std::max(R.dim_of(0,0),list.max_nix()+1),32);
+    Ptensors1_broadcast1_kernel<<<list.get_bmap().n,n,(list.max_nix()+1)*4,stream>>>
       (x.arrg+offs,x.dir.garr(dev),list.arrg,list.dir.garr(dev),R.arrg,R.dir.garr(dev),list.get_barr(1));
   }
 

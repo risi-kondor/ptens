@@ -14,6 +14,8 @@ namespace ptens{
   class AindexPack: public cnine::array_pool<int>{
   public:
 
+    int _max_nix=0;
+
     cnine::GatherMap const* bmap=nullptr; // hack
 
 
@@ -40,6 +42,10 @@ namespace ptens{
 
   public: // ---- Access -------------------------------------------------------------------------------------
 
+
+    int max_nix() const{
+      return _max_nix;
+    }
 
     int tix(const int i) const{
       assert(i<size());
@@ -108,6 +114,7 @@ namespace ptens{
       dir.push_back(tail,len);
       //lookup.push_back(pair<int,int>(tail,len));
       tail+=len;
+      _max_nix=std::max(_max_nix,len-1);
     }
 
     
