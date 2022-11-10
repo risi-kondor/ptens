@@ -115,7 +115,7 @@ class ptensors1(torch.Tensor):
         return Ptensors1_inpFn.apply(self,y)
     
     def diff2(self,y):
-        return Ptensors1_diff2Fn.apply(self,y)
+        return ptens.Ptensors1_diff2Fn.apply(self,y)
 
 
     def linmaps0(self):
