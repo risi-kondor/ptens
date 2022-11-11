@@ -86,6 +86,7 @@ __global__ void Ptensors1_reduce0_kernel(float* rarr, const int* rdir, const flo
   const int c=threadIdx.x;
   const int k=xdir[3*q+1];
   const int nc=xdir[3*q+2];
+  //if(c>=nc) return;
 
   const float* x=xarr+xdir[3*q]+c;
   float t=0;
@@ -119,6 +120,7 @@ __global__ void Ptensors1_reduce1_kernel(float* rarr, const int* rdir, const flo
   const int k=xdir[3*q+1];
   const int nc=xdir[3*q+2];
   const int rnc=rdir[3*q+2];
+  //if(c>=nc) return;
 
   const float* x=xarr+xdir[3*q]+c;
   float* r=rarr+rdir[3*q]+c;
@@ -324,6 +326,8 @@ namespace ptens{
     const_cast<AindexPack&>(list).to_device(1);
     PTENS_ASSRT(list.dev==1);
     const int nthrd=cnine::roundup(std::max(n,list.max_nix()+1),32);
+    cout<<list.max_nix()<<endl;
+    cout<<nthrd<<endl;
     Ptensors1_reduce0_kernel<<<list.size(),nthrd,(list.max_nix()+1)*4,stream>>>
       (R.arrg,R.dir.garr(dev),x.arrg+offs,x.dir.garr(dev),list.arrg,list.dir.garr(dev),n);
   }
@@ -346,6 +350,7 @@ namespace ptens{
     const_cast<AindexPack&>(list).to_device(1);
     PTENS_ASSRT(list.dev==1);
     const int nthrd=cnine::roundup(std::max(n,list.max_nix()+1),32);
+    cout<<nthrd<<endl;
     Ptensors1_reduce1_kernel<<<list.size(),nthrd,(list.max_nix()+1)*4,stream>>>
       (R.arrg,R.dir.garr(dev),x.arrg+offs,x.dir.garr(dev),list.arrg,list.dir.garr(dev),n);
   }
