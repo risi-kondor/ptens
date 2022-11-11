@@ -326,8 +326,6 @@ namespace ptens{
     const_cast<AindexPack&>(list).to_device(1);
     PTENS_ASSRT(list.dev==1);
     const int nthrd=cnine::roundup(std::max(n,list.max_nix()+1),32);
-    cout<<list.max_nix()<<endl;
-    cout<<nthrd<<endl;
     Ptensors1_reduce0_kernel<<<list.size(),nthrd,(list.max_nix()+1)*4,stream>>>
       (R.arrg,R.dir.garr(dev),x.arrg+offs,x.dir.garr(dev),list.arrg,list.dir.garr(dev),n);
   }
@@ -350,7 +348,6 @@ namespace ptens{
     const_cast<AindexPack&>(list).to_device(1);
     PTENS_ASSRT(list.dev==1);
     const int nthrd=cnine::roundup(std::max(n,list.max_nix()+1),32);
-    cout<<nthrd<<endl;
     Ptensors1_reduce1_kernel<<<list.size(),nthrd,(list.max_nix()+1)*4,stream>>>
       (R.arrg,R.dir.garr(dev),x.arrg+offs,x.dir.garr(dev),list.arrg,list.dir.garr(dev),n);
   }
