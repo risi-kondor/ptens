@@ -222,7 +222,7 @@ class Ptensors2_toFn(torch.autograd.Function):
 
     @staticmethod
     def backward(ctx,g):
-        ctx.x.move_to_back(ctx.r.get_gradp(),ctx.dev)
+        ctx.x.move_to_device_back(ctx.r.get_gradp(),ctx.dev)
         return ptensors2.dummy(), None
         
 
