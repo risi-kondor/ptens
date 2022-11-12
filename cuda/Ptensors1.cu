@@ -86,6 +86,7 @@ __global__ void Ptensors1_reduce0_kernel(float* rarr, const int* rdir, const flo
   const int c=threadIdx.x;
   const int k=xdir[3*q+1];
   const int nc=xdir[3*q+2];
+  //if(c>=nc) return;
 
   const float* x=xarr+xdir[3*q]+c;
   float t=0;
@@ -119,6 +120,7 @@ __global__ void Ptensors1_reduce1_kernel(float* rarr, const int* rdir, const flo
   const int k=xdir[3*q+1];
   const int nc=xdir[3*q+2];
   const int rnc=rdir[3*q+2];
+  //if(c>=nc) return;
 
   const float* x=xarr+xdir[3*q]+c;
   float* r=rarr+rdir[3*q]+c;

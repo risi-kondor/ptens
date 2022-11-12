@@ -30,11 +30,14 @@ namespace ptens{
 
     AindexPack(const AindexPack& x):
       array_pool<int>(x){
-      bmap=x.bmap;}
+      bmap=x.bmap;
+      _max_nix=x._max_nix;
+    }
 
     AindexPack(AindexPack&& x):
       array_pool<int>(std::move(x)){
       bmap=x.bmap; x.bmap=nullptr;
+      _max_nix=x._max_nix;
     }
 
     AindexPack& operator=(const AindexPack& x)=delete;
