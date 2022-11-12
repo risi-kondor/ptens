@@ -9,7 +9,7 @@ class TestUnite1(object):
         x=src.randn(_atoms,_nc)
 
         x.requires_grad_()
-        G=p.graph.random(N,0.6)
+        G=p.graph.randomd(N,0.6)
         z=fn(x,G)
         
         testvec=z.randn_like()
@@ -25,11 +25,11 @@ class TestUnite1(object):
 
     @pytest.mark.parametrize('nc', [1, 2, 4])
     def test_unite01(self,nc):
-        self.backprop(p.ptensors0,p.unite1,3,[[1,2],[2,3],[3]],nc)
+        self.backprop(p.ptensors0,p.unite1,3,[[0],[1],[2]],nc)
 
     @pytest.mark.parametrize('nc', [1, 2, 4])
     def test_unite02(self,nc):
-        self.backprop(p.ptensors0,p.unite2,3,[[1,2],[2,3],[3]],nc)
+        self.backprop(p.ptensors0,p.unite2,3,[[0],[1],[2]],nc)
 
     @pytest.mark.parametrize('nc', [1, 2, 4])
     def test_unite11(self,nc):

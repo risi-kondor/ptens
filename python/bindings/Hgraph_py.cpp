@@ -2,6 +2,7 @@ pybind11::class_<Hgraph>(m,"graph")
 
   .def_static("matrix",[](const at::Tensor& x){return Hgraph(cnine::RtensorA(x));})
   .def_static("random",static_cast<Hgraph(*)(const int, const float)>(&Hgraph::random))
+  .def_static("randomd",static_cast<Hgraph(*)(const int, const float)>(&Hgraph::randomd))
 
   .def("nhoods",&Hgraph::nhoods)
   .def("set",&Hgraph::set)

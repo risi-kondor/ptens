@@ -17,6 +17,12 @@ class graph:
         G.obj=_graph.random(_n,_p)
         return G
 
+    @classmethod
+    def randomd(self,_n,_p):
+        G=graph()
+        G.obj=_graph.randomd(_n,_p)
+        return G
+
     def torch(self,):
         return self.obj.dense()
 

@@ -289,7 +289,7 @@ namespace ptens{
       int N=size();
       PTENS_ASSRT(x.size()==N);
       for(int i=0; i<N; i++)
-	view_of(i)+=x.view_of(i,offs,x.nc);
+	view_of(i)+=x.view_of(i,offs,nc);
     }
 
 
