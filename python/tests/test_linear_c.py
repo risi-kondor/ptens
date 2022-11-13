@@ -5,34 +5,34 @@ import pytest
 class TestLinear(object):
     
     def backprop(self, pts, fn, _w, _b, _atoms, _nc):
-        x = pts.randn(_atoms, _nc)
+        x = pts.randn(_atoms, _nc).to('cuda')
         x.requires_grad_()
         print(fn)
-        z=fn(x,_w,_b)
+        z=fn(x,_w,_b).to('cuda')
 
-        testvec=z.randn_like()
+        testvec=z.randn_like().to('cuda')
         loss=z.inp(testvec).to('cuda')
         loss.backward(torch.tensor(1.0))
         xgrad=x.get_grad() 
 
-        xeps = pts.randn(_atoms, _nc)
-        z = fn(x+xeps,_w,_b)
+        xeps = pts.randn(_atoms, _nc).to('cuda')
+        z = fn(x+xeps,_w,_b).to('cuda')
         xloss = z.inp(testvec).to('cuda')
         assert(torch.allclose(xloss-loss,xeps.inp(xgrad),rtol=1e-3, atol=1e-4))
 
 
-    @pytest.mark.parametrize('w', [torch.tensor([[1.0,0.0],[0.0,1.0],[0.0,0.0]])])
-    @pytest.mark.parametrize('b', [torch.tensor([1.0,2.0,3.0])])
+    @pytest.mark.parametrize('w', [torch.tensor([[1.0,0.0],[0.0,1.0],[0.0,0.0]],device='cuda')])
+    @pytest.mark.parametrize('b', [torch.tensor([1.0,2.0,3.0],device='cuda')])
     def test_linear0(self, w, b):
         self.backprop(p.ptensors0, p.linear, w, b, [[1,2,3],[3,5],[2]], 3)
 
-    @pytest.mark.parametrize('w', [torch.tensor([[1.0,0.0],[0.0,1.0],[0.0,0.0]])])
-    @pytest.mark.parametrize('b', [torch.tensor([1.0,2.0,3.0])])
+    @pytest.mark.parametrize('w', [torch.tensor([[1.0,0.0],[0.0,1.0],[0.0,0.0]],device='cuda')])
+    @pytest.mark.parametrize('b', [torch.tensor([1.0,2.0,3.0],device='cuda')])
     def test_linear1(self, w, b):
         self.backprop(p.ptensors1, p.linear, w, b, [[1,2,3],[3,5],[2]], 3)
 
-    @pytest.mark.parametrize('w', [torch.tensor([[1.0,0.0],[0.0,1.0],[0.0,0.0]])])
-    @pytest.mark.parametrize('b', [torch.tensor([1.0,2.0,3.0])])
+    @pytest.mark.parametrize('w', [torch.tensor([[1.0,0.0],[0.0,1.0],[0.0,0.0]],device='cuda')])
+    @pytest.mark.parametrize('b', [torch.tensor([1.0,2.0,3.0],device='cuda')])
     def test_linear2(self, w, b):
         self.backprop(p.ptensors2, p.linear, w, b, [[1,2,3],[3,5],[2]], 3)
 
