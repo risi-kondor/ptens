@@ -13,7 +13,7 @@ class TestUnite(object):
             atoms=ptens_base.atomspack.random(N,0.3)
             x=src.randn(atoms,_nc)
         x.requires_grad_()
-        G=p.graph.random(N,0.3)
+        G=p.graph.randomd(N,0.3)
         z=fn(x,G)
         
         testvec=z.randn_like()

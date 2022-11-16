@@ -9,27 +9,27 @@ class TestUnite1(object):
         x=src.randn(_atoms,_nc)
 
         x.requires_grad_()
-        G=p.graph.random(N,0.6)
+        G=p.graph.randomd(N,0.6)
         z=fn(x,G)
         
         testvec=z.randn_like()
-        loss=z.inp(testvec).cuda()
+        loss=z.inp(testvec).to('cuda')
         loss.backward(torch.tensor(1.0))
         xgrad=x.get_grad()
 
         xeps=x.randn_like()
-        z=fn(x+xeps,G).cuda()
-        xloss=z.inp(testvec).cuda()
+        z=fn(x+xeps,G)
+        xloss=z.inp(testvec).to('cuda')
         assert(torch.allclose(xloss-loss,xeps.inp(xgrad),rtol=1e-3, atol=1e-4))
 
 
     @pytest.mark.parametrize('nc', [1, 2, 4])
     def test_unite01(self,nc):
-        self.backprop(p.ptensors0,p.unite1,3,[[1,2],[2,3],[3]],nc)
+        self.backprop(p.ptensors0,p.unite1,3,[[0],[1],[3]],nc)
 
     @pytest.mark.parametrize('nc', [1, 2, 4])
     def test_unite02(self,nc):
-        self.backprop(p.ptensors0,p.unite2,3,[[1,2],[2,3],[3]],nc)
+        self.backprop(p.ptensors0,p.unite2,3,[[0],[1],[3]],nc)
 
     @pytest.mark.parametrize('nc', [1, 2, 4])
     def test_unite11(self,nc):

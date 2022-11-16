@@ -1,6 +1,6 @@
 import torch
 import ptens as p
-import ptens_base 
+import ptens_base
 import pytest
 
 
