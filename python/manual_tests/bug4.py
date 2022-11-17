@@ -8,6 +8,7 @@ out_channels = 4
 graph = ptens.graph.random(N,0.1)
 x = ptens.ptensors1.randn(graph.nhoods(2),in_channels)
 x = x.to('cuda')
+x.requires_grad_()
 # creating labels
 y = torch.randint(out_channels - 1,(N,),device='cuda')
 
@@ -21,6 +22,9 @@ x = ptens.linear(x,m,b)
 x = ptens.linmaps0(x)
 x = x.torch()
 x = torch.softmax(x,1)
+#x=torch.sum(x)
+#x.backward(x)
+#print(x)
 
 # computing backward
 loss = torch.nn.NLLLoss()

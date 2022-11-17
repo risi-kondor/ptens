@@ -87,11 +87,11 @@ pybind11::class_<Ptensors1,cnine::RtensorPack>(m,"ptensors1")
   .def("add_linear_back0",[](Ptensors1& x, const cnine::loose_ptr<Ptensors1>& g, at::Tensor& y){
       x.get_grad().add_mprod_back0(g,RtensorA::view(y));})
   .def("linear_back1",[](Ptensors1& x, const cnine::loose_ptr<Ptensors1>& g){
-      RtensorA R=RtensorA::zero({x.nc,g->nc});
+      RtensorA R=RtensorA::zero({x.nc,g->nc},g->dev);
       g->add_linear_back1_to(R,x);
       return R.torch();})
   .def("linear_back2",[](const Ptensors1& x, const cnine::loose_ptr<Ptensors1>& g){
-      RtensorA R=RtensorA::zero({g->nc});
+      RtensorA R=RtensorA::zero({g->nc},g->dev);
       g->add_linear_back2_to(R);
       return R.torch();})
 
