@@ -15,6 +15,9 @@ namespace ptens{
   extern void Ptensors1_add_outer10_cu(cnine::RtensorPack& r, const cnine::RtensorPack& x, const cnine::RtensorPack& y, const cudaStream_t& stream);
   extern void Ptensors1_add_outer10_back0_cu(cnine::RtensorPack& x, const cnine::RtensorPack& r, const cnine::RtensorPack& y, const cudaStream_t& stream);
   extern void Ptensors1_add_outer10_back1_cu(cnine::RtensorPack& y, const cnine::RtensorPack& r, const cnine::RtensorPack& x, const cudaStream_t& stream);
+  extern void Ptensors1_add_outer01_cu(cnine::RtensorPack& r, const cnine::RtensorPack& x, const cnine::RtensorPack& y, const cudaStream_t& stream);
+  extern void Ptensors1_add_outer01_back0_cu(cnine::RtensorPack& x, const cnine::RtensorPack& r, const cnine::RtensorPack& y, const cudaStream_t& stream);
+  extern void Ptensors1_add_outer01_back1_cu(cnine::RtensorPack& y, const cnine::RtensorPack& r, const cnine::RtensorPack& x, const cudaStream_t& stream);
   #endif
 
   // ---- 0,0 -> 0 
