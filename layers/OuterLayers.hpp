@@ -122,7 +122,7 @@ namespace ptens{
 		yg.inc(a,j,g(a,i*yc+j)*x(i));
 	});
     }
-    if(g.dev==1) CUDA_STREAM(Ptensors1_add_outer01_back0_cu(yg,g,x,stream));
+    if(g.dev==1) CUDA_STREAM(Ptensors1_add_outer01_back1_cu(yg,g,x,stream));
   }
 
 
@@ -130,7 +130,6 @@ namespace ptens{
 
 
   void add_outer(Ptensors1& r, const Ptensors1& x, const Ptensors0& y){
-    //CNINE_CPUONLY1(r);
     using namespace cnine;
     int xc=x.nc;
     int yc=y.nc;
@@ -183,7 +182,7 @@ namespace ptens{
 		yg.inc(j,g(a,i*yc+j)*x(a,i));
 	});
     }
-    if(g.dev==1) CUDA_STREAM(Ptensors1_add_outer10_back0_cu(yg,g,x,stream));
+    if(g.dev==1) CUDA_STREAM(Ptensors1_add_outer10_back1_cu(yg,g,x,stream));
   }
 
 
