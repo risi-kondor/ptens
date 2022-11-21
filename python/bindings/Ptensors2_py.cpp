@@ -81,7 +81,7 @@ pybind11::class_<Ptensors2,cnine::RtensorPack>(m,"ptensors2")
   .def("add_mprod_back0",[](Ptensors2& x, const Ptensors2& g, at::Tensor& M){
       x.get_grad().add_mprod_back0(g,RtensorA::view(M));})
   .def("mprod_back1",[](Ptensors2& x, const Ptensors2& g){
-      RtensorA R=RtensorA::zero({x.nc,g.nc},g->dev);
+      RtensorA R=RtensorA::zero({x.nc,g.nc},g.dev);
       g.add_mprod_back1_to(R,x);
       return R.torch();
     })
