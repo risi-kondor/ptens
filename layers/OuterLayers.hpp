@@ -12,19 +12,31 @@
 namespace ptens{
 
   #ifdef _WITH_CUDA
+  extern void Ptensors0_add_outer_cu(cnine::RtensorPack& r, const cnine::RtensorPack& x, const cnine::RtensorPack& y, const cudaStream_t& stream);
+  extern void Ptensors0_add_outer_back0_cu(cnine::RtensorPack& x, const cnine::RtensorPack& r, const cnine::RtensorPack& y, const cudaStream_t& stream);
+  extern void Ptensors0_add_outer_back1_cu(cnine::RtensorPack& y, const cnine::RtensorPack& r, const cnine::RtensorPack& x, const cudaStream_t& stream);
   extern void Ptensors1_add_outer10_cu(cnine::RtensorPack& r, const cnine::RtensorPack& x, const cnine::RtensorPack& y, const cudaStream_t& stream);
   extern void Ptensors1_add_outer10_back0_cu(cnine::RtensorPack& x, const cnine::RtensorPack& r, const cnine::RtensorPack& y, const cudaStream_t& stream);
   extern void Ptensors1_add_outer10_back1_cu(cnine::RtensorPack& y, const cnine::RtensorPack& r, const cnine::RtensorPack& x, const cudaStream_t& stream);
   extern void Ptensors1_add_outer01_cu(cnine::RtensorPack& r, const cnine::RtensorPack& x, const cnine::RtensorPack& y, const cudaStream_t& stream);
   extern void Ptensors1_add_outer01_back0_cu(cnine::RtensorPack& x, const cnine::RtensorPack& r, const cnine::RtensorPack& y, const cudaStream_t& stream);
   extern void Ptensors1_add_outer01_back1_cu(cnine::RtensorPack& y, const cnine::RtensorPack& r, const cnine::RtensorPack& x, const cudaStream_t& stream);
+  extern void Ptensors2_add_outer20_cu(cnine::RtensorPack& r, const cnine::RtensorPack& x, const cnine::RtensorPack& y, const cudaStream_t& stream);
+  extern void Ptensors2_add_outer20_back0_cu(cnine::RtensorPack& x, const cnine::RtensorPack& r, const cnine::RtensorPack& y, const cudaStream_t& stream);
+  extern void Ptensors2_add_outer20_back1_cu(cnine::RtensorPack& y, const cnine::RtensorPack& r, const cnine::RtensorPack& x, const cudaStream_t& stream);
+  extern void Ptensors2_add_outer02_cu(cnine::RtensorPack& r, const cnine::RtensorPack& x, const cnine::RtensorPack& y, const cudaStream_t& stream);
+  extern void Ptensors2_add_outer02_back0_cu(cnine::RtensorPack& x, const cnine::RtensorPack& r, const cnine::RtensorPack& y, const cudaStream_t& stream);
+  extern void Ptensors2_add_outer02_back1_cu(cnine::RtensorPack& y, const cnine::RtensorPack& r, const cnine::RtensorPack& x, const cudaStream_t& stream);
+  extern void Ptensors2_add_outer11_cu(cnine::RtensorPack& r, const cnine::RtensorPack& x, const cnine::RtensorPack& y, const cudaStream_t& stream);
+  extern void Ptensors2_add_outer11_back0_cu(cnine::RtensorPack& x, const cnine::RtensorPack& r, const cnine::RtensorPack& y, const cudaStream_t& stream);
+  extern void Ptensors2_add_outer11_back1_cu(cnine::RtensorPack& y, const cnine::RtensorPack& r, const cnine::RtensorPack& x, const cudaStream_t& stream);
   #endif
+
 
   // ---- 0,0 -> 0 
 
 
   void add_outer(Ptensors0& r, const Ptensors0& x, const Ptensors0& y){
-    CNINE_CPUONLY1(r);
     using namespace cnine;
     int xc=x.nc;
     int yc=y.nc;
@@ -36,11 +48,11 @@ namespace ptens{
 	      r.inc(i*yc+j,x(i)*y(j));
 	});
     }
+    if(r.dev==1) CUDA_STREAM(Ptensors0_add_outer_cu(r,x,y,stream));
   }
 
 
   void add_outer_back0(Ptensors0& xg, const Ptensors0& g, const Ptensors0& y){
-    CNINE_CPUONLY1(g);
     using namespace cnine;
     int xc=xg.nc;
     int yc=y.nc;
@@ -52,11 +64,11 @@ namespace ptens{
 	      xg.inc(i,g(i*yc+j)*y(j));
 	});
     }
+    if(g.dev==1) CUDA_STREAM(Ptensors0_add_outer_back0_cu(xg,g,y,stream));
   }
 
 
   void add_outer_back1(Ptensors0& yg, const Ptensors0& g, const Ptensors0& x){
-    CNINE_CPUONLY1(g);
     using namespace cnine;
     int xc=x.nc;
     int yc=yg.nc;
@@ -68,6 +80,7 @@ namespace ptens{
 	      yg.inc(j,g(i*yc+j)*x(i));
 	});
     }
+    if(g.dev==1) CUDA_STREAM(Ptensors0_add_outer_back1_cu(yg,g,x,stream));
   }
 
 
@@ -193,7 +206,6 @@ namespace ptens{
 
 
   void add_outer(Ptensors2& r, const Ptensors1& x, const Ptensors1& y){
-    CNINE_CPUONLY1(r);
     using namespace cnine;
     int xc=x.nc;
     int yc=y.nc;
@@ -210,10 +222,10 @@ namespace ptens{
 		  r.inc(a,b,i*yc+j,x(a,i)*y(b,j));
 	});
     }
+    if(r.dev==1) CUDA_STREAM(Ptensors2_add_outer11_cu(r,x,y,stream));
   }
 
   void add_outer_back0(Ptensors1& xg, const Ptensors2& g, const Ptensors1& y){
-    CNINE_CPUONLY1(g);
     using namespace cnine;
     int xc=xg.nc;
     int yc=y.nc;
@@ -230,10 +242,10 @@ namespace ptens{
 		  xg.inc(a,i,g(a,b,i*yc+j)*y(b,j));
 	});
     }
+    if(g.dev==1) CUDA_STREAM(Ptensors2_add_outer11_back0_cu(xg,g,y,stream));
   }
 
   void add_outer_back1(Ptensors1& yg, const Ptensors2& g, const Ptensors1& x){
-    CNINE_CPUONLY1(g);
     using namespace cnine;
     int xc=x.nc;
     int yc=yg.nc;
@@ -250,6 +262,7 @@ namespace ptens{
 		  yg.inc(b,j,g(a,b,i*yc+j)*x(a,i));
 	});
     }
+    if(g.dev==1) CUDA_STREAM(Ptensors2_add_outer11_back1_cu(yg,g,x,stream));
   }
 
 
@@ -257,7 +270,6 @@ namespace ptens{
 
 
   void add_outer(Ptensors2& r, const Ptensors0& x, const Ptensors2& y){
-    CNINE_CPUONLY1(r);
     using namespace cnine;
     int xc=x.nc;
     int yc=y.nc;
@@ -273,11 +285,11 @@ namespace ptens{
 		  r.inc(a,b,i*yc+j,x(i)*y(a,b,j));
 	});
     }
+    if(r.dev==1) CUDA_STREAM(Ptensors2_add_outer02_cu(r,x,y,stream));
   }
 
 
   void add_outer_back0(Ptensors0& xg, const Ptensors2& g, const Ptensors2& y){
-    CNINE_CPUONLY1(g);
     using namespace cnine;
     int xc=xg.nc;
     int yc=y.nc;
@@ -293,10 +305,10 @@ namespace ptens{
 		  xg.inc(i,g(a,b,i*yc+j)*y(a,b,j));
 	});
     }
+    if(g.dev==1) CUDA_STREAM(Ptensors2_add_outer02_back0_cu(xg,g,y,stream));
   }
 
   void add_outer_back1(Ptensors2& yg, const Ptensors2& g, const Ptensors0& x){
-    CNINE_CPUONLY1(g);
     using namespace cnine;
     int xc=x.nc;
     int yc=yg.nc;
@@ -312,6 +324,7 @@ namespace ptens{
 		  yg.inc(a,b,j,g(a,b,i*yc+j)*x(i));
 	});
     }
+    if(g.dev==1) CUDA_STREAM(Ptensors2_add_outer02_back1_cu(yg,g,x,stream));
   }
 
 
@@ -319,7 +332,6 @@ namespace ptens{
 
 
   void add_outer(Ptensors2& r, const Ptensors2& x, const Ptensors0& y){
-    CNINE_CPUONLY1(r);
     using namespace cnine;
     int xc=x.nc;
     int yc=y.nc;
@@ -335,10 +347,10 @@ namespace ptens{
 		  r.inc(a,b,i*yc+j,x(a,b,i)*y(j));
 	});
     }
+    if(r.dev==1) CUDA_STREAM(Ptensors2_add_outer20_cu(r,x,y,stream));
   }
 
   void add_outer_back0(Ptensors2& xg, const Ptensors2& g, const Ptensors0& y){
-    CNINE_CPUONLY1(g);
     using namespace cnine;
     int xc=xg.nc;
     int yc=y.nc;
@@ -354,10 +366,10 @@ namespace ptens{
 		  xg.inc(a,b,i,g(a,b,i*yc+j)*y(j));
 	});
     }
+    if(g.dev==1) CUDA_STREAM(Ptensors2_add_outer20_back0_cu(xg,g,y,stream));
   }
 
   void add_outer_back1(Ptensors0& yg, const Ptensors2& g, const Ptensors2& x){
-    CNINE_CPUONLY1(g);
     using namespace cnine;
     int xc=x.nc;
     int yc=yg.nc;
@@ -373,6 +385,7 @@ namespace ptens{
 		  yg.inc(j,g(a,b,i*yc+j)*x(a,b,i));
 	});
     }
+    if(g.dev==1) CUDA_STREAM(Ptensors2_add_outer20_back1_cu(yg,g,x,stream));
   }
 
 

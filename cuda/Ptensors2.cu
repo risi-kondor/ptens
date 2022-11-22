@@ -666,10 +666,198 @@ __global__ void Ptensors2_outer20_kernel(float* rarr, const int* rdir, const flo
 */
 
 
+// ---- Outer -----------------------------------------------------------------------------------------------
+
+
+__global__ void Ptensors2_add_outer20_kernel(float* rarr, const int* rdir, const float* xarr, const int* xdir, const float* yarr, const int* ydir){
+  const int q=blockIdx.x;
+  const int xc=threadIdx.x;
+  const int yc=threadIdx.y;
+  const int rc=xc*ydir[2*q+1]+yc;
+  const int k=xdir[4*q+1];
+  const int nxc=xdir[4*q+3];
+  const int nrc=rdir[4*q+3];
+
+  float* r=rarr+rdir[4*q]+rc;
+  const float* x=xarr+xdir[4*q]+xc;
+  const float t=yarr[ydir[2*q]+yc];
+  for(int i=0; i<k*k; i++)
+    r[i*nrc]+=t*x[i*nxc];
+}
+
+
+__global__ void Ptensors2_add_outer20_back0_kernel(float* xarr, const int* xdir, const float* rarr, const int* rdir, const float* yarr, const int* ydir){
+  const int q=blockIdx.x;
+  const int xc=threadIdx.x;
+  const int rc=xc*ydir[2*q+1];
+  const int k=xdir[4*q+1];
+  const int nxc=xdir[4*q+3];
+  const int nyc=ydir[2*q+1];
+  const int nrc=rdir[4*q+3];
+
+  float* x=xarr+xdir[4*q]+xc;
+  const float* r=rarr+rdir[4*q]+rc;
+  const float* y=yarr+ydir[2*q];
+
+  for(int i=0; i<k*k; i++){
+    float t=0;
+    for(int yc=0; yc<nyc; yc++)
+      t+=r[i*nrc+yc]*y[yc];
+    x[i*nxc]+=t;
+  }
+}
+
+
+__global__ void Ptensors2_add_outer20_back1_kernel(float* yarr, const int* ydir, const float* rarr, const int* rdir, const float* xarr, const int* xdir){
+  const int q=blockIdx.x;
+  const int yc=threadIdx.x;
+  const int k=xdir[4*q+1];
+  const int nxc=xdir[4*q+3];
+  const int nyc=ydir[2*q+1];
+  const int nrc=rdir[4*q+3];
+
+  float t=0;
+  for(int i=0; i<k*k; i++){
+    const float* x=xarr+xdir[4*q]+i*nxc;
+    const float* r=rarr+rdir[4*q]+i*nrc+yc;
+    for(int xc=0; xc<nxc; xc++)
+      t+=r[nyc*xc]*x[xc];
+  }
+  yarr[ydir[2*q]+yc]+=t;
+}
+
+
+__global__ void Ptensors2_add_outer02_kernel(float* rarr, const int* rdir, const float* xarr, const int* xdir, const float* yarr, const int* ydir){
+  const int q=blockIdx.x;
+  const int xc=threadIdx.x;
+  const int yc=threadIdx.y;
+  const int rc=xc*ydir[4*q+3]+yc;
+  const int k=ydir[4*q+1];
+  //const int nxc=xdir[2*q+1];
+  const int nyc=ydir[4*q+3];
+  const int nrc=rdir[4*q+3];
+
+  float* r=rarr+rdir[4*q]+rc;
+  const float* y=yarr+ydir[4*q]+yc;
+  const float t=xarr[xdir[2*q]+xc];
+  for(int i=0; i<k*k; i++)
+    r[i*nrc]+=t*y[i*nyc];
+}
+
+
+__global__ void Ptensors2_add_outer02_back0_kernel(float* xarr, const int* xdir, const float* rarr, const int* rdir, const float* yarr, const int* ydir){
+  const int q=blockIdx.x;
+  const int xc=threadIdx.x;
+  const int rc=xc*ydir[4*q+3];
+  const int k=ydir[4*q+1];
+  //const int nxc=xdir[2*q+1];
+  const int nyc=ydir[4*q+3];
+  const int nrc=rdir[4*q+3];
+
+ float t=0;
+ for(int i=0; i<k*k; i++){
+   const float* y=yarr+ydir[4*q]+i*nyc;
+   const float* r=rarr+rdir[4*q]+i*nrc+rc;
+   for(int yc=0; yc<nyc; yc++)
+     t+=r[yc]*y[yc];
+ }
+ xarr[xdir[2*q]+xc]+=t;
+}
+
+
+__global__ void Ptensors2_add_outer02_back1_kernel(float* yarr, const int* ydir, const float* rarr, const int* rdir, const float* xarr, const int* xdir){
+  const int q=blockIdx.x;
+  const int yc=threadIdx.x;
+  const int k=ydir[4*q+1];
+  const int nxc=xdir[2*q+1];
+  const int nyc=ydir[4*q+3];
+  const int nrc=rdir[4*q+3];
+
+  float* y=yarr+ydir[4*q]+yc;
+  const float* r=rarr+rdir[4*q]+yc;
+  const float* x=xarr+xdir[2*q];
+
+  for(int i=0; i<k*k; i++){
+    float t=0;
+    for(int xc=0; xc<nxc; xc++)
+      t+=r[i*nrc+xc*nyc]*x[xc];
+    y[i*nyc]+=t;
+  }
+   
+}
+
+
+__global__ void Ptensors2_add_outer11_kernel(float* rarr, const int* rdir, const float* xarr, const int* xdir, const float* yarr, const int* ydir){
+  const int q=blockIdx.x;
+  const int xc=threadIdx.x;
+  const int yc=threadIdx.y;
+  const int rc=xc*ydir[3*q+2]+yc;
+  const int k=ydir[3*q+1];
+  //const int nxc=xdir[2*q+1];
+  const int nyc=ydir[3*q+2];
+  const int nrc=rdir[4*q+3];
+
+  float* r=rarr+rdir[4*q]+rc;
+  const float* x=xarr+xdir[3*q]+xc;
+  const float* y=yarr+ydir[3*q]+yc;
+  for(int i=0; i<k; i++)
+    for(int j=0; j<k; j++)
+      r[(i*k+j)*nrc]+=t*y[j*nyc];
+}
+
+
+__global__ void Ptensors2_add_outer11_back0_kernel(float* xarr, const int* xdir, const float* rarr, const int* rdir, const float* yarr, const int* ydir){
+  const int q=blockIdx.x;
+  const int xc=threadIdx.x;
+  const int rc=xc*ydir[3*q+2];
+  const int k=ydir[3*q+1];
+  //const int nxc=xdir[2*q+1];
+  const int nyc=ydir[3*q+2];
+  const int nrc=rdir[4*q+3];
+
+ for(int i=0; i<k; i++){
+   float t=0;
+   for(int j=0; j<k; j++){
+     const float* y=yarr+ydir[3*q]+j*nyc;
+     const float* r=rarr+rdir[4*q]+(i*k+j)*nrc+rc;
+     for(int yc=0; yc<nyc; yc++)
+       t+=r[yc]*y[yc];
+   }
+   xarr[xdir[3*q]+i*nxc+xc]+=t;
+ }
+}
+
+
+__global__ void Ptensors2_add_outer11_back1_kernel(float* yarr, const int* ydir, const float* rarr, const int* rdir, const float* xarr, const int* xdir){
+  const int q=blockIdx.x;
+  const int yc=threadIdx.x;
+  const int k=ydir[3*q+1];
+  const int nxc=xdir[3*q+2];
+  const int nyc=ydir[3*q+2];
+  const int nrc=rdir[4*q+3];
+
+  float* y=yarr+ydir[3*q]+yc;
+  const float* r=rarr+rdir[4*q]+yc;
+  const float* x=xarr+xdir[3*q];
+
+  for(int j=0; j<k; j++){
+    float t=0;
+    for(int i=0; i<k; i++){
+      const float* x=xarr+xdir[3*q]+i*nxc;
+      const float* r=rarr+rdir[4*q]+(i*k+j)*nrc+yc;
+      for(int xc=0; xc<nxc; xc++)
+	t+=r[xc*nyc]*x[xc];
+    }
+    yarr[ydir[3*q]+j*nyc+yc]+=t;
+  }
+   
+}
+
+
 // -----------------------------------------------------------------------------------------------------------
 
-namespace ptens{
 
+namespace ptens{
 
 
   void Ptensors2_reduce0_cu(cnine::RtensorPack& R, const cnine::RtensorPack& x, 
@@ -914,6 +1102,104 @@ namespace ptens{
     Ptensors2_broadcast2B_kernel<<<list.get_bmap().n,n,(list.max_nix()+1)*4,stream>>>
       (x.arrg+offs,x.dir.garr(dev),list.arrg,list.dir.garr(dev),R.arrg,R.dir.garr(dev),list.get_barr(1));
   }
+
+
+  void Ptensors2_add_outer20_cu(cnine::RtensorPack& r, const cnine::RtensorPack& x, const cnine::RtensorPack& y, 
+    const cudaStream_t& stream){
+    int dev=r.dev;
+    PTENS_ASSRT(r.dev==1);
+    PTENS_ASSRT(x.dev==1);
+    PTENS_ASSRT(y.dev==1);
+    dim3 threads(x.dim_of(0,2),y.dim_of(0,0));
+    Ptensors2_add_outer20_kernel<<<r.size(),threads,0,stream>>>
+      (r.arrg,r.dir.garr(dev),x.arrg,x.dir.garr(dev),y.arrg,y.dir.garr(dev));
+  }
+
+  void Ptensors2_add_outer20_back0_cu(cnine::RtensorPack& x, const cnine::RtensorPack& r, const cnine::RtensorPack& y, 
+    const cudaStream_t& stream){
+    int dev=r.dev;
+    PTENS_ASSRT(r.dev==1);
+    PTENS_ASSRT(x.dev==1);
+    PTENS_ASSRT(y.dev==1);
+    Ptensors2_add_outer20_back0_kernel<<<r.size(),x.dim_of(0,2),0,stream>>>
+      (x.arrg,x.dir.garr(dev),r.arrg,r.dir.garr(dev),y.arrg,y.dir.garr(dev));
+  }
+
+  void Ptensors2_add_outer20_back1_cu(cnine::RtensorPack& y, const cnine::RtensorPack& r, const cnine::RtensorPack& x, 
+    const cudaStream_t& stream){
+    int dev=r.dev;
+    PTENS_ASSRT(r.dev==1);
+    PTENS_ASSRT(x.dev==1);
+    PTENS_ASSRT(y.dev==1);
+    Ptensors2_add_outer20_back1_kernel<<<r.size(),y.dim_of(0,0),0,stream>>>
+      (y.arrg,y.dir.garr(dev),r.arrg,r.dir.garr(dev),x.arrg,x.dir.garr(dev));
+  }
+
+
+
+  void Ptensors2_add_outer02_cu(cnine::RtensorPack& r, const cnine::RtensorPack& x, const cnine::RtensorPack& y, 
+    const cudaStream_t& stream){
+    int dev=r.dev;
+    PTENS_ASSRT(r.dev==1);
+    PTENS_ASSRT(x.dev==1);
+    PTENS_ASSRT(y.dev==1);
+    dim3 threads(x.dim_of(0,0),y.dim_of(0,2));
+    Ptensors2_add_outer02_kernel<<<r.size(),threads,0,stream>>>
+      (r.arrg,r.dir.garr(dev),x.arrg,x.dir.garr(dev),y.arrg,y.dir.garr(dev));
+  }
+
+  void Ptensors2_add_outer02_back0_cu(cnine::RtensorPack& x, const cnine::RtensorPack& r, const cnine::RtensorPack& y, 
+    const cudaStream_t& stream){
+    int dev=r.dev;
+    PTENS_ASSRT(r.dev==1);
+    PTENS_ASSRT(x.dev==1);
+    PTENS_ASSRT(y.dev==1);
+    Ptensors2_add_outer02_back0_kernel<<<r.size(),x.dim_of(0,0),0,stream>>>
+      (x.arrg,x.dir.garr(dev),r.arrg,r.dir.garr(dev),y.arrg,y.dir.garr(dev));
+  }
+
+  void Ptensors2_add_outer02_back1_cu(cnine::RtensorPack& y, const cnine::RtensorPack& r, const cnine::RtensorPack& x, 
+    const cudaStream_t& stream){
+    int dev=r.dev;
+    PTENS_ASSRT(r.dev==1);
+    PTENS_ASSRT(x.dev==1);
+    PTENS_ASSRT(y.dev==1);
+    Ptensors2_add_outer02_back1_kernel<<<r.size(),y.dim_of(0,2),0,stream>>>
+      (y.arrg,y.dir.garr(dev),r.arrg,r.dir.garr(dev),x.arrg,x.dir.garr(dev));
+  }
+
+
+  void Ptensors2_add_outer11_cu(cnine::RtensorPack& r, const cnine::RtensorPack& x, const cnine::RtensorPack& y, 
+    const cudaStream_t& stream){
+    int dev=r.dev;
+    PTENS_ASSRT(r.dev==1);
+    PTENS_ASSRT(x.dev==1);
+    PTENS_ASSRT(y.dev==1);
+    dim3 threads(x.dim_of(0,1),y.dim_of(0,1));
+    Ptensors2_add_outer11_kernel<<<r.size(),threads,0,stream>>>
+      (r.arrg,r.dir.garr(dev),x.arrg,x.dir.garr(dev),y.arrg,y.dir.garr(dev));
+  }
+
+  void Ptensors2_add_outer11_back0_cu(cnine::RtensorPack& x, const cnine::RtensorPack& r, const cnine::RtensorPack& y, 
+    const cudaStream_t& stream){
+    int dev=r.dev;
+    PTENS_ASSRT(r.dev==1);
+    PTENS_ASSRT(x.dev==1);
+    PTENS_ASSRT(y.dev==1);
+    Ptensors2_add_outer11_back0_kernel<<<r.size(),x.dim_of(0,1),0,stream>>>
+      (x.arrg,x.dir.garr(dev),r.arrg,r.dir.garr(dev),y.arrg,y.dir.garr(dev));
+  }
+
+  void Ptensors2_add_outer11_back1_cu(cnine::RtensorPack& y, const cnine::RtensorPack& r, const cnine::RtensorPack& x, 
+    const cudaStream_t& stream){
+    int dev=r.dev;
+    PTENS_ASSRT(r.dev==1);
+    PTENS_ASSRT(x.dev==1);
+    PTENS_ASSRT(y.dev==1);
+    Ptensors2_add_outer11_back1_kernel<<<r.size(),y.dim_of(0,1),0,stream>>>
+      (y.arrg,y.dir.garr(dev),r.arrg,r.dir.garr(dev),x.arrg,x.dir.garr(dev));
+  }
+
 
 }
 

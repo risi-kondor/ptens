@@ -310,7 +310,7 @@ __global__ void Ptensors1_add_outer01_kernel(float* rarr, const int* rdir, const
   const int rc=xc*ydir[3*q+2]+yc;
   const int k=ydir[3*q+1];
   //const int nxc=xdir[2*q+1];
-  const int nyc=xdir[3*q+2];
+  const int nyc=ydir[3*q+2];
   const int nrc=rdir[3*q+2];
 
   float* r=rarr+rdir[3*q]+rc;
@@ -500,7 +500,7 @@ namespace ptens{
     PTENS_ASSRT(x.dev==1);
     PTENS_ASSRT(y.dev==1);
     dim3 threads(x.dim_of(0,0),y.dim_of(0,1));
-    Ptensors1_add_outer10_kernel<<<r.size(),threads,0,stream>>>
+    Ptensors1_add_outer01_kernel<<<r.size(),threads,0,stream>>>
       (r.arrg,r.dir.garr(dev),x.arrg,x.dir.garr(dev),y.arrg,y.dir.garr(dev));
   }
 
@@ -510,7 +510,7 @@ namespace ptens{
     PTENS_ASSRT(r.dev==1);
     PTENS_ASSRT(x.dev==1);
     PTENS_ASSRT(y.dev==1);
-    Ptensors1_add_outer10_back0_kernel<<<r.size(),x.dim_of(0,0),0,stream>>>
+    Ptensors1_add_outer01_back0_kernel<<<r.size(),x.dim_of(0,0),0,stream>>>
       (x.arrg,x.dir.garr(dev),r.arrg,r.dir.garr(dev),y.arrg,y.dir.garr(dev));
   }
 
@@ -520,7 +520,7 @@ namespace ptens{
     PTENS_ASSRT(r.dev==1);
     PTENS_ASSRT(x.dev==1);
     PTENS_ASSRT(y.dev==1);
-    Ptensors1_add_outer10_back1_kernel<<<r.size(),y.dim_of(0,1),0,stream>>>
+    Ptensors1_add_outer01_back1_kernel<<<r.size(),y.dim_of(0,1),0,stream>>>
       (y.arrg,y.dir.garr(dev),r.arrg,r.dir.garr(dev),x.arrg,x.dir.garr(dev));
   }
 

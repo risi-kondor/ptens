@@ -73,6 +73,55 @@ __global__ void Ptensors0_gather_kernel(float* rarr, const int* rdir, const floa
 }
 
 
+// ---- Outer -----------------------------------------------------------------------------------------------
+
+
+__global__ void Ptensors0_add_outer00_kernel(float* rarr, const int* rdir, const float* xarr, const int* xdir, const float* yarr, const int* ydir){
+  const int q=blockIdx.x;
+  const int xc=threadIdx.x;
+  const int yc=threadIdx.y;
+  const int rc=xc*ydir[2*q+1]+yc;
+  const int nxc=xdir[2*q+1];
+  const int nrc=rdir[2*q+1];
+
+  rarr[rdir[2*q]+rc]+=yarr[ydir[2*q]+yc]+t*xarr[xdir[2*q]+xc];
+}
+
+
+__global__ void Ptensors0_add_outer00_back0_kernel(float* xarr, const int* xdir, const float* rarr, const int* rdir, const float* yarr, const int* ydir){
+  const int q=blockIdx.x;
+  const int xc=threadIdx.x;
+  const int rc=xc*ydir[2*q+1];
+  //const int nxc=xdir[2*q+1];
+  const int nyc=ydir[2*q+1];
+  //const int nrc=rdir[2*q+1];
+
+  const float* r=rarr+rdir[2*q]+rc;
+  const float* y=yarr+ydir[2*q];
+
+  float t=0;
+  for(int yc=0; yc<nyc; yc++)
+    t+=r[yc]*y[yc];
+  xarr[xdir[2*q]+xc]+=t;
+}
+
+
+__global__ void Ptensors0_add_outer00_back1_kernel(float* yarr, const int* ydir, const float* rarr, const int* rdir, const float* xarr, const int* xdir){
+  const int q=blockIdx.x;
+  const int yc=threadIdx.x;
+  const int nxc=xdir[1*q+1];
+  const int nyc=ydir[2*q+1];
+  //const int nrc=rdir[2*q+1];
+
+  float t=0;
+  const float* x=xarr+xdir[3*q];
+  const float* r=rarr+rdir[3*q]+yc;
+  for(int xc=0; xc<nxc; xc++)
+    t+=r[nyc*xc]*x[xc];
+  yarr[ydir[2*q]+yc]+=t;
+}
+
+
 // -----------------------------------------------------------------------------------------------------------
 
 
@@ -118,6 +167,39 @@ namespace ptens{
     Ptensors0_gather_kernel<<<r.size(),x.dim_of(0,0),0,stream>>>
       (r.arrg,r.dir.garr(dev),x.arrg,x.dir.garr(dev),gmap.arrg,gmap.dir.garr(dev));
   }
+
+
+  void Ptensors0_add_outer_cu(cnine::RtensorPack& r, const cnine::RtensorPack& x, const cnine::RtensorPack& y, 
+    const cudaStream_t& stream){
+    int dev=r.dev;
+    PTENS_ASSRT(r.dev==1);
+    PTENS_ASSRT(x.dev==1);
+    PTENS_ASSRT(y.dev==1);
+    dim3 threads(x.dim_of(0,0),y.dim_of(0,0));
+    Ptensors0_add_outer_kernel<<<r.size(),threads,0,stream>>>
+      (r.arrg,r.dir.garr(dev),x.arrg,x.dir.garr(dev),y.arrg,y.dir.garr(dev));
+  }
+
+  void Ptensors0_add_outer_back0_cu(cnine::RtensorPack& x, const cnine::RtensorPack& r, const cnine::RtensorPack& y, 
+    const cudaStream_t& stream){
+    int dev=r.dev;
+    PTENS_ASSRT(r.dev==1);
+    PTENS_ASSRT(x.dev==1);
+    PTENS_ASSRT(y.dev==1);
+    Ptensors0_add_outer_back0_kernel<<<r.size(),x.dim_of(0,0),0,stream>>>
+      (x.arrg,x.dir.garr(dev),r.arrg,r.dir.garr(dev),y.arrg,y.dir.garr(dev));
+  }
+
+  void Ptensors0_add_outer_back1_cu(cnine::RtensorPack& y, const cnine::RtensorPack& r, const cnine::RtensorPack& x, 
+    const cudaStream_t& stream){
+    int dev=r.dev;
+    PTENS_ASSRT(r.dev==1);
+    PTENS_ASSRT(x.dev==1);
+    PTENS_ASSRT(y.dev==1);
+    Ptensors0_add_outer_back1_kernel<<<r.size(),y.dim_of(0,0),0,stream>>>
+      (y.arrg,y.dir.garr(dev),r.arrg,r.dir.garr(dev),x.arrg,x.dir.garr(dev));
+  }
+
 
 }
 
