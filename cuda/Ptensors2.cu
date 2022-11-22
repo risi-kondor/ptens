@@ -793,7 +793,7 @@ __global__ void Ptensors2_add_outer11_kernel(float* rarr, const int* rdir, const
   const int yc=threadIdx.y;
   const int rc=xc*ydir[3*q+2]+yc;
   const int k=ydir[3*q+1];
-  //const int nxc=xdir[2*q+1];
+  const int nxc=xdir[3*q+2];
   const int nyc=ydir[3*q+2];
   const int nrc=rdir[4*q+3];
 
@@ -802,7 +802,7 @@ __global__ void Ptensors2_add_outer11_kernel(float* rarr, const int* rdir, const
   const float* y=yarr+ydir[3*q]+yc;
   for(int i=0; i<k; i++)
     for(int j=0; j<k; j++)
-      r[(i*k+j)*nrc]+=t*y[j*nyc];
+      r[(i*k+j)*nrc]+=x[i*nxc]*y[j*nyc];
 }
 
 
@@ -811,7 +811,7 @@ __global__ void Ptensors2_add_outer11_back0_kernel(float* xarr, const int* xdir,
   const int xc=threadIdx.x;
   const int rc=xc*ydir[3*q+2];
   const int k=ydir[3*q+1];
-  //const int nxc=xdir[2*q+1];
+  const int nxc=xdir[2*q+2];
   const int nyc=ydir[3*q+2];
   const int nrc=rdir[4*q+3];
 
@@ -835,10 +835,6 @@ __global__ void Ptensors2_add_outer11_back1_kernel(float* yarr, const int* ydir,
   const int nxc=xdir[3*q+2];
   const int nyc=ydir[3*q+2];
   const int nrc=rdir[4*q+3];
-
-  float* y=yarr+ydir[3*q]+yc;
-  const float* r=rarr+rdir[4*q]+yc;
-  const float* x=xarr+xdir[3*q];
 
   for(int j=0; j<k; j++){
     float t=0;

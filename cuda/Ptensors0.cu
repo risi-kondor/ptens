@@ -76,19 +76,19 @@ __global__ void Ptensors0_gather_kernel(float* rarr, const int* rdir, const floa
 // ---- Outer -----------------------------------------------------------------------------------------------
 
 
-__global__ void Ptensors0_add_outer00_kernel(float* rarr, const int* rdir, const float* xarr, const int* xdir, const float* yarr, const int* ydir){
+__global__ void Ptensors0_add_outer_kernel(float* rarr, const int* rdir, const float* xarr, const int* xdir, const float* yarr, const int* ydir){
   const int q=blockIdx.x;
   const int xc=threadIdx.x;
   const int yc=threadIdx.y;
   const int rc=xc*ydir[2*q+1]+yc;
-  const int nxc=xdir[2*q+1];
-  const int nrc=rdir[2*q+1];
+  //const int nxc=xdir[2*q+1];
+  //const int nrc=rdir[2*q+1];
 
-  rarr[rdir[2*q]+rc]+=yarr[ydir[2*q]+yc]+t*xarr[xdir[2*q]+xc];
+  rarr[rdir[2*q]+rc]+=yarr[ydir[2*q]+yc]*xarr[xdir[2*q]+xc];
 }
 
 
-__global__ void Ptensors0_add_outer00_back0_kernel(float* xarr, const int* xdir, const float* rarr, const int* rdir, const float* yarr, const int* ydir){
+__global__ void Ptensors0_add_outer_back0_kernel(float* xarr, const int* xdir, const float* rarr, const int* rdir, const float* yarr, const int* ydir){
   const int q=blockIdx.x;
   const int xc=threadIdx.x;
   const int rc=xc*ydir[2*q+1];
@@ -106,7 +106,7 @@ __global__ void Ptensors0_add_outer00_back0_kernel(float* xarr, const int* xdir,
 }
 
 
-__global__ void Ptensors0_add_outer00_back1_kernel(float* yarr, const int* ydir, const float* rarr, const int* rdir, const float* xarr, const int* xdir){
+__global__ void Ptensors0_add_outer_back1_kernel(float* yarr, const int* ydir, const float* rarr, const int* rdir, const float* xarr, const int* xdir){
   const int q=blockIdx.x;
   const int yc=threadIdx.x;
   const int nxc=xdir[1*q+1];
