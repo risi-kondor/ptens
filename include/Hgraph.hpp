@@ -20,7 +20,8 @@ namespace ptens{
 
     mutable Hgraph* _reverse=nullptr;
     mutable cnine::CSRmatrix<float>* gmap=nullptr; 
-    mutable cnine::GatherMap* bmap=nullptr;
+    //mutable cnine::GatherMap* bmap=nullptr;
+    mutable shared_ptr<cnine::GatherMap> bmap;
     mutable vector<AtomsPack*> _nhoods; 
 
     ~Hgraph(){
@@ -28,7 +29,7 @@ namespace ptens{
       for(auto p:_nhoods)
 	delete p;
       if(gmap) delete gmap;
-      if(bmap) delete bmap;
+      //if(bmap) delete bmap;
     }
 
 
@@ -84,10 +85,10 @@ namespace ptens{
       return *gmap;
     }
 
-    const cnine::GatherMap& get_bmap() const{
-      if(!bmap) bmap=new cnine::GatherMap(broadcast_map());
-      return *bmap;
-    }
+    //const cnine::GatherMap& get_bmap() const{
+    //if(!bmap) bmap=new cnine::GatherMap(broadcast_map());
+    //return *bmap;
+    //}
 
 
     void forall_edges(std::function<void(const int, const int, const float)> lambda, const bool self=0) const{
@@ -157,7 +158,9 @@ namespace ptens{
 	  in_indices.push_back(j,in(common));
 	  out_indices.push_back(i,out(common));
 	}, self);
-      out_indices.bmap=new cnine::GatherMap(get_bmap());
+      //out_indices.bmap=new cnine::GatherMap(get_bmap());
+      if(!bmap) bmap=std::shared_ptr<cnine::GatherMap>(new cnine::GatherMap(broadcast_map())); 
+      out_indices.bmap=bmap; //new cnine::GatherMap(get_bmap());
       //cout<<22<<get_bmap()<<endl;
       return make_pair(in_indices, out_indices);
     }

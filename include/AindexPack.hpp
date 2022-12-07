@@ -16,7 +16,8 @@ namespace ptens{
 
     int _max_nix=0;
 
-    cnine::GatherMap const* bmap=nullptr; // hack
+    //cnine::GatherMap const* bmap=nullptr; // hack
+    std::shared_ptr<cnine::GatherMap> bmap;
 
 
   public: // ---- Constructors ------------------------------------------------------------------------------
@@ -102,7 +103,8 @@ namespace ptens{
 
     int* get_barr(const int _dev=0) const{
       assert(bmap);
-      const_cast<cnine::GatherMap*>(bmap)->to_device(_dev);
+      //const_cast<cnine::GatherMap*>(bmap)->to_device(_dev);
+      bmap->to_device(_dev);
       if(_dev==0) return bmap->arr;
       return bmap->arrg;
     }
