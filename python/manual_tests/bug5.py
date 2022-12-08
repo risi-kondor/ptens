@@ -4,7 +4,7 @@ import ptens
 in_channels = 512
 out_channels = 256
 N = 60
-dev='cpu'
+dev='cuda'
 
 G = ptens.graph.random(N,0.05)
 x = ptens.ptensors1.randn(G.nhoods(1),in_channels).to(dev)
