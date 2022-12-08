@@ -55,7 +55,7 @@ namespace ptens{
 
     int nc;
     AtomsPack atoms;
-    bool is_view=false;
+    //bool is_view=false;
 
 
     ~Ptensors2(){
