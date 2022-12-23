@@ -59,11 +59,15 @@ namespace ptens{
     void add(const Rtensor2_view& x) const{
       CNINE_CPUONLY();
       for(int i0=0; i0<n0; i0++)
-	for(int i1=0; i1<n1; i1++){
-	  //arr[0]+=1.0;
-	  //arr[s0*0+s1*i1]+=1.0; 
+	for(int i1=0; i1<n1; i1++)
 	  arr[s0*ix[i0]+s1*i1]+=x.arr[x.s0*i0+x.s1*i1];
-	}
+    }
+
+    void add(const Rtensor2_view& x, const float c) const{
+      CNINE_CPUONLY();
+      for(int i0=0; i0<n0; i0++)
+	for(int i1=0; i1<n1; i1++)
+	  arr[s0*ix[i0]+s1*i1]+=x.arr[x.s0*i0+x.s1*i1]/c;
     }
 
     void operator+=(const Rtensor2_view& x) const{
@@ -82,6 +86,17 @@ namespace ptens{
 	for(int j=0; j<n0; j++) 
 	  t+=arr[s0*ix[j]+s1*i];
 	r.inc(i,t);
+      }
+    }
+
+    void avg0_into(const Rtensor1_view& r){
+      CNINE_CPUONLY();
+      assert(r.n0==n1);
+      for(int i=0; i<n1; i++){
+	float t=0; 
+	for(int j=0; j<n0; j++) 
+	  t+=arr[s0*ix[j]+s1*i];
+	r.inc(i,t/n0);
       }
     }
 

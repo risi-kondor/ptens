@@ -41,6 +41,13 @@ namespace ptens{
     r.broadcast0(x.reduce0(offs,r.nc));
   }
 
+  inline void add_linmaps_n(Ptensors0& r, const Ptensors1& x, const int offs=0){
+    r.broadcast0(x.reduce0_n(),offs);
+  }
+  inline void add_linmaps_back_n(Ptensors1& r, const Ptensors0& x, const int offs=0){
+    r.broadcast0_n(x.reduce0(offs,r.nc));
+  }
+
 
   // 1 -> 1
   inline void add_linmaps(Ptensors1& r, const Ptensors1& x, const int offs=0){
@@ -49,6 +56,15 @@ namespace ptens{
   }
   inline void add_linmaps_back(Ptensors1& r, const Ptensors1& x, const int offs=0){
     r.broadcast0(x.reduce0(offs,r.nc));
+    r.broadcast1(x.reduce1(offs+r.nc,r.nc));
+  }
+
+  inline void add_linmaps_n(Ptensors1& r, const Ptensors1& x, const int offs=0){
+    r.broadcast0(x.reduce0_n(),offs);
+    r.broadcast1(x.reduce1(),offs+x.nc);
+  }
+  inline void add_linmaps_back_n(Ptensors1& r, const Ptensors1& x, const int offs=0){
+    r.broadcast0_n(x.reduce0(offs,r.nc));
     r.broadcast1(x.reduce1(offs+r.nc,r.nc));
   }
 
@@ -63,6 +79,15 @@ namespace ptens{
     r.broadcast1(x.reduce1(offs+2*r.nc,r.nc));
   }
 
+  inline void add_linmaps_n(Ptensors2& r, const Ptensors1& x, const int offs=0){
+    r.broadcast0(x.reduce0_n(),offs);
+    r.broadcast1(x.reduce1(),offs+2*x.nc);
+  }
+  inline void add_linmaps_back_n(Ptensors1& r, const Ptensors2& x, const int offs=0){
+    r.broadcast0_n(x.reduce0(offs,r.nc));
+    r.broadcast1(x.reduce1(offs+2*r.nc,r.nc));
+  }
+
 
 
   // 2 -> 0
@@ -71,6 +96,13 @@ namespace ptens{
   }
   inline void add_linmaps_back(Ptensors2& r, const Ptensors0& x, const int offs=0){
     r.broadcast0(x.reduce0(offs,2*r.nc)); // changed
+  }
+
+  inline void add_linmaps_n(Ptensors0& r, const Ptensors2& x, const int offs=0){
+    r.broadcast0(x.reduce0_n(),offs);
+  }
+  inline void add_linmaps_back_n(Ptensors2& r, const Ptensors0& x, const int offs=0){
+    r.broadcast0_n(x.reduce0(offs,2*r.nc)); // changed
   }
 
 
@@ -82,7 +114,15 @@ namespace ptens{
   inline void add_linmaps_back(Ptensors2& r, const Ptensors1& x, const int offs=0){
     r.broadcast0(x.reduce0(offs,2*r.nc)); // changed
     r.broadcast1(x.reduce1(offs+2*r.nc,3*r.nc)); // changed
-    //cout<<x.reduce1(offs+2*r.nc,3*r.nc)<<endl;
+  }
+
+  inline void add_linmaps_n(Ptensors1& r, const Ptensors2& x, const int offs=0){
+    r.broadcast0(x.reduce0_n(),offs);
+    r.broadcast1(x.reduce1_n(),offs+2*x.nc);
+  }
+  inline void add_linmaps_back_n(Ptensors2& r, const Ptensors1& x, const int offs=0){
+    r.broadcast0_n(x.reduce0(offs,2*r.nc)); // changed
+    r.broadcast1_n(x.reduce1(offs+2*r.nc,3*r.nc)); // changed
   }
 
 
@@ -97,6 +137,18 @@ namespace ptens{
     r.broadcast1(x.reduce1(offs+4*r.nc,3*r.nc)); // changed 
     r.broadcast2(x.reduce2(offs+13*r.nc,r.nc));
   }
+
+  inline void add_linmaps_n(Ptensors2& r, const Ptensors2& x, const int offs=0){
+    r.broadcast0(x.reduce0_n(),offs);
+    r.broadcast1(x.reduce1_n(),offs+4*x.nc);
+    r.broadcast2(x.reduce2(),offs+13*x.nc);
+  }
+  inline void add_linmaps_back_n(Ptensors2& r, const Ptensors2& x, const int offs=0){
+    r.broadcast0_n(x.reduce0(offs,2*r.nc)); // changed 
+    r.broadcast1_n(x.reduce1(offs+4*r.nc,3*r.nc)); // changed 
+    r.broadcast2(x.reduce2(offs+13*r.nc,r.nc));
+  }
+
 
 
   inline Ptensors0 linmaps0(const Ptensors0& x){
@@ -152,6 +204,45 @@ namespace ptens{
   inline Ptensors2 linmaps2(const Ptensors2& x){
     Ptensors2 R=Ptensors2::zero(x.atoms,15*x.nc,x.dev);
     add_linmaps(R,x);
+    return R;
+  }
+
+
+
+  inline Ptensors0 linmaps0_n(const Ptensors1& x){
+    Ptensors0 R=Ptensors0::zero(x.atoms,x.nc,x.dev);
+    add_linmaps_n(R,x);
+    return R;
+  }
+
+  inline Ptensors1 linmaps1_n(const Ptensors1& x){
+    Ptensors1 R=Ptensors1::zero(x.atoms,2*x.nc,x.dev);
+    add_linmaps_n(R,x);
+    return R;
+  }
+
+  inline Ptensors2 linmaps2_n(const Ptensors1& x){
+    Ptensors2 R=Ptensors2::zero(x.atoms,5*x.nc,x.dev);
+    add_linmaps_n(R,x);
+    return R;
+  }
+
+
+  inline Ptensors0 linmaps0_n(const Ptensors2& x){
+    Ptensors0 R=Ptensors0::zero(x.atoms,2*x.nc,x.dev);
+    add_linmaps_n(R,x);
+    return R;
+  }
+
+  inline Ptensors1 linmaps1_n(const Ptensors2& x){
+    Ptensors1 R=Ptensors1::zero(x.atoms,5*x.nc,x.dev);
+    add_linmaps_n(R,x);
+    return R;
+  }
+
+  inline Ptensors2 linmaps2_n(const Ptensors2& x){
+    Ptensors2 R=Ptensors2::zero(x.atoms,15*x.nc,x.dev);
+    add_linmaps_n(R,x);
     return R;
   }
 

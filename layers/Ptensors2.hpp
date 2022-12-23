@@ -360,6 +360,19 @@ namespace ptens{
       return R;
     }
 
+    RtensorPack reduce0_n() const{
+      RtensorPack R(size(),Gdims(2*nc),cnine::fill_zero(),dev);
+      if(dev==0){
+	for(int i=0; i<size(); i++){
+	  view_of(i).avg01_into(R.view1_of(i).block(0,nc));
+	  view_of(i).diag01().avg0_into(R.view1_of(i).block(nc,nc));
+	}
+      }
+      PTENS_CPUONLY();
+      //GPUCODE(CUDA_STREAM(Ptensors2_reduce0_cu(R,*this,0,nc,stream)));
+      return R;
+    }
+
     RtensorPack reduce0(const int offs, const int n) const{
       RtensorPack R(size(),Gdims(n),cnine::fill_zero(),dev);
       if(dev==0){
@@ -383,6 +396,21 @@ namespace ptens{
 	}
       }
       GPUCODE(CUDA_STREAM(Ptensors2_reduce0_cu(R,*this,list,0,nc,stream)));
+      return R;
+    }
+
+    RtensorPack reduce0_n(const AindexPack& list) const{
+      int N=list.size();
+      RtensorPack R(N,Gdims(2*nc),cnine::fill_zero(),dev);
+      if(dev==0){
+	for(int i=0; i<N; i++){
+	  if(list.nix(i)==0) continue;
+	  view_of(list.tens(i),list.ix(i)).avg01_into(R.view1_of(i).block(0,nc));
+	  view_of(list.tens(i),list.ix(i)).diag01().avg0_into(R.view1_of(i).block(nc,nc));
+	}
+      }
+      PTENS_CPUONLY();
+      //GPUCODE(CUDA_STREAM(Ptensors2_reduce0_cu(R,*this,list,0,nc,stream)));
       return R;
     }
 
@@ -413,6 +441,23 @@ namespace ptens{
 	}
       }
       GPUCODE(CUDA_STREAM(Ptensors2_reduce1_cu(R,*this,0,nc,stream)));
+      return R;
+    }
+
+    RtensorPack reduce1_n() const{
+      cnine::array_pool<int> dims;
+      for(int i=0; i<size(); i++)
+	dims.push_back(vector<int>({k_of(i),3*nc}));
+      RtensorPack R(dims,cnine::fill_zero(),dev);
+      if(dev==0){
+	for(int i=0; i<size(); i++){
+	  view_of(i).avg0_into(R.view2_of(i).block(0,0,-1,nc));
+	  view_of(i).avg1_into(R.view2_of(i).block(0,nc,-1,nc));
+	  R.view2_of(i).block(0,2*nc,-1,nc)+=view_of(i).diag01();
+	}
+      }
+      PTENS_CPUONLY();
+      //GPUCODE(CUDA_STREAM(Ptensors2_reduce1_cu(R,*this,0,nc,stream)));
       return R;
     }
 
@@ -447,6 +492,25 @@ namespace ptens{
 	}
       }
       GPUCODE(CUDA_STREAM(Ptensors2_reduce1_cu(R,*this,list,0,nc,stream)));
+      return R;
+    }
+
+    RtensorPack reduce1_n(const AindexPack& list) const{
+      int N=list.size();
+      cnine::array_pool<int> dims;
+      for(int i=0; i<N; i++)
+	dims.push_back(vector<int>({list.nix(i),3*nc}));
+      RtensorPack R(dims,cnine::fill_zero(),dev);
+      if(dev==0){
+	for(int i=0; i<N; i++){
+	  if(list.nix(i)==0) continue;
+	  view_of(list.tens(i),list.ix(i)).avg0_into(R.view2_of(i).block(0,0,-1,nc));
+	  view_of(list.tens(i),list.ix(i)).avg1_into(R.view2_of(i).block(0,nc,-1,nc));
+	  R.view2_of(i).block(0,2*nc,-1,nc)+=view_of(list.tens(i),list.ix(i)).diag01();
+	}
+      }
+      PTENS_CPUONLY();
+      //GPUCODE(CUDA_STREAM(Ptensors2_reduce1_cu(R,*this,list,0,nc,stream)));
       return R;
     }
 
@@ -522,17 +586,29 @@ namespace ptens{
 
 
   public: // ---- Broadcasting -------------------------------------------------------------------------------
-    // these need to be doubled
+
 
     void broadcast0(const RtensorPack& x){
       const int n=x.dim_of(0,0);
       if(dev==0){
 	for(int i=0; i<size(); i++){
-	  view_of(i)+=repeat0(repeat0(x.view1_of(i).block(0,nc),k_of(i)),k_of(i));
-	  view_of(i).diag01()+=repeat0(x.view1_of(i).block(nc,nc),k_of(i));
+	  view_of(i).add(repeat0(repeat0(x.view1_of(i).block(0,nc),k_of(i)),k_of(i)));
+	  view_of(i).diag01().add(repeat0(x.view1_of(i).block(nc,nc),k_of(i)));
 	}
       }
       GPUCODE(CUDA_STREAM(Ptensors2_broadcast0B_cu(*this,x,0,stream)));
+    }
+
+    void broadcast0_n(const RtensorPack& x){
+      const int n=x.dim_of(0,0);
+      if(dev==0){
+	for(int i=0; i<size(); i++){
+	  view_of(i).add(repeat0(repeat0(x.view1_of(i).block(0,nc),k_of(i)),k_of(i)),1.0/((float)k_of(i)*(float)(k_of(i))));
+	  view_of(i).diag01().add(repeat0(x.view1_of(i).block(nc,nc),k_of(i)),1.0/((float)k_of(i)));
+	}
+      }
+      PTENS_CPUONLY();
+      //GPUCODE(CUDA_STREAM(Ptensors2_broadcast0B_cu(*this,x,0,stream)));
     }
 
     void broadcast0(const RtensorPack& x, const int offs){
@@ -559,6 +635,22 @@ namespace ptens{
       GPUCODE(CUDA_STREAM(Ptensors2_broadcast0B_cu(*this,x,list,0,stream)));
     }
 
+    void broadcast0_n(const RtensorPack& x, const AindexPack& list){
+      int N=list.size();
+      const int n=x.dim_of(0,0);
+      if(dev==0){
+	for(int i=0; i<N; i++){
+	  if(x.dim_of(i,0)==0) continue;
+	  view_of(list.tens(i),list.ix(i)).
+	    add(repeat0(repeat0(x.view1_of(i).block(0,nc),list.nix(i)),list.nix(i)),1.0/((float)list.nix(i)*list.nix(i)));
+	  view_of(list.tens(i),list.ix(i)).diag01().
+	    add(repeat0(x.view1_of(i).block(nc,nc),list.nix(i)),1.0/((float)list.nix(i)));
+	}
+      }
+      PTENS_CPUONLY();
+      //GPUCODE(CUDA_STREAM(Ptensors2_broadcast0B_cu(*this,x,list,0,stream)));
+    }
+
     void broadcast0(const RtensorPack& x, const AindexPack& list, const int offs){
       int N=list.size();
       const int n=x.dim_of(0,0);
@@ -581,6 +673,18 @@ namespace ptens{
 	}
       }
       GPUCODE(CUDA_STREAM(Ptensors2_broadcast1B_cu(*this,x,0,stream)));
+    }
+
+    void broadcast1_n(const RtensorPack& x){
+      if(dev==0){
+	for(int i=0; i<size(); i++){
+	  view_of(i).add(repeat0(x.view2_of(i).block(0,0,-1,nc),k_of(i)),1.0/((float)k_of(i)));
+	  view_of(i).add(repeat1(x.view2_of(i).block(0,nc,-1,nc),k_of(i)),1.0/((float)k_of(i)));
+	  view_of(i).diag01()+=x.view2_of(i).block(0,2*nc,-1,nc);
+	}
+      }
+      PTENS_CPUONLY();
+      //GPUCODE(CUDA_STREAM(Ptensors2_broadcast1B_cu(*this,x,0,stream)));
     }
 
     void broadcast1(const RtensorPack& x, const int offs){
@@ -607,6 +711,23 @@ namespace ptens{
 	}
       }
       GPUCODE(CUDA_STREAM(Ptensors2_broadcast1B_cu(*this,x,list,0,stream)));
+    }
+
+    void broadcast1_n(const RtensorPack& x, const AindexPack& list){
+      int N=list.size();
+      //const int n=x.dim_of(0,1);
+      if(dev==0){
+	for(int i=0; i<N; i++){
+	  if(x.dim_of(i,0)==0) continue;
+	  view_of(list.tens(i),list.ix(i))
+	    .add(repeat0(x.view2_of(i).block(0,0,-1,nc),list.nix(i)),1.0/((float)list.nix(i)));
+	  view_of(list.tens(i),list.ix(i))
+	    .add(repeat1(x.view2_of(i).block(0,nc,-1,nc),list.nix(i)),1.0/((float)list.nix(i)));
+	  view_of(list.tens(i),list.ix(i)).diag01()+=x.view2_of(i).block(0,2*nc,-1,nc);
+	}
+      }
+      PTENS_CPUONLY();
+      //GPUCODE(CUDA_STREAM(Ptensors2_broadcast1B_cu(*this,x,list,0,stream)));
     }
 
     void broadcast1(const RtensorPack& x, const AindexPack& list, const int offs){

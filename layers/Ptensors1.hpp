@@ -388,6 +388,17 @@ namespace ptens{
       return R;
     }
 
+    RtensorPack reduce0_n() const{
+      RtensorPack R(size(),Gdims(nc),cnine::fill_zero(),dev);
+      if(dev==0){
+	for(int i=0; i<size(); i++)
+	  view_of(i).avg0_into(R.view1_of(i));
+      }
+      PTENS_CPUONLY();
+      //GPUCODE(CUDA_STREAM(Ptensors1_reduce0_cu(R,*this,0,nc,stream)));
+      return R;
+    }
+
     RtensorPack reduce0(const int offs, const int n) const{
       RtensorPack R(size(),Gdims(n),cnine::fill_zero(),dev);
       if(dev==0){
@@ -408,6 +419,20 @@ namespace ptens{
 	}
       }
       GPUCODE(CUDA_STREAM(Ptensors1_reduce0_cu(R,*this,list,0,nc,stream)));
+      return R;
+    }
+
+    RtensorPack reduce0_n(const AindexPack& list) const{
+      int N=list.size();
+      RtensorPack R(N,Gdims(nc),cnine::fill_zero(),dev);
+      if(dev==0){
+	for(int i=0; i<N; i++){
+	  if(list.nix(i)==0) continue;
+	  view_of(list.tens(i),list.ix(i)).avg0_into(R.view1_of(i));
+	}
+      }
+      PTENS_CPUONLY();
+      //GPUCODE(CUDA_STREAM(Ptensors1_reduce0_cu(R,*this,list,0,nc,stream)));
       return R;
     }
 
@@ -487,6 +512,16 @@ namespace ptens{
       GPUCODE(CUDA_STREAM(Ptensors1_broadcast0_cu(*this,x,0,stream)));
     }
 
+    void broadcast0_n(const RtensorPack& x){
+      if(dev==0){
+	for(int i=0; i<size(); i++){
+	  view_of(i).add(repeat0(x.view1_of(i),k_of(i)),1.0/((float)k_of(i)));
+	}
+      }
+      PTENS_CPUONLY();
+      //GPUCODE(CUDA_STREAM(Ptensors1_broadcast0_cu(*this,x,0,stream)));
+    }
+
     void broadcast0(const RtensorPack& x, const int offs){
       const int n=x.dim_of(0,0);
       if(dev==0){
@@ -504,6 +539,16 @@ namespace ptens{
 	  view_of(list.tens(i))+=repeat0(x.view1_of(i),list.nix(i));
       }
       GPUCODE(CUDA_STREAM(Ptensors1_broadcast0_cu(*this,x,list,0,stream)));
+    }
+
+    void broadcast0_n(const RtensorPack& x, const AindexPack& list){
+      if(dev==0){
+	int N=list.size();
+	for(int i=0; i<N; i++)
+	  view_of(list.tens(i)).add(repeat0(x.view1_of(i),list.nix(i)),1.0/((float)list.nix(i))); // check this
+      }
+      PTENS_CPUONLY();
+      //GPUCODE(CUDA_STREAM(Ptensors1_broadcast0_cu(*this,x,list,0,stream)));
     }
 
     void broadcast0(const RtensorPack& x, const AindexPack& list, const int offs){
