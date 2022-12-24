@@ -117,36 +117,6 @@ class ptensors0(torch.Tensor):
     
     def diff2(self,y):
         return Ptensors0_diff2Fn.apply(self,y)
-    
-
-    def linmaps0(self):
-        return Ptensors0_Linmaps0Fn.apply(self);
-
-    def linmaps1(self):
-        return Ptensors0_Linmaps1Fn.apply(self);
-
-    def linmaps2(self):
-        return Ptensors0_Linmaps2Fn.apply(self);
-
-
-    def transfer0(self,_atoms):
-        return Ptensors0_Transfer0Fn.apply(self,_atoms)
-
-    def transfer1(self,_atoms):
-        return Ptensors0_Transfer1Fn.apply(self,_atoms)
-
-    def transfer2(self,_atoms):
-        return Ptensors0_Transfer2Fn.apply(self,_atoms)
-
-
-    def unite1(self,G):
-        return Ptensors0_Unite1Fn.apply(self,G)
-    
-    def unite2(self,G):
-        return Ptensors0_Unite2Fn.apply(self,G)
-    
-    def gather(self,G):
-        return Ptensors0_GatherFn.apply(self,G)
 
     def outer(self,y):
         if isinstance(y,ptens.ptensors0):
@@ -155,6 +125,39 @@ class ptensors0(torch.Tensor):
             return Ptensors0_Outer1Fn.apply(self,y)
         if isinstance(y,ptens.ptensors2):
             return Ptensors0_Outer2Fn.apply(self,y)
+
+
+    # ---- Message passing -----------------------------------------------------------------------------------
+    
+
+    def linmaps0(self,normalized=False):
+        return Ptensors0_Linmaps0Fn.apply(self);
+
+    def linmaps1(self,normalized=False):
+        return Ptensors0_Linmaps1Fn.apply(self);
+
+    def linmaps2(self,normalized=False):
+        return Ptensors0_Linmaps2Fn.apply(self);
+
+
+    def transfer0(self,_atoms,normalized=False):
+        return Ptensors0_Transfer0Fn.apply(self,_atoms)
+
+    def transfer1(self,_atoms,normalized=False):
+        return Ptensors0_Transfer1Fn.apply(self,_atoms)
+
+    def transfer2(self,_atoms,normalized=False):
+        return Ptensors0_Transfer2Fn.apply(self,_atoms)
+
+
+    def unite1(self,G,normalized=False):
+        return Ptensors0_Unite1Fn.apply(self,G)
+    
+    def unite2(self,G,normalized=False):
+        return Ptensors0_Unite2Fn.apply(self,G)
+    
+    def gather(self,G,normalized=False):
+        return Ptensors0_GatherFn.apply(self,G)
 
 
     # ---- I/O ----------------------------------------------------------------------------------------------

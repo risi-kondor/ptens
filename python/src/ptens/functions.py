@@ -1,21 +1,3 @@
-def linmaps0(x):
-    return x.linmaps0()
-    
-def linmaps1(x):
-    return x.linmaps1()
-    
-def linmaps2(x):
-    return x.linmaps2()
-
-
-def transfer0(x,_atoms,G):
-    return x.transfer0(_atoms,G)
-    
-def transfer1(x,_atoms,G):
-    return x.transfer1(_atoms,G)
-    
-def transfer2(x,_atoms,G):
-    return x.transfer2(_atoms,G)
 
 
 def cat(x,y):
@@ -28,11 +10,31 @@ def relu(x,alpha=0.5):
     return x.relu(alpha)
 
 
-def unite1(x,G):
-    return x.unite1(G)
+def linmaps0(x,normalized=False):
+    return x.linmaps0(normalized)
+    
+def linmaps1(x,normalized=False):
+    return x.linmaps1(normalized)
+    
+def linmaps2(x,normalized=False):
+    return x.linmaps2(normalized)
 
-def unite2(x,G):
-    return x.unite2(G)
+
+def transfer0(x,_atoms,G,normalized=False):
+    return x.transfer0(_atoms,G,normalized)
+    
+def transfer1(x,_atoms,G,normalized=False):
+    return x.transfer1(_atoms,G,normalized)
+    
+def transfer2(x,_atoms,G,normalized=False):
+    return x.transfer2(_atoms,G,normalized)
+
+def unite1(x,G,normalized=False):
+    return x.unite1(G,normalized)
+
+def unite2(x,G,normalized=False):
+    return x.unite2(G,normalized)
+
 
 def gather(x,G):
     return x.gather(G)

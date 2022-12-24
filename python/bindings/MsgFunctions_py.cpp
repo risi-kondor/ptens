@@ -58,12 +58,27 @@ m.def("add_msg",[](Ptensors1& r, const Ptensors1& x, const Hgraph& G, int offs){
 m.def("add_msg",[](Ptensors2& r, const Ptensors1& x, const Hgraph& G, int offs){return add_msg(r,x,G,offs);}, 
   py::arg("r"), py::arg("x"), py::arg("G"), py::arg("offs")=0);
 
+m.def("add_msg_n",[](Ptensors0& r, const Ptensors1& x, const Hgraph& G, int offs){return add_msg_n(r,x,G,offs);}, 
+  py::arg("r"), py::arg("x"), py::arg("G"), py::arg("offs")=0);
+m.def("add_msg_n",[](Ptensors1& r, const Ptensors1& x, const Hgraph& G, int offs){return add_msg_n(r,x,G,offs);}, 
+  py::arg("r"), py::arg("x"), py::arg("G"), py::arg("offs")=0);
+m.def("add_msg_n",[](Ptensors2& r, const Ptensors1& x, const Hgraph& G, int offs){return add_msg_n(r,x,G,offs);}, 
+  py::arg("r"), py::arg("x"), py::arg("G"), py::arg("offs")=0);
+
 m.def("add_msg",[](Ptensors0& r, const Ptensors2& x, const Hgraph& G, int offs){return add_msg(r,x,G,offs);}, 
   py::arg("r"), py::arg("x"), py::arg("G"), py::arg("offs")=0);
 m.def("add_msg",[](Ptensors1& r, const Ptensors2& x, const Hgraph& G, int offs){return add_msg(r,x,G,offs);}, 
   py::arg("r"), py::arg("x"), py::arg("G"), py::arg("offs")=0);
 m.def("add_msg",[](Ptensors2& r, const Ptensors2& x, const Hgraph& G, int offs){return add_msg(r,x,G,offs);}, 
   py::arg("r"), py::arg("x"), py::arg("G"), py::arg("offs")=0);
+
+m.def("add_msg_n",[](Ptensors0& r, const Ptensors2& x, const Hgraph& G, int offs){return add_msg_n(r,x,G,offs);}, 
+  py::arg("r"), py::arg("x"), py::arg("G"), py::arg("offs")=0);
+m.def("add_msg_n",[](Ptensors1& r, const Ptensors2& x, const Hgraph& G, int offs){return add_msg_n(r,x,G,offs);}, 
+  py::arg("r"), py::arg("x"), py::arg("G"), py::arg("offs")=0);
+m.def("add_msg_n",[](Ptensors2& r, const Ptensors2& x, const Hgraph& G, int offs){return add_msg_n(r,x,G,offs);}, 
+  py::arg("r"), py::arg("x"), py::arg("G"), py::arg("offs")=0);
+
 
 
 m.def("add_msg_back",[](Ptensors0& r, const Ptensors0& x, const Hgraph& G, int offs){return add_msg_back(r,x,G,offs);}, 
@@ -72,6 +87,10 @@ m.def("add_msg_back",[](Ptensors1& r, const Ptensors0& x, const Hgraph& G, int o
   py::arg("r"), py::arg("x"), py::arg("G"), py::arg("offs")=0);
 m.def("add_msg_back",[](Ptensors2& r, const Ptensors0& x, const Hgraph& G, int offs){return add_msg_back(r,x,G,offs);}, 
   py::arg("r"), py::arg("x"), py::arg("G"), py::arg("offs")=0);
+m.def("add_msg_back_n",[](Ptensors1& r, const Ptensors0& x, const Hgraph& G, int offs){return add_msg_back_n(r,x,G,offs);}, 
+  py::arg("r"), py::arg("x"), py::arg("G"), py::arg("offs")=0);
+m.def("add_msg_back_n",[](Ptensors2& r, const Ptensors0& x, const Hgraph& G, int offs){return add_msg_back_n(r,x,G,offs);}, 
+  py::arg("r"), py::arg("x"), py::arg("G"), py::arg("offs")=0);
 
 m.def("add_msg_back",[](Ptensors0& r, const Ptensors1& x, const Hgraph& G, int offs){return add_msg_back(r,x,G,offs);}, 
   py::arg("r"), py::arg("x"), py::arg("G"), py::arg("offs")=0);
@@ -79,12 +98,20 @@ m.def("add_msg_back",[](Ptensors1& r, const Ptensors1& x, const Hgraph& G, int o
   py::arg("r"), py::arg("x"), py::arg("G"), py::arg("offs")=0);
 m.def("add_msg_back",[](Ptensors2& r, const Ptensors1& x, const Hgraph& G, int offs){return add_msg_back(r,x,G,offs);}, 
   py::arg("r"), py::arg("x"), py::arg("G"), py::arg("offs")=0);
+m.def("add_msg_back_n",[](Ptensors1& r, const Ptensors1& x, const Hgraph& G, int offs){return add_msg_back_n(r,x,G,offs);}, 
+  py::arg("r"), py::arg("x"), py::arg("G"), py::arg("offs")=0);
+m.def("add_msg_back_n",[](Ptensors2& r, const Ptensors1& x, const Hgraph& G, int offs){return add_msg_back_n(r,x,G,offs);}, 
+  py::arg("r"), py::arg("x"), py::arg("G"), py::arg("offs")=0);
 
 m.def("add_msg_back",[](Ptensors0& r, const Ptensors2& x, const Hgraph& G, int offs){return add_msg_back(r,x,G,offs);}, 
   py::arg("r"), py::arg("x"), py::arg("G"), py::arg("offs")=0);
 m.def("add_msg_back",[](Ptensors1& r, const Ptensors2& x, const Hgraph& G, int offs){return add_msg_back(r,x,G,offs);}, 
   py::arg("r"), py::arg("x"), py::arg("G"), py::arg("offs")=0);
 m.def("add_msg_back",[](Ptensors2& r, const Ptensors2& x, const Hgraph& G, int offs){return add_msg_back(r,x,G,offs);}, 
+  py::arg("r"), py::arg("x"), py::arg("G"), py::arg("offs")=0);
+m.def("add_msg_back_n",[](Ptensors1& r, const Ptensors2& x, const Hgraph& G, int offs){return add_msg_back_n(r,x,G,offs);}, 
+  py::arg("r"), py::arg("x"), py::arg("G"), py::arg("offs")=0);
+m.def("add_msg_back_n",[](Ptensors2& r, const Ptensors2& x, const Hgraph& G, int offs){return add_msg_back_n(r,x,G,offs);}, 
   py::arg("r"), py::arg("x"), py::arg("G"), py::arg("offs")=0);
 
 
@@ -131,6 +158,10 @@ m.def("unite1",[](const Ptensors1& x, const Hgraph& G) {return unite1(x,G);});
 m.def("unite2",[](const Ptensors1& x, const Hgraph& G) {return unite2(x,G);});
 m.def("unite1",[](const Ptensors2& x, const Hgraph& G) {return unite1(x,G);});
 m.def("unite2",[](const Ptensors2& x, const Hgraph& G) {return unite2(x,G);});
+m.def("unite1_n",[](const Ptensors1& x, const Hgraph& G) {return unite1_n(x,G);});
+m.def("unite2_n",[](const Ptensors1& x, const Hgraph& G) {return unite2_n(x,G);});
+m.def("unite1_n",[](const Ptensors2& x, const Hgraph& G) {return unite1_n(x,G);});
+m.def("unite2_n",[](const Ptensors2& x, const Hgraph& G) {return unite2_n(x,G);});
   
 m.def("unite0to1_back",[](loose_ptr<Ptensors0>& x, loose_ptr<Ptensors1>& r, const Hgraph& G) {
     return add_msg_back(x,r,G.reverse());});
@@ -144,6 +175,15 @@ m.def("unite1to2_back",[](loose_ptr<Ptensors1>& x, loose_ptr<Ptensors2>& r, cons
     return add_msg_back(x,r,G.reverse());});
 m.def("unite2to2_back",[](loose_ptr<Ptensors2>& x, loose_ptr<Ptensors2>& r, const Hgraph& G) {
     return add_msg_back(x,r,G.reverse());});
+
+m.def("unite1to1_back_n",[](loose_ptr<Ptensors1>& x, loose_ptr<Ptensors1>& r, const Hgraph& G) {
+    return add_msg_back_n(x,r,G.reverse());});
+m.def("unite2to1_back_n",[](loose_ptr<Ptensors2>& x, loose_ptr<Ptensors1>& r, const Hgraph& G) {
+    return add_msg_back_n(x,r,G.reverse());});
+m.def("unite1to2_back_n",[](loose_ptr<Ptensors1>& x, loose_ptr<Ptensors2>& r, const Hgraph& G) {
+    return add_msg_back_n(x,r,G.reverse());});
+m.def("unite2to2_back_n",[](loose_ptr<Ptensors2>& x, loose_ptr<Ptensors2>& r, const Hgraph& G) {
+    return add_msg_back_n(x,r,G.reverse());});
 
 
 m.def("gather",[](const Ptensors0& x, const Hgraph& G) {return gather(x,G);});

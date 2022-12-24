@@ -117,34 +117,6 @@ class ptensors1(torch.Tensor):
     def diff2(self,y):
         return ptens.Ptensors1_diff2Fn.apply(self,y)
 
-
-    def linmaps0(self):
-        return Ptensors1_Linmaps0Fn.apply(self);
-
-    def linmaps1(self):
-        return Ptensors1_Linmaps1Fn.apply(self);
-
-    def linmaps2(self):
-        return Ptensors1_Linmaps2Fn.apply(self);
-
-
-    def transfer0(self,_atoms,G):
-        return Ptensors1_Transfer0Fn.apply(self,_atoms,G)
-
-    def transfer1(self,_atoms,G):
-        return Ptensors1_Transfer1Fn.apply(self,_atoms,G)
-
-    def transfer2(self,_atoms,G):
-        return Ptensors1_Transfer2Fn.apply(self,_atoms,G)
-
-
-    def unite1(self,G):
-        return Ptensors1_Unite1Fn.apply(self,G)
-    
-    def unite2(self,G):
-        return Ptensors1_Unite2Fn.apply(self,G)
-
-    
     def outer(self,y):
         if isinstance(y,ptens.ptensors0):
             return Ptensors1_Outer0Fn.apply(self,y)
@@ -152,6 +124,36 @@ class ptensors1(torch.Tensor):
             return Ptensors1_Outer1Fn.apply(self,y)
 
 
+    # ---- Message passing -----------------------------------------------------------------------------------
+
+
+    def linmaps0(self,normalized=False):
+        return Ptensors1_Linmaps0Fn.apply(self,normalized);
+
+    def linmaps1(self,normalized=False):
+        return Ptensors1_Linmaps1Fn.apply(self,normalized);
+
+    def linmaps2(self,normalized=False):
+        return Ptensors1_Linmaps2Fn.apply(self,normalized);
+
+
+    def transfer0(self,_atoms,G,normalized=False):
+        return Ptensors1_Transfer0Fn.apply(self,_atoms,G,normalized)
+
+    def transfer1(self,_atoms,G,normalized=False):
+        return Ptensors1_Transfer1Fn.apply(self,_atoms,G,normalized)
+
+    def transfer2(self,_atoms,G,normalized=False):
+        return Ptensors1_Transfer2Fn.apply(self,_atoms,G,normalized)
+
+
+    def unite1(self,G,normalized=False):
+        return Ptensors1_Unite1Fn.apply(self,G,normalized)
+    
+    def unite2(self,G,normalized=False):
+        return Ptensors1_Unite2Fn.apply(self,G,normalized)
+
+    
     # ---- I/O ----------------------------------------------------------------------------------------------
 
 
@@ -351,59 +353,79 @@ class Ptensors1_linearFn(torch.autograd.Function):
 class Ptensors1_Linmaps0Fn(torch.autograd.Function):
 
     @staticmethod
-    def forward(ctx,x):
-        ctx.x=x
+    def forward(ctx,x,normalized=False):
         R=ptens.ptensors0.zeros(x.obj.view_of_atoms(),x.obj.get_nc(),x.obj.get_dev())
-        ptens_base.add_linmaps1to0(R.obj,x.obj)
+        if(normalized):
+            ptens_base.add_linmaps1to0_n(R.obj,x.obj)
+        else:
+            ptens_base.add_linmaps1to0(R.obj,x.obj)
+        ctx.normalized=normalized
         ctx.x=x.obj
         ctx.r=R.obj
         return R
         
     @staticmethod
     def backward(ctx,g):
-        ptens_base.add_linmaps1to0_back(ctx.x.gradp(),ctx.r.gradp())
-        return ptensors1(1)
+        if(ctx.normalized):
+            ptens_base.add_linmaps1to0_back_n(ctx.x.gradp(),ctx.r.gradp())
+        else:
+            ptens_base.add_linmaps1to0_back(ctx.x.gradp(),ctx.r.gradp())
+        return ptensors1(1), None
 
 
 class Ptensors1_Linmaps1Fn(torch.autograd.Function):
 
     @staticmethod
-    def forward(ctx,x):
+    def forward(ctx,x,normalized=False):
         R=ptens.ptensors1.zeros(x.obj.view_of_atoms(),x.obj.get_nc()*2,x.obj.get_dev())
         ptens_base.add_linmaps1to1(R.obj,x.obj)
+        ctx.normalized=normalized
         ctx.x=x.obj
         ctx.r=R.obj
         return R
         
     @staticmethod
     def backward(ctx,g):
-        ptens_base.add_linmaps1to1_back(ctx.x.gradp(),ctx.r.gradp())
-        return ptensors1(1)
+        if(ctx.normalized):
+            ptens_base.add_linmaps1to1_back_n(ctx.x.gradp(),ctx.r.gradp())
+        else:
+            ptens_base.add_linmaps1to1_back(ctx.x.gradp(),ctx.r.gradp())
+        return ptensors1(1), None
 
 
 class Ptensors1_Linmaps2Fn(torch.autograd.Function):
 
     @staticmethod
-    def forward(ctx,x):
+    def forward(ctx,x,normalized=False):
         R=ptens.ptensors2.zeros(x.obj.view_of_atoms(),x.obj.get_nc()*5,x.obj.get_dev())
-        ptens_base.add_linmaps1to2(R.obj,x.obj)
+        if(normalized):
+            ptens_base.add_linmaps1to2_n(R.obj,x.obj)
+        else:
+            ptens_base.add_linmaps1to2(R.obj,x.obj)
+        ctx.normalized=normalized
         ctx.x=x.obj
         ctx.r=R.obj
         return R
         
     @staticmethod
     def backward(ctx,g):
-        ptens_base.add_linmaps1to2_back(ctx.x.gradp(),ctx.r.gradp())
-        return ptensors1(1)
+        if(ctx.normalized):
+            ptens_base.add_linmaps1to2_back_n(ctx.x.gradp(),ctx.r.gradp())
+        else:
+            ptens_base.add_linmaps1to2_back(ctx.x.gradp(),ctx.r.gradp())
+        return ptensors1(1), None
 
 
 class Ptensors1_Transfer0Fn(torch.autograd.Function):
 
     @staticmethod
-    def forward(ctx,x,atoms,G):
-        ctx.x=x
+    def forward(ctx,x,atoms,G,normalized=False):
         R=ptens.ptensors0.zeros(atoms,x.obj.get_nc(),x.obj.get_dev())
-        ptens_base.add_msg(R.obj,x.obj,G.obj)
+        if(normalized):
+            ptens_base.add_msg_n(R.obj,x.obj,G.obj)
+        else:
+            ptens_base.add_msg(R.obj,x.obj,G.obj)
+        ctx.normalized=normalized
         ctx.x=x.obj
         ctx.r=R.obj
         ctx.G=G.obj
@@ -411,17 +433,23 @@ class Ptensors1_Transfer0Fn(torch.autograd.Function):
         
     @staticmethod
     def backward(ctx,g):
-        ptens_base.add_msg_back(ctx.x.gradp(),ctx.r.gradp(),ctx.G)
-        return ptensors1.dummy(), None, None
+        if(ctx.normalized):
+            ptens_base.add_msg_back_n(ctx.x.gradp(),ctx.r.gradp(),ctx.G)
+        else:
+            ptens_base.add_msg_back(ctx.x.gradp(),ctx.r.gradp(),ctx.G)
+        return ptensors1.dummy(), None, None, None
 
 
 class Ptensors1_Transfer1Fn(torch.autograd.Function):
 
     @staticmethod
-    def forward(ctx,x,atoms,G):
-        ctx.x=x
+    def forward(ctx,x,atoms,G,normalized=False):
         R=ptens.ptensors1.zeros(atoms,x.obj.get_nc()*2,x.obj.get_dev())
-        ptens_base.add_msg(R.obj,x.obj,G.obj)
+        if(normalized):
+            ptens_base.add_msg_n(R.obj,x.obj,G.obj)
+        else:
+            ptens_base.add_msg(R.obj,x.obj,G.obj)
+        ctx.normalized=normalized
         ctx.x=x.obj
         ctx.r=R.obj
         ctx.G=G.obj
@@ -429,17 +457,23 @@ class Ptensors1_Transfer1Fn(torch.autograd.Function):
         
     @staticmethod
     def backward(ctx,g):
-        ptens_base.add_msg_back(ctx.x.gradp(),ctx.r.gradp(),ctx.G)
-        return ptensors1.dummy(), None, None
+        if(ctx.normalized):
+            ptens_base.add_msg_back_n(ctx.x.gradp(),ctx.r.gradp(),ctx.G)
+        else:
+            ptens_base.add_msg_back(ctx.x.gradp(),ctx.r.gradp(),ctx.G)
+        return ptensors1.dummy(), None, None, None
 
 
 class Ptensors1_Transfer2Fn(torch.autograd.Function):
 
     @staticmethod
-    def forward(ctx,x,atoms,G):
-        ctx.x=x
+    def forward(ctx,x,atoms,G,normalized=False):
         R=ptens.ptensors2.zeros(atoms,x.obj.get_nc()*5,x.obj.get_dev())
-        ptens_base.add_msg(R.obj,x.obj,G.obj)
+        if(normalized):
+            ptens_base.add_msg_n(R.obj,x.obj,G.obj)
+        else:
+            ptens_base.add_msg(R.obj,x.obj,G.obj)
+        ctx.normalized=normalized
         ctx.x=x.obj
         ctx.r=R.obj
         ctx.G=G.obj
@@ -447,16 +481,24 @@ class Ptensors1_Transfer2Fn(torch.autograd.Function):
         
     @staticmethod
     def backward(ctx,g):
-        ptens_base.add_msg_back(ctx.x.gradp(),ctx.r.gradp(),ctx.G)
-        return ptensors1.dummy(), None, None
+        if(ctx.normalized):
+            ptens_base.add_msg_back_n(ctx.x.gradp(),ctx.r.gradp(),ctx.G)
+        else:
+            ptens_base.add_msg_back(ctx.x.gradp(),ctx.r.gradp(),ctx.G)
+        return ptensors1.dummy(), None, None, None
 
 
 class Ptensors1_Unite1Fn(torch.autograd.Function):
 
     @staticmethod
-    def forward(ctx,x,G):
+    def forward(ctx,x,G,normalized=False):
         r=ptens.ptensors1(1)
+        if(normalized):
+            r.obj=ptens_base.unite1_n(x.obj,G.obj)
+        else:
+            r.obj=ptens_base.unite1(x.obj,G.obj)
         r.obj=ptens_base.unite1(x.obj,G.obj)
+        ctx.normalized=normalized
         ctx.x=x.obj
         ctx.r=r.obj
         ctx.G=G.obj
@@ -464,16 +506,23 @@ class Ptensors1_Unite1Fn(torch.autograd.Function):
         
     @staticmethod
     def backward(ctx,g):
-        ptens_base.unite1to1_back(ctx.x.gradp(),ctx.r.gradp(),ctx.G)
-        return ptensors1.dummy(), None
+        if(ctx.normalized):
+            ptens_base.unite1to1_back_n(ctx.x.gradp(),ctx.r.gradp(),ctx.G)
+        else:
+            ptens_base.unite1to1_back(ctx.x.gradp(),ctx.r.gradp(),ctx.G)
+        return ptensors1.dummy(), None, None 
 
 
 class Ptensors1_Unite2Fn(torch.autograd.Function):
 
     @staticmethod
-    def forward(ctx,x,G):
+    def forward(ctx,x,G,normalized=False):
         r=ptens.ptensors2(1)
-        r.obj=ptens_base.unite2(x.obj,G.obj)
+        if(normalized):
+            r.obj=ptens_base.unite2_n(x.obj,G.obj)
+        else:
+            r.obj=ptens_base.unite2(x.obj,G.obj)
+        ctx.normalized=normalized
         ctx.x=x.obj
         ctx.r=r.obj
         ctx.G=G.obj
@@ -481,8 +530,11 @@ class Ptensors1_Unite2Fn(torch.autograd.Function):
         
     @staticmethod
     def backward(ctx,g):
-        ptens_base.unite1to2_back(ctx.x.gradp(),ctx.r.gradp(),ctx.G)
-        return ptensors1.dummy(), None
+        if(ctx.normalized):
+            ptens_base.unite1to2_back_n(ctx.x.gradp(),ctx.r.gradp(),ctx.G)
+        else:
+            ptens_base.unite1to2_back(ctx.x.gradp(),ctx.r.gradp(),ctx.G)
+        return ptensors1.dummy(), None, None
 
 
 class Ptensors1_Outer0Fn(torch.autograd.Function):
