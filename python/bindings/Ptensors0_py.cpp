@@ -96,6 +96,13 @@ pybind11::class_<Ptensors0,cnine::RtensorPack>(m,"ptensors0")
       g->add_mprod_back1_to(R,x);
       return R.torch();})
 
+  .def("scale_channels",[](Ptensors0& x, at::Tensor& y){
+      return x.scale_channels(RtensorA::view(y).view1());})
+  .def("add_scale_channels",[](Ptensors0& r, const Ptensors0& x, at::Tensor& y){
+      return r.add_scale_channels(x,RtensorA::view(y).view1());})
+  .def("add_scale_channels_back0",[](Ptensors0& r, const cnine::loose_ptr<Ptensors0>& g, at::Tensor& y){
+      return r.get_grad().add_scale_channels(g,RtensorA::view(y).view1());})
+
   .def("add_linear",[](Ptensors0& r, const Ptensors0& x, at::Tensor& y, at::Tensor& b){
       r.add_linear(x,RtensorA::view(y),RtensorA::view(b));})
   .def("add_linear_back0",[](Ptensors0& x, const cnine::loose_ptr<Ptensors0>& g, at::Tensor& y){

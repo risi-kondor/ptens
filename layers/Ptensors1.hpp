@@ -220,6 +220,9 @@ namespace ptens{
     Ptensors1(RtensorPack&& x, const AtomsPack& _atoms, const int _nc):
       RtensorPack(std::move(x)), atoms(_atoms), nc(_nc){}
 
+    Ptensors1(cnine::RtensorPackB&& x, const AtomsPack& _atoms):
+      RtensorPack(std::move(x)), atoms(_atoms), nc(x.nc){}
+
     //rtensor view_as_matrix() const{
     //return rtensor::view_of_blob({tail/nc,nc},get_arr(),dev);
     //}
@@ -377,6 +380,10 @@ namespace ptens{
       }
     }
     */
+
+    Ptensors1 scale_channels(const rtensor& y) const{
+      return Ptensors1(RtensorPackB::scale_channels(y.view1()),atoms);
+    }
 
  
   public: // ---- Reductions ---------------------------------------------------------------------------------

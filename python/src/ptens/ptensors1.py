@@ -123,6 +123,9 @@ class ptensors1(torch.Tensor):
         if isinstance(y,ptens.ptensors1):
             return Ptensors1_Outer1Fn.apply(self,y)
 
+    def mult_channels(self,y):
+        return Ptensors1_mult_channelsFn.apply(self,y)
+
 
     # ---- Message passing -----------------------------------------------------------------------------------
 
@@ -348,6 +351,23 @@ class Ptensors1_linearFn(torch.autograd.Function):
     def backward(ctx,g):
         ctx.x.add_linear_back0(ctx.r.gradp(),ctx.y)
         return ptensors1.dummy(), ctx.x.linear_back1(ctx.r.gradp()), ctx.x.linear_back2(ctx.r.gradp())
+
+
+class Ptensors1_mult_channelsFn(torch.autograd.Function):
+    
+    @staticmethod
+    def forward(ctx,x,y):
+        R=ptens.ptensors1.zeros(x.obj.view_of_atoms(),x.obj.get_nc(),x.obj.get_dev())
+        R.obj.add_scale_channels(x.obj,y)
+        ctx.x=x.obj
+        ctx.y=y
+        ctx.r=R.obj
+        return R
+
+    @staticmethod
+    def backward(ctx,g):
+        ctx.x.add_scale_channels_back0(ctx.r.gradp(),ctx.y)
+        return ptensors1.dummy(), None
 
 
 class Ptensors1_Linmaps0Fn(torch.autograd.Function):
