@@ -17,7 +17,7 @@ int main(int argc, char** argv){
 
   cout<<M<<endl;
   
-  CSRmatrix<float> Md=M.CSRmatrix();
+  CSRmatrix<float> Md=M.csrmatrix();
   cout<<Md<<endl;
 
   GatherMap Mg=M.broadcast_map();
