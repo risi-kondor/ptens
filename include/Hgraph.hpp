@@ -7,6 +7,7 @@
 #include "AtomsPack.hpp"
 #include "AindexPack.hpp"
 #include "GatherMap.hpp"
+#include "labeled_tree.hpp"
 
 
 namespace ptens{
@@ -15,16 +16,12 @@ namespace ptens{
   class Hgraph: public cnine::SparseRmatrix{
   public:
 
-    //typedef cnine::PrefixTree<int> PrefixTree;
     typedef cnine::labeled_tree<int> labeled_tree;
-    typedef cnine::tforest<int> tforest;
-
 
     using cnine::SparseRmatrix::SparseRmatrix;
 
     mutable Hgraph* _reverse=nullptr;
     mutable cnine::CSRmatrix<float>* gmap=nullptr; 
-    //mutable cnine::GatherMap* bmap=nullptr;
     mutable shared_ptr<cnine::GatherMap> bmap;
     mutable vector<AtomsPack*> _nhoods; 
 
@@ -42,6 +39,17 @@ namespace ptens{
 
     Hgraph(const int _n):
       Hgraph(_n,_n){}
+
+    Hgraph(const int _n, const initializer_list<pair<int,int> >& list): 
+      Hgraph(_n){
+      for(auto p:list){
+	set(p.first,p.second,1.0);
+	set(p.second,p.first,1.0);
+      }
+    }
+
+
+  public: // ---- Named Constructors -------------------------------------------------------------------------
 
 
     static Hgraph random(const int _n, const float p=0.5){
@@ -82,17 +90,19 @@ namespace ptens{
       return n;
     }
 
-    vector<int> neighbors(const int i) const{
-      vector<int> r;
-      for(auto& p: row(i))
-	r.push_back(p.first);
-      return r;
+    void insert(const Hgraph& H, vector<int> v){
+      for(auto p:v)
+	PTENS_ASSRT(p<n);
+      H.for_each_edge([&](const int i, const int j){
+	  set(v[i],v[j],1.0);});
     }
 
-    void for_each_neighbor_of(const int i, std::function<void(const int, const float)> lambda) const{
-      const auto& r=row(i);
-      for(auto& p: r)
-	lambda(p.first,p.second);
+    vector<int> neighbors(const int i) const{
+      vector<int> r;
+      const auto _r=row(i);
+      for(auto& p: _r)
+	r.push_back(p.first);
+      return r;
     }
 
     const Hgraph& reverse() const{
@@ -106,11 +116,29 @@ namespace ptens{
       return *gmap;
     }
 
-    //const cnine::GatherMap& get_bmap() const{
-    //if(!bmap) bmap=new cnine::GatherMap(broadcast_map());
-    //return *bmap;
-    //}
+    void for_each_neighbor_of(const int i, std::function<void(const int, const float)> lambda) const{
+      const auto& r=row(i);
+      for(auto& p: r)
+	lambda(p.first,p.second);
+    }
 
+    void for_each_edge(std::function<void(const int, const int)> lambda, const bool self=0) const{
+      for(auto& p: lists){
+	int i=p.first;
+	if(self) lambda(i,i);
+	p.second->forall_nonzero([&](const int j, const float v){
+	    lambda(i,j);});
+      }
+    }
+
+    void for_each_edge(std::function<void(const int, const int, const float)> lambda, const bool self=0) const{
+      for(auto& p: lists){
+	int i=p.first;
+	if(self) lambda(i,i,1.0);
+	p.second->forall_nonzero([&](const int j, const float v){
+	    lambda(i,j,v);});
+      }
+    }
 
     void forall_edges(std::function<void(const int, const int, const float)> lambda, const bool self=0) const{
       for(auto& p: lists){
@@ -120,7 +148,6 @@ namespace ptens{
 	    lambda(i,j,v);});
       }
     }
-
 
     AtomsPack nhoods(const int i) const{
       if(_nhoods.size()==0) _nhoods.push_back(new AtomsPack(n));
@@ -153,8 +180,6 @@ namespace ptens{
       AtomsPack R;
       for(int i=0; i<n; i++){
 	std::set<int> w;
-	//for(auto p:x[i]) // diagonal 
-	  //w.insert(p);
 	for(auto q: const_cast<Hgraph&>(*this).row(i)){
 	  auto a=x[q.first];
 	  for(auto p:a)
@@ -182,7 +207,6 @@ namespace ptens{
       //out_indices.bmap=new cnine::GatherMap(get_bmap());
       if(!bmap) bmap=std::shared_ptr<cnine::GatherMap>(new cnine::GatherMap(broadcast_map())); 
       out_indices.bmap=bmap; //new cnine::GatherMap(get_bmap());
-      //cout<<22<<get_bmap()<<endl;
       return make_pair(in_indices, out_indices);
     }
 
@@ -222,21 +246,22 @@ namespace ptens{
   public: // ---- Subgraphs ----------------------------------------------------------------------------------
 
 
-    labeled_tree greedy_spanning_tree(const int root=0){
+    labeled_tree greedy_spanning_tree(const int root=0) const{
       PTENS_ASSRT(getn()>0);
       vector<bool> matched(n,false);
+      matched[root]=true;
       labeled_tree* T=greedy_spanning_tree(root,matched);
       return std::move(*T);
     }
 
-    labeled_tree* greedy_spanning_tree(const int v, vector<bool>& matched){
+    labeled_tree* greedy_spanning_tree(const int v, vector<bool>& matched) const{
       PTENS_ASSRT(v<n);
       labeled_tree* r=new labeled_tree(v);
       for(auto& p: row(v)){
 	if(p.second==0) continue;
 	if(matched[p.first]) continue;
 	matched[p.first]=true;
-	r.children.push_back(greedy_spanning_tree(p.first,matched));
+	r->children.push_back(greedy_spanning_tree(p.first,matched));
       }
       return r;
     }
@@ -388,3 +413,9 @@ namespace ptens{
       return nullptr;
     }
     */
+    //const cnine::GatherMap& get_bmap() const{
+    //if(!bmap) bmap=new cnine::GatherMap(broadcast_map());
+    //return *bmap;
+    //}
+
+
