@@ -52,6 +52,17 @@ namespace ptens{
   public: // ---- Named Constructors -------------------------------------------------------------------------
 
 
+    static Hgraph edge_index(const cnine::RtensorA& M){
+      PTENS_ASSRT(M.ndims()==2);
+      PTENS_ASSRT(M.get_dim(0)==2);
+      int n=M.max()+1;
+      int nedges=M.get_dim(1);
+      Hgraph R(n);
+      for(int i=0; i<nedges; i++)
+	R.set(M(0,i),M(1,i),1.0);
+      return R;
+    }
+
     static Hgraph random(const int _n, const float p=0.5){
       return cnine::SparseRmatrix::random_symmetric(_n,p);
     }

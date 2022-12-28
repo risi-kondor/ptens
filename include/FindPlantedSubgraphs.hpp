@@ -4,6 +4,7 @@
 //#include <set>
 #include "Ptens_base.hpp"
 #include "labeled_tree.hpp"
+#include "labeled_forest.hpp"
 #include "AtomsPack.hpp"
 #include "AindexPack.hpp"
 #include "Hgraph.hpp"
@@ -36,8 +37,8 @@ namespace ptens{
       Htraversal=S.indexed_depth_first_traversal();
       assignment=vector<int>(n,-1);
 
-      for(auto p:Htraversal) cout<<p.first<<" "; cout<<endl;
-      for(auto p:Htraversal) cout<<p.second<<" "; cout<<endl;
+      //for(auto p:Htraversal) cout<<p.first<<" "; cout<<endl;
+      //for(auto p:Htraversal) cout<<p.second<<" "; cout<<endl;
 
       for(int i=0; i<G.getn(); i++){
 	labeled_tree* T=new labeled_tree(i);
@@ -48,7 +49,6 @@ namespace ptens{
 	}
       }
     }
-
 
     operator AindexPack(){
       AindexPack R;

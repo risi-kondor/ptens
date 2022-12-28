@@ -4,6 +4,7 @@
 #include <map>
 
 #include "array_pool.hpp"
+#include "labeled_forest.hpp"
 #include "Atoms.hpp"
 
 
@@ -48,6 +49,16 @@ namespace ptens{
       for(auto& p:x)
 	push_back(p);
     }
+
+    AtomsPack(const cnine::labeled_forest<int>& forest){
+      for(auto p:forest)
+	p->for_each_maximal_path([&](const vector<int>& x){
+	    push_back(x);});
+    }
+
+
+  public: // ---- Static Constructors ------------------------------------------------------------------------
+
 
     static AtomsPack random(const int n, const float p=0.5){
       AtomsPack R;
