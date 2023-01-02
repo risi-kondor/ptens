@@ -23,5 +23,6 @@ from ptens.ptensors1 import ptensors1 as ptensors1
 from ptens.ptensors2 import ptensors2 as ptensors2
 
 from ptens.graph import graph as graph
+import ptens.modules as modules
 
 from ptens.functions import *
