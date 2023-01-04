@@ -6,6 +6,12 @@ from ptens_base import graph as _graph
 class graph:
 
     @classmethod
+    def from_edge_index(self,M):
+        G=graph()
+        G.obj=_graph.edge_index(M)
+        return G
+
+    @classmethod
     def from_matrix(self,M):
         G=graph()
         G.obj=_graph.matrix(M)
@@ -23,11 +29,14 @@ class graph:
         G.obj=_graph.randomd(_n,_p)
         return G
 
-    def torch(self,):
+    def torch(self):
         return self.obj.dense()
 
     def nhoods(self,_l):
         return self.obj.nhoods(_l)
+
+    def subgraphs(self,H):
+        return self.obj.subgraphs(H.obj)
 
     def __str__(self):
         return self.obj.__str__()

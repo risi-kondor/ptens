@@ -4,6 +4,7 @@
 #include <map>
 
 #include "array_pool.hpp"
+#include "labeled_forest.hpp"
 #include "Atoms.hpp"
 
 
@@ -12,6 +13,7 @@ namespace ptens{
   class AtomsPack: public cnine::array_pool<int>{
   public:
 
+    int k=-1;
 
   public: // ---- Constructors ------------------------------------------------------------------------------
 
@@ -23,15 +25,17 @@ namespace ptens{
 
 
     AtomsPack(const int N){
+      k=1;
       for(int i=0; i<N; i++)
 	push_back(vector<int>({i}));
     }
 
-    AtomsPack(const int N, const int k){
-      for(int i=0; i<N; i++){
-	vector<int> v;
-	for(int j=0; j<k; j++) 
+    AtomsPack(const int N, const int _k){
+      k=_k;
+      vector<int> v;
+      for(int j=0; j<k; j++) 
 	  v.push_back(j);
+      for(int i=0; i<N; i++){
 	push_back(v);
       }
     }
@@ -45,6 +49,16 @@ namespace ptens{
       for(auto& p:x)
 	push_back(p);
     }
+
+    AtomsPack(const cnine::labeled_forest<int>& forest){
+      for(auto p:forest)
+	p->for_each_maximal_path([&](const vector<int>& x){
+	    push_back(x);});
+    }
+
+
+  public: // ---- Static Constructors ------------------------------------------------------------------------
+
 
     static AtomsPack random(const int n, const float p=0.5){
       AtomsPack R;
@@ -75,18 +89,19 @@ namespace ptens{
 
 
     AtomsPack(const AtomsPack& x):
-      array_pool(x){
+      array_pool(x), k(x.k){
       PTENS_COPY_WARNING();
     }
 
     AtomsPack(AtomsPack&& x):
-      array_pool(std::move(x)){
+      array_pool(std::move(x)), k(x.k){
       PTENS_MOVE_WARNING();
     }
 
     AtomsPack& operator=(const AtomsPack& x){
       PTENS_ASSIGN_WARNING();
       cnine::array_pool<int>::operator=(x);
+      k=x.k;
       return *this;
     }
 
@@ -95,15 +110,15 @@ namespace ptens{
   public: // ---- Conversions --------------------------------------------------------------------------------
 
 
-    AtomsPack(cnine::array_pool<int>&& x):
-      cnine::array_pool<int>(std::move(x)){}
+    AtomsPack(cnine::array_pool<int>&& x, const int _k=-1):
+      cnine::array_pool<int>(std::move(x)), k(_k){}
 
 
   public: // ---- Views --------------------------------------------------------------------------------------
 
 
     AtomsPack view(){
-      return AtomsPack(cnine::array_pool<int>::view());
+      return AtomsPack(cnine::array_pool<int>::view(),k);
     }
 
 
