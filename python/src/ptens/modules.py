@@ -79,3 +79,46 @@ class BatchNormalization_1P(torch.nn.BatchNorm1d):
 class Dropout_1P(torch.nn.Dropout1d):
   def forward(self, input: ptensors1) -> ptensors1:
     return ptensors1.from_matrix(super().forward(input.torch()),input.get_atoms())
+class Dropout(torch.nn.Module):
+  def __init__(self, prob: torch.float = 0.5, device : str = 'cuda') -> None:
+    super().__init__()
+    self.p = prob
+    self.device = device
+  def cuda(self, device = None):
+    self.device = device
+    return super().cuda(device)
+  def forward(self, x: Union[p.ptensors0,p.ptensors1,p.ptensors2]):
+    dropout = (torch.rand(x.get_nc(),device=self.device) > self.p).float()
+    if isinstance(x,p.ptensors0):
+      return p.ptensors0.mult_channels(x,dropout)
+    elif isinstance(x,p.ptensors1):
+      return p.ptensors1.mult_channels(x,dropout)
+    elif isinstance(x,p.ptensors2):
+      return p.ptensors2.mult_channels(x,dropout)
+    else:
+      raise NotImplementedError('Dropout not implemented for type \"' + str(type(x)) + "\"")
+class BatchNorm(torch.nn.Module):
+  def __init__(self, num_features: int, eps: torch.float = 1E-5, momentum: torch.float = 0.1) -> None:
+    super().__init__()
+    self.has_had_first_batch = False
+    # TODO: consider using 'UnitializedParameter' here
+    self.running_mean = torch.nn.parameter.Parameter(torch.empty(num_features))
+    self.running_var = torch.nn.parameter.Parameter(torch.empty(num_features))
+    self.eps = eps
+    self.momentum = momentum
+  def forward(self, x):
+    r"""
+    x can be any type of ptensors
+    """
+    x_vals : torch.Tensor = x.torch()
+    if self.has_had_first_batch:
+      self.has_had_first_batch = True
+      self.running_mean.data = x_vals.mean(0)
+      self.running_var.data = x_vals.var(0)
+    else:
+      self.running_mean.data = (1 - self.momentum) * self.running_mean.data + self.momentum * x_vals.mean()
+      self.running_var.data = (1 - self.momentum) * self.running_var.data + self.momentum * x_vals.var(unbiased=False)
+    y = (self.running_var + self.eps)**-0.5
+    b = -self.running_mean * y
+    # TODO: make this better
+    return p.linear(x,torch.diag(y),b)
