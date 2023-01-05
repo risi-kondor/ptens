@@ -42,9 +42,14 @@ class ConvolutionalLayer_0P(torch.nn.Module):
     return F
 
 class ConvolutionalLayer_1P(torch.nn.Module):
-  def __init__(self, channels_in: int, channels_out: int, bias : bool = True) -> None:
+  def __init__(self, channels_in: int, channels_out: int, bias : bool = True, reduction_type : str = "sum") -> None:
+    r"""
+    reduction_types: "sum" and "mean"
+    """
     super().__init__()
+    assert reduction_type == "sum" or reduction_type == "mean"
     self.lin = Linear(2*channels_in,channels_out,bias)
+    self.use_mean = reduction_type == "mean"
   def reset_parameters(self):
     self.lin.reset_parameters()
   def forward(self, features: ptensors1, graph: graph, symm_norm: Optional[ptensors0] = None) -> ptensors1:
@@ -54,7 +59,7 @@ class ConvolutionalLayer_1P(torch.nn.Module):
     if not symm_norm is None:
       features = outer(features,symm_norm)
     # VxVxk -> VxVxk*2
-    F = unite1(features,graph)
+    F = unite1(features,graph,self.use_mean)
     # [VxVxk] [VxVxk*2] -> [VxVxk*3]
     # [VxV*k*2] -> [VxV*k']
     F = self.lin(F)
