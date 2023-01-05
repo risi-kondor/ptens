@@ -16,13 +16,13 @@
 
 #include "LinmapFunctions.hpp"
 #include "MsgFunctions.hpp"
+#include "FindPlantedSubgraphs.hpp"
 
 #include "GatherLayers.hpp"
 #include "LinmapLayers.hpp"
 #include "EMPlayers.hpp"
 #include "OuterLayers.hpp"
 #include "ConcatLayers.hpp"
-
 
 ptens::PtensSession session;
 
