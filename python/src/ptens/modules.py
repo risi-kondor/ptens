@@ -87,14 +87,14 @@ class Dropout(torch.nn.Module):
   def cuda(self, device = None):
     self.device = device
     return super().cuda(device)
-  def forward(self, x: Union[p.ptensors0,p.ptensors1,p.ptensors2]):
+  def forward(self, x):
     dropout = (torch.rand(x.get_nc(),device=self.device) > self.p).float()
-    if isinstance(x,p.ptensors0):
-      return p.ptensors0.mult_channels(x,dropout)
-    elif isinstance(x,p.ptensors1):
-      return p.ptensors1.mult_channels(x,dropout)
-    elif isinstance(x,p.ptensors2):
-      return p.ptensors2.mult_channels(x,dropout)
+    if isinstance(x,ptensors0):
+      return ptensors0.mult_channels(x,dropout)
+    elif isinstance(x,ptensors1):
+      return ptensors1.mult_channels(x,dropout)
+    elif isinstance(x,ptensors2):
+      return ptensors2.mult_channels(x,dropout)
     else:
       raise NotImplementedError('Dropout not implemented for type \"' + str(type(x)) + "\"")
 class BatchNorm(torch.nn.Module):
@@ -121,4 +121,4 @@ class BatchNorm(torch.nn.Module):
     y = (self.running_var + self.eps)**-0.5
     b = -self.running_mean * y
     # TODO: make this better
-    return p.linear(x,torch.diag(y),b)
+    return linear(x,torch.diag(y),b)
