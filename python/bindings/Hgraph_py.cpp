@@ -6,6 +6,7 @@ pybind11::class_<Hgraph>(m,"graph")
   .def_static("randomd",static_cast<Hgraph(*)(const int, const float)>(&Hgraph::randomd))
 
   .def("nhoods",&Hgraph::nhoods)
+  .def("edges",&Hgraph::edges)
   .def("set",&Hgraph::set)
 
   .def("dense",[](const Hgraph& G){return G.dense().torch();})
