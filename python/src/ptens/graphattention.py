@@ -1,131 +1,62 @@
+import numpy as np
 import torch
 import torch.nn as nn
 from torch.nn import Parameter, Sequential
-import ptens
-from ptens import ptensors0, ptensors1, ptensors2, graph
-from ptens.functions import linear, relu, linmaps0, outer, unite1, gather
-from ptens.modules import Linear, Dropout
-import enum
-
-class LayerType(enum.Enum):
-    IMP1 = 0,
-    IMP2 = 1,
-    IMP3 = 2
-    
-class GraphAttention(torch.nn.Module):
-    def __init__(self,
-                 num_layers,
-                 num_heads_per_layer,
-                 num_features_per_layer,
-                 add_skip_connection=True,
-                 bias = True,
-                 dropout = 0.6,
-                 layer_type = LayerType.IMP3,
-                 log_attention_weights = False):
-        
-        super().__init__()
-        assert num_layers == len(num_heads_per_layer) == len(num_features_per_layer) - 1, f'Enter valid arch params.'
-        GraphAttentionLayer = get_layer_type(layer_type)
-        num_heads_per_layer= [1] + num_leads_per_layer
-
-        # collect GAT layers
-        for i in range(num_layers):
-            layer = GraphAttentionLayer(num_in_features = num_features_per_layer[i]*num_heads_per_layer[i],
-                                        num_out_features = num_features_per_layer[i+1],
-                                        num_heads = num_heads_per_layer[i+1],
-                                        concat = True if i < num_layers - 1 else False, # last GAT layer does mean avg, the others do concat
-                                        activation = relu if i < num_layers - 1 else None, 
-                                        dropout_prob = dropout,
-                                        add_skip_connection = add_skip_connection,
-                                        bias = bias,
-                                        log_attention_weights = log_attention_weights)
-            gat_layers.append(layer)
-        self.gat_net = Sequential(*gat_layers,)
-
-        def forward(self, data):
-            return self.gat_net(data)
-
-class GraphAttentionLayer(torch.nn.Module):
-    head_dim = 1
-    def __init__(self,
-                 num_in_features,
-                 num_out_features,
-                 num_heads,
-                 layer_type,
-                 concat = True,
-                 activation = relu, 
-                 dropout_prob = 0.6,
-                 add_skip_connection = True,
-                 bias = True,
-                 log_attention_weights = False):
-        super().__init__()
-        # saving this in forward prop in children layers (im1/2/3)
-        self.num_heads = num_heads
-        self.num_out_features = num_out_features
+from torch.nn.functional import softmax
+import ptens 
+from ptens.functions import linear, relu, cat
+from ptens.modules import Dropout
+class GraphAttentionLayer_P1(nn.Module):
+    """
+    An implementation of GATConv layer in ptens. 
+    """
+#   linmaps0->1: copy/ptensor by len(domain)
+#   linmaps1->0: sum/ptensor
+    def __init__(self, in_channels: int, out_channels: int, d_prob: torch.float = 0.5, alpha = 0.5, concat=True):
+        super(GraphAttentionLayer, self).__init__()
+        self.d_prob = d_prob
+        self.in_channels = in_channels
+        self.out_channels = out_channels
+        self.alpha = alpha
         self.concat = concat
-        self.add_skip_connection = add_skip_connection
 
-        if layer_type == LayerType.IMP1:
-            self.proj_param = Parameter(torch.Tensor(num_heads,
-                                                     num_in_features,
-                                                     num_out_features))
-        else:
-            self.linear_proj = Linear(num_in_features,
-                                      num_heads*num_out_features,
-                                      bias = False)
-        self.scoring_fn_target = Parameter(torch.Tensor(1,
-                                                        num_heads,
-                                                        num_out_features))
-        self.scoring_fn_source = Parameter(torch.Tensor(1,
-                                                        num_heads,
-                                                        num_out_features))
-        if layer_type = LayerType.IMP1: # simple reshape in the case of implementation(IMP)1
-            self.scoring_fn_target = Parameter(self.scoring_fn_target.reshape(num_heads,
-                                                                              num_out_features,
-                                                                              1))
-            self.scoring_fn_source = Parameter(self.scoring_fn_source.reshape(num_heads,
-                                                                              num_out_features,
-                                                                              1))
-        if bias and concat:
-            self.bias = Parameter(torch.Tensor(num_heads*num_features))
-        elif bias and not concat:
-            self.bias = Parameter(torch.Tensor(num_features))
-        else:
-            self.register_parameter('bias', None)
+        self.W = Parameter(torch.empty(in_channels, out_channels))
+        nn.init.xavier_uniform_(self.W.data, gain=1.414)
+        self.a = Parameter(torch.empty(2*out_channels, 1))
+        nn.init.xavier_uniform_(self.a.data, gain=1.414)
+        self.relu = relu(self.alpha)
 
-        if add_skip_connection:
-            self.skip_proj = Linear(num_in_features, num_heads*num_out_features, bias = False)
-        else:
-            self.register_parameter('skip_proj', None)
-
-        self.activation = activation
-        self.dropout = Dropout(p = dropout_prob)     
-        self.attention_weights = None
-        self.init_params(layer_type)
-
-    def init_params(self, layer_type):
-        nn.init.xavier_uniform_(self.proj_param if layer_type == LayerType.IMP1 else self.linear_proj.weight)
-        nn.init.xavier_uniform_(self.scoring_fn_source)
-        if self.bias is not None:
-            torch.nn.init.zeros_(self.bias)
-
-    def skip_concat_bias(self, attention_coefficients, in_nodes_features, out_nodes_features):
-        if self.log_attention_weights:
-            self.attention_weights = attention_coefficients
-        if not out_nodes_features.is_contiguous():
-            out_nodes_features = out_nodes_features.contiguous()
-
-        if self.add_skip_connection:
-            if out_nodes_features.shape[-1] == in_nodes_features.shape[-1]:
-                out_nodes_features += in_nodes_features.unsqueeze(1)
-            else:
-                out_nodes_features += self.skip_proj(in_nodes_features).view(-1,self.num_heads, self.num_out_features)
-
+    def forward(self, h: ptensors1, adj: ptensors1):
+        h = ptens.linmaps0(h).torch()
+        Wh = torch.mm(h, self.W) # h.shape: (N, in_channels), Wh.shape: (N, out_channels)
+        e_p1 = self._prepare_attentional_mechanism_input(Wh)
+        # e_p1 -> e_p0 -> size of e_p0 -> size of e_p1                      ?? linmaps1->0; linmaps0->1
+        e_p0 = ptens.linmaps0(e_p1) 
+        e_p0_r, e_p0_c = e_p0.torch().size()
+        e_p1_r = e_p0_r + e_p1.get_nc()
+        e_p1_c = e_p0_c
+        #zero_vec = -9e15*torch.ones_like(e_p1_r, e_p1_c)
+        zero_vec = -9e15*torch.ones_like(e_p0_r, e_p0_c)
+        # ptensors1 -> ptensors0 -> torch -> do -> ptensors0 -> ptensors1   ?? linmaps1->0; linmaps0->1
+        adj_torch = ptens.linmaps0(adj).torch()
+        e_torch = e_p0.torch()
+        attention = torch.where(adj_torch > 0, e_torch, zero_vec)
+        attention = softmax(attention, dim=1)
+        attention_p1 = ptens.linmaps1(ptens.ptensors0.from_matrix(attention))
+        attention_p1 = Dropout(attention_p1, self.d_prob)  
+        h_prime = attention*Wh
         if self.concat:
-            out_nodes_features = out_nodes_features.view(-1, self.num_heads*self.num_out_features)
+            return relu(h_prime)
         else:
-            out_nodes_features = out_nodes_features.mean(dim=self.head_dim)
+            return h_prime
 
-        if self.bias is not None:
-            out_nodes_features += self.bias
-        return out_nodes_features if self.activation is None else self.activation(out_nodes_features)
+    def _prepare_attentional_mechanism_input(self, Wh):
+        Wh1 = torch.matmul(Wh, self.a[:self.out_channels, :])
+        Wh2 = torch.matmul(Wh, self.a[self.out_channels:, :])
+        e = Wh1 + Wh2.T
+        e_p1 = ptens.linmaps1(ptens.ptensors0.from_matrix(e))
+        return self.relu(e_p1)
+
+    def __repr__(self):
+        return self.__class__.__name__ + ' (' + str(self.in_channels) + ' -> ' + str(self.out_channels) + ')'
+
