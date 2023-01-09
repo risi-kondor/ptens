@@ -37,9 +37,6 @@ namespace ptens{
       Htraversal=S.indexed_depth_first_traversal();
       assignment=vector<int>(n,-1);
 
-      //for(auto p:Htraversal) cout<<p.first<<" "; cout<<endl;
-      //for(auto p:Htraversal) cout<<p.second<<" "; cout<<endl;
-
       for(int i=0; i<G.getn(); i++){
 	labeled_tree* T=new labeled_tree(i);
 	matches.push_back(T);

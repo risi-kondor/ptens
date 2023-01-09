@@ -25,5 +25,8 @@ int main(int argc, char** argv){
   //for(int i=0; i<5; i++)
   //cout<<M.nhoods(i)<<endl;
 
+  auto E=M.edges();
+  cout<<E<<endl;
+
 }
 

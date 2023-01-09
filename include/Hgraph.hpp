@@ -24,11 +24,13 @@ namespace ptens{
     mutable cnine::CSRmatrix<float>* gmap=nullptr; 
     mutable shared_ptr<cnine::GatherMap> bmap;
     mutable vector<AtomsPack*> _nhoods; 
+    mutable AtomsPack* _edges=nullptr;
 
     ~Hgraph(){
       // if(_reverse) delete _reverse; // hack!
       for(auto p:_nhoods)
 	delete p;
+      if(!_edges) delete _edges;
       if(gmap) delete gmap;
       //if(bmap) delete bmap;
     }
@@ -180,6 +182,18 @@ namespace ptens{
       }
       
       return AtomsPack(*_nhoods[i]);
+    }
+
+    const AtomsPack& edges(){
+      if(!_edges) make_edges();
+      return *_edges;
+    }
+
+    void make_edges(){
+      delete _edges;
+      _edges=new AtomsPack();
+      for_each_edge([&](const int i, const int j, const float v){
+	  _edges->push_back({i,j});});
     }
 
 
