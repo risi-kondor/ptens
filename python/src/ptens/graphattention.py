@@ -4,7 +4,7 @@ import torch.nn as nn
 from torch.nn import Parameter, Sequential, LeakyReLU, ReLU
 from torch.nn.functional import softmax, dropout
 import ptens 
-from ptens.functions import linear, relu, cat, elu
+from ptens.functions import linear, relu, cat
 from ptens.modules import Dropout
 class GraphAttentionLayer_P0(nn.Module):
     """
