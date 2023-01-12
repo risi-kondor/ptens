@@ -74,16 +74,6 @@ class Reduce_1P_0P(torch.nn.Module):
     features = linmaps0(features)
     a = self.lin(features)
     return a
-
-class BatchNormalization_0P(torch.nn.BatchNorm1d):
-  def forward(self, x: ptensors0) -> ptensors0:
-    return ptensors0.from_matrix(super().forward(x.torch()))
-class BatchNormalization_1P(torch.nn.BatchNorm1d):
-  def forward(self, x: ptensors1) -> ptensors1:
-    return ptensors1.from_matrix(super().forward(x.torch()),x.get_atoms())
-class Dropout_1P(torch.nn.Dropout1d):
-  def forward(self, input: ptensors1) -> ptensors1:
-    return ptensors1.from_matrix(super().forward(input.torch()),input.get_atoms())
 class Dropout(torch.nn.Module):
   def __init__(self, prob: torch.float = 0.5, device : str = 'cuda') -> None:
     super().__init__()
