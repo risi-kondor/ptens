@@ -35,6 +35,9 @@ class graph:
     def nhoods(self,_l):
         return self.obj.nhoods(_l)
 
+    def edges(self,_l):
+        return self.obj.edges()
+
     def subgraphs(self,H):
         return self.obj.subgraphs(H.obj)
 

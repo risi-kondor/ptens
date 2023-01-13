@@ -318,8 +318,10 @@ __global__ void Ptensors1_broadcast1_kernel(float* xarr, const int* xdir, const 
     if(c>=rnc) return;
 
     const float* r=rarr+rdir[3*src]+c;
-    for(int i=0; i<k; i++)
+    for(int i=0; i<k; i++){
+      //if(c==0) printf("%d %d %d %d %d %d %d\n",src,target,i,ix[i+1],xdir[3*target],xdir[3*target+1],nc);
       x[ix[i+1]*nc]+=r[i*rnc];
+    }
   }
 }
 
@@ -577,6 +579,9 @@ namespace ptens{
     const_cast<AindexPack&>(list).to_device(1);
     PTENS_ASSRT(list.dev==1);
     int n=cnine::roundup(std::max(R.dim_of(0,0),list.max_nix()+1),32);
+    //cout<<">>"<<n<<endl;
+    //cout<<x.dir<<endl;
+    //cout<<cnine::GatherMap(list.get_bmap(),0)<<endl;
     Ptensors1_broadcast1_kernel<<<list.get_bmap().n,n,(list.max_nix()+1)*4,stream>>>
       (x.arrg+offs,x.dir.garr(dev),list.arrg,list.dir.garr(dev),R.arrg,R.dir.garr(dev),list.get_barr(1));
   }

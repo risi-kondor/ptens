@@ -160,7 +160,7 @@ namespace ptens{
 
 
     static Ptensors1 concat(const Ptensors1& x, const Ptensors1& y){
-      Ptensors1 R=Ptensors1::zero(x.atoms,x.nc+y.nc);
+      Ptensors1 R=Ptensors1::zero(x.atoms,x.nc+y.nc,x.dev);
       R.add_to_channels(x,0);
       R.add_to_channels(y,x.nc);
       return R;

@@ -177,7 +177,7 @@ namespace ptens{
     }
 
     static Ptensors2 concat(const Ptensors2& x, const Ptensors2& y){
-      Ptensors2 R=Ptensors2::zero(x.atoms,x.nc+y.nc);
+      Ptensors2 R=Ptensors2::zero(x.atoms,x.nc+y.nc,x.dev);
       R.add_to_channels(x,0);
       R.add_to_channels(y,x.nc);
       return R;
