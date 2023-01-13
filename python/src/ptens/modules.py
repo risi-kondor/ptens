@@ -95,10 +95,9 @@ class Dropout(torch.nn.Module):
 class BatchNorm(torch.nn.Module):
   def __init__(self, num_features: int, eps: torch.float = 1E-5, momentum: torch.float = 0.1) -> None:
     super().__init__()
-    self.has_had_first_batch = False
     # TODO: consider using 'UnitializedParameter' here
-    self.running_mean = torch.nn.parameter.Parameter(torch.empty(num_features))
-    self.running_var = torch.nn.parameter.Parameter(torch.empty(num_features))
+    self.running_mean = None
+    self.running_var = None
     self.eps = eps
     self.momentum = momentum
   def forward(self, x):
@@ -106,14 +105,16 @@ class BatchNorm(torch.nn.Module):
     x can be any type of ptensors
     """
     x_vals : torch.Tensor = x.torch()
-    if self.has_had_first_batch:
+    if self.running_mean is None:
       self.has_had_first_batch = True
-      self.running_mean.data = x_vals.mean(0)
-      self.running_var.data = x_vals.var(0)
+      self.running_mean = x_vals.mean(0)
+      self.running_var = x_vals.var(0)
     else:
-      self.running_mean.data = (1 - self.momentum) * self.running_mean.data + self.momentum * x_vals.mean()
-      self.running_var.data = (1 - self.momentum) * self.running_var.data + self.momentum * x_vals.var(unbiased=False)
+      self.running_mean = (1 - self.momentum) * self.running_mean + self.momentum * x_vals.mean()
+      self.running_var = (1 - self.momentum) * self.running_var + self.momentum * x_vals.var(unbiased=False)
     y = (self.running_var + self.eps)**-0.5
     b = -self.running_mean * y
+    test = torch.einsum('ij,jk->ij',x_vals,torch.diag(y)) + b
+    print(test.mean(),test.var())
     # TODO: make this better
     return linear(x,torch.diag(y),b)
