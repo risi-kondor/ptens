@@ -53,6 +53,9 @@ __global__ void Ptensors0_broadcast0_kernel(float* xarr, const int* xdir, const 
     const float w=*reinterpret_cast<const float*>(bmap+boffs+2*j+1);
     t+=w*rarr[rdir[2*src]+c];
   }
+  //if(c==0) printf("xdir[0]=%f\n",xdir[0]);
+  //if(c==0) printf("target=%d\n",target);
+  //if(c==0) printf("%f\n",xdir[2*target]);
   xarr[xdir[2*target]+c]+=t;
 }
 
@@ -155,7 +158,10 @@ namespace ptens{
     PTENS_ASSRT(R.dev==1);
     PTENS_ASSRT(x.dev==1);
     const_cast<AindexPack&>(list).to_device(1);
-    Ptensors0_broadcast0_kernel<<<R.size(),R.dim_of(0,0),0,stream>>>
+    //cout<<list.get_bmap().n<<endl;
+    //cout<<R.size()<<endl;
+    //cout<<x.size()<<endl;
+    Ptensors0_broadcast0_kernel<<<list.get_bmap().n,R.dim_of(0,0),0,stream>>>
       (x.arrg+offs,x.dir.garr(dev),list.arrg,list.dir.garr(dev),R.arrg,R.dir.garr(dev),list.get_barr(1));
   }
 

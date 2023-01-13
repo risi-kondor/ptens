@@ -120,7 +120,6 @@ namespace ptens{
 
     const Hgraph& reverse() const{
       if(!_reverse) _reverse=new Hgraph(transp());
-      //if(_reverse) const_cast<Hgraph&>(*this).make_reverse();
       return *_reverse;
     }
 
