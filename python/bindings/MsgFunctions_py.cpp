@@ -115,12 +115,38 @@ m.def("add_msg_back_n",[](Ptensors2& r, const Ptensors2& x, const Hgraph& G, int
   py::arg("r"), py::arg("x"), py::arg("G"), py::arg("offs")=0);
 
 
+m.def("add_msg_back",[](loose_ptr<Ptensors0>& r, const loose_ptr<Ptensors0>& x, const Hgraph& G){
+    return add_msg_back(r,x,G.reverse());});
+m.def("add_msg_back",[](loose_ptr<Ptensors1>& r, const loose_ptr<Ptensors0>& x, const Hgraph& G){
+    return add_msg_back(r,x,G.reverse());});
+m.def("add_msg_back",[](loose_ptr<Ptensors2>& r, const loose_ptr<Ptensors0>& x, const Hgraph& G){
+    return add_msg_back(r,x,G.reverse());});
+m.def("add_msg_back_n",[](loose_ptr<Ptensors1>& r, const loose_ptr<Ptensors0>& x, const Hgraph& G){
+    return add_msg_back_n(r,x,G.reverse());});
+m.def("add_msg_back_n",[](loose_ptr<Ptensors2>& r, const loose_ptr<Ptensors0>& x, const Hgraph& G){
+    return add_msg_back_n(r,x,G.reverse());});
 
 m.def("add_msg_back",[](loose_ptr<Ptensors0>& r, const loose_ptr<Ptensors1>& x, const Hgraph& G){
     return add_msg_back(r,x,G.reverse());});
-
-m.def("add_msg_back",[](loose_ptr<Ptensors1>& r, const loose_ptr<Ptensors1>& x, const Hgraph& G){ // added
+m.def("add_msg_back",[](loose_ptr<Ptensors1>& r, const loose_ptr<Ptensors1>& x, const Hgraph& G){
     return add_msg_back(r,x,G.reverse());});
+m.def("add_msg_back",[](loose_ptr<Ptensors2>& r, const loose_ptr<Ptensors1>& x, const Hgraph& G){
+    return add_msg_back(r,x,G.reverse());});
+m.def("add_msg_back_n",[](loose_ptr<Ptensors1>& r, const loose_ptr<Ptensors1>& x, const Hgraph& G){
+    return add_msg_back_n(r,x,G.reverse());});
+m.def("add_msg_back_n",[](loose_ptr<Ptensors2>& r, const loose_ptr<Ptensors1>& x, const Hgraph& G){
+    return add_msg_back_n(r,x,G.reverse());});
+
+m.def("add_msg_back",[](loose_ptr<Ptensors0>& r, const loose_ptr<Ptensors2>& x, const Hgraph& G){
+    return add_msg_back(r,x,G.reverse());});
+m.def("add_msg_back",[](loose_ptr<Ptensors1>& r, const loose_ptr<Ptensors2>& x, const Hgraph& G){
+    return add_msg_back(r,x,G.reverse());});
+m.def("add_msg_back",[](loose_ptr<Ptensors2>& r, const loose_ptr<Ptensors2>& x, const Hgraph& G){
+    return add_msg_back(r,x,G.reverse());});
+m.def("add_msg_back_n",[](loose_ptr<Ptensors1>& r, const loose_ptr<Ptensors2>& x, const Hgraph& G){
+    return add_msg_back_n(r,x,G.reverse());});
+m.def("add_msg_back_n",[](loose_ptr<Ptensors2>& r, const loose_ptr<Ptensors2>& x, const Hgraph& G){
+    return add_msg_back_n(r,x,G.reverse());});
 
 
 // do we need these??
