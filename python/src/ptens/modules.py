@@ -118,3 +118,23 @@ class BatchNorm(torch.nn.Module):
     print(test.mean(),test.var())
     # TODO: make this better
     return linear(x,torch.diag(y),b)
+class PNormalize(torch.nn.Module):
+  def __init__(self, p: int = 2, eps: torch.float = 1E-5) -> None:
+    super().__init__()
+    self.eps = eps
+    self.p = p
+  def forward(self, x):
+    r"""
+    x can be any type of ptensors
+    """
+    x_vals : torch.Tensor = x.torch()
+    pnorm = torch.linalg.norm(x_vals,self.p,0)
+    pnorm = (self.eps + pnorm)**-1
+    if isinstance(x,ptensors0):
+      return ptensors0.mult_channels(x,pnorm)
+    elif isinstance(x,ptensors1):
+      return ptensors1.mult_channels(x,pnorm)
+    elif isinstance(x,ptensors2):
+      return ptensors2.mult_channels(x,pnorm)
+    else:
+      raise NotImplementedError('PNormalize not implemented for type \"' + str(type(x)) + "\"")
