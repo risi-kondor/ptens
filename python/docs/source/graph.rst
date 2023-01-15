@@ -14,7 +14,15 @@ dense matrix:
  >>> A=torch.tensor([[0,1,0],[1,0,1],[0,1,0]],dtype=torch.float32)
  >>> G=ptens.graph.from_matrix(A)
 
-Graphs are stored in a custom sparse datastructure, allowing `ptens` to potentially handle graphs with a 
+Alternatively, it can be initialized from an "edge index", which is just a :math:`2\times E` integer 
+tensor, listing all the edges:
+
+.. code-block:: python
+
+ >>> A=torch.tensor([[0,1,1,2],[1,0,2,1]],dtype=torch.float32)
+ >>> G=ptens.graph.from_edge_index(A)
+
+Graphs are stored in a custom sparse data structure, allowing `ptens` to potentially handle graphs with a 
 large number of vertices. Graphs are printed out by listing the edges incident 
 on each vertex. Continuing the above example:
 
@@ -49,7 +57,6 @@ the number of vertices and the probability of there being an edge beween any two
          [1., 0., 0., 0., 0., 0., 0., 0.],
          [1., 0., 0., 0., 0., 0., 0., 1.],
          [1., 0., 0., 0., 1., 0., 1., 0.]])
-
 
 =============
 Neighborhoods
@@ -94,3 +101,64 @@ The ``nhoods(k)`` function returns these reference domains as ``atomspack`` obje
  (1,4,7)
 
 
+===================
+Edges and subgraphs
+===================
+
+The ``edges()`` method returns the list of edges in ``G``:
+
+.. code-block:: python
+
+ >>> G=ptens.graph.random(8,0.3)
+ >>> E=G.edges()
+ >>> print(E)
+ (0,1)
+ (1,0)
+ (1,2)
+ (2,1)
+ (2,7)
+ (4,5)
+ (4,6)
+ (4,7) 
+ (5,4)
+ (6,4)
+ (7,2)
+ (7,4)
+
+More generally, if we define a second graph ``H``, the ``subgraphs(H)`` method finds all occurrences of ``H`` 
+in ``G`` as a subgraph as an ``atomspack``:
+
+.. code-block:: python
+
+ >>> G=ptens.graph.random(8,0.6)
+ >>> triangle=ptens.graph.from_matrix(torch.tensor([[0,1,1],[1,0,1],[1,1,0]],dtype=torch.float32))
+ >>> S=G.subgraphs(triangle)
+ >>> S
+ (0,1,6)
+ (0,3,6)
+ (0,5,6)
+ (1,4,6)
+ (4,5,6)
+ (4,5,7)
+ (4,6,7)
+ (5,6,7)
+
+========
+Overlaps
+========
+
+Given two ``atomspack`` objects, the ``overlaps(A,B)`` method creates a bipartite graph in which in which 
+there is an edge from ``i`` to ``j`` if the ``i`` 'th set in ``A`` has a non-zero intersection with the 
+``j`` 'th set in ``B``. 
+
+.. code-block:: python
+
+ >>> A=ptens_base.atomspack([[0,1],[2],[4,5]])
+ >>> B=ptens_base.atomspack([[1,3],[5,2],[0]])
+ >>> G=ptens.graph.overlaps(A,B)
+ >>> G.torch()
+ tensor([[1., 0., 1.],
+         [0., 1., 0.],
+         [0., 1., 0.]])
+
+ 
