@@ -29,13 +29,19 @@ class graph:
         G.obj=_graph.randomd(_n,_p)
         return G
 
+    @classmethod
+    def overlaps(self,x,y):
+        G=graph()
+        G.obj=_graph.overlaps(x,y)
+        return G
+
     def torch(self):
         return self.obj.dense()
 
     def nhoods(self,_l):
         return self.obj.nhoods(_l)
 
-    def edges(self,_l):
+    def edges(self):
         return self.obj.edges()
 
     def subgraphs(self,H):

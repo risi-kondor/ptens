@@ -33,6 +33,7 @@ namespace ptens{
 
     FindPlantedSubgraphs(const Graph& _G, const Graph& _H):
       G(_G), H(_H), n(_H.getn()){
+      cout<<"compute"<<endl;
       labeled_tree S=H.greedy_spanning_tree();
       Htraversal=S.indexed_depth_first_traversal();
       assignment=vector<int>(n,-1);
@@ -53,6 +54,14 @@ namespace ptens{
       for(auto p:matches)
 	p->for_each_maximal_path([&](const vector<int>& x){
 	    R.push_back(i++,x);});
+      return R;
+    }
+
+    operator cnine::array_pool<int>(){
+      cnine::array_pool<int> R;
+      for(auto p:matches)
+	p->for_each_maximal_path([&](const vector<int>& x){
+	    R.push_back(x);});
       return R;
     }
 
@@ -100,6 +109,23 @@ namespace ptens{
 
       assignment[v]=-1;
       return node.children.size()>0;
+    }
+
+  };
+
+
+  class CachedPlantedSubgraphs{
+  public:
+
+    typedef Hgraph Graph;
+
+    cnine::array_pool<int> operator()(const Graph& G, const Graph& H){
+      //if(!G.subgraphlist_cache) G.subgraphlist_cache=new HgraphSubgraphListCache; 
+      auto it=G.subgraphlist_cache.find(H);
+      if(it!=G.subgraphlist_cache.end()) return *it->second;
+      auto newpack=new cnine::array_pool<int>(FindPlantedSubgraphs(G,H));
+      G.subgraphlist_cache[H]=newpack;
+      return *newpack;
     }
 
   };

@@ -10,7 +10,10 @@
 #include "labeled_tree.hpp"
 
 
+
 namespace ptens{
+
+  //class HgraphSubgraphListCache;
 
 
   class Hgraph: public cnine::SparseRmatrix{
@@ -25,6 +28,8 @@ namespace ptens{
     mutable shared_ptr<cnine::GatherMap> bmap;
     mutable vector<AtomsPack*> _nhoods; 
     mutable AtomsPack* _edges=nullptr;
+    mutable unordered_map<SparseRmatrix,cnine::array_pool<int>*> subgraphlist_cache;
+    //mutable HgraphSubgraphListCache* subgraphlist_cache=nullptr;
 
     ~Hgraph(){
       // if(_reverse) delete _reverse; // hack!
@@ -33,6 +38,8 @@ namespace ptens{
       if(!_edges) delete _edges;
       if(gmap) delete gmap;
       //if(bmap) delete bmap;
+      for(auto p:subgraphlist_cache) delete p.second;
+      //delete subgraphlist_cache;
     }
 
 
@@ -73,6 +80,19 @@ namespace ptens{
       auto R=cnine::SparseRmatrix::random_symmetric(_n,p);
       for(int i=0; i<_n; i++)
 	R.set(i,i,1.0);
+      return R;
+    }
+
+    static Hgraph overlaps(const cnine::array_pool<int>& x, const cnine::array_pool<int>& y){
+      Hgraph R(x.size(),y.size());
+      for(int i=0; i<x.size(); i++){
+	auto v=x(i);
+	for(int j=0; j<y.size(); j++){
+	  auto w=y(j);
+	  if([&](){for(auto p:v) if(std::find(w.begin(),w.end(),p)!=w.end()) return true; return false;}())
+	    R.set(i,j,1.0);
+	}
+      }
       return R;
     }
 
@@ -301,14 +321,33 @@ namespace ptens{
 
   };
 
+
 }
+  
+
+namespace std{
+
+  template<>
+  struct hash<ptens::Hgraph>{
+  public:
+    size_t operator()(const ptens::Hgraph& x) const{
+      return hash<cnine::SparseRmatrix>()(x);
+    }
+  };
+}
+
+//namespace ptens{
+//class HgraphSubgraphListCache: public unordered_map<Hgraph,AindexPack>{
+//public:
+//};
+//}
+
 
 #endif
 
 
    /*
-    AindexPack all_subgraphs_isomorphic_to(const Hgraph& H){
-      
+    AindexPack all_subgraphs_isomorphic_to(const Hgraph& H      
       tforest matches;
       tnode S=H.greedy_spanning_tree();
       auto traversal=S.indexed_depth_first_traversal();

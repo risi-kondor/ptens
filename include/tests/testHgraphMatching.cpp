@@ -26,5 +26,8 @@ int main(int argc, char** argv){
   AindexPack sets(fn);
   cout<<sets<<endl;
 
+  cout<<CachedPlantedSubgraphs()(G,triangle)<<endl;
+  cout<<CachedPlantedSubgraphs()(G,triangle)<<endl;
+
 }
 
