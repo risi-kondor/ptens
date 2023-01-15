@@ -83,7 +83,7 @@ class Dropout(torch.nn.Module):
     self.device = device
     return super().cuda(device)
   def forward(self, x):
-    dropout = (torch.rand(x.get_nc(),device=self.device) > self.p).float()
+    dropout = (torch.rand(x.get_nc(),device=self.device) < self.p).float()
     if isinstance(x,ptensors0):
       return ptensors0.mult_channels(x,dropout)
     elif isinstance(x,ptensors1):
