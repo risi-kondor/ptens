@@ -61,10 +61,11 @@ namespace ptens{
   public: // ---- Named Constructors -------------------------------------------------------------------------
 
 
-    static Hgraph edge_index(const cnine::RtensorA& M){
+    static Hgraph edge_index(const cnine::RtensorA& M, int n=-1){
       PTENS_ASSRT(M.ndims()==2);
       PTENS_ASSRT(M.get_dim(0)==2);
-      int n=M.max()+1;
+      if(n==-1) n=M.max()+1;
+      else PTENS_ASSRT(M.max()<n);
       int nedges=M.get_dim(1);
       Hgraph R(n);
       for(int i=0; i<nedges; i++)

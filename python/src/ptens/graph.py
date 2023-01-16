@@ -6,9 +6,9 @@ from ptens_base import graph as _graph
 class graph:
 
     @classmethod
-    def from_edge_index(self,M):
+    def from_edge_index(self,M,n=-1):
         G=graph()
-        G.obj=_graph.edge_index(M)
+        G.obj=_graph.edge_index(M,n)
         return G
 
     @classmethod
