@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Callable, List, Optional, Union
 import torch
 from ptens import ptensors0, ptensors1, ptensors2, graph
 from ptens.functions import linear, linmaps0, outer, unite1, gather
@@ -41,6 +41,31 @@ class ConvolutionalLayer_0P(torch.nn.Module):
       features = outer(F,symm_norm)
     return F
 
+# TODO: find a better place for the below function
+def generate_generic_shape(name: str, size: int) -> graph:
+  shape_types = ['star','cycle','path']
+  assert name in shape_types
+  assert size >= 0
+  def generate_star():
+    nonlocal size
+    edge_index = torch.tensor([[0,i,i,0] for i in range(1,size + 1)],dtype=torch.float32)
+    edge_index = edge_index.view(-1,2).transpose(0,1)
+    return graph.from_edge_index(edge_index)
+  def generate_cycle():
+    nonlocal size
+    edge_index = torch.tensor([[i,(i + 1) % size,(i + 1) % size,i] for i in range(size)],dtype=torch.float32)
+    edge_index = edge_index.view(-1,2).transpose(0,1)
+    return graph.from_edge_index(edge_index)
+  def generate_path():
+    nonlocal size
+    edge_index = torch.tensor([[i,i + 1,i + 1,i] for i in range(size - 1)],dtype=torch.float32)
+    edge_index = edge_index.view(-1,2).transpose(0,1)
+    return graph.from_edge_index(edge_index)
+  return [generate_star,generate_cycle,generate_path][shape_types[size]]()
+def create_edge_ptensors1(edge_index: torch.Tensor, edge_attributes: torch.Tensor) -> ptensors1:
+  atoms = edge_index.transpose(0,1).tolist()
+  return ptensors1.from_matrix(edge_attributes,atoms)
+
 class ConvolutionalLayer_1P(torch.nn.Module):
   def __init__(self, channels_in: int, channels_out: int, bias : bool = True, reduction_type : str = "sum") -> None:
     r"""
@@ -66,6 +91,34 @@ class ConvolutionalLayer_1P(torch.nn.Module):
     if not symm_norm is None:
       features = outer(F,symm_norm)
     return F
+class ConvolutionalLayer_1P_V2(torch.nn.Module):
+  def __init__(self, channels_in: int, channels_out: int, target_domains: Callable[[graph],List[List]], incoming_order : int = 1, bias : bool = True, reduction_type : str = "sum") -> None:
+    r"""
+    reduction_types: "sum" and "mean"
+    """
+    super().__init__()
+    assert reduction_type == "sum" or reduction_type == "mean"
+    self.lin = Linear([1,2,5][incoming_order]*channels_in,channels_out,bias)
+    self.use_mean = reduction_type == "mean"
+    self.target_domains = target_domains
+  def reset_parameters(self):
+    self.lin.reset_parameters()
+  def forward(self, features: Union[ptensors0,ptensors1], graph: graph, symm_norm: Optional[ptensors0] = None) -> ptensors1:
+    r"""
+    Give symm_norm if you want symmetric normalization.
+    """
+    if symm_norm is not None:
+      features = outer(features,symm_norm)
+    if isinstance(features,ptensors0):
+      F = ptensors0.transfer1(features,self.target_domains(graph))
+    elif isinstance(features,ptensors1):
+      F = ptensors1.transfer1(features,self.target_domains(graph))
+    else:
+      raise Exception("Unhandled 'features' type: " + str(type(features)))
+    F = self.lin(F)
+    if symm_norm is not None:
+      features = outer(F,symm_norm)
+    return F
 class Reduce_1P_0P(torch.nn.Module):
   def __init__(self, in_channels: int, out_channels: int, bias: bool = True) -> None:
     super().__init__()
@@ -83,7 +136,7 @@ class Dropout(torch.nn.Module):
     self.device = device
     return super().cuda(device)
   def forward(self, x):
-    dropout = (torch.rand(x.get_nc(),device=self.device) < self.p).float()
+    dropout = (torch.rand(x.get_nc(),device=self.device) > self.p).float()
     if isinstance(x,ptensors0):
       return ptensors0.mult_channels(x,dropout)
     elif isinstance(x,ptensors1):
