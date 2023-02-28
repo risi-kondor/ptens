@@ -1,7 +1,14 @@
-from typing import Callable, List, Optional, Union
+from typing import Callable, List, Optional, Tuple, Union
 import torch
 from ptens import ptensors0, ptensors1, ptensors2, graph
+from ptens_base import atomspack
 from ptens.functions import linear, linmaps0, outer, unite1, gather
+######################################## Functions ###########################################
+def ConvertEdgeAttributesToPtensors1(edge_index: torch.Tensor, edge_attributes: torch.Tensor):
+  atoms = edge_index.transpose(0,1).float()
+  return ptensors1.from_matrix(edge_attributes,atoms)
+
+######################################## MODULES ###########################################
 class Linear(torch.nn.Module):
   def __init__(self,in_channels: int, out_channels: int, bias: bool = True) -> None:
     super().__init__()
@@ -16,6 +23,36 @@ class Linear(torch.nn.Module):
   def forward(self,x: ptensors1) -> ptensors1:
     assert x.get_nc() == self.w.size(0)
     return x * self.w if self.b is None else linear(x,self.w,self.b) 
+
+class LazyLinear(torch.nn.Module):
+  def __init__(self,out_channels: int = None, bias: bool = True) -> None:
+    r"""
+    NOTE: if you do not initialize 'out_channels', it must be initialized before calling 'forward'.
+    """
+    super().__init__()
+    #This follows Glorot initialization for weights.
+    self.w = torch.nn.parameter.UninitializedParameter()
+    self.b = torch.nn.parameter.UninitializedParameter() if bias else None
+    self.out_channels = out_channels
+  def reset_parameters(self):
+    if not self.has_uninitialized_params():
+      self.w = torch.nn.init.xavier_uniform_(self.w)
+      if not self.b is None:
+        self.b = torch.nn.init.zeros_(self.b)
+  def initialize_parameters(self, input) -> None:
+    if self.has_uninitialized_params():
+      with torch.no_grad():
+        self.weight.materialize((self.out_channels, input.get_nc()))
+        if self.bias is not None:
+            self.bias.materialize(self.out_channels)
+        self.reset_parameters()
+  def forward_standard(self,x: Union[ptensors0,ptensors1,ptensors2]) -> Union[ptensors0,ptensors1,ptensors2]:
+    assert x.get_nc() == self.w.size(0)
+    return x * self.w if self.b is None else linear(x,self.w,self.b)
+  def forward(self,x: Union[ptensors0,ptensors1,ptensors2]) -> Union[ptensors0,ptensors1,ptensors2]:
+    self.initialize_parameters(x)
+    self.forward = self.forward_standard
+    return self.forward(x)
 
 class ConvolutionalLayer_0P(torch.nn.Module):
   r"""
@@ -46,22 +83,13 @@ def generate_generic_shape(name: str, size: int) -> graph:
   shape_types = ['star','cycle','path']
   assert name in shape_types
   assert size >= 0
-  def generate_star():
-    nonlocal size
-    edge_index = torch.tensor([[0,i,i,0] for i in range(1,size + 1)],dtype=torch.float32)
-    edge_index = edge_index.view(-1,2).transpose(0,1)
-    return graph.from_edge_index(edge_index)
-  def generate_cycle():
-    nonlocal size
-    edge_index = torch.tensor([[i,(i + 1) % size,(i + 1) % size,i] for i in range(size)],dtype=torch.float32)
-    edge_index = edge_index.view(-1,2).transpose(0,1)
-    return graph.from_edge_index(edge_index)
-  def generate_path():
-    nonlocal size
-    edge_index = torch.tensor([[i,i + 1,i + 1,i] for i in range(size - 1)],dtype=torch.float32)
-    edge_index = edge_index.view(-1,2).transpose(0,1)
-    return graph.from_edge_index(edge_index)
-  return [generate_star,generate_cycle,generate_path][shape_types[size]]()
+  generate_star = lambda size: torch.tensor([[0,i,i,0] for i in range(1,size + 1)],dtype=torch.float32)
+  generate_cycle = lambda size: torch.tensor([[i,(i + 1) % size,(i + 1) % size,i] for i in range(size)],dtype=torch.float32)
+  generate_path = lambda size: torch.tensor([[i,i + 1,i + 1,i] for i in range(size - 1)],dtype=torch.float32)
+  edge_index = [generate_star,generate_cycle,generate_path][shape_types.index(name)](size)
+  edge_index = edge_index.view(-1,2).transpose(0,1)
+  return graph.from_edge_index(edge_index,0)
+  #return graph.from_matrix(torch.sparse_coo_tensor(edge_index,torch.ones(edge_index.size(1),dtype=torch.float)).to_dense())
 def create_edge_ptensors1(edge_index: torch.Tensor, edge_attributes: torch.Tensor) -> ptensors1:
   atoms = edge_index.transpose(0,1).tolist()
   return ptensors1.from_matrix(edge_attributes,atoms)
@@ -91,33 +119,89 @@ class ConvolutionalLayer_1P(torch.nn.Module):
     if not symm_norm is None:
       features = outer(F,symm_norm)
     return F
-class ConvolutionalLayer_1P_V2(torch.nn.Module):
-  def __init__(self, channels_in: int, channels_out: int, target_domains: Callable[[graph],List[List]], incoming_order : int = 1, bias : bool = True, reduction_type : str = "sum") -> None:
+class LazySubstructureTransferLayer(torch.nn.Module):
+  def __init__(self, graph_filter: Union[graph,Tuple[str,int]], channels_out: int, out_order: int = None, bias : bool = True, reduction_type : str = "sum") -> None:
     r"""
     reduction_types: "sum" and "mean"
+    leave 'out_order' as 'None' to keep same as input (NOTE: cannot leave as default if input is of order 0.)
     """
     super().__init__()
     assert reduction_type == "sum" or reduction_type == "mean"
-    self.lin = Linear([1,2,5][incoming_order]*channels_in,channels_out,bias)
+    assert out_order in [None,1,2]
+    if isinstance(graph_filter,Tuple[str,int]):
+      graph_filter = generate_generic_shape(*graph_filter)
+    assert isinstance(graph_filter,graph)
+    self.lin = LazyLinear(channels_out,bias)
     self.use_mean = reduction_type == "mean"
-    self.target_domains = target_domains
+    self.graph_filter = graph_filter
+    self.out_order = out_order
+    self.unite = None
   def reset_parameters(self):
     self.lin.reset_parameters()
-  def forward(self, features: Union[ptensors0,ptensors1], graph: graph, symm_norm: Optional[ptensors0] = None) -> ptensors1:
-    r"""
-    Give symm_norm if you want symmetric normalization.
-    """
-    if symm_norm is not None:
-      features = outer(features,symm_norm)
-    if isinstance(features,ptensors0):
-      F = ptensors0.transfer1(features,self.target_domains(graph))
-    elif isinstance(features,ptensors1):
-      F = ptensors1.transfer1(features,self.target_domains(graph))
-    else:
-      raise Exception("Unhandled 'features' type: " + str(type(features)))
+  def forward(self, features: Union[ptensors0,ptensors1,ptensors2], graph: graph) -> Union[ptensors0,ptensors1,ptensors2]:
+    domain_map = graph.overlaps(graph.subgraphs(self.graph_filter),atomspack(features.get_atoms()))
+    if self.unite is None:
+      if isinstance(features,ptensors0):
+        in_order = 0
+      elif isinstance(features,ptensors1):
+        in_order = 1
+      elif isinstance(features,ptensors2):
+        in_order = 2
+      else:
+        raise "'features' must be instance of 'ptensors[0|1|2]'"
+      out_order = in_order if self.out_order is None else self.out_order
+      assert out_order is not None, "If 'in_order' is '0', then 'out_order' cannot be 'None'."
+      #
+      self.unite = [
+        [ptensors0.unite1,ptensors0.unite2],
+        [ptensors1.unite1,ptensors1.unite2],
+        [ptensors2.unite1,ptensors2.unite2],
+        ][in_order][out_order]
+    F = self.unite(F,domain_map,self.use_mean)
     F = self.lin(F)
-    if symm_norm is not None:
-      features = outer(F,symm_norm)
+    return F
+class LazySkipConnectionConvolutionalLayer(torch.nn.Module):
+  def __init__(self, channels_out: int, reduction_type : str = "sum", out_order: int = None, bias : bool = True) -> None:
+    r"""
+    reduction_types: "sum" and "mean"
+    leave 'out_order' as 'None' to keep same as input (NOTE: cannot leave as default if input is of order 0.)
+    """
+    super().__init__()
+    assert reduction_type == "sum" or reduction_type == "mean"
+    assert out_order in [None,0,1,2]
+    self.lin1 = LazyLinear(channels_out,bias=False)
+    self.lin2 = LazyLinear(channels_out,bias)
+    self.use_mean = reduction_type == "mean"
+    self.out_order = out_order
+    self.transfer = None
+  def reset_parameters(self):
+    self.lin1.reset_parameters()
+    self.lin2.reset_parameters()
+  def forward(self, features: Union[ptensors0,ptensors1,ptensors2], graph: graph) -> Union[ptensors0,ptensors1,ptensors2]:
+    if self.transfer is None:
+      if isinstance(features,ptensors0):
+        in_order = 0
+      elif isinstance(features,ptensors1):
+        in_order = 1
+      elif isinstance(features,ptensors2):
+        in_order = 2
+      else:
+        raise "'features' must be instance of 'ptensors[0|1|2]'"
+      out_order = in_order if self.out_order is None else self.out_order
+      assert out_order is not None, "If 'in_order' is '0', then 'out_order' cannot be 'None'."
+      #
+      self.lin1.out_channels = features.get_nc()
+      #
+      self.transfer = [
+        [ptensors0.transfer1,ptensors0.transfer0],
+        [ptensors1.transfer1,ptensors1.transfer0],
+        [ptensors2.transfer1,ptensors2.transfer0],
+        ][in_order][out_order]
+      if in_order == 0:
+        q = self.transfer
+        self.transfer = lambda x,G,n: q(x,n)
+    F1 = self.transfer(F,graph,F.get_atoms())
+    F = self.lin2(F) + self.lin1(F1)
     return F
 class Reduce_1P_0P(torch.nn.Module):
   def __init__(self, in_channels: int, out_channels: int, bias: bool = True) -> None:
