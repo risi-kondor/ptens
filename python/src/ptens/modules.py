@@ -5,12 +5,17 @@ from torch.nn import Parameter, Sequential, LeakyReLU, ReLU
 from torch.nn.functional import softmax, dropout
 import ptens 
 from ptens import ptensors0, ptensors1, ptensors2, graph
+from warnings import warn
 from ptens_base import atomspack
 from ptens.functions import linear, linmaps0, outer, unite1, gather, relu, cat
 ######################################## Functions ###########################################
 def ConvertEdgeAttributesToPtensors1(edge_index: torch.Tensor, edge_attributes: torch.Tensor):
   atoms = edge_index.transpose(0,1).float()
   return ptensors1.from_matrix(edge_attributes,atoms)
+
+def ComputeDomainMap(source_domains: List[List[int]], graph_filter: graph) -> graph:
+  # TODO: make it so .get_atoms() returns an atomspack, so we don't have to convert back to one.
+  return graph.overlaps(graph.subgraphs(graph_filter),atomspack(source_domains))
 
 ######################################## MODULES ###########################################
 class Linear(torch.nn.Module):
@@ -60,7 +65,7 @@ class LazyLinear(torch.nn.Module):
 
 class ConvolutionalLayer_0P(torch.nn.Module):
   r"""
-  An implementation of GCNConv in ptens.
+  An implementation of GCN in ptens.
   """
   def __init__(self, channels_in: int, channels_out: int, bias : bool = True) -> None:
     super().__init__()
@@ -123,11 +128,12 @@ class ConvolutionalLayer_1P(torch.nn.Module):
     if not symm_norm is None:
       features = outer(F,symm_norm)
     return F
-class LazySubstructureTransferLayer(torch.nn.Module):
-  def __init__(self, graph_filter: Union[graph,Tuple[str,int]], channels_out: int, out_order: int = None, bias : bool = True, reduction_type : str = "sum") -> None:
+class LazyUnite(torch.nn.Module):
+  def __init__(self, channels_out: int, out_order: int = None, bias : bool = True, reduction_type : str = "sum") -> None:
     r"""
     reduction_types: "sum" and "mean"
-    leave 'out_order' as 'None' to keep same as input (NOTE: cannot leave as default if input is of order 0.)
+    leave 'out_order' as 'None' to keep same as input
+    NOTE: if you are planning on using the same source/target domains more than once, consider using a unite layer instead and computing the domain mapping separately.
     """
     super().__init__()
     assert reduction_type == "sum" or reduction_type == "mean"
@@ -140,8 +146,6 @@ class LazySubstructureTransferLayer(torch.nn.Module):
     self.graph_filter = graph_filter
     self.out_order = out_order
     self.unite = None
-  def reset_parameters(self):
-    self.lin.reset_parameters()
   def forward(self, features: Union[ptensors0,ptensors1,ptensors2], graph: graph) -> Union[ptensors0,ptensors1,ptensors2]:
     domain_map = graph.overlaps(graph.subgraphs(self.graph_filter),atomspack(features.get_atoms()))
     if self.unite is None:
@@ -157,14 +161,35 @@ class LazySubstructureTransferLayer(torch.nn.Module):
       assert out_order is not None, "If 'in_order' is '0', then 'out_order' cannot be 'None'."
       #
       self.unite = [
-        [ptensors0.unite1,ptensors0.unite2],
-        [ptensors1.unite1,ptensors1.unite2],
-        [ptensors2.unite1,ptensors2.unite2],
+        [lambda x,y: (x,y),ptensors0.unite1,ptensors0.unite2],
+        [ptensors1.linmaps0,ptensors1.unite1,ptensors1.unite2],
+        [ptensors2.linmaps0,ptensors2.unite1,ptensors2.unite2],
         ][in_order][out_order]
-    F = self.unite(F,domain_map,self.use_mean)
+      if in_order == 0 and out_order == 0:
+        warn("You have 'in_order = out_order = 0', this means the unite layer is simply a linear layer.  Did you intend this?")
+      if out_order == 0:
+        q = self.unite
+        self.unite = lambda x,G,n: q(x,n)
+    F = self.unite(features,domain_map,self.use_mean)
     F = self.lin(F)
     return F
-class LazySkipConnectionConvolutionalLayer(torch.nn.Module):
+class LazySubstructureTransfer(LazyUnite):
+  def __init__(self, channels_out: int, graph_filter: Union[graph,Tuple[str,int],None] = None, out_order: int = None, bias : bool = True, reduction_type : str = "sum") -> None:
+    r"""
+    reduction_types: "sum" and "mean"
+    leave 'out_order' as 'None' to keep same as input (NOTE: cannot leave as default if input is of order 0.)
+    NOTE: if you are planning on using the same source/target domains more than once, consider using a unite layer instead and computing the domain mapping separately.
+    """
+    super().__init__(channels_out,out_order,bias,reduction_type)
+    assert out_order != 0
+    if isinstance(graph_filter,Tuple[str,int]):
+      graph_filter = generate_generic_shape(*graph_filter)
+    assert isinstance(graph_filter,graph)
+    self.graph_filter = graph_filter
+  def forward(self, features: Union[ptensors0,ptensors1,ptensors2], graph: graph) -> Union[ptensors0,ptensors1,ptensors2]:
+    domain_map = ComputeDomainMap(features.get_atoms(),graph)
+    return super().forward(features,domain_map)
+class LazyTransferLayer(torch.nn.Module):
   def __init__(self, channels_out: int, reduction_type : str = "sum", out_order: int = None, bias : bool = True) -> None:
     r"""
     reduction_types: "sum" and "mean"
@@ -173,15 +198,11 @@ class LazySkipConnectionConvolutionalLayer(torch.nn.Module):
     super().__init__()
     assert reduction_type == "sum" or reduction_type == "mean"
     assert out_order in [None,0,1,2]
-    self.lin1 = LazyLinear(channels_out,bias=False)
-    self.lin2 = LazyLinear(channels_out,bias)
+    self.lin = LazyLinear(channels_out,bias)
     self.use_mean = reduction_type == "mean"
     self.out_order = out_order
     self.transfer = None
-  def reset_parameters(self):
-    self.lin1.reset_parameters()
-    self.lin2.reset_parameters()
-  def forward(self, features: Union[ptensors0,ptensors1,ptensors2], graph: graph) -> Union[ptensors0,ptensors1,ptensors2]:
+  def forward(self, features: Union[ptensors0,ptensors1,ptensors2], target_domains: Union[List[List[int]],atomspack], graph: graph) -> Union[ptensors0,ptensors1,ptensors2]:
     if self.transfer is None:
       if isinstance(features,ptensors0):
         in_order = 0
@@ -192,29 +213,31 @@ class LazySkipConnectionConvolutionalLayer(torch.nn.Module):
       else:
         raise "'features' must be instance of 'ptensors[0|1|2]'"
       out_order = in_order if self.out_order is None else self.out_order
-      assert out_order is not None, "If 'in_order' is '0', then 'out_order' cannot be 'None'."
       #
-      self.lin1.out_channels = features.get_nc()
+      self.lin.out_channels = features.get_nc()
       #
       self.transfer = [
-        [ptensors0.transfer1,ptensors0.transfer0],
-        [ptensors1.transfer1,ptensors1.transfer0],
-        [ptensors2.transfer1,ptensors2.transfer0],
+        [ptensors0.transfer0,ptensors0.transfer1,ptensors0.transfer2],
+        [ptensors1.transfer0,ptensors1.transfer1,ptensors1.transfer2],
+        [ptensors2.transfer0,ptensors2.transfer1,ptensors2.transfer2],
         ][in_order][out_order]
       if in_order == 0:
         q = self.transfer
         self.transfer = lambda x,G,n: q(x,n)
-    F1 = self.transfer(F,graph,F.get_atoms())
-    F = self.lin2(F) + self.lin1(F1)
+    F = self.transfer(features,graph,self.use_mean)
+    F = self.lin(F)
     return F
-class Reduce_1P_0P(torch.nn.Module):
-  def __init__(self, in_channels: int, out_channels: int, bias: bool = True) -> None:
-    super().__init__()
-    self.lin = Linear(in_channels,out_channels,bias)
-  def forward(self, features: ptensors1) -> ptensors0:
-    features = linmaps0(features)
-    a = self.lin(features)
-    return a
+class LazyPtensGraphConvolutionalLayer(LazyTransferLayer):
+  def __init__(self, channels_out: int, reduction_type : str = "sum", out_order: int = None, bias : bool = True) -> None:
+    r"""
+    This is a generalization of GCN to higher orders.  The limiting factor is that the source and target domains must be the same.
+    reduction_types: "sum" and "mean"
+    leave 'out_order' as 'None' to keep same as input (NOTE: cannot leave as default if input is of order 0.)
+    """
+    super().__init__(channels_out,reduction_type,out_order,bias)
+    self.lin2 = LazyLinear(channels_out,bias=False)
+  def forward(self, features: Union[ptensors0,ptensors1,ptensors2], graph: graph) -> Union[ptensors0,ptensors1,ptensors2]:
+    return super().forward(features,features.get_atoms(),graph) + self.lin2(features)
 class Dropout(torch.nn.Module):
   def __init__(self, prob: torch.float = 0.5, device : str = 'cuda') -> None:
     super().__init__()
@@ -224,41 +247,18 @@ class Dropout(torch.nn.Module):
     self.device = device
     return super().cuda(device)
   def forward(self, x):
-    dropout = (torch.rand(x.get_nc(),device=self.device) > self.p).float()
-    if isinstance(x,ptensors0):
-      return ptensors0.mult_channels(x,dropout)
-    elif isinstance(x,ptensors1):
-      return ptensors1.mult_channels(x,dropout)
-    elif isinstance(x,ptensors2):
-      return ptensors2.mult_channels(x,dropout)
+    if self.training:
+      dropout = 1/(1 - self.p)*(torch.rand(x.get_nc(),device=self.device) > self.p)
+      if isinstance(x,ptensors0):
+        return ptensors0.mult_channels(x,dropout)
+      elif isinstance(x,ptensors1):
+        return ptensors1.mult_channels(x,dropout)
+      elif isinstance(x,ptensors2):
+        return ptensors2.mult_channels(x,dropout)
+      else:
+        raise NotImplementedError('Dropout not implemented for type \"' + str(type(x)) + "\"")
     else:
-      raise NotImplementedError('Dropout not implemented for type \"' + str(type(x)) + "\"")
-class BatchNorm(torch.nn.Module):
-  def __init__(self, num_features: int, eps: torch.float = 1E-5, momentum: torch.float = 0.1) -> None:
-    super().__init__()
-    # TODO: consider using 'UnitializedParameter' here
-    self.running_mean = None
-    self.running_var = None
-    self.eps = eps
-    self.momentum = momentum
-  def forward(self, x):
-    r"""
-    x can be any type of ptensors
-    """
-    x_vals : torch.Tensor = x.torch()
-    if self.running_mean is None:
-      self.has_had_first_batch = True
-      self.running_mean = x_vals.mean(0)
-      self.running_var = x_vals.var(0)
-    else:
-      self.running_mean = (1 - self.momentum) * self.running_mean + self.momentum * x_vals.mean()
-      self.running_var = (1 - self.momentum) * self.running_var + self.momentum * x_vals.var(unbiased=False)
-    y = (self.running_var + self.eps)**-0.5
-    b = -self.running_mean * y
-    test = torch.einsum('ij,jk->ij',x_vals,torch.diag(y)) + b
-    print(test.mean(),test.var())
-    # TODO: make this better
-    return linear(x,torch.diag(y),b)
+      return x
 class LazyBatchNorm(torch.nn.Module):
   def __init__(self, eps: torch.float = 1E-5, momentum: torch.float = 0.1) -> None:
     super().__init__()
@@ -315,7 +315,14 @@ class PNormalize(torch.nn.Module):
       return ptensors2.mult_channels(x,pnorm)
     else:
       raise NotImplementedError('PNormalize not implemented for type \"' + str(type(x)) + "\"")
-
+class Reduce_1P_0P(torch.nn.Module):
+  def __init__(self, in_channels: int, out_channels: int, bias: bool = True) -> None:
+    super().__init__()
+    self.lin = Linear(in_channels,out_channels,bias)
+  def forward(self, features: ptensors1) -> ptensors0:
+    features = linmaps0(features)
+    a = self.lin(features)
+    return a
 class GraphAttentionLayer_P0(nn.Module):
     """
     An implementation of GATConv layer in ptens. 
