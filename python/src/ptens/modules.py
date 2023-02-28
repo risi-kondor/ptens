@@ -39,12 +39,12 @@ class LazyLinear(torch.nn.Module):
     self.b = torch.nn.parameter.UninitializedParameter() if bias else None
     self.out_channels = out_channels
   def reset_parameters(self):
-    if not self.has_uninitialized_params():
+    if not isinstance(self.w,torch.nn.parameter.UninitializedParameter):
       self.w = torch.nn.init.xavier_uniform_(self.w)
       if not self.b is None:
         self.b = torch.nn.init.zeros_(self.b)
   def initialize_parameters(self, input) -> None:
-    if self.has_uninitialized_params():
+    if isinstance(self.w,torch.nn.parameter.UninitializedParameter):
       with torch.no_grad():
         self.weight.materialize((self.out_channels, input.get_nc()))
         if self.bias is not None:
@@ -259,6 +259,42 @@ class BatchNorm(torch.nn.Module):
     print(test.mean(),test.var())
     # TODO: make this better
     return linear(x,torch.diag(y),b)
+class LazyBatchNorm(torch.nn.Module):
+  def __init__(self, eps: torch.float = 1E-5, momentum: torch.float = 0.1) -> None:
+    super().__init__()
+    #self.running_mean = torch.nn.parameter.UninitializedParameter()
+    #self.running_var = torch.nn.parameter.UninitializedParameter()
+    #self.weight = torch.nn.parameter.UninitializedParameter()
+    #self.bias = torch.nn.parameter.UninitializedParameter()
+    self.eps = eps
+    self.momentum = momentum
+  def forward(self, x):
+    r"""
+    x can be any type of ptensors
+    """
+    x_val : torch.Tensor = x.torch()
+    if len(list(self.parameters())) == 0:
+      nc = x.get_nc()
+      #self.running_mean.materialize(nc)
+      #self.running_var.materialize(nc)
+      #self.weight.materialize(nc)
+      #self.bias.materialize(nc)
+      running_mean = x_val.mean(0)
+      running_var = x_val.var(0)
+      self.running_mean = torch.nn.parameter.Parameter(running_mean)
+      self.running_var = torch.nn.parameter.Parameter(running_var)
+      self.weight = torch.nn.parameter.Parameter(torch.ones(nc))
+      self.bias = torch.nn.parameter.Parameter(torch.zeros(nc))
+    else:
+      m = self.momentum
+      running_mean = (1 - m) * self.running_mean + m * x_val.mean(0)
+      running_var = (1 - m) * self.running_var + m * x_val.var(0)
+    #
+    m = self.weight * (running_var + self.eps)**-0.5
+    # TODO: if we can add channel wise addition broadcasting to all reference domains, we will not need to do this.
+    b = self.bias - running_mean * m
+    output = linear(x,torch.diag(m),b)
+    return output
 class PNormalize(torch.nn.Module):
   def __init__(self, p: int = 2, eps: torch.float = 1E-5) -> None:
     super().__init__()
