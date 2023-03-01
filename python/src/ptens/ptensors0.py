@@ -143,14 +143,14 @@ class ptensors0(torch.Tensor):
         return Ptensors0_Linmaps2Fn.apply(self);
 
 
-    def transfer0(self,_atoms,normalized=False):
-        return Ptensors0_Transfer0Fn.apply(self,_atoms)
+    def transfer0(self,_atoms,G,normalized=False):
+        return Ptensors0_Transfer0Fn.apply(self,_atoms,G)
 
-    def transfer1(self,_atoms,normalized=False):
-        return Ptensors0_Transfer1Fn.apply(self,_atoms)
+    def transfer1(self,_atoms,G,normalized=False):
+        return Ptensors0_Transfer1Fn.apply(self,_atoms,G)
 
-    def transfer2(self,_atoms,normalized=False):
-        return Ptensors0_Transfer2Fn.apply(self,_atoms)
+    def transfer2(self,_atoms,G,normalized=False):
+        return Ptensors0_Transfer2Fn.apply(self,_atoms,G)
 
 
     def unite1(self,G,normalized=False):

@@ -13,9 +13,9 @@ def ConvertEdgeAttributesToPtensors1(edge_index: torch.Tensor, edge_attributes: 
   atoms = edge_index.transpose(0,1).float()
   return ptensors1.from_matrix(edge_attributes,atoms)
 
-def ComputeDomainMap(source_domains: List[List[int]], graph_filter: graph) -> graph:
+def ComputeSubstructureMap(source_domains: List[List[int]], graph_filter: graph, G: graph) -> graph:
   # TODO: make it so .get_atoms() returns an atomspack, so we don't have to convert back to one.
-  return graph.overlaps(graph.subgraphs(graph_filter),atomspack(source_domains))
+  return graph.overlaps(G.subgraphs(graph_filter),atomspack(source_domains))
 
 ######################################## MODULES ###########################################
 class Linear(torch.nn.Module):
@@ -31,7 +31,7 @@ class Linear(torch.nn.Module):
       self.b = torch.nn.init.zeros_(self.b)
   def forward(self,x: ptensors1) -> ptensors1:
     assert x.get_nc() == self.w.size(0)
-    return x * self.w if self.b is None else linear(x,self.w,self.b) 
+    return x * self.w if self.b is None else linear(x,self.w,self.b)
 
 class LazyLinear(torch.nn.Module):
   def __init__(self,out_channels: int = None, bias: bool = True) -> None:
@@ -161,7 +161,7 @@ class LazyUnite(torch.nn.Module):
       assert out_order is not None, "If 'in_order' is '0', then 'out_order' cannot be 'None'."
       #
       self.unite = [
-        [lambda x,y: (x,y),ptensors0.unite1,ptensors0.unite2],
+        [lambda x,y: x,ptensors0.unite1,ptensors0.unite2],
         [ptensors1.linmaps0,ptensors1.unite1,ptensors1.unite2],
         [ptensors2.linmaps0,ptensors2.unite1,ptensors2.unite2],
         ][in_order][out_order]
@@ -173,7 +173,7 @@ class LazyUnite(torch.nn.Module):
     F = self.unite(features,domain_map,self.use_mean)
     F = self.lin(F)
     return F
-class LazySubstructureTransfer(LazyUnite):
+class LazySubstructureTransport(LazyUnite):
   def __init__(self, channels_out: int, graph_filter: Union[graph,Tuple[str,int],None] = None, out_order: int = None, bias : bool = True, reduction_type : str = "sum") -> None:
     r"""
     reduction_types: "sum" and "mean"
@@ -187,13 +187,13 @@ class LazySubstructureTransfer(LazyUnite):
     assert isinstance(graph_filter,graph)
     self.graph_filter = graph_filter
   def forward(self, features: Union[ptensors0,ptensors1,ptensors2], graph: graph) -> Union[ptensors0,ptensors1,ptensors2]:
-    domain_map = ComputeDomainMap(features.get_atoms(),graph)
+    domain_map = ComputeSubstructureMap(features.get_atoms(),self.graph_filter,graph)
     return super().forward(features,domain_map)
-class LazyTransferLayer(torch.nn.Module):
+class LazyTransfer(torch.nn.Module):
   def __init__(self, channels_out: int, reduction_type : str = "sum", out_order: int = None, bias : bool = True) -> None:
     r"""
     reduction_types: "sum" and "mean"
-    leave 'out_order' as 'None' to keep same as input (NOTE: cannot leave as default if input is of order 0.)
+    leave 'out_order' as 'None' to keep same as input
     """
     super().__init__()
     assert reduction_type == "sum" or reduction_type == "mean"
@@ -227,7 +227,18 @@ class LazyTransferLayer(torch.nn.Module):
     F = self.transfer(features,graph,self.use_mean)
     F = self.lin(F)
     return F
-class LazyPtensGraphConvolutionalLayer(LazyTransferLayer):
+class LazyTransferNHoods(LazyTransfer):
+  def __init__(self, channels_out: int, num_hops: int, reduction_type : str = "sum", out_order: int = None, bias : bool = True) -> None:
+    r"""
+    reduction_types: "sum" and "mean"
+    leave 'out_order' as 'None' to keep same as input
+    """
+    super().__init__(channels_out,reduction_type,out_order,bias)
+    self.num_hops = num_hops
+    self.lin2 = LazyLinear(channels_out,bias=False)
+  def forward(self, features: Union[ptensors0,ptensors1,ptensors2], graph: graph) -> Union[ptensors0,ptensors1,ptensors2]:
+    return super().forward(features,graph.nhoods(self.num_hops),graph)
+class LazyPtensGraphConvolutional(LazyTransfer):
   def __init__(self, channels_out: int, reduction_type : str = "sum", out_order: int = None, bias : bool = True) -> None:
     r"""
     This is a generalization of GCN to higher orders.  The limiting factor is that the source and target domains must be the same.
