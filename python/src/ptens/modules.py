@@ -13,9 +13,14 @@ def ConvertEdgeAttributesToPtensors1(edge_index: torch.Tensor, edge_attributes: 
   atoms = edge_index.transpose(0,1).float()
   return ptensors1.from_matrix(edge_attributes,atoms)
 
-def ComputeSubstructureMap(source_domains: atomspack, graph_filter: graph, G: graph) -> graph:
+def ComputeSubstructureMap(source_domains: atomspack, graph_filter: graph, G: graph, both_dirs: bool = False) -> Union[graph,Tuple[graph,graph]]:
   # TODO: make it so .get_atoms() returns an atomspack, so we don't have to convert back to one.
-  return graph.overlaps(G.subgraphs(graph_filter),atomspack(source_domains))
+  subgraphs = G.subgraphs(graph_filter)
+  to_sub = graph.overlaps(subgraphs,source_domains)
+  if both_dirs:
+    from_sub = graph.overlaps(source_domains,subgraphs)
+    return to_sub, from_sub
+  return to_sub
 
 ######################################## MODULES ###########################################
 class Linear(torch.nn.Module):
