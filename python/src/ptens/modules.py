@@ -13,7 +13,7 @@ def ConvertEdgeAttributesToPtensors1(edge_index: torch.Tensor, edge_attributes: 
   atoms = edge_index.transpose(0,1).float()
   return ptensors1.from_matrix(edge_attributes,atoms)
 
-def ComputeSubstructureMap(source_domains: atomspack, graph_filter: graph, G: graph) -> Tuple[graph,graph]:
+def ComputeSubstructureMap(source_domains: atomspack, graph_filter: graph, G: graph) -> graph:
   # TODO: make it so .get_atoms() returns an atomspack, so we don't have to convert back to one.
   return graph.overlaps(G.subgraphs(graph_filter),atomspack(source_domains))
 
@@ -34,7 +34,7 @@ class Linear(torch.nn.Module):
     return x * self.w if self.b is None else linear(x,self.w,self.b)
 
 class LazyLinear(torch.nn.Module):
-  def __init__(self,out_channels: int = None, bias: bool = True) -> None:
+  def __init__(self,out_channels: Optional[int] = None, bias: bool = True) -> None:
     r"""
     NOTE: if you do not initialize 'out_channels', it must be initialized before calling 'forward'.
     """
@@ -77,7 +77,7 @@ class ConvolutionalLayer_0P(torch.nn.Module):
     Give symm_norm if you want symmetric normalization.
     """
     if not symm_norm is None:
-      features = outer(features,symm_norm)
+      features = outer(features,symm_norm) # type: ignore
     # VxVxk -> VxVxk
     F = gather(features,graph)
     # [VxVxk] [VxVxk*2] -> [VxVxk*3]
@@ -119,7 +119,7 @@ class ConvolutionalLayer_1P(torch.nn.Module):
     Give symm_norm if you want symmetric normalization.
     """
     if not symm_norm is None:
-      features = outer(features,symm_norm)
+      features = outer(features,symm_norm) # type: ignore
     # VxVxk -> VxVxk*2
     F = unite1(features,graph,self.use_mean)
     # [VxVxk] [VxVxk*2] -> [VxVxk*3]
@@ -129,7 +129,7 @@ class ConvolutionalLayer_1P(torch.nn.Module):
       features = outer(F,symm_norm)
     return F
 class LazyUnite(torch.nn.Module):
-  def __init__(self, channels_out: int = None, out_order: int = None, bias : bool = True, reduction_type : str = "sum") -> None:
+  def __init__(self, channels_out: Optional[int] = None, out_order: Optional[int] = None, bias : bool = True, reduction_type : str = "sum") -> None:
     r"""
     reduction_types: "sum" and "mean"
     leave 'out_order' and 'channels_out' as 'None' to keep same as input
@@ -138,12 +138,8 @@ class LazyUnite(torch.nn.Module):
     super().__init__()
     assert reduction_type == "sum" or reduction_type == "mean"
     assert out_order in [None,1,2]
-    if isinstance(graph_filter,Tuple[str,int]):
-      graph_filter = generate_generic_shape(*graph_filter)
-    assert isinstance(graph_filter,graph)
     self.lin = LazyLinear(channels_out,bias)
     self.use_mean = reduction_type == "mean"
-    self.graph_filter = graph_filter
     self.out_order = out_order
     self.unite = None
   def forward(self, features: Union[ptensors0,ptensors1,ptensors2], graph: graph) -> Union[ptensors0,ptensors1,ptensors2]:
@@ -158,7 +154,7 @@ class LazyUnite(torch.nn.Module):
       elif isinstance(features,ptensors2):
         in_order = 2
       else:
-        raise "'features' must be instance of 'ptensors[0|1|2]'"
+        raise Exception("'features' must be instance of 'ptensors[0|1|2]'")
       out_order = in_order if self.out_order is None else self.out_order
       assert out_order is not None, "If 'in_order' is '0', then 'out_order' cannot be 'None'."
       #
@@ -176,7 +172,7 @@ class LazyUnite(torch.nn.Module):
     F = self.lin(F)
     return F
 class LazySubstructureTransport(LazyUnite):
-  def __init__(self, channels_out: int, graph_filter: Union[graph,Tuple[str,int],None] = None, out_order: int = None, bias : bool = True, reduction_type : str = "sum") -> None:
+  def __init__(self, channels_out: int, graph_filter: Union[graph,Tuple[str,int],None] = None, out_order: Optional[int] = None, bias : bool = True, reduction_type : str = "sum") -> None:
     r"""
     reduction_types: "sum" and "mean"
     leave 'out_order' as 'None' to keep same as input (NOTE: cannot leave as default if input is of order 0.)
@@ -184,7 +180,7 @@ class LazySubstructureTransport(LazyUnite):
     """
     super().__init__(channels_out,out_order,bias,reduction_type)
     assert out_order != 0
-    if isinstance(graph_filter,Tuple[str,int]):
+    if isinstance(graph_filter,tuple):
       graph_filter = generate_generic_shape(*graph_filter)
     assert isinstance(graph_filter,graph)
     self.graph_filter = graph_filter
@@ -192,7 +188,7 @@ class LazySubstructureTransport(LazyUnite):
     domain_map = ComputeSubstructureMap(features.get_atoms(),self.graph_filter,graph)
     return super().forward(features,domain_map)
 class LazyTransfer(torch.nn.Module):
-  def __init__(self, channels_out: int = None, reduction_type : str = "sum", out_order: int = None, bias : bool = True) -> None:
+  def __init__(self, channels_out: Optional[int] = None, reduction_type : str = "sum", out_order: Optional[int] = None, bias : bool = True) -> None:
     r"""
     reduction_types: "sum" and "mean"
     leave 'out_order' and 'channels_out' as 'None' to keep same as input
@@ -215,7 +211,7 @@ class LazyTransfer(torch.nn.Module):
       elif isinstance(features,ptensors2):
         in_order = 2
       else:
-        raise "'features' must be instance of 'ptensors[0|1|2]'"
+        raise Exception("'features' must be instance of 'ptensors[0|1|2]'")
       out_order = in_order if self.out_order is None else self.out_order
       #
       self.lin.out_channels = features.get_nc()
@@ -232,7 +228,7 @@ class LazyTransfer(torch.nn.Module):
     F = self.lin(F)
     return F
 class LazyTransferNHoods(LazyTransfer):
-  def __init__(self, channels_out: int, num_hops: int, reduction_type : str = "sum", out_order: int = None, bias : bool = True) -> None:
+  def __init__(self, channels_out: int, num_hops: int, reduction_type : str = "sum", out_order: Optional[int] = None, bias : bool = True) -> None:
     r"""
     reduction_types: "sum" and "mean"
     leave 'out_order' as 'None' to keep same as input
@@ -243,7 +239,7 @@ class LazyTransferNHoods(LazyTransfer):
   def forward(self, features: Union[ptensors0,ptensors1,ptensors2], graph: graph) -> Union[ptensors0,ptensors1,ptensors2]:
     return super().forward(features,graph.nhoods(self.num_hops),graph)
 class LazyPtensGraphConvolutional(LazyTransfer):
-  def __init__(self, channels_out: int = None, reduction_type : str = "sum", out_order: int = None, bias : bool = True) -> None:
+  def __init__(self, channels_out: Optional[int] = None, reduction_type : str = "sum", out_order: Optional[int] = None, bias : bool = True) -> None:
     r"""
     This is a generalization of GCN to higher orders.  The limiting factor is that the source and target domains must be the same.
     reduction_types: "sum" and "mean"
