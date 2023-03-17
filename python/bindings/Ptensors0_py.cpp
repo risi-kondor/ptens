@@ -5,6 +5,8 @@ pybind11::class_<Ptensors0,cnine::RtensorPack>(m,"ptensors0")
   .def(pybind11::init<const at::Tensor&>())
   .def(pybind11::init<const Ptensors0&>())
   .def(pybind11::init<const Ptensors0&, const int>())
+  .def(pybind11::init<const at::Tensor&, const AtomsPack&>())
+  .def(pybind11::init<const at::Tensor&, const vector<vector<int> >& >())
 
   .def_static("dummy",[]() {return Ptensors0(0,0);})
 

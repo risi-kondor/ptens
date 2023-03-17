@@ -189,6 +189,11 @@ namespace ptens{
       //nc=A.dim(1);
     }
 
+    Ptensors0(const rtensor& A, const AtomsPack& _atoms):
+      RtensorPackB(A), atoms(_atoms){
+      //nc=A.dim(1);
+    }
+
     #ifdef _WITH_ATEN
     Ptensors0(const at::Tensor& T):
       RtensorPackB(rtensor(T)){
@@ -196,6 +201,9 @@ namespace ptens{
       atoms=AtomsPack(size());
       //nc=dim_of(0,0);
     }
+
+    Ptensors0(const at::Tensor& T, const AtomsPack& _atoms):
+      Ptensors0(rtensor(T),_atoms){}
     #endif 
 
 
