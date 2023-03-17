@@ -13,7 +13,7 @@ def ConvertEdgeAttributesToPtensors1(edge_index: torch.Tensor, edge_attributes: 
   atoms = edge_index.transpose(0,1).float()
   return ptensors1.from_matrix(edge_attributes,atoms)
 
-def ComputeSubstructureMap(source_domains: List[List[int]], graph_filter: graph, G: graph) -> graph:
+def ComputeSubstructureMap(source_domains: atomspack, graph_filter: graph, G: graph) -> Tuple[graph,graph]:
   # TODO: make it so .get_atoms() returns an atomspack, so we don't have to convert back to one.
   return graph.overlaps(G.subgraphs(graph_filter),atomspack(source_domains))
 
@@ -129,10 +129,10 @@ class ConvolutionalLayer_1P(torch.nn.Module):
       features = outer(F,symm_norm)
     return F
 class LazyUnite(torch.nn.Module):
-  def __init__(self, channels_out: int, out_order: int = None, bias : bool = True, reduction_type : str = "sum") -> None:
+  def __init__(self, channels_out: int = None, out_order: int = None, bias : bool = True, reduction_type : str = "sum") -> None:
     r"""
     reduction_types: "sum" and "mean"
-    leave 'out_order' as 'None' to keep same as input
+    leave 'out_order' and 'channels_out' as 'None' to keep same as input
     NOTE: if you are planning on using the same source/target domains more than once, consider using a unite layer instead and computing the domain mapping separately.
     """
     super().__init__()
@@ -149,6 +149,8 @@ class LazyUnite(torch.nn.Module):
   def forward(self, features: Union[ptensors0,ptensors1,ptensors2], graph: graph) -> Union[ptensors0,ptensors1,ptensors2]:
     domain_map = graph.overlaps(graph.subgraphs(self.graph_filter),atomspack(features.get_atoms()))
     if self.unite is None:
+      if self.lin.out_channels is None:
+        self.lin.out_channels = self.features.get_nc()
       if isinstance(features,ptensors0):
         in_order = 0
       elif isinstance(features,ptensors1):
@@ -190,10 +192,10 @@ class LazySubstructureTransport(LazyUnite):
     domain_map = ComputeSubstructureMap(features.get_atoms(),self.graph_filter,graph)
     return super().forward(features,domain_map)
 class LazyTransfer(torch.nn.Module):
-  def __init__(self, channels_out: int, reduction_type : str = "sum", out_order: int = None, bias : bool = True) -> None:
+  def __init__(self, channels_out: int = None, reduction_type : str = "sum", out_order: int = None, bias : bool = True) -> None:
     r"""
     reduction_types: "sum" and "mean"
-    leave 'out_order' as 'None' to keep same as input
+    leave 'out_order' and 'channels_out' as 'None' to keep same as input
     """
     super().__init__()
     assert reduction_type == "sum" or reduction_type == "mean"
@@ -204,6 +206,8 @@ class LazyTransfer(torch.nn.Module):
     self.transfer = None
   def forward(self, features: Union[ptensors0,ptensors1,ptensors2], target_domains: Union[List[List[int]],atomspack], graph: graph) -> Union[ptensors0,ptensors1,ptensors2]:
     if self.transfer is None:
+      if self.lin.out_channels is None:
+        self.lin.out_channels = features.get_nc()
       if isinstance(features,ptensors0):
         in_order = 0
       elif isinstance(features,ptensors1):
@@ -239,16 +243,21 @@ class LazyTransferNHoods(LazyTransfer):
   def forward(self, features: Union[ptensors0,ptensors1,ptensors2], graph: graph) -> Union[ptensors0,ptensors1,ptensors2]:
     return super().forward(features,graph.nhoods(self.num_hops),graph)
 class LazyPtensGraphConvolutional(LazyTransfer):
-  def __init__(self, channels_out: int, reduction_type : str = "sum", out_order: int = None, bias : bool = True) -> None:
+  def __init__(self, channels_out: int = None, reduction_type : str = "sum", out_order: int = None, bias : bool = True) -> None:
     r"""
     This is a generalization of GCN to higher orders.  The limiting factor is that the source and target domains must be the same.
     reduction_types: "sum" and "mean"
-    leave 'out_order' as 'None' to keep same as input (NOTE: cannot leave as default if input is of order 0.)
+    leave 'out_order' and 'channels_out' as 'None' to keep same as input (NOTE: cannot leave as default if input is of order 0.)
     """
     super().__init__(channels_out,reduction_type,out_order,bias)
     self.lin2 = LazyLinear(channels_out,bias=False)
-  def forward(self, features: Union[ptensors0,ptensors1,ptensors2], graph: graph) -> Union[ptensors0,ptensors1,ptensors2]:
+  def forward_adv(self, features: Union[ptensors0,ptensors1,ptensors2], graph: graph) -> Union[ptensors0,ptensors1,ptensors2]:
     return super().forward(features,features.get_atoms(),graph) + self.lin2(features)
+  def forward(self, features: Union[ptensors0,ptensors1,ptensors2], graph: graph) -> Union[ptensors0,ptensors1,ptensors2]:
+    self.forward = self.forward_adv
+    if self.lin2.out_channels is None:
+      self.lin2.out_channels = features.get_nc()
+    return self.forward(features,graph)
 class Dropout(torch.nn.Module):
   def __init__(self, prob: torch.float = 0.5, device : str = 'cuda') -> None:
     super().__init__()
