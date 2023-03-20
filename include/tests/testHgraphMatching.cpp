@@ -13,6 +13,8 @@ int main(int argc, char** argv){
   Hgraph triangle(3,{{0,1},{1,2},{2,0}});
   Hgraph square(4,{{0,1},{1,2},{2,3},{3,0}});
 
+  cout<<triangle.str()<<endl;
+
   //Hgraph G=Hgraph::random(5,0.5);
   Hgraph G(8);
   G.insert(triangle,{0,1,2});

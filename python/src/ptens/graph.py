@@ -6,15 +6,21 @@ from ptens_base import graph as _graph
 class graph:
 
     @classmethod
-    def from_edge_index(self,M,n=-1):
+    def from_edge_index(self,M,n=-1,labels=None):
         G=graph()
-        G.obj=_graph.edge_index(M,n)
+        if labels is None:
+            G.obj=_graph.edge_index(M,n)
+        else:
+            G.obj=_graph.edge_index(M,labels,n)
         return G
 
     @classmethod
-    def from_matrix(self,M):
+    def from_matrix(self,M,labels=None):
         G=graph()
-        G.obj=_graph.matrix(M)
+        if labels is None:
+            G.obj=_graph.matrix(M)
+        else:
+            G.obj=_graph.matrix(M,labels)
         return G
 
     @classmethod
