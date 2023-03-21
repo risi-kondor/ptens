@@ -204,7 +204,6 @@ class LazySubstructureTransport(LazyUnite):
     r"""
     reduction_types: "sum" and "mean"
     leave 'out_order' as 'None' to keep same as input (NOTE: cannot leave as default if input is of order 0.)
-    NOTE: if you are planning on using the same source/target domains more than once, consider using a unite/transfer layer instead and computing the domain mapping separately.
     """
     super().__init__(channels_out,out_order,bias,reduction_type)
     assert out_order != 0
@@ -246,8 +245,6 @@ class LazyTransfer(torch.nn.Module):
       else:
         raise Exception("'features' must be instance of 'ptensors[0|1|2]'")
       out_order = in_order if self.out_order is None else self.out_order
-      #
-      self.lin.out_channels = features.get_nc()
       #
       self.transfer = [
         [ptensors0.transfer0,ptensors0.transfer1,ptensors0.transfer2],
