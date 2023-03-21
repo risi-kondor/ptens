@@ -550,7 +550,7 @@ namespace ptens{
       if(dev==0){
 	int N=list.size();
 	for(int i=0; i<N; i++)
-	  view_of(list.tens(i))+=repeat0(x.view1_of(i),list.nix(i));
+	  view_of(list.tens(i),list.ix(i))+=repeat0(x.view1_of(i),list.nix(i));
       }
       GPUCODE(CUDA_STREAM(Ptensors1_broadcast0_cu(*this,x,list,0,stream)));
     }
@@ -559,7 +559,7 @@ namespace ptens{
       if(dev==0){
 	int N=list.size();
 	for(int i=0; i<N; i++)
-	  view_of(list.tens(i)).add(repeat0(x.view1_of(i),list.nix(i)),1.0/((float)list.nix(i))); // check this
+	  view_of(list.tens(i),list.ix(i)).add(repeat0(x.view1_of(i),list.nix(i)),1.0/((float)list.nix(i))); // check this
       }
       //PTENS_CPUONLY();
       GPUCODE(CUDA_STREAM(Ptensors1_broadcast0n_cu(*this,x,list,0,stream)));
