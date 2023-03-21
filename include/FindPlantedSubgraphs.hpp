@@ -36,7 +36,7 @@ namespace ptens{
       labeled_tree S=H.greedy_spanning_tree();
       Htraversal=S.indexed_depth_first_traversal();
       assignment=vector<int>(n,-1);
-      cout<<"compute"<<endl;
+      /*cout<<"compute"<<endl;*/
 
       for(int i=0; i<G.getn(); i++){
 	labeled_tree* T=new labeled_tree(i);
