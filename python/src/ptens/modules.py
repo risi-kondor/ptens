@@ -82,9 +82,9 @@ class LazyLinear(torch.nn.Module):
         self.reset_parameters()
   def forward_standard(self,x: Union[ptensors0,ptensors1,ptensors2]) -> Union[ptensors0,ptensors1,ptensors2]:
     assert x.get_nc() == self.w.size(0)
-    return x * self.w if self.b is None else linear(x,self.w,self.b)
-    # TODO: figure out why multiplication is broken. (nevermind, keeping this just in case)
-    #return linear(x,self.w,torch.zeros(self.w.size(0),device=self.w.device) if self.b is None else self.b)
+    #return x * self.w if self.b is None else linear(x,self.w,self.b)
+    # TODO: figure out why multiplication is broken.
+    return linear(x,self.w,torch.zeros(self.w.size(0),device=self.w.device) if self.b is None else self.b)
   def forward(self,x: Union[ptensors0,ptensors1,ptensors2]) -> Union[ptensors0,ptensors1,ptensors2]:
     self.initialize_parameters(x)
     self.forward = self.forward_standard
