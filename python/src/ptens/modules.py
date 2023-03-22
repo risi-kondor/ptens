@@ -18,7 +18,7 @@ class MapInfo:
   r"""
     Boiler Plate class for storing information regarding a map between subgraphs.
   """
-  def __init__(self, forward_map: Optional[atomspack], backward_map: Optional[atomspack], source_domains: Optional[atomspack], target_domains: Optional[atomspack], subgraph: Optional[graph]):
+  def __init__(self, forward_map: graph, backward_map: Optional[graph], source_domains: Optional[atomspack], target_domains: Optional[atomspack], subgraph: Optional[graph]):
     self.forward_map = forward_map
     self.backward_map = backward_map
     self.source_domains = source_domains
@@ -78,7 +78,7 @@ class LazyLinear(torch.nn.Module):
       with torch.no_grad():
         self.w.materialize((input.get_nc(),self.out_channels))
         if self.b is not None:
-            self.b.materialize(self.out_channels)# type: ignore
+          self.b.materialize(self.out_channels)# type: ignore
         self.reset_parameters()
   def forward_standard(self,x: Union[ptensors0,ptensors1,ptensors2]) -> Union[ptensors0,ptensors1,ptensors2]:
     assert x.get_nc() == self.w.size(0)
@@ -291,7 +291,7 @@ class Dropout(torch.nn.Module):
   def forward(self, x, device):
     # TODO: replace device with device from 'x'.
     if self.training:
-      dropout = 1/(1 - self.p)*(torch.rand(x.get_nc(),device=device) > self.p) # type: ignore
+      dropout = 1/(1 - self.p)*(torch.rand(x.get_nc(),device=device) < self.p) # type: ignore
       if isinstance(x,ptensors0):
         return ptensors0.mult_channels(x,dropout)
       elif isinstance(x,ptensors1):
@@ -307,8 +307,8 @@ class LazyBatchNorm(torch.nn.Module):
     super().__init__()
     #self.running_mean = torch.nn.parameter.UninitializedParameter()
     #self.running_var = torch.nn.parameter.UninitializedParameter()
-    self.weight = torch.nn.parameter.UninitializedParameter(requires_grad=True)
-    self.bias = torch.nn.parameter.UninitializedParameter(requires_grad=True)
+    #self.weight = torch.nn.parameter.UninitializedParameter(requires_grad=True)
+    #self.bias = torch.nn.parameter.UninitializedParameter(requires_grad=True)
     self.eps = eps
     self.momentum = momentum
     self.first_run = True
@@ -323,23 +323,24 @@ class LazyBatchNorm(torch.nn.Module):
       if self.first_run:
         self.first_run = False
         nc = x.get_nc()
-        self.weight.materialize(nc,device=x_val.device)
-        self.bias.materialize(nc,device=x_val.device)
+        self.weight = torch.nn.parameter.Parameter(torch.ones(nc,device=x_mean.device,requires_grad=True))
+        self.bias = torch.nn.parameter.Parameter(torch.zeros(nc,device=x_mean.device,requires_grad=True))
         self.register_buffer("running_mean",x_mean)
         self.register_buffer("running_var",x_var)
       else:
         m = self.momentum
         self.running_mean = (1 - m) * self.running_mean + m * x_mean
         self.running_var = (1 - m) * self.running_var + m * x_var
-    elif self.running_mean is None:
+    elif self.first_run:
       return x # Why would you do this...
     else:
       x_mean = self.running_mean
       x_var = self.running_var
     #
-    mult = self.weight / torch.sqrt(x_var + self.eps)
+    mult = 1 / torch.sqrt(x_var + self.eps)
     # TODO: if we can add channel wise addition broadcasting to all reference domains, we will not need to do this.
     b = self.bias - x_mean * mult
+    mult = self.weight * mult
     output = linear(x,torch.diag(mult),b)
     return output
 class PNormalize(torch.nn.Module):
