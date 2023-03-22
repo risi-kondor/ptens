@@ -217,17 +217,14 @@ class GraphAttentionLayer_P0(nn.Module):
         self.leakyrelu = LeakyReLU(self.leakyrelu_alpha)
         self.relu = relu(self.relu_alpha)
 
-    # ptensors0 -> tensor -> do -> ptensors0
     def forward(self, h: ptensors0, adj: ptensors0):
         h_torch = h.torch()
         adj_torch = adj.torch()
         Wh = torch.mm(h_torch, self.W) 
         e = self._prepare_attentional_mechanism_input(Wh) 
-
         zero_vec = -9e15*torch.ones_like(e) 
-        attention = torch.where(adj_torch > 0, e, zero_vec) 
-        attention = softmax(attention, dim=1)
-        attention = dropout(attention, self.d_prob, training = self.training)
+        attention = dropout(softmax(torch.where(adj_torch > 0, e, zero_vec) , dim=1),
+                            self.d_prob, training = self.training)
         h_prime = torch.matmul(attention, Wh)
         
         h_prime_p0 = ptens.ptensors0.from_matrix(h_prime)
@@ -266,22 +263,19 @@ class GraphAttentionLayer_P1(nn.Module):
         self.relu = relu(self.alpha)
 
     def forward(self, h: ptensors1, adj: ptensors1):
-        h = ptens.linmaps0(h).torch() # ptensors1 -> ptensors0 -> torch
+        h = ptens.linmaps0(h).torch() 
         Wh = torch.mm(h, self.W) 
         e_p1 = self._prepare_attentional_mechanism_input(Wh)
         # e_p1 -> e_p0 -> size of e_p0 -> size of e_p1                      
         e_p0 = ptens.linmaps0(e_p1) 
         e_p0_r, e_p0_c = e_p0.torch().size()
         e_p1_r = e_p0_r + e_p1.get_nc()                                   
-        e_p1_c = e_p0_c
         zero_vec = -9e15*torch.ones_like(e_p0_r, e_p0_c)
         # ptensors1 -> ptensors0 -> torch -> do -> ptensors0 -> ptensors1 
         adj_torch = ptens.linmaps0(adj).torch()
         e_torch = e_p0.torch()
-        attention = torch.where(adj_torch > 0, e_torch, zero_vec)
-        attention = softmax(attention, dim=1)
-        attention_p1 = ptens.linmaps1(ptens.ptensors0.from_matrix(attention))
-        attention_p1 = Dropout(attention_p1, self.d_prob)  
+        attention softmax(torch.where(adj_torch > 0, e_torch, zero_vec), dim=1)
+        attention_p1 = Dropout(ptens.linmaps1(ptens.ptensors0.from_matrix(attention)), self.d_prob)  
         h_prime = attention*Wh
         if self.concat:
             return relu(h_prime)
