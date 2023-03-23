@@ -33,10 +33,10 @@ namespace ptens{
 
     FindPlantedSubgraphs(const Graph& _G, const Graph& _H):
       G(_G), H(_H), n(_H.getn()){
-      cout<<"compute"<<endl;
       labeled_tree S=H.greedy_spanning_tree();
       Htraversal=S.indexed_depth_first_traversal();
       assignment=vector<int>(n,-1);
+      /*cout<<"compute"<<endl;*/
 
       for(int i=0; i<G.getn(); i++){
 	labeled_tree* T=new labeled_tree(i);
@@ -75,6 +75,8 @@ namespace ptens{
       const int v=Htraversal[m].first;
       const int w=node.label;
       //cout<<"trying "<<v<<" against "<<w<<" at level "<<m<<endl;
+
+      if(G.is_labeled && H.is_labeled && (G.labels(w)!=H.labels(v))) return false;
 
       for(auto& p:H.row(v)){
 	if(assignment[p.first]==-1) continue;

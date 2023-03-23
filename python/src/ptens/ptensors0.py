@@ -11,9 +11,9 @@ import ptens.ptensors2
 class ptensors0(torch.Tensor):
 
     @classmethod
-    def from_matrix(self,T):
-        return Ptensors0_fromMxFn.apply(T)
-
+    def from_matrix(self,T,atoms=None):
+        return Ptensors0_fromMxFn.apply(T,atoms)
+            
     @classmethod
     def dummy(self):
         R=ptensors0(1)
@@ -143,14 +143,14 @@ class ptensors0(torch.Tensor):
         return Ptensors0_Linmaps2Fn.apply(self);
 
 
-    def transfer0(self,_atoms,normalized=False):
-        return Ptensors0_Transfer0Fn.apply(self,_atoms)
+    def transfer0(self,_atoms,G,normalized=False):
+        return Ptensors0_Transfer0Fn.apply(self,_atoms,G)
 
-    def transfer1(self,_atoms,normalized=False):
-        return Ptensors0_Transfer1Fn.apply(self,_atoms)
+    def transfer1(self,_atoms,G,normalized=False):
+        return Ptensors0_Transfer1Fn.apply(self,_atoms,G)
 
-    def transfer2(self,_atoms,normalized=False):
-        return Ptensors0_Transfer2Fn.apply(self,_atoms)
+    def transfer2(self,_atoms,G,normalized=False):
+        return Ptensors0_Transfer2Fn.apply(self,_atoms,G)
 
 
     def unite1(self,G,normalized=False):
@@ -179,15 +179,18 @@ class ptensors0(torch.Tensor):
 class Ptensors0_fromMxFn(torch.autograd.Function):
 
     @staticmethod
-    def forward(ctx,x):
+    def forward(ctx,x,atoms):
         R=ptensors0(1)
-        R.obj=_ptensors0(x)
+        if atoms:
+            R.obj=_ptensors0(x,atoms)
+        else:
+            R.obj=_ptensors0(x)
         ctx.r=R.obj
         return R
 
     @staticmethod
     def backward(ctx,g):
-        return ctx.r.get_grad().torch()
+        return ctx.r.get_grad().torch(), None
 
 
 class Ptensors0_toMxFn(torch.autograd.Function):
