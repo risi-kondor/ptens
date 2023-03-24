@@ -379,7 +379,7 @@ class Reduce_1P_0P(torch.nn.Module):
     return a
 class GraphAttentionLayer_P0(nn.Module):
     """
-    An implementation of GATConv layer in ptens. 
+    An implementation of GAT layer in ptens. 
     """
     def __init__(self, in_channels: int, out_channels: int, d_prob = 0.5, leakyrelu_alpha = 0.5, relu_alpha = 0.5, concat=True):
         super(GraphAttentionLayer_P0, self).__init__()
@@ -425,7 +425,7 @@ class GraphAttentionLayer_P0(nn.Module):
         
 class GraphAttentionLayer_P1(nn.Module):
     """
-    An implementation of GATConv layer in ptens. 
+    An implementation of GAT layer in ptens. 
     """
 #   linmaps0->1: copy/ptensor by len(domain)
 #   linmaps1->0: sum/ptensor
@@ -450,12 +450,13 @@ class GraphAttentionLayer_P1(nn.Module):
         # e_p1 -> e_p0 -> size of e_p0 -> size of e_p1                      
         e_p0 = ptens.linmaps0(e_p1) 
         e_p0_r, e_p0_c = e_p0.torch().size()
-        e_p1_r = e_p0_r + e_p1.get_nc()                                   
+        e_p1_r = e_p0_r + e_p1.get_nc()
+
         zero_vec = -9e15*torch.ones_like(e_p0_r, e_p0_c)
-        # ptensors1 -> ptensors0 -> torch -> do -> ptensors0 -> ptensors1 
+        # ptensors1 -> ptensors0 -> torch -> ... -> ptensors0 -> ptensors1 
         adj_torch = ptens.linmaps0(adj).torch()
         e_torch = e_p0.torch()
-        attention softmax(torch.where(adj_torch > 0, e_torch, zero_vec), dim=1)
+        attention = softmax(torch.where(adj_torch > 0, e_torch, zero_vec), dim=1)
         attention_p1 = Dropout(ptens.linmaps1(ptens.ptensors0.from_matrix(attention)), self.d_prob)  
         h_prime = attention*Wh
         if self.concat:
