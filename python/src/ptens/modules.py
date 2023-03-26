@@ -390,7 +390,7 @@ class Reduce_1P_0P(torch.nn.Module):
     return a
 class GraphAttentionLayer_P0(nn.Module):
     """
-    An implementation of GATConv layer in ptens. 
+    An implementation of GAT layer in ptens. 
     """
     def __init__(self, in_channels: int, out_channels: int, d_prob = 0.5, leakyrelu_alpha = 0.5, relu_alpha = 0.5, concat=True):
         super(GraphAttentionLayer_P0, self).__init__()
@@ -409,17 +409,14 @@ class GraphAttentionLayer_P0(nn.Module):
         self.leakyrelu = LeakyReLU(self.leakyrelu_alpha)
         self.relu = relu(self.relu_alpha)
 
-    # ptensors0 -> tensor -> do -> ptensors0
     def forward(self, h: ptensors0, adj: ptensors0):
         h_torch = h.torch()
         adj_torch = adj.torch()
         Wh = torch.mm(h_torch, self.W) 
         e = self._prepare_attentional_mechanism_input(Wh) 
-
         zero_vec = -9e15*torch.ones_like(e) 
-        attention = torch.where(adj_torch > 0, e, zero_vec) 
-        attention = softmax(attention, dim=1)
-        attention = dropout(attention, self.d_prob, training = self.training)
+        attention = dropout(softmax(torch.where(adj_torch > 0, e, zero_vec) , dim=1),
+                            self.d_prob, training = self.training)
         h_prime = torch.matmul(attention, Wh)
         
         h_prime_p0 = ptens.ptensors0.from_matrix(h_prime)
@@ -439,17 +436,17 @@ class GraphAttentionLayer_P0(nn.Module):
         
 class GraphAttentionLayer_P1(nn.Module):
     """
-    An implementation of GATConv layer in ptens. 
+    An implementation of GAT layer in ptens. 
     """
 #   linmaps0->1: copy/ptensor by len(domain)
 #   linmaps1->0: sum/ptensor
-    def __init__(self, in_channels: int, out_channels: int, d_prob: torch.float = 0.5, alpha = 0.5, concat=True):
+    def __init__(self, in_channels: int, out_channels: int, d_prob: torch.float = 0.5, alpha = 0.5, cat=True):
         super(GraphAttentionLayer_P1, self).__init__()
         self.d_prob = d_prob
         self.in_channels = in_channels
         self.out_channels = out_channels
         self.alpha = alpha
-        self.concat = concat
+        self.concat = cat
 
         self.W = Parameter(torch.empty(in_channels, out_channels))
         nn.init.xavier_uniform_(self.W.data, gain=1.414)
@@ -458,23 +455,17 @@ class GraphAttentionLayer_P1(nn.Module):
         self.relu = relu(self.alpha)
 
     def forward(self, h: ptensors1, adj: ptensors1):
-        h = ptens.linmaps0(h).torch() # ptensors1 -> ptensors0 -> torch
+        h = ptens.linmaps0(h).torch() 
         Wh = torch.mm(h, self.W) 
-        e_p1 = self._prepare_attentional_mechanism_input(Wh)
-        # e_p1 -> e_p0 -> size of e_p0 -> size of e_p1                      
+        e_p1 = self._prepare_attentional_mechanism_input(Wh)                   
         e_p0 = ptens.linmaps0(e_p1) 
         e_p0_r, e_p0_c = e_p0.torch().size()
-        e_p1_r = e_p0_r + e_p1.get_nc()                                   
-        e_p1_c = e_p0_c
+        e_p1_r = e_p0_r + e_p1.get_nc()
+
         zero_vec = -9e15*torch.ones_like(e_p0_r, e_p0_c)
-        # ptensors1 -> ptensors0 -> torch -> do -> ptensors0 -> ptensors1 
-        adj_torch = ptens.linmaps0(adj).torch()
-        e_torch = e_p0.torch()
-        attention = torch.where(adj_torch > 0, e_torch, zero_vec)
-        attention = softmax(attention, dim=1)
-        attention_p1 = ptens.linmaps1(ptens.ptensors0.from_matrix(attention))
-        attention_p1 = Dropout(attention_p1, self.d_prob)  
-        h_prime = attention*Wh
+        attention = softmax(torch.where(ptens.linmaps0(adj).torch() > 0, e_p0.torch(), zero_vec), dim=1)
+        attention_p1 = Dropout(ptens.linmaps1(ptens.ptensors0.from_matrix(attention)), self.d_prob)  
+        h_prime = attention_p1*Wh
         if self.concat:
             return relu(h_prime)
         else:
