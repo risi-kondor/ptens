@@ -122,12 +122,33 @@ namespace ptens{
 
     static Hgraph overlaps(const cnine::array_pool<int>& x, const cnine::array_pool<int>& y){
       Hgraph R(x.size(),y.size());
-      for(int i=0; i<x.size(); i++){
-	auto v=x(i);
+      if(y.size()<10){
+	for(int i=0; i<x.size(); i++){
+	  auto v=x(i);
+	  for(int j=0; j<y.size(); j++){
+	    auto w=y(j);
+	    if([&](){for(auto p:v) if(std::find(w.begin(),w.end(),p)!=w.end()) return true; return false;}())
+	      R.set(i,j,1.0);
+	  }
+	}
+      }else{
+	unordered_map<int,vector<int> > map;
 	for(int j=0; j<y.size(); j++){
 	  auto w=y(j);
-	  if([&](){for(auto p:v) if(std::find(w.begin(),w.end(),p)!=w.end()) return true; return false;}())
-	    R.set(i,j,1.0);
+	  for(auto p:w){
+	    auto it=map.find(p);
+	    if(it==map.end()) map[p]=vector<int>({j});
+	    else it->second.push_back(j);
+	  }
+	  for(int i=0; i<x.size(); i++){
+	    auto v=x(i);
+	    for(auto p:v){
+	      auto it=map.find(p);
+	      if(it!=map.end())
+		for(auto q:it->second)
+		  R.set(i,q,1.0);
+	    }
+	  }
 	}
       }
       return R;
