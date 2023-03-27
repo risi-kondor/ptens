@@ -39,7 +39,8 @@ def ComputeSubstructureMap(source_domains: atomspack, graph_filter: graph, G: gr
       source_domains,
       subgraphs,
     ])
-  return MapInfo(*info,subgraph=graph.overlaps(subgraphs,subgraphs) if include_subgraph_graph else None)
+  info = MapInfo(*info,subgraph=graph.overlaps(subgraphs,subgraphs) if include_subgraph_graph else None)
+  return info
 
 ######################################## MODULES ###########################################
 class Linear(torch.nn.Module):
@@ -429,13 +430,13 @@ class GraphAttentionLayer_P1(nn.Module):
     """
 #   linmaps0->1: copy/ptensor by len(domain)
 #   linmaps1->0: sum/ptensor
-    def __init__(self, in_channels: int, out_channels: int, d_prob: torch.float = 0.5, alpha = 0.5, concat=True):
+    def __init__(self, in_channels: int, out_channels: int, d_prob: torch.float = 0.5, alpha = 0.5, cat=True):
         super(GraphAttentionLayer_P1, self).__init__()
         self.d_prob = d_prob
         self.in_channels = in_channels
         self.out_channels = out_channels
         self.alpha = alpha
-        self.concat = concat
+        self.concat = cat
 
         self.W = Parameter(torch.empty(in_channels, out_channels))
         nn.init.xavier_uniform_(self.W.data, gain=1.414)
@@ -446,19 +447,15 @@ class GraphAttentionLayer_P1(nn.Module):
     def forward(self, h: ptensors1, adj: ptensors1):
         h = ptens.linmaps0(h).torch() 
         Wh = torch.mm(h, self.W) 
-        e_p1 = self._prepare_attentional_mechanism_input(Wh)
-        # e_p1 -> e_p0 -> size of e_p0 -> size of e_p1                      
+        e_p1 = self._prepare_attentional_mechanism_input(Wh)                   
         e_p0 = ptens.linmaps0(e_p1) 
         e_p0_r, e_p0_c = e_p0.torch().size()
         e_p1_r = e_p0_r + e_p1.get_nc()
 
         zero_vec = -9e15*torch.ones_like(e_p0_r, e_p0_c)
-        # ptensors1 -> ptensors0 -> torch -> ... -> ptensors0 -> ptensors1 
-        adj_torch = ptens.linmaps0(adj).torch()
-        e_torch = e_p0.torch()
-        attention = softmax(torch.where(adj_torch > 0, e_torch, zero_vec), dim=1)
+        attention = softmax(torch.where(ptens.linmaps0(adj).torch() > 0, e_p0.torch(), zero_vec), dim=1)
         attention_p1 = Dropout(ptens.linmaps1(ptens.ptensors0.from_matrix(attention)), self.d_prob)  
-        h_prime = attention*Wh
+        h_prime = attention_p1*Wh
         if self.concat:
             return relu(h_prime)
         else:
