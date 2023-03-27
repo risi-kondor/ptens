@@ -9,6 +9,7 @@
 #include "GatherMap.hpp"
 #include "labeled_tree.hpp"
 
+#include <chrono>
 
 
 namespace ptens{
@@ -122,6 +123,7 @@ namespace ptens{
 
     static Hgraph overlaps(const cnine::array_pool<int>& x, const cnine::array_pool<int>& y){
       Hgraph R(x.size(),y.size());
+      auto t0 = std::chrono::system_clock::now();
       if(y.size()<10){
 	for(int i=0; i<x.size(); i++){
 	  auto v=x(i);
@@ -132,6 +134,7 @@ namespace ptens{
 	  }
 	}
       }else{
+	cout<<"New overlaps"<<endl;
 	unordered_map<int,vector<int> > map;
 	for(int j=0; j<y.size(); j++){
 	  auto w=y(j);
@@ -151,6 +154,8 @@ namespace ptens{
 	  }
 	}
       }
+      auto elapsed=chrono::duration<double,std::milli>(chrono::system_clock::now()-t0).count();
+      cout<<"Overlaps between "<<x.size()<<" domains and "<<y.size()<<" domains in "<<to_string(elapsed)<<"ms."<<endl; 
       return R;
     }
 
