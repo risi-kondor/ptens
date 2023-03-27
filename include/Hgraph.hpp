@@ -9,6 +9,7 @@
 #include "GatherMap.hpp"
 #include "labeled_tree.hpp"
 
+#include <chrono>
 
 
 namespace ptens{
@@ -97,6 +98,16 @@ namespace ptens{
       return R;
     }
 
+    static Hgraph edge_index(const cnine::RtensorA& M, const int n, const int m){
+      PTENS_ASSRT(M.ndims()==2);
+      PTENS_ASSRT(M.get_dim(0)==2);
+      int nedges=M.get_dim(1);
+      Hgraph R(n,m);
+      for(int i=0; i<nedges; i++)
+	R.set(M(0,i),M(1,i),1.0);
+      return R;
+    }
+
     static Hgraph edge_index(const cnine::RtensorA& M, const cnine::RtensorA& L, int n=-1){
       PTENS_ASSRT(M.ndims()==2);
       PTENS_ASSRT(M.get_dim(0)==2);
@@ -122,6 +133,7 @@ namespace ptens{
 
     static Hgraph overlaps(const cnine::array_pool<int>& x, const cnine::array_pool<int>& y){
       Hgraph R(x.size(),y.size());
+      auto t0 = std::chrono::system_clock::now();
       if(y.size()<10){
 	for(int i=0; i<x.size(); i++){
 	  auto v=x(i);
@@ -132,14 +144,14 @@ namespace ptens{
 	  }
 	}
       }else{
-	unordered_map<int,vector<int> > map;
+	cout<<"New overlaps"<<endl;
+	/*
+	map_of_lists<int,int> map;
 	for(int j=0; j<y.size(); j++){
 	  auto w=y(j);
-	  for(auto p:w){
-	    auto it=map.find(p);
-	    if(it==map.end()) map[p]=vector<int>({j});
-	    else it->second.push_back(j);
-	  }
+	  for(auto p:w)
+	    map.insert(p,j);
+	}
 	  for(int i=0; i<x.size(); i++){
 	    auto v=x(i);
 	    for(auto p:v){
@@ -149,8 +161,29 @@ namespace ptens{
 		  R.set(i,q,1.0);
 	    }
 	  }
+	  }					
+	*/
+	unordered_map<int,vector<int> > map;
+	for(int j=0; j<y.size(); j++){
+	  auto w=y(j);
+	  for(auto p:w){
+	    auto it=map.find(p);
+	    if(it==map.end()) map[p]=vector<int>({j});
+	    else it->second.push_back(j);
+	  }
+	}
+	for(int i=0; i<x.size(); i++){
+	  auto v=x(i);
+	  for(auto p:v){
+	    auto it=map.find(p);
+	    if(it!=map.end())
+	      for(auto q:it->second)
+		R.set(i,q,1.0);
+	  }
 	}
       }
+      auto elapsed=chrono::duration<double,std::milli>(chrono::system_clock::now()-t0).count();
+      cout<<"Overlaps between "<<x.size()<<" domains and "<<y.size()<<" domains in "<<to_string(elapsed)<<"ms."<<endl; 
       return R;
     }
 

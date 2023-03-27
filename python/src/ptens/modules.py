@@ -39,7 +39,8 @@ def ComputeSubstructureMap(source_domains: atomspack, graph_filter: graph, G: gr
       source_domains,
       subgraphs,
     ])
-  return MapInfo(*info,subgraph=graph.overlaps(subgraphs,subgraphs) if include_subgraph_graph else None)
+  info = MapInfo(*info,subgraph=graph.overlaps(subgraphs,subgraphs) if include_subgraph_graph else None)
+  return info
 
 ######################################## MODULES ###########################################
 class Linear(torch.nn.Module):
