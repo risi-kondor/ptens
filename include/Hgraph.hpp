@@ -145,14 +145,13 @@ namespace ptens{
 	}
       }else{
 	cout<<"New overlaps"<<endl;
-	unordered_map<int,vector<int> > map;
+	/*
+	map_of_lists<int,int> map;
 	for(int j=0; j<y.size(); j++){
 	  auto w=y(j);
-	  for(auto p:w){
-	    auto it=map.find(p);
-	    if(it==map.end()) map[p]=vector<int>({j});
-	    else it->second.push_back(j);
-	  }
+	  for(auto p:w)
+	    map.insert(p,j);
+	}
 	  for(int i=0; i<x.size(); i++){
 	    auto v=x(i);
 	    for(auto p:v){
@@ -161,6 +160,25 @@ namespace ptens{
 		for(auto q:it->second)
 		  R.set(i,q,1.0);
 	    }
+	  }
+	  }					
+	*/
+	unordered_map<int,vector<int> > map;
+	for(int j=0; j<y.size(); j++){
+	  auto w=y(j);
+	  for(auto p:w){
+	    auto it=map.find(p);
+	    if(it==map.end()) map[p]=vector<int>({j});
+	    else it->second.push_back(j);
+	  }
+	}
+	for(int i=0; i<x.size(); i++){
+	  auto v=x(i);
+	  for(auto p:v){
+	    auto it=map.find(p);
+	    if(it!=map.end())
+	      for(auto q:it->second)
+		R.set(i,q,1.0);
 	  }
 	}
       }
