@@ -98,6 +98,16 @@ namespace ptens{
       return R;
     }
 
+    static Hgraph edge_index(const cnine::RtensorA& M, const int n, const int m){
+      PTENS_ASSRT(M.ndims()==2);
+      PTENS_ASSRT(M.get_dim(0)==2);
+      int nedges=M.get_dim(1);
+      Hgraph R(n,m);
+      for(int i=0; i<nedges; i++)
+	R.set(M(0,i),M(1,i),1.0);
+      return R;
+    }
+
     static Hgraph edge_index(const cnine::RtensorA& M, const cnine::RtensorA& L, int n=-1){
       PTENS_ASSRT(M.ndims()==2);
       PTENS_ASSRT(M.get_dim(0)==2);

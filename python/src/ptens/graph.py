@@ -6,10 +6,13 @@ from ptens_base import graph as _graph
 class graph:
 
     @classmethod
-    def from_edge_index(self,M,n=-1,labels=None):
+    def from_edge_index(self,M,n=-1,labels=None,m=None):
         G=graph()
         if labels is None:
-            G.obj=_graph.edge_index(M,n)
+            if m is None:
+                G.obj=_graph.edge_index(M,n)
+            else:
+                G.obj=_graph.edge_index(M,n,m)
         else:
             G.obj=_graph.edge_index(M,labels,n)
         return G

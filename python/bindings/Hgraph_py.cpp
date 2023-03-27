@@ -2,6 +2,9 @@ pybind11::class_<Hgraph>(m,"graph")
 
   .def_static("edge_index",[](const at::Tensor& x, const int n=-1){
       return Hgraph::edge_index(cnine::RtensorA(x),n);})
+  .def_static("edge_index",[](const at::Tensor& x, const int n, const int m){
+      return Hgraph::edge_index(cnine::RtensorA(x),n,m);})
+
   .def_static("edge_index",[](const at::Tensor& x, const at::Tensor& l, const int n){
       return Hgraph::edge_index(cnine::RtensorA(x),cnine::RtensorA(l),n);})
 
