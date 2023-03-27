@@ -9,7 +9,6 @@ from ptens import ptensors0, ptensors1, ptensors2, graph
 from warnings import warn
 from ptens_base import atomspack
 from ptens.functions import linear, linmaps0, outer, unite1, unite2, gather, relu, cat
-from torch.profiler import record_function # TODO: remove this
 ######################################## Functions ###########################################
 def ConvertEdgeAttributesToPtensors1(edge_index: torch.Tensor, edge_attributes: torch.Tensor):
   atoms = edge_index.transpose(0,1).float()
@@ -29,22 +28,19 @@ def ComputeSubstructureMap(source_domains: atomspack, graph_filter: graph, G: gr
   r"""
   Returns None if subgraph does not appear
   """
-  with record_function("ComputeSubstructureMap"):
-    # TODO: make it so .get_atoms() returns an atomspack, so we don't have to convert back to one.
-    with record_function("subgraphs"):
-      subgraphs = G.subgraphs(graph_filter)
-    if len(subgraphs) == 0:
-      return None
-    with record_function("overlaps"):
-      info = [graph.overlaps(subgraphs,source_domains)]
-      if extra_info:
-        info.extend([
-          graph.overlaps(source_domains,subgraphs),
-          source_domains,
-          subgraphs,
-        ])
-      info = MapInfo(*info,subgraph=graph.overlaps(subgraphs,subgraphs) if include_subgraph_graph else None)
-    return info
+  # TODO: make it so .get_atoms() returns an atomspack, so we don't have to convert back to one.
+  subgraphs = G.subgraphs(graph_filter)
+  if len(subgraphs) == 0:
+    return None
+  info = [graph.overlaps(subgraphs,source_domains)]
+  if extra_info:
+    info.extend([
+      graph.overlaps(source_domains,subgraphs),
+      source_domains,
+      subgraphs,
+    ])
+  info = MapInfo(*info,subgraph=graph.overlaps(subgraphs,subgraphs) if include_subgraph_graph else None)
+  return info
 
 ######################################## MODULES ###########################################
 class Linear(torch.nn.Module):
@@ -86,16 +82,14 @@ class LazyLinear(torch.nn.Module):
           self.b.materialize(self.out_channels)# type: ignore
         self.reset_parameters()
   def forward_standard(self,x: Union[ptensors0,ptensors1,ptensors2]) -> Union[ptensors0,ptensors1,ptensors2]:
-    with record_function("LazyLinear.forward_standard"):
-      assert x.get_nc() == self.w.size(0)
-      #return x * self.w if self.b is None else linear(x,self.w,self.b)
-      # TODO: figure out why multiplication is broken.
-      return linear(x,self.w,torch.zeros(self.w.size(0),device=self.w.device) if self.b is None else self.b)
+    assert x.get_nc() == self.w.size(0)
+    #return x * self.w if self.b is None else linear(x,self.w,self.b)
+    # TODO: figure out why multiplication is broken.
+    return linear(x,self.w,torch.zeros(self.w.size(0),device=self.w.device) if self.b is None else self.b)
   def forward(self,x: Union[ptensors0,ptensors1,ptensors2]) -> Union[ptensors0,ptensors1,ptensors2]:
-    with record_function("LazyLinear.forward"):
-      self.initialize_parameters(x)
-      self.forward = self.forward_standard
-      return self.forward(x)
+    self.initialize_parameters(x)
+    self.forward = self.forward_standard
+    return self.forward(x)
 
 class ConvolutionalLayer_0P(torch.nn.Module):
   r"""
@@ -240,31 +234,30 @@ class LazyTransfer(torch.nn.Module):
     self.out_order = out_order
     self.transfer = None
   def forward(self, features: Union[ptensors0,ptensors1,ptensors2], target_domains: Union[List[List[int]],atomspack], graph: graph) -> Union[ptensors0,ptensors1,ptensors2]:
-    with record_function("ptens.modules.LazyTransfer.forward"):
-      if self.transfer is None:
-        if self.lin.out_channels is None:
-          self.lin.out_channels = features.get_nc()
-        if isinstance(features,ptensors0):
-          in_order = 0
-        elif isinstance(features,ptensors1):
-          in_order = 1
-        elif isinstance(features,ptensors2):
-          in_order = 2
-        else:
-          raise Exception("'features' must be instance of 'ptensors[0|1|2]'")
-        out_order = in_order if self.out_order is None else self.out_order
-        #
-        self.transfer = [
-          [ptensors0.transfer0,ptensors0.transfer1,ptensors0.transfer2],
-          [ptensors1.transfer0,ptensors1.transfer1,ptensors1.transfer2],
-          [ptensors2.transfer0,ptensors2.transfer1,ptensors2.transfer2],
-          ][in_order][out_order]
-        if in_order == 0:
-          q = self.transfer
-          self.transfer = lambda x,t,G,n: q(x,G,n)
-      F = self.transfer(features,target_domains, graph, self.use_mean)
-      F = self.lin(F)
-      return F
+    if self.transfer is None:
+      if self.lin.out_channels is None:
+        self.lin.out_channels = features.get_nc()
+      if isinstance(features,ptensors0):
+        in_order = 0
+      elif isinstance(features,ptensors1):
+        in_order = 1
+      elif isinstance(features,ptensors2):
+        in_order = 2
+      else:
+        raise Exception("'features' must be instance of 'ptensors[0|1|2]'")
+      out_order = in_order if self.out_order is None else self.out_order
+      #
+      self.transfer = [
+        [ptensors0.transfer0,ptensors0.transfer1,ptensors0.transfer2],
+        [ptensors1.transfer0,ptensors1.transfer1,ptensors1.transfer2],
+        [ptensors2.transfer0,ptensors2.transfer1,ptensors2.transfer2],
+        ][in_order][out_order]
+      if in_order == 0:
+        q = self.transfer
+        self.transfer = lambda x,t,G,n: q(x,G,n)
+    F = self.transfer(features,target_domains, graph, self.use_mean)
+    F = self.lin(F)
+    return F
 class LazyTransferNHoods(LazyTransfer):
   def __init__(self, channels_out: int, num_hops: int, reduction_type : str = "sum", out_order: Optional[int] = None, bias : bool = True) -> None:
     r"""
@@ -288,30 +281,28 @@ class LazyPtensGraphConvolutional(LazyTransfer):
   def forward_adv(self, features: Union[ptensors0,ptensors1,ptensors2], graph: graph) -> Union[ptensors0,ptensors1,ptensors2]:
     return super().forward(features,features.get_atoms(),graph) + self.lin2(features)
   def forward(self, features: Union[ptensors0,ptensors1,ptensors2], graph: graph) -> Union[ptensors0,ptensors1,ptensors2]:
-    with record_function("LazyPtensGraphConvolutional.forward"):
-      self.forward = self.forward_adv
-      if self.lin2.out_channels is None:
-        self.lin2.out_channels = features.get_nc()
-      return self.forward(features,graph)
+    self.forward = self.forward_adv
+    if self.lin2.out_channels is None:
+      self.lin2.out_channels = features.get_nc()
+    return self.forward(features,graph)
 class Dropout(torch.nn.Module):
   def __init__(self, prob: float = 0.5) -> None: # type: ignore
     super().__init__()
     self.p = prob
   def forward(self, x, device):
-    with record_function("ptens.modules.Dropout.forward"):
-      # TODO: replace device with device from 'x'.
-      if self.training:
-        dropout = 1/(1 - self.p)*(torch.rand(x.get_nc(),device=device) > self.p) # type: ignore
-        if isinstance(x,ptensors0):
-          return ptensors0.mult_channels(x,dropout)
-        elif isinstance(x,ptensors1):
-          return ptensors1.mult_channels(x,dropout)
-        elif isinstance(x,ptensors2):
-          return ptensors2.mult_channels(x,dropout)
-        else:
-          raise NotImplementedError('Dropout not implemented for type \"' + str(type(x)) + "\"")
+    # TODO: replace device with device from 'x'.
+    if self.training:
+      dropout = 1/(1 - self.p)*(torch.rand(x.get_nc(),device=device) > self.p) # type: ignore
+      if isinstance(x,ptensors0):
+        return ptensors0.mult_channels(x,dropout)
+      elif isinstance(x,ptensors1):
+        return ptensors1.mult_channels(x,dropout)
+      elif isinstance(x,ptensors2):
+        return ptensors2.mult_channels(x,dropout)
       else:
-        return x
+        raise NotImplementedError('Dropout not implemented for type \"' + str(type(x)) + "\"")
+    else:
+      return x
 class LazyBatchNorm(torch.nn.Module):
   def __init__(self, eps: float = 1E-5, momentum: float = 0.1) -> None: # type: ignore
     super().__init__()
@@ -325,41 +316,40 @@ class LazyBatchNorm(torch.nn.Module):
     r"""
     x can be any type of ptensors
     """
-    with record_function("ptens.modules.LazyBatchNorm.forward"):
-      if self.first_run:
-        self.first_run = False
-        x_val : torch.Tensor = x.torch()
-        nc = x.get_nc()
-        with torch.no_grad():
-          self.weight.materialize(nc,device=x_val.device)
-          self.weight.data = torch.ones(nc,device=x_val.device,requires_grad=True)
-          self.bias.materialize(nc,device=x_val.device)
-          self.bias.data = torch.zeros(nc,device=x_val.device,requires_grad=True)
-      elif self.training:
-        x_val : torch.Tensor = x.torch()
-      if self.training:
-        x_mean = x_val.mean(0)
-        x_var = x_val.var(0)
-        if self.running_vals_uninitialized:
-          self.running_vals_uninitialized = False
-          self.register_buffer("running_mean",x_mean)
-          self.register_buffer("running_var",x_var)
-        else:
-          m = self.momentum
-          with torch.no_grad():
-            self.running_mean = (1 - m) * self.running_mean + m * x_mean
-            self.running_var = (1 - m) * self.running_var + m * x_var
-      elif self.running_vals_uninitialized:
-        return x # Why would you do this...
+    if self.first_run:
+      self.first_run = False
+      x_val : torch.Tensor = x.torch()
+      nc = x.get_nc()
+      with torch.no_grad():
+        self.weight.materialize(nc,device=x_val.device)
+        self.weight.data = torch.ones(nc,device=x_val.device,requires_grad=True)
+        self.bias.materialize(nc,device=x_val.device)
+        self.bias.data = torch.zeros(nc,device=x_val.device,requires_grad=True)
+    elif self.training:
+      x_val : torch.Tensor = x.torch()
+    if self.training:
+      x_mean = x_val.mean(0)
+      x_var = x_val.var(0)
+      if self.running_vals_uninitialized:
+        self.running_vals_uninitialized = False
+        self.register_buffer("running_mean",x_mean)
+        self.register_buffer("running_var",x_var)
       else:
-        x_mean = self.running_mean
-        x_var = self.running_var
-      #
-      mult = self.weight / torch.sqrt(x_var + self.eps)
-      # TODO: if we can add channel wise addition broadcasting to all reference domains, we will not need to do this.
-      b = self.bias - x_mean * mult
-      output = linear(x,torch.diag(mult),b)
-      return output
+        m = self.momentum
+        with torch.no_grad():
+          self.running_mean = (1 - m) * self.running_mean + m * x_mean
+          self.running_var = (1 - m) * self.running_var + m * x_var
+    elif self.running_vals_uninitialized:
+      return x # Why would you do this...
+    else:
+      x_mean = self.running_mean
+      x_var = self.running_var
+    #
+    mult = self.weight / torch.sqrt(x_var + self.eps)
+    # TODO: if we can add channel wise addition broadcasting to all reference domains, we will not need to do this.
+    b = self.bias - x_mean * mult
+    output = linear(x,torch.diag(mult),b)
+    return output
 class PNormalize(torch.nn.Module):
   def __init__(self, p: int = 2, eps: float = 1E-5) -> None:
     super().__init__()
