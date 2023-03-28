@@ -37,7 +37,7 @@ namespace ptens{
     //mutable HgraphSubgraphListCache* subgraphlist_cache=nullptr;
 
     ~Hgraph(){
-      // if(_reverse) delete _reverse; // hack!
+      if(_reverse) delete _reverse; // hack!
       for(auto p:_nhoods)
 	delete p;
       if(!_edges) delete _edges;
