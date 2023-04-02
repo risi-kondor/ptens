@@ -290,6 +290,8 @@ class Dropout(torch.nn.Module):
     super().__init__()
     self.p = prob
   def forward(self, x, device):
+    if self.p == 0:
+      return x
     # TODO: replace device with device from 'x'.
     if self.training:
       dropout = 1/(1 - self.p)*(torch.rand(x.get_nc(),device=device) > self.p) # type: ignore
