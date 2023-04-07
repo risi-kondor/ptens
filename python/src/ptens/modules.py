@@ -259,7 +259,7 @@ class LazyTransfer(torch.nn.Module):
     F = self.lin(F)
     return F
 class LazyTransferNHoods(LazyTransfer):
-  def __init__(self, channels_out: int, num_hops: int, reduction_type : str = "sum", out_order: Optional[int] = None, bias : bool = True) -> None:
+  def __init__(self, num_hops: int, channels_out: Optional[int] = None, reduction_type : str = "sum", out_order: Optional[int] = None, bias : bool = True) -> None:
     r"""
     reduction_types: "sum" and "mean"
     leave 'out_order' as 'None' to keep same as input
