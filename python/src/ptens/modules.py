@@ -266,7 +266,6 @@ class LazyTransferNHoods(LazyTransfer):
     """
     super().__init__(channels_out,reduction_type,out_order,bias)
     self.num_hops = num_hops
-    self.lin2 = LazyLinear(channels_out,bias=False)
   def forward(self, features: Union[ptensors0,ptensors1,ptensors2], graph: graph) -> Union[ptensors0,ptensors1,ptensors2]:
     return super().forward(features,graph.nhoods(self.num_hops),graph)
 class LazyPtensGraphConvolutional(LazyTransfer):
