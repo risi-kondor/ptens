@@ -579,7 +579,7 @@ namespace ptens{
     PTENS_ASSRT(x.dev==1);
     const_cast<AindexPack&>(list).to_device(1);
     PTENS_ASSRT(list.dev==1);
-    int n=cnine::roundup(std::max(R.dim_of(0,0),list.max_nix()+1),32); // here??
+    int n=cnine::roundup(std::max(R.dim_of(0,1),list.max_nix()+1),32); // here??
     //cout<<">>"<<n<<endl;
     //cout<<x.dir<<endl;
     //cout<<cnine::GatherMap(list.get_bmap(),0)<<endl;
