@@ -4,10 +4,12 @@
 #include <set>
 #include "Ptens_base.hpp"
 #include "SparseRmatrix.hpp"
+//#include "SparseRmatrixB.hpp"
 #include "AtomsPack.hpp"
 #include "AindexPack.hpp"
 #include "GatherMap.hpp"
 #include "labeled_tree.hpp"
+#include "map_of_lists.hpp"
 
 #include <chrono>
 
@@ -20,10 +22,12 @@ namespace ptens{
   class Hgraph: public cnine::SparseRmatrix{
   public:
 
+    typedef cnine::SparseRmatrix BaseMatrix;
+
     typedef cnine::labeled_tree<int> labeled_tree;
     typedef cnine::RtensorA RtensorA;
 
-    using cnine::SparseRmatrix::SparseRmatrix;
+    using BaseMatrix::BaseMatrix;
 
     RtensorA labels;
     bool is_labeled=false;
@@ -33,7 +37,7 @@ namespace ptens{
     mutable shared_ptr<cnine::GatherMap> bmap;
     mutable vector<AtomsPack*> _nhoods; 
     mutable AtomsPack* _edges=nullptr;
-    mutable unordered_map<SparseRmatrix,cnine::array_pool<int>*> subgraphlist_cache;
+    mutable unordered_map<BaseMatrix,cnine::array_pool<int>*> subgraphlist_cache;
     //mutable HgraphSubgraphListCache* subgraphlist_cache=nullptr;
 
     ~Hgraph(){
@@ -121,11 +125,11 @@ namespace ptens{
     }
 
     static Hgraph random(const int _n, const float p=0.5){
-      return cnine::SparseRmatrix::random_symmetric(_n,p);
+      return BaseMatrix::random_symmetric(_n,p);
     }
 
     static Hgraph randomd(const int _n, const float p=0.5){
-      auto R=cnine::SparseRmatrix::random_symmetric(_n,p);
+      auto R=BaseMatrix::random_symmetric(_n,p);
       for(int i=0; i<_n; i++)
 	R.set(i,i,1.0);
       return R;
@@ -134,7 +138,7 @@ namespace ptens{
     static Hgraph overlaps(const cnine::array_pool<int>& x, const cnine::array_pool<int>& y){
       Hgraph R(x.size(),y.size());
       auto t0 = std::chrono::system_clock::now();
-      if(y.size()<10){
+      if(y.size()<1){
 	for(int i=0; i<x.size(); i++){
 	  auto v=x(i);
 	  for(int j=0; j<y.size(); j++){
@@ -145,26 +149,22 @@ namespace ptens{
 	}
       }else{
 	cout<<"New overlaps"<<endl;
-	/*
-	map_of_lists<int,int> map;
+	cnine::map_of_lists<int,int> map;
 	for(int j=0; j<y.size(); j++){
 	  auto w=y(j);
 	  for(auto p:w)
-	    map.insert(p,j);
+	    map.push_back(p,j);
 	}
-	  for(int i=0; i<x.size(); i++){
-	    auto v=x(i);
-	    for(auto p:v){
-	      auto it=map.find(p);
-	      if(it!=map.end())
-		for(auto q:it->second)
-		  R.set(i,q,1.0);
-	    }
-	  }
-	  }					
-	*/
-	unordered_map<int,vector<int> > map;
-	for(int j=0; j<y.size(); j++){
+	for(int i=0; i<x.size(); i++){
+	  auto v=x(i);
+	  for(auto p:v)
+	    map.for_each_in_list(p,[&](const int q){
+		R.set(i,q,1.0);
+		});
+	}
+	/*
+	  unordered_map<int,vector<int> > map;
+	  for(int j=0; j<y.size(); j++){
 	  auto w=y(j);
 	  for(auto p:w){
 	    auto it=map.find(p);
@@ -181,6 +181,7 @@ namespace ptens{
 		R.set(i,q,1.0);
 	  }
 	}
+      */
       }
       auto elapsed=chrono::duration<double,std::milli>(chrono::system_clock::now()-t0).count();
       cout<<"Overlaps between "<<x.size()<<" domains and "<<y.size()<<" domains in "<<to_string(elapsed)<<"ms."<<endl; 
@@ -192,12 +193,12 @@ namespace ptens{
 
 
     Hgraph(const Hgraph& x):
-      SparseRmatrix(x), 
+      BaseMatrix(x), 
       labels(x.labels),
       is_labeled(x.is_labeled){}
 
     Hgraph(Hgraph&& x):
-      SparseRmatrix(std::move(x)),
+      BaseMatrix(std::move(x)),
       labels(std::move(x.labels)),
       is_labeled(x.is_labeled){}
 
@@ -207,11 +208,11 @@ namespace ptens{
   public: // ---- Conversions --------------------------------------------------------------------------------
 
 
-    Hgraph(const cnine::SparseRmatrix& x):
-      cnine::SparseRmatrix(x){}
+    Hgraph(const BaseMatrix& x):
+      BaseMatrix(x){}
 
-    Hgraph(const cnine::SparseRmatrix& x, const cnine::RtensorA& L):
-      cnine::SparseRmatrix(x),
+    Hgraph(const BaseMatrix& x, const cnine::RtensorA& L):
+      BaseMatrix(x),
       labels(L),
       is_labeled(true){
       PTENS_ASSRT(labels.dims.size()==1);
