@@ -11,7 +11,7 @@
 #include "labeled_tree.hpp"
 #include "map_of_lists.hpp"
 
-#include <chrono>
+//#include <chrono>
 
 
 namespace ptens{
@@ -41,7 +41,7 @@ namespace ptens{
     //mutable HgraphSubgraphListCache* subgraphlist_cache=nullptr;
 
     ~Hgraph(){
-      // if(_reverse) delete _reverse; // hack!
+      if(_reverse) delete _reverse; // hack!
       for(auto p:_nhoods)
 	delete p;
       if(!_edges) delete _edges;
@@ -137,8 +137,8 @@ namespace ptens{
 
     static Hgraph overlaps(const cnine::array_pool<int>& x, const cnine::array_pool<int>& y){
       Hgraph R(x.size(),y.size());
-      auto t0 = std::chrono::system_clock::now();
-      if(y.size()<1){
+      //auto t0 = std::chrono::system_clock::now();
+      if(y.size()<10){
 	for(int i=0; i<x.size(); i++){
 	  auto v=x(i);
 	  for(int j=0; j<y.size(); j++){
@@ -148,8 +148,9 @@ namespace ptens{
 	  }
 	}
       }else{
-	cout<<"New overlaps"<<endl;
-	cnine::map_of_lists<int,int> map;
+	//cout<<"New overlaps"<<endl;
+	/*
+	map_of_lists<int,int> map;
 	for(int j=0; j<y.size(); j++){
 	  auto w=y(j);
 	  for(auto p:w)
@@ -162,9 +163,9 @@ namespace ptens{
 		R.set(i,q,1.0);
 		});
 	}
-	/*
-	  unordered_map<int,vector<int> > map;
-	  for(int j=0; j<y.size(); j++){
+	*/
+	unordered_map<int,vector<int> > map;
+	for(int j=0; j<y.size(); j++){
 	  auto w=y(j);
 	  for(auto p:w){
 	    auto it=map.find(p);
@@ -181,10 +182,9 @@ namespace ptens{
 		R.set(i,q,1.0);
 	  }
 	}
-      */
       }
-      auto elapsed=chrono::duration<double,std::milli>(chrono::system_clock::now()-t0).count();
-      cout<<"Overlaps between "<<x.size()<<" domains and "<<y.size()<<" domains in "<<to_string(elapsed)<<"ms."<<endl; 
+      //auto elapsed=chrono::duration<double,std::milli>(chrono::system_clock::now()-t0).count();
+      //cout<<"Overlaps between "<<x.size()<<" domains and "<<y.size()<<" domains in "<<to_string(elapsed)<<"ms."<<endl; 
       return R;
     }
 

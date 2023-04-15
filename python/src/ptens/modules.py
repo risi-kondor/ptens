@@ -259,14 +259,13 @@ class LazyTransfer(torch.nn.Module):
     F = self.lin(F)
     return F
 class LazyTransferNHoods(LazyTransfer):
-  def __init__(self, channels_out: int, num_hops: int, reduction_type : str = "sum", out_order: Optional[int] = None, bias : bool = True) -> None:
+  def __init__(self, num_hops: int, channels_out: Optional[int] = None, reduction_type : str = "sum", out_order: Optional[int] = None, bias : bool = True) -> None:
     r"""
     reduction_types: "sum" and "mean"
     leave 'out_order' as 'None' to keep same as input
     """
     super().__init__(channels_out,reduction_type,out_order,bias)
     self.num_hops = num_hops
-    self.lin2 = LazyLinear(channels_out,bias=False)
   def forward(self, features: Union[ptensors0,ptensors1,ptensors2], graph: graph) -> Union[ptensors0,ptensors1,ptensors2]:
     return super().forward(features,graph.nhoods(self.num_hops),graph)
 class LazyPtensGraphConvolutional(LazyTransfer):
@@ -290,6 +289,8 @@ class Dropout(torch.nn.Module):
     super().__init__()
     self.p = prob
   def forward(self, x, device):
+    if self.p == 0:
+      return x
     # TODO: replace device with device from 'x'.
     if self.training:
       dropout = 1/(1 - self.p)*(torch.rand(x.get_nc(),device=device) > self.p) # type: ignore
