@@ -9,7 +9,7 @@
 
 namespace ptens{
 
-  void add_concat(Ptensors1& r, const Ptensors0& x, const cnine::SparseRmatrix& G, bool self=0){
+  void add_concat(Ptensors1& r, const Ptensors0& x, const Hgraph& G, bool self=0){
     int nc=x.get_nc();
     assert(r.nc==nc);
     int n=G.n;
@@ -38,7 +38,7 @@ namespace ptens{
   }
 
 
-  void add_concat_back(Ptensors0& r, const Ptensors1& x, const cnine::SparseRmatrix& G, bool self=0){
+  void add_concat_back(Ptensors0& r, const Ptensors1& x, const Hgraph& G, bool self=0){
     int nc=x.get_nc();
     assert(r.nc==nc);
     int n=G.n;
@@ -65,7 +65,7 @@ namespace ptens{
   }
 
 
-  Ptensors1 concat1(const AtomsPack& _atoms, const cnine::SparseRmatrix& G, const Ptensors0& x){
+  Ptensors1 concat1(const AtomsPack& _atoms, const Hgraph& G, const Ptensors0& x){
     Ptensors1 R=Ptensors1::zero(_atoms,x.get_nc());
     add_concat(R,x,G);
     return R;

@@ -315,7 +315,8 @@ __global__ void Ptensors1_broadcast1_kernel(float* xarr, const int* xdir, const 
     const int src=bmap[boffs+2*s];
     const int k=load_indices(ix,xiarr,xidir,src);
     __syncthreads();
-    if(c>=rnc) return;
+    //if(c>=rnc) return;
+    if(c>=rnc) continue; // changed 
 
     const float* r=rarr+rdir[3*src]+c;
     for(int i=0; i<k; i++){
@@ -578,7 +579,7 @@ namespace ptens{
     PTENS_ASSRT(x.dev==1);
     const_cast<AindexPack&>(list).to_device(1);
     PTENS_ASSRT(list.dev==1);
-    int n=cnine::roundup(std::max(R.dim_of(0,0),list.max_nix()+1),32);
+    int n=cnine::roundup(std::max(R.dim_of(0,1),list.max_nix()+1),32); // here??
     //cout<<">>"<<n<<endl;
     //cout<<x.dir<<endl;
     //cout<<cnine::GatherMap(list.get_bmap(),0)<<endl;
