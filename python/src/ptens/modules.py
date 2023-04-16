@@ -1,4 +1,4 @@
-from typing import List, Optional, Tuple, Union
+from typing import List, Literal, Optional, Tuple, Union
 import torch
 import torch.nn as nn
 from torch.nn import LeakyReLU
@@ -10,9 +10,15 @@ from warnings import warn
 from ptens_base import atomspack
 from ptens.functions import linear, linmaps0, outer, unite1, unite2, gather, relu, cat
 ######################################## Functions ###########################################
-def ConvertEdgeAttributesToPtensors1(edge_index: torch.Tensor, edge_attributes: torch.Tensor):
-  atoms = edge_index.transpose(0,1).float()
-  return ptensors1.from_matrix(edge_attributes,atoms)
+
+
+def get_edge_maps(edge_index: torch.Tensor, num_nodes: Optional[int] = None) -> Tuple[ptens.graph,ptens.graph]:
+  if num_nodes is None:
+    num_nodes = int(edge_index.max().item()) + 1
+  edge_ids = torch.arange(edge_index.size(1),dtype=torch.float)
+  nodes_to_edges = ptens.graph.from_edge_index(torch.stack([edge_index[1],edge_ids]),n=num_nodes,m=edge_index.size(1))
+  edges_to_nodes = ptens.graph.from_edge_index(torch.stack([edge_ids,edge_index[0]]),n=edge_index.size(1),m=num_nodes)
+  return edges_to_nodes, nodes_to_edges
 
 class MapInfo:
   r"""
@@ -43,6 +49,40 @@ def ComputeSubstructureMap(source_domains: atomspack, graph_filter: graph, G: gr
   return info
 
 ######################################## MODULES ###########################################
+class GINConv_0P(torch.nn.Module):
+  def __init__(self, nn: torch.nn.Module, eps: float = 0, train_eps: bool = False, reduction_type: Union[Literal['mean'],Literal['sum']] = 'sum') -> None:
+    super().__init__()
+    self.nn = nn
+    eps += 1
+    if train_eps:
+      self.eps = torch.nn.parameter.Parameter(torch.tensor(eps,dtype=torch.float))
+    else:
+      self.register_buffer('eps',torch.tensor(eps,dtype=torch.float))
+    self.normalize_reduction = reduction_type == 'mean'
+  def forward(self, x: ptens.ptensors0, G: ptens.graph):
+    x = self.eps * x + x.gather(G,self.normalize_reduction)
+    return self.nn(x)
+
+
+class GINEConv_0P(torch.nn.Module):
+  def __init__(self, nn: torch.nn.Module, eps: float = 0, train_eps: bool = False, reduction_type: Union[Literal['mean'],Literal['sum']] = 'sum') -> None:
+    super().__init__()
+    self.nn = nn
+    eps += 1
+    if train_eps:
+      self.eps = torch.nn.parameter.Parameter(torch.tensor(eps,dtype=torch.float))
+    else:
+      self.register_buffer('eps',torch.tensor(eps,dtype=torch.float))
+    self.normalize_reduction = reduction_type == 'mean'
+  def forward(self, x: ptens.ptensors0, e: ptens.ptensors0, vertex_to_edge_map: ptens.graph, edge_to_vertex_map: ptens.graph):
+    y : ptens.ptensors0 = x.gather(vertex_to_edge_map)
+    y = y + e
+    y = y.relu(0.)
+    y = y.gather(edge_to_vertex_map,self.normalize_reduction)
+    x = ptens.ptensors0.mult_channels(x,self.eps.broadcast_to(x.get_nc()))
+    x = x + y
+    return self.nn(x)
+
 class Linear(torch.nn.Module):
   def __init__(self,in_channels: int, out_channels: int, bias: bool = True) -> None:
     super().__init__()
@@ -169,6 +209,8 @@ class LazyUnite(torch.nn.Module):
     self.use_mean = reduction_type == "mean"
     self.out_order = out_order
     self.unite = None
+  def reset_parameters(self):
+    self.lin.reset_parameters()
   def forward(self, features: Union[ptensors0,ptensors1,ptensors2], graph: graph) -> Union[ptensors0,ptensors1,ptensors2]:
     if self.unite is None:
       if self.lin.out_channels is None:
@@ -313,6 +355,10 @@ class LazyBatchNorm(torch.nn.Module):
     self.momentum = momentum
     self.first_run = True
     self.running_vals_uninitialized = True
+  def reset_parameters(self):
+    self.weight.data = torch.ones_like(self.weight.data)
+    self.bias.data = torch.zeros_like(self.bias.data)
+    self.running_vals_uninitialized = True
   def forward(self, x):
     r"""
     x can be any type of ptensors
@@ -323,9 +369,7 @@ class LazyBatchNorm(torch.nn.Module):
       nc = x.get_nc()
       with torch.no_grad():
         self.weight.materialize(nc,device=x_val.device)
-        self.weight.data = torch.ones(nc,device=x_val.device,requires_grad=True)
         self.bias.materialize(nc,device=x_val.device)
-        self.bias.data = torch.zeros(nc,device=x_val.device,requires_grad=True)
     elif self.training:
       x_val : torch.Tensor = x.torch()
     if self.training:
