@@ -42,10 +42,13 @@ def main():
                      cwd + cnine_folder + '/objects/tensor',
                      cwd + cnine_folder + '/objects/backendA',
                      cwd + cnine_folder + '/objects/backendB',
+                     cwd + cnine_folder + '/objects/ntensor',
+                     cwd + cnine_folder + '/objects/labeled',
                      cwd + cnine_folder + '/objects/tensor_views',
                      cwd + cnine_folder + '/objects/tensor_array',
                      cwd + cnine_folder + '/objects/tensor_array/cell_maps',
                      cwd + cnine_folder + '/objects/tensor_array/cell_ops',
+                     cwd + cnine_folder + '/objects/ntensor',
                      cwd + '/../include',
                      cwd + '/../tensors',
                      cwd + '/../layers'
