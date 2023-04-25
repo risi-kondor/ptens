@@ -49,31 +49,50 @@ def ComputeSubstructureMap(source_domains: atomspack, graph_filter: graph, G: gr
   return info
 
 ######################################## MODULES ###########################################
+
+def reset_params_recursive(module: torch.nn.Module):
+  if hasattr(module,'reset_parameters'):
+    module.reset_parameters()
+  else:
+    assert len([p for p in module.parameters(False) if p.requires_grad]) == 0
+    for child in  module.children():
+      reset_params_recursive(child)  
+
 class GINConv_0P(torch.nn.Module):
-  def __init__(self, nn: torch.nn.Module, eps: float = 0, train_eps: bool = False, reduction_type: Union[Literal['mean'],Literal['sum']] = 'sum') -> None:
+  def __init__(self, nn: torch.nn.Module, eps: float = 0, train_eps: bool = True, reduction_type: Union[Literal['mean'],Literal['sum']] = 'sum') -> None:
     super().__init__()
     self.nn = nn
     eps += 1
+    self.eps_shifted_init = eps
     if train_eps:
-      self.eps = torch.nn.parameter.Parameter(torch.tensor(eps,dtype=torch.float))
+      self.register_parameter('eps',torch.nn.parameter.Parameter(torch.tensor(eps,dtype=torch.float),requires_grad=True))
     else:
       self.register_buffer('eps',torch.tensor(eps,dtype=torch.float))
     self.normalize_reduction = reduction_type == 'mean'
+  def reset_parameters(self):
+    reset_params_recursive(self.nn)
+    if self.eps.requires_grad:
+      self.eps.data = torch.tensor(self.eps_shifted_init,dtype=torch.float,requires_grad=True) 
   def forward(self, x: ptens.ptensors0, G: ptens.graph):
     x = self.eps * x + x.gather(G,self.normalize_reduction)
     return self.nn(x)
 
 
 class GINEConv_0P(torch.nn.Module):
-  def __init__(self, nn: torch.nn.Module, eps: float = 0, train_eps: bool = False, reduction_type: Union[Literal['mean'],Literal['sum']] = 'sum') -> None:
+  def __init__(self, nn: torch.nn.Module, eps: float = 0, train_eps: bool = True, reduction_type: Union[Literal['mean'],Literal['sum']] = 'sum') -> None:
     super().__init__()
     self.nn = nn
     eps += 1
+    self.eps_shifted_init = eps
     if train_eps:
-      self.eps = torch.nn.parameter.Parameter(torch.tensor(eps,dtype=torch.float))
+      self.register_parameter('eps',torch.nn.parameter.Parameter(torch.tensor(eps,dtype=torch.float),requires_grad=True))
     else:
       self.register_buffer('eps',torch.tensor(eps,dtype=torch.float))
     self.normalize_reduction = reduction_type == 'mean'
+  def reset_parameters(self):
+    reset_params_recursive(self.nn)
+    if self.eps.requires_grad:
+      self.eps.data = torch.tensor(self.eps_shifted_init,dtype=torch.float,requires_grad=True)
   def forward(self, x: ptens.ptensors0, e: ptens.ptensors0, vertex_to_edge_map: ptens.graph, edge_to_vertex_map: ptens.graph):
     y : ptens.ptensors0 = x.gather(vertex_to_edge_map)
     y = y + e
@@ -84,19 +103,22 @@ class GINEConv_0P(torch.nn.Module):
     return self.nn(x)
 
 class Linear(torch.nn.Module):
-  def __init__(self,in_channels: int, out_channels: int, bias: bool = True) -> None:
+  def __init__(self, in_channels: int, out_channels: int, bias: bool = True) -> None:
     super().__init__()
     #This follows Glorot initialization for weights.
-    self.w = torch.nn.parameter.Parameter(torch.empty(in_channels,out_channels))
-    self.b = torch.nn.parameter.Parameter(torch.empty(out_channels)) if bias else None
+    self.w = torch.nn.parameter.Parameter(torch.empty(in_channels,out_channels),requires_grad=True)
+    self.b = torch.nn.parameter.Parameter(torch.empty(out_channels),requires_grad=True)
     self.reset_parameters()
   def reset_parameters(self):
-    self.w = torch.nn.init.xavier_uniform_(self.w)
-    if not self.b is None:
-      self.b = torch.nn.init.zeros_(self.b)
-  def forward(self,x: ptensors1) -> ptensors1:
+    if not isinstance(self.w,torch.nn.parameter.UninitializedParameter):
+      self.w = torch.nn.init.xavier_uniform_(self.w)
+      if self.b is not None:
+        self.b = torch.nn.init.zeros_(self.b)
+  def forward(self,x: Union[ptensors0,ptensors1,ptensors2]) -> Union[ptensors0,ptensors1,ptensors2]:
     assert x.get_nc() == self.w.size(0)
-    return x * self.w if self.b is None else linear(x,self.w,self.b)
+    #return x * self.w if self.b is None else linear(x,self.w,self.b)
+    # TODO: figure out why multiplication is broken.
+    return linear(x,self.w,torch.zeros(self.w.size(1),device=self.w.device) if self.b is None else self.b)
 
 class LazyLinear(torch.nn.Module):
   def __init__(self,out_channels: Optional[int] = None, bias: bool = True) -> None:
@@ -125,7 +147,7 @@ class LazyLinear(torch.nn.Module):
     assert x.get_nc() == self.w.size(0)
     #return x * self.w if self.b is None else linear(x,self.w,self.b)
     # TODO: figure out why multiplication is broken.
-    return linear(x,self.w,torch.zeros(self.w.size(0),device=self.w.device) if self.b is None else self.b)
+    return linear(x,self.w,torch.zeros(self.w.size(1),device=self.w.device) if self.b is None else self.b)
   def forward(self,x: Union[ptensors0,ptensors1,ptensors2]) -> Union[ptensors0,ptensors1,ptensors2]:
     self.initialize_parameters(x)
     self.forward = self.forward_standard
@@ -330,12 +352,13 @@ class Dropout(torch.nn.Module):
   def __init__(self, prob: float = 0.5) -> None: # type: ignore
     super().__init__()
     self.p = prob
-  def forward(self, x, device):
+    self.device_holder = torch.nn.parameter.Parameter()
+  def forward(self, x):
     if self.p == 0:
       return x
     # TODO: replace device with device from 'x'.
     if self.training:
-      dropout = 1/(1 - self.p)*(torch.rand(x.get_nc(),device=device) > self.p) # type: ignore
+      dropout = 1/(1 - self.p)*(torch.rand(x.get_nc(),device=self.device_holder.device) > self.p) # type: ignore
       if isinstance(x,ptensors0):
         return ptensors0.mult_channels(x,dropout)
       elif isinstance(x,ptensors1):
@@ -347,21 +370,28 @@ class Dropout(torch.nn.Module):
     else:
       return x
 class LazyBatchNorm(torch.nn.Module):
-  def __init__(self, eps: float = 1E-5, momentum: float = 0.1) -> None: # type: ignore
+  def __init__(self, eps: float = 1E-5, momentum: float = 0.1, affine : bool = True, weight: bool = True, bias: bool = True) -> None: # type: ignore
     r"""
     NOTE: this updates during training during the forward pass, as well as during the backward pass.
+    NOTE: disabling affine disables weight and bias
     """
     # TODO: is this ^ how it should work?
     super().__init__()
-    self.weight = torch.nn.parameter.UninitializedParameter(requires_grad=True)
-    self.bias = torch.nn.parameter.UninitializedParameter(requires_grad=True)
+    self._use_weight = affine and weight
+    self._use_bias = affine and bias
+    if self._use_weight:
+      self.weight = torch.nn.parameter.UninitializedParameter(requires_grad=True)
+    if self._use_bias:
+      self.bias = torch.nn.parameter.UninitializedParameter(requires_grad=True)
     self.eps = eps
     self.momentum = momentum
     self.first_run = True
     self.running_vals_uninitialized = True
   def reset_parameters(self):
-    self.weight.data = torch.ones_like(self.weight.data,requires_grad=True)
-    self.bias.data = torch.zeros_like(self.bias.data,requires_grad=True)
+    if self._use_weight:
+      self.weight.data = torch.ones_like(self.weight.data,requires_grad=True)
+      if self._use_bias:
+        self.bias.data = torch.zeros_like(self.bias.data,requires_grad=True)
     self.running_vals_uninitialized = True
   def forward(self, x):
     r"""
@@ -372,8 +402,10 @@ class LazyBatchNorm(torch.nn.Module):
       x_val : torch.Tensor = x.torch()
       nc = x.get_nc()
       with torch.no_grad():
-        self.weight.materialize(nc,device=x_val.device)
-        self.bias.materialize(nc,device=x_val.device)
+        if self._use_weight:
+          self.weight.materialize(nc,device=x_val.device)
+        if self._use_bias:
+          self.bias.materialize(nc,device=x_val.device)
         self.reset_parameters()
     elif self.training:
       x_val : torch.Tensor = x.torch()
@@ -396,9 +428,9 @@ class LazyBatchNorm(torch.nn.Module):
       x_mean = self.running_mean
       x_var = self.running_var
     #
-    mult = self.weight / torch.sqrt(x_var + self.eps)
     # TODO: if we can add channel wise addition broadcasting to all reference domains, we will not need to do this.
-    b = self.bias - x_mean * mult
+    mult = (self.weight if self._use_weight else 1) / torch.sqrt(x_var + self.eps)
+    b = (self.bias - x_mean * mult) if self._use_bias else (- x_mean * mult)
     output = linear(x,torch.diag(mult),b)
     return output
 class PNormalize(torch.nn.Module):
