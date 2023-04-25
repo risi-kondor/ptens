@@ -197,7 +197,7 @@ class ConvolutionalLayer_1P(torch.nn.Module):
       features = outer(F,symm_norm)
     return F
 class LazyUnite(torch.nn.Module):
-  def __init__(self, channels_out: Optional[int] = None, out_order: Optional[int] = None, bias : bool = True, reduction_type : str = "sum") -> None:
+  def __init__(self, channels_out: Optional[int] = None, out_order: Optional[int] = None, bias : bool = True, reduction_type : Literal['sum','mean'] = 'sum') -> None:
     r"""
     reduction_types: "sum" and "mean"
     leave 'out_order' and 'channels_out' as 'None' to keep same as input
@@ -348,6 +348,10 @@ class Dropout(torch.nn.Module):
       return x
 class LazyBatchNorm(torch.nn.Module):
   def __init__(self, eps: float = 1E-5, momentum: float = 0.1) -> None: # type: ignore
+    r"""
+    NOTE: this updates during training during the forward pass, as well as during the backward pass.
+    """
+    # TODO: is this ^ how it should work?
     super().__init__()
     self.weight = torch.nn.parameter.UninitializedParameter(requires_grad=True)
     self.bias = torch.nn.parameter.UninitializedParameter(requires_grad=True)
@@ -356,8 +360,8 @@ class LazyBatchNorm(torch.nn.Module):
     self.first_run = True
     self.running_vals_uninitialized = True
   def reset_parameters(self):
-    self.weight.data = torch.ones_like(self.weight.data)
-    self.bias.data = torch.zeros_like(self.bias.data)
+    self.weight.data = torch.ones_like(self.weight.data,requires_grad=True)
+    self.bias.data = torch.zeros_like(self.bias.data,requires_grad=True)
     self.running_vals_uninitialized = True
   def forward(self, x):
     r"""
@@ -370,9 +374,11 @@ class LazyBatchNorm(torch.nn.Module):
       with torch.no_grad():
         self.weight.materialize(nc,device=x_val.device)
         self.bias.materialize(nc,device=x_val.device)
+        self.reset_parameters()
     elif self.training:
       x_val : torch.Tensor = x.torch()
     if self.training:
+      self.forward_value = [x_val.detach().cpu().numpy()]
       x_mean = x_val.mean(0)
       x_var = x_val.var(0)
       if self.running_vals_uninitialized:
