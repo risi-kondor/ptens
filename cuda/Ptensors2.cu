@@ -1272,7 +1272,7 @@ namespace ptens{
     PTENS_ASSRT(R.dev==1);
     PTENS_ASSRT(x.dev==1);
     const_cast<AindexPack&>(list).to_device(1);
-    int n=cnine::roundup(std::max(R.dim_of(0,0),list.max_nix()+1),32);
+    int n=cnine::roundup(std::max(R.dim_of(0,0),list.max_nix()+1),32); // should be x.dim_of(0,2)??
     Ptensors2_broadcast0B_kernel<<<list.get_bmap().n,n,(list.max_nix()+1)*4,stream>>>
       (x.arrg+offs,x.dir.garr(dev),list.arrg,list.dir.garr(dev),R.arrg,R.dir.garr(dev),list.get_barr(1));
   }
@@ -1283,7 +1283,7 @@ namespace ptens{
     PTENS_ASSRT(R.dev==1);
     PTENS_ASSRT(x.dev==1);
     const_cast<AindexPack&>(list).to_device(1);
-    int n=cnine::roundup(std::max(R.dim_of(0,0),list.max_nix()+1),32);
+    int n=cnine::roundup(std::max(R.dim_of(0,0),list.max_nix()+1),32); // should be x.dim_of(0,2)??
     Ptensors2_broadcast0Bn_kernel<<<list.get_bmap().n,n,(list.max_nix()+1)*4,stream>>>
       (x.arrg+offs,x.dir.garr(dev),list.arrg,list.dir.garr(dev),R.arrg,R.dir.garr(dev),list.get_barr(1));
   }
@@ -1304,7 +1304,7 @@ namespace ptens{
     int dev=R.dev;
     PTENS_ASSRT(R.dev==1);
     PTENS_ASSRT(x.dev==1);
-    int n=R.dim_of(0,1);
+    int n=R.dim_of(0,1); // is this correct?
     Ptensors2_broadcast1B_kernel<<<R.size(),n,0,stream>>>(x.arrg+offs,x.dir.garr(dev),R.arrg,R.dir.garr(dev));
   }
 
@@ -1323,7 +1323,7 @@ namespace ptens{
     PTENS_ASSRT(R.dev==1);
     PTENS_ASSRT(x.dev==1);
     const_cast<AindexPack&>(list).to_device(1);
-    int n=cnine::roundup(std::max(R.dim_of(0,0),list.max_nix()+1),32);
+    int n=cnine::roundup(std::max(R.dim_of(0,0),list.max_nix()+1),32); // change dim_of?
     Ptensors2_broadcast1_kernel<<<list.get_bmap().n,n,(list.max_nix()+1)*4,stream>>>
       (x.arrg+offs,x.dir.garr(dev),list.arrg,list.dir.garr(dev),R.arrg,R.dir.garr(dev),list.get_barr(1));
   }
