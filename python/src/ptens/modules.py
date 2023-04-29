@@ -16,9 +16,9 @@ def get_edge_maps(edge_index: torch.Tensor, num_nodes: Optional[int] = None) -> 
   if num_nodes is None:
     num_nodes = int(edge_index.max().item()) + 1
   edge_ids = torch.arange(edge_index.size(1),dtype=torch.float)
-  nodes_to_edges = ptens.graph.from_edge_index(torch.stack([edge_index[1],edge_ids]),n=num_nodes,m=edge_index.size(1))
-  edges_to_nodes = ptens.graph.from_edge_index(torch.stack([edge_ids,edge_index[0]]),n=edge_index.size(1),m=num_nodes)
-  return edges_to_nodes, nodes_to_edges
+  E_to_G = ptens.graph.from_edge_index(torch.stack([edge_index[1],edge_ids]),n=num_nodes,m=edge_index.size(1))
+  G_to_E = ptens.graph.from_edge_index(torch.stack([edge_ids,edge_index[0]]),n=edge_index.size(1),m=num_nodes)
+  return E_to_G, G_to_E
 
 class MapInfo:
   r"""
@@ -63,18 +63,20 @@ class GINConv_0P(torch.nn.Module):
     super().__init__()
     self.nn = nn
     eps += 1
+    eps = [eps]
     self.eps_shifted_init = eps
     if train_eps:
-      self.register_parameter('eps',torch.nn.parameter.Parameter(torch.tensor(eps,dtype=torch.float),requires_grad=True))
+      self.eps = torch.nn.parameter.Parameter(torch.tensor(eps,dtype=torch.float),requires_grad=True)
     else:
       self.register_buffer('eps',torch.tensor(eps,dtype=torch.float))
     self.normalize_reduction = reduction_type == 'mean'
   def reset_parameters(self):
     reset_params_recursive(self.nn)
     if self.eps.requires_grad:
-      self.eps.data = torch.tensor(self.eps_shifted_init,dtype=torch.float,requires_grad=True) 
+      self.eps.data = torch.tensor(self.eps_shifted_init,dtype=torch.float,device=self.eps.device,requires_grad=True)
   def forward(self, x: ptens.ptensors0, G: ptens.graph):
-    x = self.eps * x + x.gather(G,self.normalize_reduction)
+    #x = self.eps * x + x.gather(G,self.normalize_reduction)
+    x = ptens.ptensors0.mult_channels(x,self.eps *torch.ones(x.get_nc(),device=self.eps.device)) + x.gather(G,self.normalize_reduction)
     return self.nn(x)
 
 
@@ -83,22 +85,23 @@ class GINEConv_0P(torch.nn.Module):
     super().__init__()
     self.nn = nn
     eps += 1
+    eps = [eps]
     self.eps_shifted_init = eps
     if train_eps:
-      self.register_parameter('eps',torch.nn.parameter.Parameter(torch.tensor(eps,dtype=torch.float),requires_grad=True))
+      self.eps = torch.nn.parameter.Parameter(torch.tensor(eps,dtype=torch.float),requires_grad=True)
     else:
       self.register_buffer('eps',torch.tensor(eps,dtype=torch.float))
     self.normalize_reduction = reduction_type == 'mean'
   def reset_parameters(self):
     reset_params_recursive(self.nn)
     if self.eps.requires_grad:
-      self.eps.data = torch.tensor(self.eps_shifted_init,dtype=torch.float,requires_grad=True)
+      self.eps.data = torch.tensor(self.eps_shifted_init,dtype=torch.float,device=self.eps.device,requires_grad=True)
   def forward(self, x: ptens.ptensors0, e: ptens.ptensors0, vertex_to_edge_map: ptens.graph, edge_to_vertex_map: ptens.graph):
     y : ptens.ptensors0 = x.gather(vertex_to_edge_map)
     y = y + e
-    y = y.relu(0.)
+    y = y.relu(0)
     y = y.gather(edge_to_vertex_map,self.normalize_reduction)
-    x = ptens.ptensors0.mult_channels(x,self.eps.broadcast_to(x.get_nc()))
+    x = ptens.ptensors0.mult_channels(x,self.eps *torch.ones(x.get_nc(),device=self.eps.device))
     x = x + y
     return self.nn(x)
 
