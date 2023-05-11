@@ -123,6 +123,27 @@ class Linear(torch.nn.Module):
     # TODO: figure out why multiplication is broken.
     return linear(x,self.w,torch.zeros(self.w.size(1),device=self.w.device) if self.b is None else self.b)
 
+class Linear(torch.nn.Module):
+  def __init__(self, in_channels: int,out_channels: int, bias: bool = True) -> None:
+    r"""
+    NOTE: if you do not initialize 'out_channels', it must be initialized before calling 'forward'.
+    """
+    super().__init__()
+    #This follows Glorot initialization for weights.
+    self.w = torch.nn.parameter.Parameter(torch.empty(in_channels,out_channels))
+    self.b = torch.nn.parameter.UninitializedParameter(torch.empty(out_channels)) if bias else None
+    self.out_channels = out_channels
+    self.reset_parameters()
+  def reset_parameters(self):
+    if not isinstance(self.w,torch.nn.parameter.UninitializedParameter):
+      self.w = torch.nn.init.xavier_uniform_(self.w)
+      if self.b is not None:
+        self.b = torch.nn.init.zeros_(self.b)
+  def forward(self,x: Union[ptensors0,ptensors1,ptensors2]) -> Union[ptensors0,ptensors1,ptensors2]:
+    assert x.get_nc() == self.w.size(0)
+    # TODO: figure out why multiplication is broken.
+    return linear(x,self.w,torch.zeros(self.w.size(1),device=self.w.device) if self.b is None else self.b)
+
 class LazyLinear(torch.nn.Module):
   def __init__(self,out_channels: Optional[int] = None, bias: bool = True) -> None:
     r"""
@@ -221,6 +242,30 @@ class ConvolutionalLayer_1P(torch.nn.Module):
     if not symm_norm is None:
       features = outer(F,symm_norm)
     return F
+def _get_mult_factor(in_order: Literal[0,1,2], out_order: Literal[0,1,2]) -> int:
+  return [
+    [1,1,1],
+    [1,2,5],
+    [1,5,15],
+  ][in_order][out_order]
+
+class Unite(torch.nn.Module):
+  def __init__(self, channels_in: int, channels_out: int, in_order: Literal[0,1,2], out_order: Literal[0,1,2], bias : bool = True, reduction_type : Literal['sum','mean'] = 'sum') -> None:
+    r"""
+    reduction_types: "sum" and "mean"
+    leave 'out_order' and 'channels_out' as 'None' to keep same as input
+    """
+    super().__init__()
+    self.lin = Linear(channels_in*_get_mult_factor(in_order,out_order),channels_out,bias)
+    self.use_mean = reduction_type == "mean"
+    self.unite = [lambda x, G, n: linmaps0(x,n),unite1,unite2][out_order]
+
+  def reset_parameters(self):
+    self.lin.reset_parameters()
+  def forward(self, features: Union[ptensors0,ptensors1,ptensors2], graph: graph) -> Union[ptensors0,ptensors1,ptensors2]:
+    F = self.unite(features,graph,self.use_mean)
+    F = self.lin(F)
+    return F
 class LazyUnite(torch.nn.Module):
   def __init__(self, channels_out: Optional[int] = None, out_order: Optional[int] = None, bias : bool = True, reduction_type : Literal['sum','mean'] = 'sum') -> None:
     r"""
@@ -287,6 +332,18 @@ class LazySubstructureTransport(LazyUnite):
     if domain_map is None:
       return None
     return super().forward(features,domain_map.forward_map) # type: ignore
+class Transfer(torch.nn.Module):
+  def __init__(self, in_channels: int, channels_out: int, in_order: Literal[0,1,2], out_order: Literal[0,1,2], reduction_type : Literal['mean','sum'] = "sum", bias : bool = True) -> None:
+    super().__init__()
+    self.lin = Linear(in_channels * _get_mult_factor(in_order,out_order),channels_out,bias)
+    self.use_mean = reduction_type == "mean"
+    self.transfer = [ptens.transfer0,ptens.transfer1,ptens.transfer2][out_order]
+  def reset_parameters(self):
+    self.lin.reset_parameters()
+  def forward(self, features: Union[ptensors0,ptensors1,ptensors2], target_domains: Union[List[List[int]],atomspack], graph: graph) -> Union[ptensors0,ptensors1,ptensors2]:
+    F = self.transfer(features,target_domains, graph, self.use_mean)
+    F = self.lin(F)
+    return F
 class LazyTransfer(torch.nn.Module):
   def __init__(self, channels_out: Optional[int] = None, reduction_type : str = "sum", out_order: Optional[int] = None, bias : bool = True) -> None:
     r"""
@@ -372,6 +429,53 @@ class Dropout(torch.nn.Module):
         raise NotImplementedError('Dropout not implemented for type \"' + str(type(x)) + "\"")
     else:
       return x
+class BatchNorm(torch.nn.Module):
+  def __init__(self, channels: int, eps: float = 1E-5, momentum: float = 0.1, affine : bool = True, weight: bool = True, bias: bool = True) -> None: # type: ignore
+    r"""
+    NOTE: this updates during training during the forward pass, as well as during the backward pass.
+    NOTE: disabling affine disables weight and bias
+    """
+    # TODO: is this ^ how it should work?
+    super().__init__()
+    self._use_weight = affine and weight
+    self._use_bias = affine and bias
+    if self._use_weight:
+      self.weight = torch.nn.parameter.Parameter(torch.ones(channels,requires_grad=True))
+    if self._use_bias:
+      self.bias = torch.nn.parameter.Parameter(torch.ones(channels,requires_grad=True))
+    self.running_mean = torch.empty(channels,requires_grad=False)
+    self.running_var = torch.empty(channels,requires_grad=False)
+    self.eps = eps
+    self.momentum = momentum
+    self.first_run = True
+  def reset_parameters(self):
+    if self._use_weight:
+      self.weight.data = torch.ones_like(self.weight.data,requires_grad=True)
+      if self._use_bias:
+        self.bias.data = torch.zeros_like(self.bias.data,requires_grad=True)
+    self.running_vals_uninitialized = True
+  def forward(self, x):
+    r"""
+    x can be any type of ptensors
+    """
+    if self.training:
+      x_val : torch.Tensor = x.torch()
+      if self.first_run:
+        x_mean, x_var = x_val.mean(), x_val.var()
+        self.register_buffer("running_mean",x_mean)
+        self.register_buffer("running_var",x_var)
+    elif self.first_run:
+      return x
+    else:
+      x_val : torch.Tensor = x.torch()
+      x_mean, x_var = x_val.mean(), x_val.var()
+
+    #
+    # TODO: if we can add channel wise addition broadcasting to all reference domains, we will not need to do this.
+    mult = (self.weight if self._use_weight else 1) / torch.sqrt(x_var + self.eps) #type: ignore
+    b = (self.bias - x_mean * mult) if self._use_bias else (- x_mean * mult) #type: ignore
+    output = linear(x,torch.diag(mult),b)
+    return output
 class LazyBatchNorm(torch.nn.Module):
   def __init__(self, eps: float = 1E-5, momentum: float = 0.1, affine : bool = True, weight: bool = True, bias: bool = True) -> None: # type: ignore
     r"""
