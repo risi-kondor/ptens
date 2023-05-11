@@ -123,27 +123,6 @@ class Linear(torch.nn.Module):
     # TODO: figure out why multiplication is broken.
     return linear(x,self.w,torch.zeros(self.w.size(1),device=self.w.device) if self.b is None else self.b)
 
-class Linear(torch.nn.Module):
-  def __init__(self, in_channels: int,out_channels: int, bias: bool = True) -> None:
-    r"""
-    NOTE: if you do not initialize 'out_channels', it must be initialized before calling 'forward'.
-    """
-    super().__init__()
-    #This follows Glorot initialization for weights.
-    self.w = torch.nn.parameter.Parameter(torch.empty(in_channels,out_channels))
-    self.b = torch.nn.parameter.UninitializedParameter(torch.empty(out_channels)) if bias else None
-    self.out_channels = out_channels
-    self.reset_parameters()
-  def reset_parameters(self):
-    if not isinstance(self.w,torch.nn.parameter.UninitializedParameter):
-      self.w = torch.nn.init.xavier_uniform_(self.w)
-      if self.b is not None:
-        self.b = torch.nn.init.zeros_(self.b)
-  def forward(self,x: Union[ptensors0,ptensors1,ptensors2]) -> Union[ptensors0,ptensors1,ptensors2]:
-    assert x.get_nc() == self.w.size(0)
-    # TODO: figure out why multiplication is broken.
-    return linear(x,self.w,torch.zeros(self.w.size(1),device=self.w.device) if self.b is None else self.b)
-
 class LazyLinear(torch.nn.Module):
   def __init__(self,out_channels: Optional[int] = None, bias: bool = True) -> None:
     r"""
