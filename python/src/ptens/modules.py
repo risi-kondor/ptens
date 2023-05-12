@@ -422,8 +422,8 @@ class BatchNorm(torch.nn.Module):
       self.weight = torch.nn.parameter.Parameter(torch.ones(channels,requires_grad=True))
     if self._use_bias:
       self.bias = torch.nn.parameter.Parameter(torch.ones(channels,requires_grad=True))
-    self.running_mean = torch.empty(channels,requires_grad=False)
-    self.running_var = torch.empty(channels,requires_grad=False)
+    self.register_buffer("running_mean",torch.empty(channels))
+    self.register_buffer("running_var",torch.empty(channels))
     self.eps = eps
     self.momentum = momentum
     self.first_run = True
@@ -441,8 +441,9 @@ class BatchNorm(torch.nn.Module):
       x_val : torch.Tensor = x.torch()
       if self.first_run:
         x_mean, x_var = x_val.mean(), x_val.var()
-        self.register_buffer("running_mean",x_mean)
-        self.register_buffer("running_var",x_var)
+        with torch.no_grad():
+          self.running_mean = x_mean
+          self.running_var = self.running_var
     elif self.first_run:
       return x
     else:
