@@ -76,7 +76,7 @@ class GINConv_0P(torch.nn.Module):
       self.eps.data = torch.tensor(self.eps_shifted_init,dtype=torch.float,device=self.eps.device,requires_grad=True)
   def forward(self, x: ptens.ptensors0, G: ptens.graph):
     #x = self.eps * x + x.gather(G,self.normalize_reduction)
-    x = ptens.ptensors0.mult_channels(x,self.eps *torch.ones(x.get_nc(),device=self.eps.device)) + x.gather(G,self.normalize_reduction)
+    x = x.mult_channels(self.eps *torch.ones(x.get_nc(),device=self.eps.device)) + x.gather(G,self.normalize_reduction)
     return self.nn(x)
 
 
@@ -398,14 +398,7 @@ class Dropout(torch.nn.Module):
     # TODO: replace device with device from 'x'.
     if self.training:
       dropout = 1/(1 - self.p)*(torch.rand(x.get_nc(),device=self.device_holder.device) > self.p) # type: ignore
-      if isinstance(x,ptensors0):
-        return ptensors0.mult_channels(x,dropout)
-      elif isinstance(x,ptensors1):
-        return ptensors1.mult_channels(x,dropout)
-      elif isinstance(x,ptensors2):
-        return ptensors2.mult_channels(x,dropout)
-      else:
-        raise NotImplementedError('Dropout not implemented for type \"' + str(type(x)) + "\"")
+      return x.mult_channels(dropout)
     else:
       return x
 class BatchNorm(torch.nn.Module):
