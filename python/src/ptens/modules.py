@@ -10,8 +10,6 @@ from warnings import warn
 from ptens_base import atomspack
 from ptens.functions import linear, linmaps0, outer, unite1, unite2, gather, relu, cat
 ######################################## Functions ###########################################
-
-
 def get_edge_maps(edge_index: torch.Tensor, num_nodes: Optional[int] = None) -> Tuple[ptens.graph,ptens.graph]:
   if num_nodes is None:
     num_nodes = int(edge_index.max().item()) + 1
@@ -423,10 +421,8 @@ class Reduce_1P_0P(torch.nn.Module):
     features = linmaps0(features)
     a = self.lin(features)
     return a
+  
 class GraphAttentionLayer_P0(nn.Module):
-    """
-    An implementation of GAT layer in ptens. 
-    """
     def __init__(self, in_channels: int, out_channels: int, d_prob = 0.5, leakyrelu_alpha = 0.5, relu_alpha = 0.5, concat=True):
         super(GraphAttentionLayer_P0, self).__init__()
         self.d_prob = d_prob
@@ -470,11 +466,6 @@ class GraphAttentionLayer_P0(nn.Module):
         return self.__class__.__name__ + ' (' + str(self.in_channels) + ' -> ' + str(self.out_channels) + ')'
         
 class GraphAttentionLayer_P1(nn.Module):
-    """
-    An implementation of GAT layer in ptens. 
-    """
-#   linmaps0->1: copy/ptensor by len(domain)
-#   linmaps1->0: sum/ptensor
     def __init__(self, in_channels: int, out_channels: int, d_prob: torch.float = 0.5, alpha = 0.5, cat=True):
         super(GraphAttentionLayer_P1, self).__init__()
         self.d_prob = d_prob
@@ -493,7 +484,7 @@ class GraphAttentionLayer_P1(nn.Module):
         h = ptens.linmaps0(h).torch() 
         Wh = torch.mm(h, self.W) 
         e_p1 = self._prepare_attentional_mechanism_input(Wh)                   
-        e_p0 = ptens.linmaps0(e_p1) 
+        e_p0 = ptens.linmaps0(e_p1)
         e_p0_r, e_p0_c = e_p0.torch().size()
         e_p1_r = e_p0_r + e_p1.get_nc()
 
