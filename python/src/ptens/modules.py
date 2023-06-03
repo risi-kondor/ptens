@@ -401,8 +401,20 @@ class Dropout(torch.nn.Module):
     else:
       return x
 class BatchNorm(torch.nn.BatchNorm1d):
-    def __init__(self, num_features: int, eps: float = 0.00001, momentum: float = 0.1, affine: bool = True, track_running_stats: bool = True, device=None, dtype=None) -> None:
-      super().__init__(num_features, eps, momentum, affine, track_running_stats, device, dtype)
+    @override
+    def forward(self, input: ptens.ptensors2) -> ptens.ptensors2:...
+    @override
+    def forward(self, input: ptens.ptensors1) -> ptens.ptensors1:...
+    @override
+    def forward(self, input: ptens.ptensors0) -> ptens.ptensors0:...
+
+    def forward(self, input: Union[ptens.ptensors0,ptens.ptensors1,ptens.ptensors2]) -> Union[ptens.ptensors0,ptens.ptensors1,ptens.ptensors2]:
+      if isinstance(input,ptens.ptensors0):
+        return ptens.ptensors0.from_matrix(super().forward(input.torch()),input.get_atoms())
+      elif isinstance(input,ptens.ptensors1):
+        return ptens.ptensors1.from_matrix(super().forward(input.torch()),input.get_atoms())
+      return ptens.ptensors2.from_matrix(super().forward(input.torch()),input.get_atoms())
+class LazyBatchNorm(torch.nn.LazyBatchNorm1d):
     @override
     def forward(self, input: ptens.ptensors2) -> ptens.ptensors2:...
     @override
