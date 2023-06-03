@@ -1,4 +1,5 @@
 from typing import List, Literal, Optional, Tuple, Union
+from typing_extensions import override
 import torch
 import torch.nn as nn
 from torch.nn import LeakyReLU
@@ -399,118 +400,18 @@ class Dropout(torch.nn.Module):
       return x.mult_channels(dropout)
     else:
       return x
-class BatchNorm(torch.nn.Module):
-  def __init__(self, channels: int, eps: float = 1E-5, momentum: float = 0.1, affine : bool = True, weight: bool = True, bias: bool = True) -> None: # type: ignore
-    r"""
-    NOTE: this updates during training during the forward pass, as well as during the backward pass.
-    NOTE: disabling affine disables weight and bias
-    """
-    # TODO: is this ^ how it should work?
-    super().__init__()
-    self._use_weight = affine and weight
-    self._use_bias = affine and bias
-    if self._use_weight:
-      self.weight = torch.nn.parameter.Parameter(torch.ones(channels,requires_grad=True))
-    if self._use_bias:
-      self.bias = torch.nn.parameter.Parameter(torch.ones(channels,requires_grad=True))
-    self.register_buffer("running_mean",torch.empty(channels))
-    self.register_buffer("running_var",torch.empty(channels))
-    self.eps = eps
-    self.momentum = momentum
-    self.first_run = True
-  def reset_parameters(self):
-    if self._use_weight:
-      self.weight.data = torch.ones_like(self.weight.data,requires_grad=True)
-      if self._use_bias:
-        self.bias.data = torch.zeros_like(self.bias.data,requires_grad=True)
-    self.running_vals_uninitialized = True
-  def forward(self, x):
-    r"""
-    x can be any type of ptensors
-    """
-    if self.training:
-      x_val : torch.Tensor = x.torch()
-      if self.first_run:
-        x_mean, x_var = x_val.mean(), x_val.var()
-        with torch.no_grad():
-          self.running_mean = x_mean
-          self.running_var = self.running_var
-    elif self.first_run:
-      return x
-    else:
-      x_val : torch.Tensor = x.torch()
-      x_mean, x_var = x_val.mean(), x_val.var()
+class BatchNorm(torch.nn.BatchNorm1d):
+    def __init__(self, num_features: int, eps: float = 0.00001, momentum: float = 0.1, affine: bool = True, track_running_stats: bool = True, device=None, dtype=None) -> None:
+      super().__init__(num_features, eps, momentum, affine, track_running_stats, device, dtype)
+    @override
+    def forward(self, input: ptens.ptensors2) -> ptens.ptensors2:...
+    @override
+    def forward(self, input: ptens.ptensors1) -> ptens.ptensors1:...
+    @override
+    def forward(self, input: ptens.ptensors0) -> ptens.ptensors0:...
 
-    #
-    # TODO: if we can add channel wise addition broadcasting to all reference domains, we will not need to do this.
-    mult = (self.weight if self._use_weight else 1) / torch.sqrt(x_var + self.eps) #type: ignore
-    b = (self.bias - x_mean * mult) if self._use_bias else (- x_mean * mult) #type: ignore
-    output = linear(x,torch.diag(mult),b)
-    return output
-class LazyBatchNorm(torch.nn.Module):
-  def __init__(self, eps: float = 1E-5, momentum: float = 0.1, affine : bool = True, weight: bool = True, bias: bool = True) -> None: # type: ignore
-    r"""
-    NOTE: this updates during training during the forward pass, as well as during the backward pass.
-    NOTE: disabling affine disables weight and bias
-    """
-    # TODO: is this ^ how it should work?
-    super().__init__()
-    self._use_weight = affine and weight
-    self._use_bias = affine and bias
-    if self._use_weight:
-      self.weight = torch.nn.parameter.UninitializedParameter(requires_grad=True)
-    if self._use_bias:
-      self.bias = torch.nn.parameter.UninitializedParameter(requires_grad=True)
-    self.eps = eps
-    self.momentum = momentum
-    self.first_run = True
-    self.running_vals_uninitialized = True
-  def reset_parameters(self):
-    if self._use_weight:
-      self.weight.data = torch.ones_like(self.weight.data,requires_grad=True)
-      if self._use_bias:
-        self.bias.data = torch.zeros_like(self.bias.data,requires_grad=True)
-    self.running_vals_uninitialized = True
-  def forward(self, x):
-    r"""
-    x can be any type of ptensors
-    """
-    if self.first_run:
-      self.first_run = False
-      x_val : torch.Tensor = x.torch()
-      nc = x.get_nc()
-      with torch.no_grad():
-        if self._use_weight:
-          self.weight.materialize(nc,device=x_val.device)
-        if self._use_bias:
-          self.bias.materialize(nc,device=x_val.device)
-        self.reset_parameters()
-    elif self.training:
-      x_val : torch.Tensor = x.torch()
-    if self.training:
-      self.forward_value = [x_val.detach().cpu().numpy()]
-      x_mean = x_val.mean(0)
-      x_var = x_val.var(0)
-      if self.running_vals_uninitialized:
-        self.running_vals_uninitialized = False
-        self.register_buffer("running_mean",x_mean)
-        self.register_buffer("running_var",x_var)
-      else:
-        m = self.momentum
-        with torch.no_grad():
-          self.running_mean = (1 - m) * self.running_mean + m * x_mean
-          self.running_var = (1 - m) * self.running_var + m * x_var
-    elif self.running_vals_uninitialized:
-      return x # Why would you do this...
-    else:
-      x_mean = self.running_mean
-      x_var = self.running_var
-    #
-    # TODO: if we can add channel wise addition broadcasting to all reference domains, we will not need to do this.
-    mult = (self.weight if self._use_weight else 1) / torch.sqrt(x_var + self.eps)
-    b = (self.bias - x_mean * mult) if self._use_bias else (- x_mean * mult)
-    output = linear(x,torch.diag(mult),b)
-    return output
+    def forward(self, input: Union[ptens.ptensors0,ptens.ptensors1,ptens.ptensors2]) -> Union[ptens.ptensors0,ptens.ptensors1,ptens.ptensors2]:
+      return ptens.ptensors0.from_matrix(super().forward(input.torch()),input.get_atoms())
 class PNormalize(torch.nn.Module):
   def __init__(self, p: int = 2, eps: float = 1E-5) -> None:
     super().__init__()
