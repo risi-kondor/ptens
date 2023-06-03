@@ -411,7 +411,11 @@ class BatchNorm(torch.nn.BatchNorm1d):
     def forward(self, input: ptens.ptensors0) -> ptens.ptensors0:...
 
     def forward(self, input: Union[ptens.ptensors0,ptens.ptensors1,ptens.ptensors2]) -> Union[ptens.ptensors0,ptens.ptensors1,ptens.ptensors2]:
-      return ptens.ptensors0.from_matrix(super().forward(input.torch()),input.get_atoms())
+      if isinstance(input,ptens.ptensors0):
+        return ptens.ptensors0.from_matrix(super().forward(input.torch()),input.get_atoms())
+      elif isinstance(input,ptens.ptensors1):
+        return ptens.ptensors1.from_matrix(super().forward(input.torch()),input.get_atoms())
+      return ptens.ptensors2.from_matrix(super().forward(input.torch()),input.get_atoms())
 class PNormalize(torch.nn.Module):
   def __init__(self, p: int = 2, eps: float = 1E-5) -> None:
     super().__init__()
