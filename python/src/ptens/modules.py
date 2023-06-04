@@ -414,7 +414,10 @@ class BatchNorm(torch.nn.BatchNorm1d):
       elif isinstance(input,ptens.ptensors1):
         return ptens.ptensors1.from_matrix(super().forward(input.torch()),input.get_atoms())
       return ptens.ptensors2.from_matrix(super().forward(input.torch()),input.get_atoms())
-class LazyBatchNorm(torch.nn.LazyBatchNorm1d):
+class LazyBatchNorm(torch.nn.Module):
+    def __init__(self, eps=0.00001, momentum=0.1, affine=True, track_running_stats=True, device=None, dtype=None) -> None:
+        super().__init__()
+        self.bn = torch.nn.BatchNorm1d(eps, momentum, affine, track_running_stats, device, dtype)
     @override
     def forward(self, input: ptens.ptensors2) -> ptens.ptensors2:...
     @override
@@ -424,10 +427,10 @@ class LazyBatchNorm(torch.nn.LazyBatchNorm1d):
 
     def forward(self, input: Union[ptens.ptensors0,ptens.ptensors1,ptens.ptensors2]) -> Union[ptens.ptensors0,ptens.ptensors1,ptens.ptensors2]:
       if isinstance(input,ptens.ptensors0):
-        return ptens.ptensors0.from_matrix(super().forward(input.torch()),input.get_atoms())
+        return ptens.ptensors0.from_matrix(self.bn(input.torch()),input.get_atoms())
       elif isinstance(input,ptens.ptensors1):
-        return ptens.ptensors1.from_matrix(super().forward(input.torch()),input.get_atoms())
-      return ptens.ptensors2.from_matrix(super().forward(input.torch()),input.get_atoms())
+        return ptens.ptensors1.from_matrix(self.bn(input.torch()),input.get_atoms())
+      return ptens.ptensors2.from_matrix(self.bn(input.torch()),input.get_atoms())
 class PNormalize(torch.nn.Module):
   def __init__(self, p: int = 2, eps: float = 1E-5) -> None:
     super().__init__()
