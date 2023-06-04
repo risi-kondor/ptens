@@ -417,7 +417,7 @@ class BatchNorm(torch.nn.BatchNorm1d):
 class LazyBatchNorm(torch.nn.Module):
     def __init__(self, eps=0.00001, momentum=0.1, affine=True, track_running_stats=True, device=None, dtype=None) -> None:
         super().__init__()
-        self.bn = torch.nn.BatchNorm1d(eps, momentum, affine, track_running_stats, device, dtype)
+        self.bn = torch.nn.LazyBatchNorm1d(eps, momentum, affine, track_running_stats, device, dtype)
     @override
     def forward(self, input: ptens.ptensors2) -> ptens.ptensors2:...
     @override
