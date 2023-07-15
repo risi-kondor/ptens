@@ -2,11 +2,11 @@
 Graphs
 ******
 
-One of the primary applications of permutation equivariant neural nets is the contructon of graph neural 
+One of the primary applications of permutation equivariant neural nets are graph neural 
 networks. The ``ptens.graph`` class provides the necessary functionality to build graph neural nets 
 consisting of Ptensor layers.
 
-A ``graph`` object can be initialized directly from its adjacency matrix, provided as an :math:`n \times n` 
+A ``graph`` object can be initialized directly from its adjacency matrix, represented as an :math:`n \times n` 
 dense matrix:
 
 .. code-block:: python
@@ -63,9 +63,9 @@ Neighborhoods
 =============
 
 The ``graph`` class provides some specialized functionality required by equivariant graph neural nets. 
-One feature of such networks is that thee references domains of the neurons correspond to 
+In certain classes of GNNs, the references domains of the neurons correspond to 
 the k-neighborhoods around each vertex in the graph. 
-The ``nhoods(k)`` function returns these reference domains as ``atomspack`` objects. 
+The ``nhoods(k)`` function returns these reference domains as an ``atomspack`` object. 
 
 .. code-block:: python
 
@@ -126,7 +126,7 @@ The ``edges()`` method returns the list of edges in ``G``:
  (7,4)
 
 More generally, if we define a second graph ``H``, the ``subgraphs(H)`` method finds all occurrences of ``H`` 
-in ``G`` as a subgraph as an ``atomspack``:
+in ``G`` as a subgraph and returns the result as an ``atomspack``:
 
 .. code-block:: python
 
@@ -147,7 +147,7 @@ in ``G`` as a subgraph as an ``atomspack``:
 Overlaps
 ========
 
-Given two ``atomspack`` objects, the ``overlaps(A,B)`` method creates a bipartite graph in which in which 
+Given two ``atomspack`` objects, the ``overlaps(A,B)`` method creates a bipartite graph in which 
 there is an edge from ``i`` to ``j`` if the ``i`` 'th set in ``A`` has a non-zero intersection with the 
 ``j`` 'th set in ``B``. 
 

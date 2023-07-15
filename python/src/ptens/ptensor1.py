@@ -10,7 +10,7 @@
 # original or modified form) must retain this copyright notice and 
 # must be accompanied by a verbatim copy of the license. 
 #
-#
+
 import torch
 
 import ptens_base 
@@ -25,20 +25,20 @@ import ptens.ptensor2
 class ptensor1(torch.Tensor):
 
     @classmethod
-    def zeros(self, _atoms, _nc):
-        R=ptensor1(torch.zeros(len(_atoms),_nc))
+    def zeros(self, _atoms, _nc, device='cpu'):
+        R=ptensor1(torch.zeros(len(_atoms),_nc,device))
         R.atoms=_atoms
         return R
     
     @classmethod
-    def randn(self, _atoms, _nc):
-        R=ptensor1(torch.randn(len(_atoms),_nc))
+    def randn(self, _atoms, _nc, device='cpu'):
+        R=ptensor1(torch.randn(len(_atoms),_nc,device))
         R.atoms=_atoms
         return R
 
     @classmethod
-    def sequential(self, _atoms, _nc):
-        R=ptensor1(_ptensor1.sequential(_atoms,_nc).torch())
+    def sequential(self, _atoms, _nc, device='cpu'):
+        R=ptensor1(_ptensor1.sequential(_atoms,_nc,ptens.device_id(device)).torch())
         R.atoms=_atoms
         return R
 

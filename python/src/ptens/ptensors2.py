@@ -15,6 +15,7 @@ import torch
 
 import ptens_base
 from ptens_base import ptensors2 as _ptensors2
+from ptens.utility import device_id as device_id
 
 import ptens.ptensors0 
 import ptens.ptensors1 
@@ -33,27 +34,27 @@ class ptensors2(torch.Tensor):
         return R
 
     @classmethod
-    def raw(self, _atoms, _nc, _dev=0):
+    def raw(self, _atoms, _nc, device=0):
         R=ptensors2(1)
-        R.obj=_ptensors2.raw(_atoms,_nc,_dev)
+        R.obj=_ptensors2.raw(_atoms,_nc,ptens.device_id(device))
         return R
 
     @classmethod
-    def zeros(self, _atoms, _nc, _dev=0):
+    def zeros(self, _atoms, _nc, device=0):
         R=ptensors2(1)
-        R.obj=_ptensors2.zero(_atoms,_nc,_dev)
+        R.obj=_ptensors2.zero(_atoms,_nc,ptens.device_id(device))
         return R
 
     @classmethod
-    def randn(self, _atoms, _nc, _sigma=1.0, _device=0):
+    def randn(self, _atoms, _nc, _sigma=1.0, device=0):
         R=ptensors2(1)
-        R.obj=_ptensors2.gaussian(_atoms,_nc,_sigma,ptens.device_id(_device))
+        R.obj=_ptensors2.gaussian(_atoms,_nc,_sigma,ptens.device_id(device))
         return R
 
     @classmethod
-    def sequential(self, _atoms, _nc, _dev=0):
+    def sequential(self, _atoms, _nc, device=0):
         R=ptensors2(1)
-        R.obj=_ptensors2.sequential(_atoms,_nc,_dev)
+        R.obj=_ptensors2.sequential(_atoms,_nc,ptens.device_id(device))
         return R
 
     def randn_like(self,sigma=1.0):
@@ -101,8 +102,8 @@ class ptensors2(torch.Tensor):
     def torch(self):
         return Ptensors2_toMxFn.apply(self)
 
-    def to(self, _device='cpu'):
-        return Ptensors2_toFn.apply(self,_device)
+    def to(self, device='cpu'):
+        return Ptensors2_toFn.apply(self,device)
         #self.obj.to_device(ptens.device_id(_device))
 
 

@@ -80,6 +80,11 @@ PyTorch tensor:
          [1., 1., 1., 1., 1.],
          [2., 2., 2., 2., 2.]])
 
+Similarly to individual Ptensors, Ptensor layers can be created on the GPU by adding a ``device`` 
+argument to their constructor and can be moved to/from the GPU using the ``to`` method. 
+All operations on GPU-resident layers are performed on the GPU.
+
+
 ===================
 Getters and setters
 ===================

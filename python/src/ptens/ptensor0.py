@@ -25,20 +25,20 @@ import ptens.ptensor2
 class ptensor0(torch.Tensor):
 
     @classmethod
-    def zeros(self, _atoms, _nc):
+    def zeros(self, _atoms, _nc, device='cpu'):
         R=ptensor0(torch.zeros(_nc))
         R.atoms=_atoms
         return R
     
     @classmethod
-    def randn(self, _atoms, _nc):
+    def randn(self, _atoms, _nc, device='cpu'):
         R=ptensor0(torch.randn(_nc))
         R.atoms=_atoms
         return R
 
     @classmethod
-    def sequential(self, _atoms, _nc):
-        R=ptensor0(_ptensor0.sequential(_atoms,_nc).torch())
+    def sequential(self, _atoms, _nc, device='cpu'):
+        R=ptensor0(_ptensor0.sequential(_atoms,_nc,ptens.device_id(device)).torch())
         R.atoms=_atoms
         return R
 

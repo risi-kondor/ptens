@@ -7,14 +7,14 @@ reference domain :math:`(a_1,\ldots,a_k)` is a :math:`(p+1)`'th order tensor
 :math:`A\in\mathbb{R}^{k\times k\times\ldots\times k\times c}`, where :math:`c` is the number 
 of channels. The elements of the reference domain are called `atoms`. 
 The defining property of Ptensors is that if :math:`(a_1,\ldots,a_k)` are permuted 
-by a permutation :math:`\sigma`, then :math:`A` transforms to :math:`A'` with 
+by a permutation :math:`\sigma`, then :math:`A` transforms to a Ptensor :math:`A'` with 
 
 .. math::
   A'_{i_1,\ldots,i_k,c}=A_{i_{\sigma^{-1}(1)},\ldots,i_{\sigma^{-1}(k)},c}
 
 Currently `ptens` supports zeroth, first and second order Ptensors. The corresponding classes are  
 ``ptensor0``, ``ptensor1`` and ``ptensor2``. Each of these classes is derived  
-``torch.Tensor``, allowing all the usual PyTorch arithmetic operations to be applied to PTensors. 
+``torch.Tensor``, allowing all the usual PyTorch arithmetic operations to be applied to Ptensors. 
 Note, however, that some of these operations might break equivariance. For example, changing 
 just one slice or one element of a Ptensor is generally not an equivariant 
 operation. 
@@ -102,7 +102,22 @@ For debugging purposes `ptens` also provides a ``sequential`` initializer, e.g.:
  [ 5 6 7 8 9 ]
  [ 10 11 12 13 14 ]
 
+By default Ptensors are placed on the host (CPU). To instead create the Ptensor on the 
+GPU, similarly to PyTorch, a ``device`` argument can be used:
 
+.. code-block:: python
+
+ >>> A=ptens.ptensor1.sequential([1,2,3],5,device='gpu')
+
+Furthermore, tensors can be moved back and forth between the CPU and the GPU using the ``to`` method:
+
+.. code-block:: python
+
+ >>> B=A.to('cpu')
+
+In general, if the inputs of a given operation are on the GPU, the operation will be performed on the GPU, 
+and the result is also placed on the GPU. 
+Currently, `ptens` only supports using a single GPU. 
 
 
 
