@@ -23,12 +23,6 @@ must be accompanied by a verbatim copy of the license.
 #include "RtensorPack.hpp"
 #include "AindexPack.hpp"
 #include "CSRmatrix.hpp"
-//#include "Ptensors0.hpp"
-//#include "Rtensor2_view.hpp"
-//#include "Rtensor3_view.hpp"
-//#include "Itensor1_view.hpp"
-//#include "Itensor2_view.hpp"
-//#include "CUDAhelpers.hpp"
 
 
 __global__ void Ptensors0_reduce0_kernel(float* rarr, const int* rdir, const float* xarr, const int* xdir){
@@ -66,9 +60,6 @@ __global__ void Ptensors0_broadcast0_kernel(float* xarr, const int* xdir, const 
     const float w=*reinterpret_cast<const float*>(bmap+boffs+2*j+1);
     t+=w*rarr[rdir[2*src]+c];
   }
-  //if(c==0) printf("xdir[0]=%f\n",xdir[0]);
-  //if(c==0) printf("target=%d\n",target);
-  //if(c==0) printf("%f\n",xdir[2*target]);
   xarr[xdir[2*target]+c]+=t;
 }
 
@@ -97,8 +88,6 @@ __global__ void Ptensors0_add_outer_kernel(float* rarr, const int* rdir, const f
   const int xc=threadIdx.x;
   const int yc=threadIdx.y;
   const int rc=xc*ydir[2*q+1]+yc;
-  //const int nxc=xdir[2*q+1];
-  //const int nrc=rdir[2*q+1];
 
   rarr[rdir[2*q]+rc]+=yarr[ydir[2*q]+yc]*xarr[xdir[2*q]+xc];
 }
@@ -108,9 +97,7 @@ __global__ void Ptensors0_add_outer_back0_kernel(float* xarr, const int* xdir, c
   const int q=blockIdx.x;
   const int xc=threadIdx.x;
   const int rc=xc*ydir[2*q+1];
-  //const int nxc=xdir[2*q+1];
   const int nyc=ydir[2*q+1];
-  //const int nrc=rdir[2*q+1];
 
   const float* r=rarr+rdir[2*q]+rc;
   const float* y=yarr+ydir[2*q];
@@ -171,9 +158,6 @@ namespace ptens{
     PTENS_ASSRT(R.dev==1);
     PTENS_ASSRT(x.dev==1);
     const_cast<AindexPack&>(list).to_device(1);
-    //cout<<list.get_bmap().n<<endl;
-    //cout<<R.size()<<endl;
-    //cout<<x.size()<<endl;
     Ptensors0_broadcast0_kernel<<<list.get_bmap().n,R.dim_of(0,0),0,stream>>>
       (x.arrg+offs,x.dir.garr(dev),list.arrg,list.dir.garr(dev),R.arrg,R.dir.garr(dev),list.get_barr(1));
   }

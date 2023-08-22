@@ -1,10 +1,11 @@
 pybind11::class_<cnine::RtensorPack>(m,"rtensor_pack");
 
-pybind11::class_<Ptensors0,cnine::RtensorPack>(m,"ptensors0")
+pybind11::class_<Ptensors0/*,cnine::RtensorPack*/>(m,"ptensors0")
 
-  .def(pybind11::init<const at::Tensor&>())
   .def(pybind11::init<const Ptensors0&>())
   .def(pybind11::init<const Ptensors0&, const int>())
+
+  .def(pybind11::init<const at::Tensor&>())
   .def(pybind11::init<const at::Tensor&, const AtomsPack&>())
   .def(pybind11::init<const at::Tensor&, const vector<vector<int> >& >())
 
@@ -71,7 +72,6 @@ pybind11::class_<Ptensors0,cnine::RtensorPack>(m,"ptensors0")
   .def("view_of_atoms",&Ptensors0::view_of_atoms)
 
 
-//.def("atoms_of",&Ptensors0::atoms_of)
   .def("atoms_of",[](const Ptensors0& x, const int i){return vector<int>(x.atoms_of(i));})
   .def("push_back",&Ptensors0::push_back)
 
@@ -143,9 +143,3 @@ pybind11::class_<Ptensors0,cnine::RtensorPack>(m,"ptensors0")
 
 pybind11::class_<loose_ptr<Ptensors0> >(m,"ptensors0_lptr");
 
-
-
-//.def("ReLU",[](const Ptensors0& x, const float alpha){
-//      Ptensors0 R=Ptensors0::zeros_like(x);
-//      R.add_ReLU(x,alpha);
-//      return R;})
