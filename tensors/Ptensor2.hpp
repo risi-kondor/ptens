@@ -11,6 +11,7 @@
  * must be accompanied by a verbatim copy of the license. 
  *
  */
+
 #ifndef _ptens_Ptensor2
 #define _ptens_Ptensor2
 
