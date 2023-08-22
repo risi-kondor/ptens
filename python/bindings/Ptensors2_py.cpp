@@ -1,7 +1,8 @@
-pybind11::class_<Ptensors2,cnine::RtensorPack>(m,"ptensors2")
+pybind11::class_<Ptensors2/*,cnine::RtensorPack*/>(m,"ptensors2")
 
   .def(pybind11::init<const Ptensors2&>())
   .def(pybind11::init<const Ptensors2&, const int>())
+
   .def(pybind11::init<const at::Tensor&, const AtomsPack&>())
   .def(pybind11::init<const at::Tensor&, const vector<vector<int> >&>())
 
@@ -41,11 +42,6 @@ pybind11::class_<Ptensors2,cnine::RtensorPack>(m,"ptensors2")
 
   .def("add_to_grad",[](Ptensors2& x, const int i, at::Tensor& T){
       x.get_grad().view_of_tensor(i).add(RtensorA::view(T));})
-
-//.def("device",&Ptensors2::get_device)
-//.def("to",&Ptensors2::to_device)
-//.def("to_device",&Ptensors2::to_device)
-//.def("move_to",[](Ptensors2& x, const int _dev){x.move_to_device(_dev);})
 
 
 // ---- Access ----------------------------------------------------------------------------------------------

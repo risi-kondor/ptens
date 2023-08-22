@@ -210,14 +210,14 @@ namespace ptens{
 
     #ifdef _WITH_ATEN
     Ptensors0(const at::Tensor& T):
-      RtensorPackB(rtensor(T)){
+      RtensorPackB(rtensor::regular(T)){
       assert(size()>0);
       atoms=AtomsPack(size());
       //nc=dim_of(0,0);
     }
 
     Ptensors0(const at::Tensor& T, const AtomsPack& _atoms):
-      Ptensors0(rtensor(T),_atoms){}
+      Ptensors0(rtensor::regular(T),_atoms){}
     #endif 
 
 

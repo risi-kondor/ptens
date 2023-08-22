@@ -258,10 +258,7 @@ namespace ptens{
 
     #ifdef _WITH_ATEN
     Ptensors2(const at::Tensor& T, const AtomsPack& _atoms):
-      Ptensors2(rtensor(T),_atoms){}
-    //RtensorPack(rtensor(T),_atoms.dims1(A.dim(1))), atoms(_atoms){
-    //nc=dim_of(0,0);
-    //}
+      Ptensors2(rtensor::regular(T),_atoms){}
     #endif 
 
     //rtensor view_as_matrix() const{

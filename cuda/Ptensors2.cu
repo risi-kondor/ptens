@@ -22,12 +22,6 @@ must be accompanied by a verbatim copy of the license.
 #include "Ptens_base.hpp"
 #include "RtensorPack.hpp"
 #include "AindexPack.hpp"
-//#include "Ptensors2.hpp"
-//#include "Rtensor2_view.hpp"
-//#include "Rtensor3_view.hpp"
-//#include "Itensor1_view.hpp"
-//#include "Itensor2_view.hpp"
-//#include "CUDAhelpers.hpp"
 
 
 __forceinline__ __device__ int load_indices(int* ix, const int* xiarr, const int* xidir, const int q){

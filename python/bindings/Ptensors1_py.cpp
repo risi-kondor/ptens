@@ -1,7 +1,8 @@
-pybind11::class_<Ptensors1,cnine::RtensorPack>(m,"ptensors1")
+pybind11::class_<Ptensors1/*,cnine::RtensorPack*/>(m,"ptensors1")
 
   .def(pybind11::init<const Ptensors1&>())
   .def(pybind11::init<const Ptensors1&, const int>())
+
   .def(pybind11::init<const at::Tensor&, const AtomsPack&>())
   .def(pybind11::init<const at::Tensor&, const vector<vector<int> >& >())
 
@@ -43,7 +44,6 @@ pybind11::class_<Ptensors1,cnine::RtensorPack>(m,"ptensors1")
 
 // ---- Access ----------------------------------------------------------------------------------------------
 
-//.def_readwrite("atoms",&Ptensors1::atoms)
 
   .def("get_dev",&Ptensors1::get_dev)
   .def("get_nc",&Ptensors1::get_nc)
@@ -58,7 +58,7 @@ pybind11::class_<Ptensors1,cnine::RtensorPack>(m,"ptensors1")
   .def("push_back",&Ptensors1::push_back)
 
   .def("to_device",&Ptensors1::to_device)
-//.def("move_to_device",&Ptensors1::to_device)
+  .def("move_to_device",&Ptensors1::to_device)
   .def("move_to_device_back",[](Ptensors1& x, const cnine::loose_ptr<Ptensors1>& g, const int dev){
       if(!x.grad) x.grad=new Ptensors1(g,dev);
       else x.grad->add(Ptensors1(g,dev));})
