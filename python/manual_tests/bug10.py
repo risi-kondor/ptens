@@ -12,5 +12,6 @@ x = ptens.ptensors0.from_matrix(values.cuda(),atoms)
 # It also doesn't care if we are concatenating a tensor to itself or two distinct tensors.
 # However, calling '.torch()' twice as done below is necessary.
 y = torch.cat([x.torch(),x.torch()],-1)
-y.relu().sum().backward()
+y.norm().backward()
+#y.relu().sum().backward()
 
