@@ -74,14 +74,31 @@ pybind11::class_<Ptensors1/*,cnine::RtensorPack*/>(m,"ptensors1")
 
   .def("add_mprod",[](Ptensors1& r, const Ptensors1& x, at::Tensor& y){
       r.add_mprod(x,RtensorA::view(y));})
-  .def("add_mprod_back0",[](Ptensors1& x, const Ptensors1& g, at::Tensor& M){
+  .def("add_mprod_back0",[](Ptensors1& x, const cnine::loose_ptr<Ptensors1>& g, at::Tensor& M){
       x.get_grad().add_mprod_back0(g,RtensorA::view(M));})
-  .def("mprod_back1",[](Ptensors1& x, const Ptensors1& g){
-      RtensorA R=RtensorA::zero({x.nc,g.nc},g.dev);
-      g.add_mprod_back1_to(R,x);
+  .def("mprod_back1",[](Ptensors1& x, const cnine::loose_ptr<Ptensors1>& g){
+      RtensorA R=RtensorA::zero({x.nc,g->nc},g->dev);
+      g->add_mprod_back1_to(R,x);
       return R.torch();
     })
 
+  .def("add_scale",[](Ptensors1& r, const Ptensors1& x, at::Tensor& y){
+      RtensorA Y(y);
+      Y.move_to_device(0);
+      PTENS_ASSRT(Y.ndims()==1);
+      PTENS_ASSRT(Y.dims[0]==1);
+      r.add(x,Y(0));})
+  .def("add_scale_back0",[](Ptensors1& x, const cnine::loose_ptr<Ptensors1>& g, at::Tensor& y){
+      RtensorA Y(y);
+      Y.move_to_device(0);
+      PTENS_ASSRT(Y.ndims()==1);
+      PTENS_ASSRT(Y.dims[0]==1);
+      x.get_grad().add(g,Y(0));})
+  .def("scale_back1",[](Ptensors1&x, const cnine::loose_ptr<Ptensors1>& g){
+      RtensorA R(Gdims(1));
+      R.set(0,x.inp(*g));
+      return R.move_to_device(g->dev).torch();})
+  
   .def("scale_channels",[](Ptensors1& x, at::Tensor& y){
       return x.scale_channels(RtensorA::view(y).view1());})
   .def("add_scale_channels",[](Ptensors1& r, const Ptensors1& x, at::Tensor& y){
