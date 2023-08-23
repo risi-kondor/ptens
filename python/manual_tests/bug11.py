@@ -9,10 +9,10 @@ values = torch.rand(num_nodes,channels,requires_grad=True)
 atoms = [[i] for i in range(num_nodes)]     
 m = torch.rand(channels,channels)
 
-x = ptens.ptensors0.from_matrix(values,atoms)
+x = ptens.ptensors2.from_matrix(values.cuda(),atoms)
 #y = (x*m).torch()
 
-z=torch.tensor([3.0])
+z=torch.tensor([3.0]).cuda()
 y=x.scale(z)
 
 print(x)

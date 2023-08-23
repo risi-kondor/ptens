@@ -359,7 +359,7 @@ class Ptensors0_mult_channelsFn(torch.autograd.Function):
 
     @staticmethod
     def backward(ctx,g):
-        ctx.x.add_scale_channnels_back0(ctx.r.gradp(),ctx.y)
+        ctx.x.add_scale_channels_back0(ctx.r.gradp(),ctx.y)
         return ptensors0.dummy(), None
 
 
