@@ -25,6 +25,8 @@
 #include "loose_ptr.hpp"
 #include "diff_class.hpp"
 
+#include "PtensLoggedTimer.hpp"
+
 
 namespace ptens{
 
@@ -321,6 +323,7 @@ namespace ptens{
 
     RtensorPackB reduce0() const{
       RtensorPackB R(size(),Gdims(nc),cnine::fill_zero(),dev);
+      TimedFn T("Ptensors0","::reduce0",*this);
       if(dev==0){
 	for(int i=0; i<size(); i++)
 	  R.view1_of(i).add(view_of(i));
@@ -331,6 +334,7 @@ namespace ptens{
 
     RtensorPackB reduce0(const int offs, const int n) const{
       RtensorPackB R(size(),Gdims(n),cnine::fill_zero(),dev);
+      TimedFn T("Ptensors0","::reduce0",*this);
       if(dev==0){
 	for(int i=0; i<size(); i++)
 	  R.view1_of(i).add(view_of(i,offs,n));
@@ -343,6 +347,7 @@ namespace ptens{
       int N=list.size();
       cnine::array_pool<int> dims;
       RtensorPackB R(N,Gdims(nc),cnine::fill_zero(),dev);
+      TimedFn T("Ptensors0","::reduce0",*this,list);
       if(dev==0){
 	for(int i=0; i<N; i++){
 	  if(list.nix(i)==0) continue;
@@ -356,6 +361,7 @@ namespace ptens{
     RtensorPackB reduce0(const AindexPack& list, const int offs, const int n) const{
       int N=list.size();
       RtensorPackB R(N,Gdims(nc),cnine::fill_zero(),dev);
+      TimedFn T("Ptensors0","::reduce0",*this,list);
       if(dev==0){
 	for(int i=0; i<N; i++){
 	  if(list.nix(i)==0) continue;
@@ -371,6 +377,7 @@ namespace ptens{
 
     
     void broadcast0(const RtensorPackB& x){
+      TimedFn T("Ptensors0","brcast0",*this,x);
       if(dev==0){
 	for(int i=0; i<size(); i++)
 	  view_of(i)+=x.view1_of(i);
@@ -379,6 +386,7 @@ namespace ptens{
     }
 
     void broadcast0(const RtensorPackB& x, const int offs){
+      TimedFn T("Ptensors0","brcast0",*this,x);
       if(dev==0){
 	const int n=x.dim_of(0,0);
 	for(int i=0; i<size(); i++)
@@ -388,6 +396,7 @@ namespace ptens{
     }
 
     void broadcast0(const RtensorPackB& x, const AindexPack& list){
+      TimedFn T("Ptensors0","brcast0",*this,x,list);
       if(dev==0){
 	int N=list.size();
 	for(int i=0; i<N; i++){
@@ -398,6 +407,7 @@ namespace ptens{
     }
 
     void broadcast0(const RtensorPackB& x, const AindexPack& list, const int offs){
+      TimedFn T("Ptensors0","brcast0",*this,x,list);
       if(dev==0){
 	int N=list.size();
 	const int n=x.dim_of(0,0);
@@ -414,6 +424,10 @@ namespace ptens{
 
     string classname() const{
       return "Ptensors0";
+    }
+
+    string repr() const{
+      return "<Ptensors0[N="+to_string(size())+"]>";
     }
 
     string str(const string indent="") const{
@@ -438,72 +452,3 @@ namespace ptens{
 
 #endif 
 
-    //Ptensors0* gradp(){
-    //if(!grad) grad=Ptensors0::new_zeros_like(*this);
-    //return grad;
-    //}
-
-    //Ptensors0* get_gradp(){
-    //if(!grad) grad=Ptensors0::new_zeros_like(*this);
-    //return grad;
-    //}
-
-    //Ptensors1 view_of_grad(){
-    //if(!grad) grad=new_zeros_like(*this);
-    //return grad->view();
-    //}
-    //void add_to_grad(const Ptensors0* x){
-    //if(grad) grad->add(*x);
-    //else grad=new Ptensors0(*x);
-    //}
-
-    /*
-    void add_to_grad(const Ptensors0& x){
-      if(grad) grad->add(x);
-      else grad=new Ptensors0(x);
-    }
-
-    Ptensors0& get_grad(){
-      if(!grad) grad=Ptensors0::new_zeros_like(*this);
-      return *grad;
-    }
-
-    loose_ptr<Ptensors0> get_gradp(){
-      if(!grad) grad=Ptensors0::new_zeros_like(*this);
-      return grad;
-    }
-    */
-    /*
-    void add_mprod(const Ptensors0& x, const rtensor& y){
-      PTENS_CPUONLY();
-      PTENS_ASSRT(x.size()==size());
-      if(dev==0){
-	for(int i=0; i<size(); i++)
-	  add_matmul_Ax_to(view_of(i),y.view2().transp(),x.view_of(i));
-      }else{
-	view_as_matrix().add_mprod(x.view_as_matrix(),y);
-      }
-    }
-
-    void add_mprod_back0(const Ptensors0& g, const rtensor& y){
-      PTENS_CPUONLY();
-      PTENS_ASSRT(g.size()==size());
-      if(dev==0){
-	for(int i=0; i<size(); i++)
-	  add_matmul_Ax_to(view_of(i),y.view2(),g.view_of(i));
-      }else{
-	view_as_matrix().add_Mprod_AT(g.view_as_matrix(),y);
-      }
-    }
-
-    void add_mprod_back1_to(rtensor& r, const Ptensors0& x) const{
-      PTENS_CPUONLY();
-      PTENS_ASSRT(x.size()==size());
-      if(dev==0){
-	for(int i=0; i<size(); i++)
-	  r.view2().add_outer(x.view_of(i),view_of(i));
-      }else{
-	r.add_Mprod_TA(x.view_as_matrix(),view_as_matrix());
-      }    
-    }
-    */

@@ -15,14 +15,17 @@
 #include "CnineSession.hpp"
 #include "LinmapFunctions.hpp"
 #include "MsgFunctions.hpp"
+#include "PtensSession.hpp"
 
 using namespace ptens;
 using namespace cnine;
 
+PtensSession ptens_session;
+
 
 int main(int argc, char** argv){
 
-  cnine_session session;
+  //cnine_session session;
 
   auto A=Ptensor1::sequential({0,1,2,3},1);
   cout<<A<<endl;

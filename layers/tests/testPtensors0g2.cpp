@@ -22,6 +22,9 @@
 using namespace ptens;
 using namespace cnine;
 
+PtensSession ptens_session;
+
+
 template<typename TYPE>
 Ptensors0 backward_linmap(const Ptensors0& x, const TYPE& G){
   Ptensors0 R=Ptensors0::zeros_like(x);

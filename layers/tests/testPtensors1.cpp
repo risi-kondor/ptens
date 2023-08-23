@@ -20,12 +20,14 @@
 using namespace ptens;
 using namespace cnine;
 
+PtensSession ptens_session;
+
 
 int main(int argc, char** argv){
 
-  cnine_session session;
+  //cnine_session session;
 
-  if(true){
+  if(false){
     Ptensors1 A=Ptensors1::randn({{1,2,3},{3,5},{2}},2);
     cout<<A<<endl;
     auto Ag=A.to_device(1);

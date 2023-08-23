@@ -21,6 +21,8 @@
 using namespace ptens;
 using namespace cnine;
 
+PtensSession ptens_session;
+
 
 int main(int argc, char** argv){
 

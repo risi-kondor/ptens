@@ -24,6 +24,8 @@
 #include "Ptensor2.hpp"
 #include "diff_class.hpp"
 
+#include "PtensLoggedTimer.hpp"
+
 
 namespace ptens{
 
@@ -375,6 +377,7 @@ namespace ptens{
 
 
     RtensorPackB reduce0() const{
+      TimedFn T("Ptensors2","reduce0",*this);
       RtensorPackB R(size(),Gdims(2*nc),cnine::fill_zero(),dev);
       if(dev==0){
 	for(int i=0; i<size(); i++){
@@ -387,6 +390,7 @@ namespace ptens{
     }
 
     RtensorPackB reduce0_n() const{
+      TimedFn T("Ptensors2","reduce0_n",*this);
       RtensorPackB R(size(),Gdims(2*nc),cnine::fill_zero(),dev);
       if(dev==0){
 	for(int i=0; i<size(); i++){
@@ -400,6 +404,7 @@ namespace ptens{
     }
 
     RtensorPackB reduce0(const int offs, const int n) const{
+      TimedFn T("Ptensors2","reduce0",*this);
       RtensorPackB R(size(),Gdims(n),cnine::fill_zero(),dev);
       if(dev==0){
 	for(int i=0; i<size(); i++){
@@ -412,6 +417,7 @@ namespace ptens{
     }
 
     RtensorPackB reduce0(const AindexPack& list) const{
+      TimedFn T("Ptensors2","reduce0",*this,list);
       int N=list.size();
       RtensorPackB R(N,Gdims(2*nc),cnine::fill_zero(),dev);
       if(dev==0){
@@ -426,6 +432,7 @@ namespace ptens{
     }
 
     RtensorPackB reduce0_n(const AindexPack& list) const{
+      TimedFn T("Ptensors2","reduce0_n",*this,list);
       int N=list.size();
       RtensorPackB R(N,Gdims(2*nc),cnine::fill_zero(),dev);
       if(dev==0){
@@ -441,6 +448,7 @@ namespace ptens{
     }
 
     RtensorPackB reduce0(const AindexPack& list, const int offs, const int n) const{
+      TimedFn T("Ptensors2","reduce0",*this,list);
       int N=list.size();
       RtensorPackB R(N,Gdims(n),cnine::fill_zero(),dev);
       if(dev==0){
@@ -456,6 +464,7 @@ namespace ptens{
 
 
     RtensorPackB reduce1() const{
+      TimedFn T("Ptensors2","reduce1",*this);
       cnine::array_pool<int> dims;
       for(int i=0; i<size(); i++)
 	dims.push_back(vector<int>({k_of(i),3*nc}));
@@ -472,6 +481,7 @@ namespace ptens{
     }
 
     RtensorPackB reduce1_n() const{
+      TimedFn T("Ptensors2","reduce1_n",*this);
       cnine::array_pool<int> dims;
       for(int i=0; i<size(); i++)
 	dims.push_back(vector<int>({k_of(i),3*nc}));
@@ -489,6 +499,7 @@ namespace ptens{
     }
 
     RtensorPackB reduce1(const int offs, const int n) const{
+      TimedFn T("Ptensors2","reduce1",*this);
       cnine::array_pool<int> dims;
       for(int i=0; i<size(); i++)
 	dims.push_back(vector<int>({k_of(i),n}));
@@ -505,6 +516,7 @@ namespace ptens{
     }
 
     RtensorPackB reduce1(const AindexPack& list) const{
+      TimedFn T("Ptensors2","reduce1",*this,list);
       int N=list.size();
       cnine::array_pool<int> dims;
       for(int i=0; i<N; i++)
@@ -523,6 +535,7 @@ namespace ptens{
     }
 
     RtensorPackB reduce1_n(const AindexPack& list) const{
+      TimedFn T("Ptensors2","reduce1_n",*this,list);
       int N=list.size();
       cnine::array_pool<int> dims;
       for(int i=0; i<N; i++)
@@ -542,6 +555,7 @@ namespace ptens{
     }
 
     RtensorPackB reduce1(const AindexPack& list, const int offs, const int n) const{
+      TimedFn T("Ptensors2","reduce1",*this,list);
       int N=list.size();
       cnine::array_pool<int> dims;
       for(int i=0; i<N; i++)
@@ -560,10 +574,12 @@ namespace ptens{
     }
 
     RtensorPackB reduce2() const{
+      TimedFn T("Ptensors2","reduce2",*this);
       return *this;
     }
 
     RtensorPackB reduce2(const int offs, const int n) const{ // flipping 
+      TimedFn T("Ptensors2","reduce2",*this);
       cnine::array_pool<int> dims;
       for(int i=0; i<size(); i++)
 	dims.push_back(vector<int>({k_of(i),k_of(i),n}));
@@ -579,6 +595,7 @@ namespace ptens{
     }
 
     RtensorPackB reduce2(const AindexPack& list) const{ // no flipping 
+      TimedFn T("Ptensors2","reduce2",*this,list);
       int N=list.size();
       cnine::array_pool<int> dims;
       for(int i=0; i<N; i++)
@@ -595,6 +612,7 @@ namespace ptens{
     }
 
     RtensorPackB reduce2(const AindexPack& list, const int offs, const int n) const{
+      TimedFn T("Ptensors2","reduce2",*this,list);
       int N=list.size();
       cnine::array_pool<int> dims;
       for(int i=0; i<N; i++)
@@ -616,6 +634,7 @@ namespace ptens{
 
 
     void broadcast0(const RtensorPackB& x){
+      TimedFn T("Ptensors2","brcast0",*this,x);
       const int n=x.dim_of(0,0);
       if(dev==0){
 	for(int i=0; i<size(); i++){
@@ -627,6 +646,7 @@ namespace ptens{
     }
 
     void broadcast0_n(const RtensorPackB& x){
+      TimedFn T("Ptensors2","brcast0_n",*this,x);
       const int n=x.dim_of(0,0);
       if(dev==0){
 	for(int i=0; i<size(); i++){
@@ -639,6 +659,7 @@ namespace ptens{
     }
 
     void broadcast0(const RtensorPackB& x, const int offs){
+      TimedFn T("Ptensors2","brcast0",*this,x);
       const int n=x.dim_of(0,0);
       if(dev==0){
 	for(int i=0; i<size(); i++){
@@ -650,6 +671,7 @@ namespace ptens{
     }
 
     void broadcast0(const RtensorPackB& x, const AindexPack& list){
+      TimedFn T("Ptensors2","brcast0",*this,x,list);
       int N=list.size();
       const int n=x.dim_of(0,0);
       if(dev==0){
@@ -663,6 +685,7 @@ namespace ptens{
     }
 
     void broadcast0_n(const RtensorPackB& x, const AindexPack& list){
+      TimedFn T("Ptensors2","brcast0_n",*this,x,list);
       int N=list.size();
       const int n=x.dim_of(0,0);
       if(dev==0){
@@ -679,6 +702,7 @@ namespace ptens{
     }
 
     void broadcast0(const RtensorPackB& x, const AindexPack& list, const int offs){
+      TimedFn T("Ptensors2","brcast0",*this,x,list);
       int N=list.size();
       const int n=x.dim_of(0,0);
       if(dev==0){
@@ -692,6 +716,7 @@ namespace ptens{
     }
 
     void broadcast1(const RtensorPackB& x){
+      TimedFn T("Ptensors2","brcast1",*this,x);
       if(dev==0){
 	for(int i=0; i<size(); i++){
 	  view_of(i)+=repeat0(x.view2_of(i).block(0,0,-1,nc),k_of(i));
@@ -703,6 +728,7 @@ namespace ptens{
     }
 
     void broadcast1_n(const RtensorPackB& x){
+      TimedFn T("Ptensors2","brcast1_n",*this,x);
       if(dev==0){
 	for(int i=0; i<size(); i++){
 	  view_of(i).add(repeat0(x.view2_of(i).block(0,0,-1,nc),k_of(i)),1.0/((float)k_of(i)));
@@ -715,6 +741,7 @@ namespace ptens{
     }
 
     void broadcast1(const RtensorPackB& x, const int offs){
+      TimedFn T("Ptensors2","brcast1",*this,x);
       const int n=x.dim_of(0,1);
       if(dev==0){
 	for(int i=0; i<size(); i++){
@@ -727,6 +754,7 @@ namespace ptens{
     }
 
     void broadcast1(const RtensorPackB& x, const AindexPack& list){
+      TimedFn T("Ptensors2","brcast1",*this,x,list);
       int N=list.size();
       //const int n=x.dim_of(0,1);
       if(dev==0){
@@ -741,6 +769,7 @@ namespace ptens{
     }
 
     void broadcast1_n(const RtensorPackB& x, const AindexPack& list){
+      TimedFn T("Ptensors2","brcast1_n",*this,x,list);
       int N=list.size();
       //const int n=x.dim_of(0,1);
       if(dev==0){
@@ -758,6 +787,7 @@ namespace ptens{
     }
 
     void broadcast1(const RtensorPackB& x, const AindexPack& list, const int offs){
+      TimedFn T("Ptensors2","brcast1",*this,x,list);
       int N=list.size();
       const int n=x.dim_of(0,1);
       if(dev==0){
@@ -772,6 +802,7 @@ namespace ptens{
     }
 
     void broadcast2(const RtensorPackB& x){ // no flipping
+      TimedFn T("Ptensors2","brcast2",*this,x);
       //const int n=x.dim_of(0,2);
       if(dev==0){
 	for(int i=0; i<size(); i++){
@@ -782,6 +813,7 @@ namespace ptens{
     }
 
     void broadcast2(const RtensorPackB& x, const int offs){
+      TimedFn T("Ptensors2","brcast2",*this,x);
       const int n=x.dim_of(0,2);
       if(dev==0){
 	for(int i=0; i<size(); i++){
@@ -793,6 +825,7 @@ namespace ptens{
     }
 
     void broadcast2(const RtensorPackB& x, const AindexPack& list){
+      TimedFn T("Ptensors2","brcast2",*this,x,list);
       int N=list.size();
       //const int n=x.dim_of(0,2);
       if(dev==0){
@@ -805,6 +838,7 @@ namespace ptens{
     }
 
     void broadcast2(const RtensorPackB& x, const AindexPack& list, const int offs){
+      TimedFn T("Ptensors2","brcast2",*this,x,list);
       int N=list.size();
       const int n=x.dim_of(0,2);
       if(dev==0){
@@ -823,6 +857,10 @@ namespace ptens{
 
     string classname() const{
       return "Ptensors2";
+    }
+
+    string repr() const{
+      return "<Ptensors2[N="+to_string(size())+"]>";
     }
 
     string str(const string indent="") const{
@@ -846,38 +884,4 @@ namespace ptens{
 
 
 #endif 
-    /*
-    void add_mprod(const Ptensors2& x, const rtensor& y){
-      PTENS_CPUONLY();
-      PTENS_ASSRT(x.size()==size());
-      if(dev==0){
-	for(int i=0; i<size(); i++)
-	  fused_view_of(i).add_matmul_AA(x.fused_view_of(i),y.view2());
-      }else{
-	view_as_matrix().add_mprod(x.view_as_matrix(),y);
-      }
-    }
-
-    void add_mprod_back0(const Ptensors2& g, const rtensor& y){
-      PTENS_CPUONLY();
-      PTENS_ASSRT(g.size()==size());
-      if(dev==0){
-	for(int i=0; i<size(); i++)
-	  fused_view_of(i).add_matmul_AT(g.fused_view_of(i),y.view2());
-      }else{
-	view_as_matrix().add_Mprod_AT(g.view_as_matrix(),y);
-      }
-    }
-
-    void add_mprod_back1_to(rtensor& r, const Ptensors2& x) const{
-      PTENS_CPUONLY();
-      PTENS_ASSRT(x.size()==size());
-      if(dev==0){
-	for(int i=0; i<size(); i++)
-	  r.view2().add_matmul_TA(x.fused_view_of(i),fused_view_of(i));
-      }else{
-	r.add_Mprod_TA(x.view_as_matrix(),view_as_matrix());
-      }
-    }
-    */
  

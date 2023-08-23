@@ -153,6 +153,9 @@ namespace ptens{
     }
     */
 
+    string repr() const{
+      return "<AindexPack[N="+to_string(size())+"]>";
+    }
 
     friend ostream& operator<<(ostream& stream, const AindexPack& v){
       stream<<v.str(); return stream;}

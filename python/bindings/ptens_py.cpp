@@ -24,7 +24,7 @@
 #include "OuterLayers.hpp"
 #include "ConcatLayers.hpp"
 
-ptens::PtensSession session;
+ptens::PtensSession ptens_session;
 
 PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
 

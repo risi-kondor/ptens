@@ -19,11 +19,15 @@
 #include "Ptensors1.hpp"
 #include "Ptensors2.hpp"
 
+#include "PtensLoggedTimer.hpp"
+//extern ptens::PtensSession ptens_session;
+
 
 namespace ptens{
 
   // 0 -> 0
   inline void add_linmaps(Ptensors0& r, const Ptensors0& x, const int offs=0){
+    //LoggedTimer("add linmaps ",x," -> ",r);
     r.broadcast0(x.reduce0(),offs);
   }
   inline void add_linmaps_back(Ptensors0& r, const Ptensors0& x, const int offs=0){
@@ -32,6 +36,7 @@ namespace ptens{
 
   // 0 -> 1
   inline void add_linmaps(Ptensors1& r, const Ptensors0& x, const int offs=0){
+    //LoggedTimer("add linmaps ",x," -> ",r);
     r.broadcast0(x.reduce0(),offs);
   }
   inline void add_linmaps_back(Ptensors0& r, const Ptensors1& x, const int offs=0){
@@ -40,6 +45,7 @@ namespace ptens{
 
   // 0 -> 2
   inline void add_linmaps(Ptensors2& r, const Ptensors0& x, const int offs=0){
+    //LoggedTimer("add linmaps ",x," -> ",r);
     r.broadcast0(x.reduce0(),offs);
   }
   inline void add_linmaps_back(Ptensors0& r, const Ptensors2& x, const int offs=0){
@@ -49,6 +55,7 @@ namespace ptens{
 
   // 1 -> 0
   inline void add_linmaps(Ptensors0& r, const Ptensors1& x, const int offs=0){
+    //LoggedTimer("add linmaps ",x," -> ",r);
     r.broadcast0(x.reduce0(),offs);
   }
   inline void add_linmaps_back(Ptensors1& r, const Ptensors0& x, const int offs=0){
@@ -65,19 +72,23 @@ namespace ptens{
 
   // 1 -> 1
   inline void add_linmaps(Ptensors1& r, const Ptensors1& x, const int offs=0){
+    //LoggedTimer("add linmaps ",x," -> ",r);
     r.broadcast0(x.reduce0(),offs);
     r.broadcast1(x.reduce1(),offs+x.nc);
   }
   inline void add_linmaps_back(Ptensors1& r, const Ptensors1& x, const int offs=0){
+    //LoggedTimer("add linmaps back ",x," -> ",r);
     r.broadcast0(x.reduce0(offs,r.nc));
     r.broadcast1(x.reduce1(offs+r.nc,r.nc));
   }
 
   inline void add_linmaps_n(Ptensors1& r, const Ptensors1& x, const int offs=0){
+    //LoggedTimer("add linmap_n ",x," -> ",r);
     r.broadcast0(x.reduce0_n(),offs);
     r.broadcast1(x.reduce1(),offs+x.nc);
   }
   inline void add_linmaps_back_n(Ptensors1& r, const Ptensors1& x, const int offs=0){
+    //LoggedTimer("add linmaps_n back ",x," -> ",r);
     r.broadcast0_n(x.reduce0(offs,r.nc));
     r.broadcast1(x.reduce1(offs+r.nc,r.nc));
   }
@@ -85,6 +96,7 @@ namespace ptens{
 
   // 1 -> 2
   inline void add_linmaps(Ptensors2& r, const Ptensors1& x, const int offs=0){
+    //LoggedTimer("add linmaps ",x," -> ",r);
     r.broadcast0(x.reduce0(),offs);
     r.broadcast1(x.reduce1(),offs+2*x.nc);
   }
@@ -106,6 +118,7 @@ namespace ptens{
 
   // 2 -> 0
   inline void add_linmaps(Ptensors0& r, const Ptensors2& x, const int offs=0){
+    //LoggedTimer("add linmaps ",x," -> ",r);
     r.broadcast0(x.reduce0(),offs);
   }
   inline void add_linmaps_back(Ptensors2& r, const Ptensors0& x, const int offs=0){
@@ -122,6 +135,7 @@ namespace ptens{
 
   // 2 -> 1
   inline void add_linmaps(Ptensors1& r, const Ptensors2& x, const int offs=0){
+    //LoggedTimer("add linmaps ",x," -> ",r);
     r.broadcast0(x.reduce0(),offs);
     r.broadcast1(x.reduce1(),offs+2*x.nc);
   }
@@ -142,6 +156,7 @@ namespace ptens{
 
   // 2 -> 2
   inline void add_linmaps(Ptensors2& r, const Ptensors2& x, const int offs=0){
+    //LoggedTimer("add linmaps ",x," -> ",r);
     r.broadcast0(x.reduce0(),offs);
     r.broadcast1(x.reduce1(),offs+4*x.nc);
     r.broadcast2(x.reduce2(),offs+13*x.nc);

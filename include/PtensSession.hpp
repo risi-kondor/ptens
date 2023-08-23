@@ -14,6 +14,10 @@
 #ifndef _PtensSession
 #define _PtensSession
 
+#include <fstream>
+#include <chrono>
+#include <ctime>
+
 #include "CnineSession.hpp"
 
 
@@ -22,10 +26,15 @@ namespace ptens{
   class PtensSession{
   public:
 
+    ofstream logfile;
+
     cnine::cnine_session* cnine_session=nullptr;
 
 
+
     PtensSession(const int _nthreads=1){
+
+      cnine_session=new cnine::cnine_session(_nthreads);
 
       #ifdef _WITH_CUDA
       cout<<"Initializing ptens with GPU support."<<endl;
@@ -33,14 +42,44 @@ namespace ptens{
       cout<<"Initializing ptens without GPU support."<<endl;
       #endif
 
-      cnine_session=new cnine::cnine_session(_nthreads);
 
+      logfile.open("ptens.log");
+      auto time = std::chrono::system_clock::now();
+      std::time_t timet = std::chrono::system_clock::to_time_t(time);
+      #ifdef _WITH_CUDA
+      logfile<<"Ptens session started with CUDA at "<<std::ctime(&timet)<<endl;
+      #else
+      logfile<<"Ptens session started without CUDA at "<<std::ctime(&timet)<<endl;
+      #endif 
+      
+    }
+
+    ~PtensSession(){
+
+      cout<<"Shutting down ptens."<<endl;
+      std::time_t timet = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
+      logfile<<endl<<"Ptens session shut down at "<<std::ctime(&timet)<<endl<<endl<<endl;
+      logfile.close();
+      
+      delete cnine_session;
     }
 
 
-    ~PtensSession(){
-      cout<<"Shutting down ptens."<<endl;
-      delete cnine_session;
+  public: // Logging 
+
+    void log(const string msg){
+      std::time_t timet = std::time(nullptr);
+      char os[30];
+      strftime(os,30,"%H:%M:%S ",std::localtime(&timet));
+      logfile<<os<<msg<<endl;
+    }
+    
+    template<typename OBJ>
+    void log(const string msg, const OBJ& obj){
+      std::time_t timet = std::time(nullptr);
+      char os[30];
+      strftime(os,30,"%H:%M:%S ",std::localtime(&timet));
+      logfile<<os<<msg<<obj.repr()<<endl;
     }
     
   };

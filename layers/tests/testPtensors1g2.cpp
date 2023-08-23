@@ -22,6 +22,8 @@
 using namespace ptens;
 using namespace cnine;
 
+PtensSession ptens_session;
+
 
 template<typename TYPE>
 Ptensors1 backward_linmap(const Ptensors1& x, const TYPE& g){
