@@ -370,7 +370,7 @@ class Ptensors1_linearFn(torch.autograd.Function):
         return ptensors1.dummy(), ctx.x.linear_back1(ctx.r.gradp()), ctx.x.linear_back2(ctx.r.gradp())
 
 
-class Ptensors0_scaleFn(torch.autograd.Function):
+class Ptensors1_scaleFn(torch.autograd.Function):
     
     @staticmethod
     def forward(ctx,x,y):

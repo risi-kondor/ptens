@@ -136,7 +136,7 @@ class ptensors2(torch.Tensor):
             return Ptensors2_Outer0Fn.apply(self,y)
 
     def scale(self,y):
-        return Ptensors0_scaleFn.apply(self,y)
+        return Ptensors2_scaleFn.apply(self,y)
 
     def mult_channels(self,y):
         return Ptensors2_mult_channelsFn.apply(self,y)
