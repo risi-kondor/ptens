@@ -134,6 +134,7 @@ namespace ptens{
     int dev=R.dev;
     PTENS_ASSRT(R.dev==1);
     PTENS_ASSRT(x.dev==1);
+    if(R.size()==0) return;
     Ptensors0_reduce0_kernel<<<R.size(),n,0,stream>>>(R.arrg,R.dir.garr(dev),x.arrg+offs,x.dir.garr(dev));
   }
 
@@ -142,6 +143,7 @@ namespace ptens{
     PTENS_ASSRT(R.dev==1);
     PTENS_ASSRT(x.dev==1);
     const_cast<AindexPack&>(list).to_device(1);
+    if(R.size()==0) return;
     Ptensors0_reduce0_kernel<<<R.size(),n,0,stream>>>(R.arrg,R.dir.garr(dev),x.arrg+offs,x.dir.garr(dev),list.arrg,list.dir.garr(dev),n);
   }
 
@@ -149,6 +151,7 @@ namespace ptens{
     int dev=R.dev;
     PTENS_ASSRT(R.dev==1);
     PTENS_ASSRT(x.dev==1);
+    if(R.size()==0) return;
     Ptensors0_broadcast0_kernel<<<R.size(),x.dim_of(0,0),0,stream>>>
       (x.arrg+offs,x.dir.garr(dev),R.arrg,R.dir.garr(dev));
   }
@@ -157,6 +160,7 @@ namespace ptens{
     int dev=R.dev;
     PTENS_ASSRT(R.dev==1);
     PTENS_ASSRT(x.dev==1);
+    if(list.get_bmap().n==0) return;
     const_cast<AindexPack&>(list).to_device(1);
     Ptensors0_broadcast0_kernel<<<list.get_bmap().n,R.dim_of(0,0),0,stream>>>
       (x.arrg+offs,x.dir.garr(dev),list.arrg,list.dir.garr(dev),R.arrg,R.dir.garr(dev),list.get_barr(1));
@@ -166,6 +170,7 @@ namespace ptens{
     int dev=r.dev;
     PTENS_ASSRT(r.dev==1);
     PTENS_ASSRT(x.dev==1);
+    if(r.size()==0) return;
     const_cast<cnine::CSRmatrix<float>&>(gmap).to_device(dev);
     Ptensors0_gather_kernel<<<r.size(),x.dim_of(0,0),0,stream>>>
       (r.arrg,r.dir.garr(dev),x.arrg,x.dir.garr(dev),gmap.arrg,gmap.dir.garr(dev));
@@ -179,6 +184,7 @@ namespace ptens{
     PTENS_ASSRT(x.dev==1);
     PTENS_ASSRT(y.dev==1);
     dim3 threads(x.dim_of(0,0),y.dim_of(0,0));
+    if(r.size()==0) return;
     Ptensors0_add_outer_kernel<<<r.size(),threads,0,stream>>>
       (r.arrg,r.dir.garr(dev),x.arrg,x.dir.garr(dev),y.arrg,y.dir.garr(dev));
   }
@@ -189,6 +195,7 @@ namespace ptens{
     PTENS_ASSRT(r.dev==1);
     PTENS_ASSRT(x.dev==1);
     PTENS_ASSRT(y.dev==1);
+    if(r.size()==0) return;
     Ptensors0_add_outer_back0_kernel<<<r.size(),x.dim_of(0,0),0,stream>>>
       (x.arrg,x.dir.garr(dev),r.arrg,r.dir.garr(dev),y.arrg,y.dir.garr(dev));
   }
@@ -199,6 +206,7 @@ namespace ptens{
     PTENS_ASSRT(r.dev==1);
     PTENS_ASSRT(x.dev==1);
     PTENS_ASSRT(y.dev==1);
+    if(r.size()==0) return;
     Ptensors0_add_outer_back1_kernel<<<r.size(),y.dim_of(0,0),0,stream>>>
       (y.arrg,y.dir.garr(dev),r.arrg,r.dir.garr(dev),x.arrg,x.dir.garr(dev));
   }
