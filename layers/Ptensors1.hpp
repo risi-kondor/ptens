@@ -560,7 +560,7 @@ namespace ptens{
 
     void broadcast0(const RtensorPackB& x, const int offs){
       TimedFn T("Ptensors1","brcast0",*this,x);
-      const int n=x.dim_of(0,0);
+      const int n=x.nc;
       if(dev==0){
 	for(int i=0; i<size(); i++){
 	  view_of(i,offs,n)+=repeat0(x.view1_of(i),k_of(i));
@@ -593,7 +593,7 @@ namespace ptens{
       TimedFn T("Ptensors1","brcast0",*this,x,list);
       if(dev==0){
 	int N=list.size();
-	const int n=x.dim_of(0,0);
+	const int n=x.nc;
 	for(int i=0; i<N; i++){
 	  view_of(list.tens(i),list.ix(i),offs,n)+=repeat0(x.view1_of(i),list.nix(i));
 	}
@@ -615,7 +615,7 @@ namespace ptens{
     void broadcast1(const RtensorPackB& x, const int offs){
       TimedFn T("Ptensors1","brcast1",*this,x);
       if(dev==0){
-	const int n=x.dim_of(0,1);
+	const int n=x.nc;
 	for(int i=0; i<size(); i++){
 	  view_of(i,offs,n)+=x.view2_of(i);
 	}
@@ -639,7 +639,7 @@ namespace ptens{
       TimedFn T("Ptensors1","brcast1",*this,x,list);
       if(dev==0){
 	int N=list.size();
-	const int n=x.dim_of(0,1);
+	const int n=x.nc;
 	for(int i=0; i<N; i++){
 	  if(x.dim_of(i,0)==0) continue;
 	  view_of(list.tens(i),list.ix(i),offs,n)+=x.view2_of(i);

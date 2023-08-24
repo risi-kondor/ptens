@@ -26,24 +26,24 @@
 namespace ptens{
 
   #ifdef _WITH_CUDA
-  extern void Ptensors0_add_outer_cu(cnine::RtensorPack& r, const cnine::RtensorPack& x, const cnine::RtensorPack& y, const cudaStream_t& stream);
-  extern void Ptensors0_add_outer_back0_cu(cnine::RtensorPack& x, const cnine::RtensorPack& r, const cnine::RtensorPack& y, const cudaStream_t& stream);
-  extern void Ptensors0_add_outer_back1_cu(cnine::RtensorPack& y, const cnine::RtensorPack& r, const cnine::RtensorPack& x, const cudaStream_t& stream);
+  extern void Ptensors0_add_outer_cu(cnine::RtensorPackB& r, const cnine::RtensorPackB& x, const cnine::RtensorPackB& y, const cudaStream_t& stream);
+  extern void Ptensors0_add_outer_back0_cu(cnine::RtensorPackB& x, const cnine::RtensorPackB& r, const cnine::RtensorPackB& y, const cudaStream_t& stream);
+  extern void Ptensors0_add_outer_back1_cu(cnine::RtensorPackB& y, const cnine::RtensorPackB& r, const cnine::RtensorPackB& x, const cudaStream_t& stream);
   extern void Ptensors1_add_outer10_cu(cnine::RtensorPackB& r, const cnine::RtensorPackB& x, const cnine::RtensorPackB& y, const cudaStream_t& stream);
   extern void Ptensors1_add_outer10_back0_cu(cnine::RtensorPackB& x, const cnine::RtensorPackB& r, const cnine::RtensorPackB& y, const cudaStream_t& stream);
   extern void Ptensors1_add_outer10_back1_cu(cnine::RtensorPackB& y, const cnine::RtensorPackB& r, const cnine::RtensorPackB& x, const cudaStream_t& stream);
   extern void Ptensors1_add_outer01_cu(cnine::RtensorPackB& r, const cnine::RtensorPackB& x, const cnine::RtensorPackB& y, const cudaStream_t& stream);
   extern void Ptensors1_add_outer01_back0_cu(cnine::RtensorPackB& x, const cnine::RtensorPackB& r, const cnine::RtensorPackB& y, const cudaStream_t& stream);
   extern void Ptensors1_add_outer01_back1_cu(cnine::RtensorPackB& y, const cnine::RtensorPackB& r, const cnine::RtensorPackB& x, const cudaStream_t& stream);
-  extern void Ptensors2_add_outer20_cu(cnine::RtensorPack& r, const cnine::RtensorPack& x, const cnine::RtensorPack& y, const cudaStream_t& stream);
-  extern void Ptensors2_add_outer20_back0_cu(cnine::RtensorPack& x, const cnine::RtensorPack& r, const cnine::RtensorPack& y, const cudaStream_t& stream);
-  extern void Ptensors2_add_outer20_back1_cu(cnine::RtensorPack& y, const cnine::RtensorPack& r, const cnine::RtensorPack& x, const cudaStream_t& stream);
-  extern void Ptensors2_add_outer02_cu(cnine::RtensorPack& r, const cnine::RtensorPack& x, const cnine::RtensorPack& y, const cudaStream_t& stream);
-  extern void Ptensors2_add_outer02_back0_cu(cnine::RtensorPack& x, const cnine::RtensorPack& r, const cnine::RtensorPack& y, const cudaStream_t& stream);
-  extern void Ptensors2_add_outer02_back1_cu(cnine::RtensorPack& y, const cnine::RtensorPack& r, const cnine::RtensorPack& x, const cudaStream_t& stream);
-  extern void Ptensors2_add_outer11_cu(cnine::RtensorPack& r, const cnine::RtensorPack& x, const cnine::RtensorPack& y, const cudaStream_t& stream);
-  extern void Ptensors2_add_outer11_back0_cu(cnine::RtensorPack& x, const cnine::RtensorPack& r, const cnine::RtensorPack& y, const cudaStream_t& stream);
-  extern void Ptensors2_add_outer11_back1_cu(cnine::RtensorPack& y, const cnine::RtensorPack& r, const cnine::RtensorPack& x, const cudaStream_t& stream);
+  extern void Ptensors2_add_outer20_cu(cnine::RtensorPackB& r, const cnine::RtensorPackB& x, const cnine::RtensorPackB& y, const cudaStream_t& stream);
+  extern void Ptensors2_add_outer20_back0_cu(cnine::RtensorPackB& x, const cnine::RtensorPackB& r, const cnine::RtensorPackB& y, const cudaStream_t& stream);
+  extern void Ptensors2_add_outer20_back1_cu(cnine::RtensorPackB& y, const cnine::RtensorPackB& r, const cnine::RtensorPackB& x, const cudaStream_t& stream);
+  extern void Ptensors2_add_outer02_cu(cnine::RtensorPackB& r, const cnine::RtensorPackB& x, const cnine::RtensorPackB& y, const cudaStream_t& stream);
+  extern void Ptensors2_add_outer02_back0_cu(cnine::RtensorPackB& x, const cnine::RtensorPackB& r, const cnine::RtensorPackB& y, const cudaStream_t& stream);
+  extern void Ptensors2_add_outer02_back1_cu(cnine::RtensorPackB& y, const cnine::RtensorPackB& r, const cnine::RtensorPackB& x, const cudaStream_t& stream);
+  extern void Ptensors2_add_outer11_cu(cnine::RtensorPackB& r, const cnine::RtensorPackB& x, const cnine::RtensorPackB& y, const cudaStream_t& stream);
+  extern void Ptensors2_add_outer11_back0_cu(cnine::RtensorPackB& x, const cnine::RtensorPackB& r, const cnine::RtensorPackB& y, const cudaStream_t& stream);
+  extern void Ptensors2_add_outer11_back1_cu(cnine::RtensorPackB& y, const cnine::RtensorPackB& r, const cnine::RtensorPackB& x, const cudaStream_t& stream);
   #endif
 
 

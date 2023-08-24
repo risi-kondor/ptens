@@ -32,10 +32,10 @@ namespace ptens{
 
 
   #ifdef _WITH_CUDA
-  extern void Ptensors0_reduce0_cu(cnine::RtensorPack& R,const cnine::RtensorPack& x, int offs, int n, const cudaStream_t& stream);
-  extern void Ptensors0_reduce0_cu(cnine::RtensorPack& R, const cnine::RtensorPack& x, const AindexPack& list, int offs, int n, const cudaStream_t& stream);
-  extern void Ptensors0_broadcast0_cu(cnine::RtensorPack& R, const cnine::RtensorPack& x, const int offs, const cudaStream_t& stream);
-  extern void Ptensors0_broadcast0_cu(cnine::RtensorPack& R, const cnine::RtensorPack& x, const AindexPack& list, const int offs, const cudaStream_t& stream);
+  extern void Ptensors0_reduce0_cu(cnine::RtensorPackB& R,const cnine::RtensorPackB& x, int offs, int n, const cudaStream_t& stream);
+  extern void Ptensors0_reduce0_cu(cnine::RtensorPackB& R, const cnine::RtensorPackB& x, const AindexPack& list, int offs, int n, const cudaStream_t& stream);
+  extern void Ptensors0_broadcast0_cu(cnine::RtensorPackB& R, const cnine::RtensorPackB& x, const int offs, const cudaStream_t& stream);
+  extern void Ptensors0_broadcast0_cu(cnine::RtensorPackB& R, const cnine::RtensorPackB& x, const AindexPack& list, const int offs, const cudaStream_t& stream);
   #endif
 
 
@@ -388,7 +388,7 @@ namespace ptens{
     void broadcast0(const RtensorPackB& x, const int offs){
       TimedFn T("Ptensors0","brcast0",*this,x);
       if(dev==0){
-	const int n=x.dim_of(0,0);
+	const int n=x.nc;
 	for(int i=0; i<size(); i++)
 	  view_of(i,offs,n).add(x.view1_of(i));
       }
@@ -410,7 +410,7 @@ namespace ptens{
       TimedFn T("Ptensors0","brcast0",*this,x,list);
       if(dev==0){
 	int N=list.size();
-	const int n=x.dim_of(0,0);
+	const int n=x.nc;
 	for(int i=0; i<N; i++)
 	  view_of(list.tens(i),list.ix(i),offs,n)+=x.view1_of(i);
       }
