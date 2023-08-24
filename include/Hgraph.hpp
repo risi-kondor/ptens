@@ -240,6 +240,14 @@ namespace ptens{
       return n;
     }
 
+    int nedges() const{
+      int t=0;
+      for(auto q:lists)
+	if(q.second->size()>0)
+	  t+=q.second->size();
+      return t;
+    }
+
     void insert(const Hgraph& H, vector<int> v){
       for(auto p:v)
 	PTENS_ASSRT(p<n);
@@ -361,7 +369,7 @@ namespace ptens{
 	  Atoms in=inputs[j];
 	  Atoms out=outputs[i];
 	  Atoms common=out.intersect(in);
-	  auto p=out(common);
+	  //auto p=out(common);
 	  in_indices.push_back(j,in(common));
 	  out_indices.push_back(i,out(common));
 	}, self);
@@ -469,141 +477,4 @@ namespace std{
 
 
 #endif
-
-
-   /*
-    AindexPack all_subgraphs_isomorphic_to(const Hgraph& H      
-      tforest matches;
-      tnode S=H.greedy_spanning_tree();
-      auto traversal=S.indexed_depth_first_traversal();
-      vector<int> assignment(traversal.size(),-1);
-
-      for(int i=0; i<n; i++){
-	tnode* T=new tnode(i);
-	matches.push_back(T);
-	if(!complete_match(*T,matches,traversal,assignment)){
-	  delete T;
-	  matches.pop_back();
-	}
-      }
-
-      AindexPack R;
-      for(auto p:matches)
-	p->forall_maximal_paths([&](const vector<int>& x){
-	    R.push_back(x);});
-      return R;
-    }
-
-    
-    // try to match next vertex in traversal to w
-    bool complete_match(tnode& node, const tforest& matches, 
-      const vector<int>& traversal, vector<int> assignment, int m){
-
-      PTENS_ASSRT(m<traversal.size());
-      const int v=traversal[m].first;
-
-      for(auto& p:H.row(v)){
-	if(assignment[p.first]==-1) continue;
-	if(p.second!=(*this)(w,assignment[p.first])) return;
-      }
-      for(auto& p:row(w)){
-	auto it=std::find(assignment.begin(),assignment.end(),p.first);
-	if(it==assignment.end()) return;
-	if(p.second!=H(v,traversal[it-assignment.begin()])) return;
-      }
-
-      assignment[v]=w;
-      if(m==traversal.size()-1)
-	return !T.contains_some_permutation_of(assignment));
-
-      //const int newv=traversal[m+1].first;
-      const int parentv=traversal[traversal[m+1].second];
-      const int parentw=assignment[parentv];
-
-      // try to match next vertex in traversal to each neighbor of parentw  
-      for(auto& p:row(parentw)){
-	if(std::find(assignment.begin(),assignment.end(),p.first)!=assignment.end()) continue;
-	auto subtree=match(traversal,assignment,p.first,m+1);
-	if(subtree!=nullptr) R.children[p.first]=subtree;
-      }
-      if(R.children.size()>0) return R;
-
-      delete R;
-      return nullptr;
-    }
-    */
-
-    /*
-    AindexPack subgraphs(const Hgraph& H){
-      
-      PrefixTree T;
-      PrefixTree S=H.greedy_spanning_tree(0);
-      auto traversal=S.indexed_depth_first_traversal(0);
-      //vector<int> traversal({0});
-      //S.depth_first_traversal([&](const int i){traversal.push_back(i);});
-
-      for(int i=0; i<n; i++){
-	vector<int> assignment(traversal.size(),-1);
-	PrefixTree* sub=match(traversal,assignment,i,0);
-	if(sub!=nullptr) T.children[i]=sub;
-      }
-
-      AindexPack R;
-      T.forall_maximal_paths([&](const vector<int>& x){
-	  int n=x.size()
-	  assert(df.size()==n);
-	  vector<int> r(n);
-	  for(int i=0; i<n; i++)
-	    v[df[i]]=x[i];
-	  R.push_back(r);
-	});
-      return R;
-    }
-
-
-    // try to match next vertex in traversal to w
-    PrefixTree* match(const PrefixTree* root, const vector<int>& traversal, vector<int> assignment, 
-      PrefixTree* parent, const int w, const int m){
-      PTENS_ASSRT(m<traversal.size());
-      const int v=traversal[m].first;
-
-      for(auto& p:H.row(v)){
-	if(assignment[p.first]==-1) continue;
-	if(p.second!=(*this)(w,assignment[p.first])) return;
-      }
-      for(auto& p:row(w)){
-	auto it=std::find(assignment.begin(),assignment.end(),p.first);
-	if(it==assignment.end()) return;
-	if(p.second!=H(v,traversal[it-assignment.begin()])) return;
-      }
-
-      assignment[v]=w;
-      if(m==traversal.size()-1){
-	if(!T.contains_some_permutation_of(vertices)) parent[w]=new PrefixTree(); 
-	return;
-      }
-
-      //const int newv=traversal[m+1].first;
-      const int parentv=traversal[traversal[m+1].second];
-      const int parentw=assignment[parentv];
-
-      // try to match next vertex in traversal to each neighbor of parentw  
-      PrefixTree* R=new PrefixTree();
-      
-      for(auto& p:row(parentw)){
-	if(std::find(assignment.begin(),assignment.end(),p.first)!=assignment.end()) continue;
-	auto subtree=match(traversal,assignment,p.first,m+1);
-	if(subtree!=nullptr) R.children[p.first]=subtree;
-      }
-      if(R.children.size()>0) return R;
-
-      delete R;
-      return nullptr;
-    }
-    */
-    //const cnine::GatherMap& get_bmap() const{
-    //if(!bmap) bmap=new cnine::GatherMap(broadcast_map());
-    //return *bmap;
-    //}
-
 
