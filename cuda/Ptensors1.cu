@@ -20,7 +20,7 @@ must be accompanied by a verbatim copy of the license.
 #include <thrust/tuple.h>
 
 #include "Ptens_base.hpp"
-#include "RtensorPack.hpp"
+#include "RtensorPackB.hpp"
 #include "AindexPack.hpp"
 
 
@@ -612,7 +612,7 @@ namespace ptens{
     PTENS_ASSRT(x.dev==1);
     PTENS_ASSRT(y.dev==1);
     if(r.size()==0) return;
-    dim3 threads(x.dim_of(0,1),y.dim_of(0,0));
+    dim3 threads(x.nc,y.nc);
     Ptensors1_add_outer10_kernel<<<r.size(),threads,0,stream>>>
       (r.arrg,r.dir.garr(dev),x.arrg,x.dir.garr(dev),y.arrg,y.dir.garr(dev));
   }
@@ -624,7 +624,7 @@ namespace ptens{
     PTENS_ASSRT(x.dev==1);
     PTENS_ASSRT(y.dev==1);
     if(r.size()==0) return;
-    Ptensors1_add_outer10_back0_kernel<<<r.size(),x.dim_of(0,1),0,stream>>>
+    Ptensors1_add_outer10_back0_kernel<<<r.size(),x.nc,0,stream>>>
       (x.arrg,x.dir.garr(dev),r.arrg,r.dir.garr(dev),y.arrg,y.dir.garr(dev));
   }
 
@@ -635,7 +635,7 @@ namespace ptens{
     PTENS_ASSRT(x.dev==1);
     PTENS_ASSRT(y.dev==1);
     if(r.size()==0) return;
-    Ptensors1_add_outer10_back1_kernel<<<r.size(),y.dim_of(0,0),0,stream>>>
+    Ptensors1_add_outer10_back1_kernel<<<r.size(),y.nc,0,stream>>>
       (y.arrg,y.dir.garr(dev),r.arrg,r.dir.garr(dev),x.arrg,x.dir.garr(dev));
   }
 
@@ -648,7 +648,7 @@ namespace ptens{
     PTENS_ASSRT(x.dev==1);
     PTENS_ASSRT(y.dev==1);
     if(r.size()==0) return;
-    dim3 threads(x.dim_of(0,0),y.dim_of(0,1));
+    dim3 threads(x.nc,y.nc);
     Ptensors1_add_outer01_kernel<<<r.size(),threads,0,stream>>>
       (r.arrg,r.dir.garr(dev),x.arrg,x.dir.garr(dev),y.arrg,y.dir.garr(dev));
   }
@@ -660,7 +660,7 @@ namespace ptens{
     PTENS_ASSRT(x.dev==1);
     PTENS_ASSRT(y.dev==1);
     if(r.size()==0) return;
-    Ptensors1_add_outer01_back0_kernel<<<r.size(),x.dim_of(0,0),0,stream>>>
+    Ptensors1_add_outer01_back0_kernel<<<r.size(),x.nc,0,stream>>>
       (x.arrg,x.dir.garr(dev),r.arrg,r.dir.garr(dev),y.arrg,y.dir.garr(dev));
   }
 
@@ -671,7 +671,7 @@ namespace ptens{
     PTENS_ASSRT(x.dev==1);
     PTENS_ASSRT(y.dev==1);
     if(r.size()==0) return;
-    Ptensors1_add_outer01_back1_kernel<<<r.size(),y.dim_of(0,1),0,stream>>>
+    Ptensors1_add_outer01_back1_kernel<<<r.size(),y.nc,0,stream>>>
       (y.arrg,y.dir.garr(dev),r.arrg,r.dir.garr(dev),x.arrg,x.dir.garr(dev));
   }
 
