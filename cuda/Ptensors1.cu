@@ -20,7 +20,7 @@ must be accompanied by a verbatim copy of the license.
 #include <thrust/tuple.h>
 
 #include "Ptens_base.hpp"
-#include "RtensorPackBB.hpp"
+#include "RtensorPackB.hpp"
 #include "AindexPack.hpp"
 
 

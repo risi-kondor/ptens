@@ -24,7 +24,7 @@
 namespace ptens{
 
   #ifdef _WITH_CUDA
-  extern void Ptensors0_gather_cu(cnine::RtensorPack& R,const cnine::RtensorPack& x, const cnine::CSRmatrix<float>& gmap, const cudaStream_t& stream);
+  extern void Ptensors0_gather_cu(cnine::RtensorPackB& R,const cnine::RtensorPackB& x, const cnine::CSRmatrix<float>& gmap, const cudaStream_t& stream);
   #endif 
 
 
