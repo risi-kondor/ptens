@@ -28,6 +28,8 @@ namespace ptens{
   public:
 
     int _max_nix=0;
+    int count1=0;
+    int count2=0;
 
     //cnine::GatherMap const* bmap=nullptr; // hack
     std::shared_ptr<cnine::GatherMap> bmap;
@@ -46,12 +48,16 @@ namespace ptens{
       array_pool<int>(x){
       bmap=x.bmap;
       _max_nix=x._max_nix;
+      count1=x.count1;
+      count2=x.count2;
     }
 
     AindexPack(AindexPack&& x):
       array_pool<int>(std::move(x)){
       bmap=x.bmap; x.bmap=nullptr;
       _max_nix=x._max_nix;
+      count1=x.count1;
+      count2=x.count2;
     }
 
     AindexPack& operator=(const AindexPack& x)=delete;

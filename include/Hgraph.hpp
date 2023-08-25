@@ -240,6 +240,13 @@ namespace ptens{
       return n;
     }
 
+    bool is_empty() const{
+      for(auto q:lists)
+	if(q.second->size()>0)
+	  return false;
+      return true;
+    }
+
     int nedges() const{
       int t=0;
       for(auto q:lists)
@@ -369,9 +376,17 @@ namespace ptens{
 	  Atoms in=inputs[j];
 	  Atoms out=outputs[i];
 	  Atoms common=out.intersect(in);
-	  //auto p=out(common);
-	  in_indices.push_back(j,in(common));
-	  out_indices.push_back(i,out(common));
+	  //in_indices.push_back(j,in(common));
+	  //out_indices.push_back(i,out(common));
+	  auto _in=in(common);
+	  auto _out=out(common);
+	  in_indices.push_back(j,_in);
+	  out_indices.push_back(i,_out);
+	  in_indices.count1+=_in.size();
+	  in_indices.count2+=_in.size()*_in.size();
+	  out_indices.count1+=_out.size();
+	  out_indices.count2+=_out.size()*_out.size();
+	    
 	}, self);
       //out_indices.bmap=new cnine::GatherMap(get_bmap());
       if(!bmap) bmap=std::shared_ptr<cnine::GatherMap>(new cnine::GatherMap(broadcast_map())); 

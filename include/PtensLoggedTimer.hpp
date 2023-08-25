@@ -34,6 +34,13 @@ namespace ptens{
     int n_ops=0;
     chrono::time_point<chrono::system_clock> t0;
 
+    ~LoggedTimer(){
+      auto elapsed=chrono::duration<double,std::milli>(chrono::system_clock::now()-t0).count();
+      if(n_ops>0) ptens_session.log(task+" "+to_string(elapsed)+" ms"+" ["+to_string((int)(((float)n_ops)/elapsed/1000.0))+" Mflops]");
+      else ptens_session.log(task+" "+to_string(elapsed)+" ms");
+    }
+
+
     LoggedTimer(string _task=""):
       task(_task){
       t0=chrono::system_clock::now();
@@ -104,14 +111,6 @@ namespace ptens{
     }
 
 
-
-
-    ~LoggedTimer(){
-      auto elapsed=chrono::duration<double,std::milli>(chrono::system_clock::now()-t0).count();
-      if(n_ops>0) ptens_session.log(task+" "+to_string(elapsed)+" ms"+" ["+to_string((int)(((float)n_ops)/elapsed/1000.0))+" Mflops]");
-      else ptens_session.log(task+" "+to_string(elapsed)+" ms");
-    }
-
   };
 
 
@@ -129,6 +128,20 @@ namespace ptens{
     template<typename OBJ0, typename OBJ1, typename OBJ2>
     TimedFn(string cl, string fn, const OBJ0& obj0, const OBJ1& obj1, const OBJ2& obj2):
       LoggedTimer(cl+"::"+fn+"("+obj0.repr()+","+obj1.repr()+","+obj2.repr()+")"){}
+
+
+    template<typename OBJ0>
+    TimedFn(string cl, string fn, const OBJ0& obj0, const int count):
+      LoggedTimer(cl+"::"+fn+"("+obj0.repr()+")"+" [n="+to_string(count)+"]",count){}
+
+    template<typename OBJ0, typename OBJ1>
+    TimedFn(string cl, string fn, const OBJ0& obj0, const OBJ1& obj1, const int count):
+      LoggedTimer(cl+"::"+fn+"("+obj0.repr()+","+obj1.repr()+")"+" [n="+to_string(count)+"]",count){}
+
+    template<typename OBJ0, typename OBJ1, typename OBJ2>
+    TimedFn(string cl, string fn, const OBJ0& obj0, const OBJ1& obj1, const OBJ2& obj2, const int count):
+      LoggedTimer(cl+"::"+fn+"("+obj0.repr()+","+obj1.repr()+","+obj2.repr()+")"+" [n="+to_string(count)+"]",count){}
+
 
   };
 
