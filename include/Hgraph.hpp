@@ -24,19 +24,14 @@
 #include "labeled_tree.hpp"
 #include "map_of_lists.hpp"
 
-//#include <chrono>
-
 
 namespace ptens{
-
-  //class HgraphSubgraphListCache;
 
 
   class Hgraph: public cnine::SparseRmatrix{
   public:
 
     typedef cnine::SparseRmatrix BaseMatrix;
-
     typedef cnine::labeled_tree<int> labeled_tree;
     typedef cnine::RtensorA RtensorA;
 
@@ -68,6 +63,9 @@ namespace ptens{
   public: // ---- Constructors -------------------------------------------------------------------------------
 
 
+    Hgraph():
+      Hgraph(0){};
+
     Hgraph(const int _n):
       Hgraph(_n,_n){}
 
@@ -97,6 +95,17 @@ namespace ptens{
 	set(p.first,p.second,1.0);
 	set(p.second,p.first,1.0);
       }
+    }
+
+    Hgraph(const cnine::RtensorA& M, int n):
+      Hgraph(n){
+      PTENS_ASSRT(M.ndims()==2);
+      PTENS_ASSRT(M.get_dim(0)==2);
+      //if(n==-1) n=M.max()+1;else 
+      PTENS_ASSRT(M.max()<n);
+      int nedges=M.get_dim(1);
+      for(int i=0; i<nedges; i++)
+	set(M(0,i),M(1,i),1.0);
     }
 
 
@@ -465,6 +474,9 @@ namespace ptens{
       if(is_labeled) oss<<labels.str(indent+"  ")<<endl;
       return oss.str();
     }
+
+    friend ostream& operator<<(ostream& stream, const Hgraph& x){
+      stream<<x.str(); return stream;}
 
   };
 

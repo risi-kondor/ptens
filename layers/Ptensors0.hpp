@@ -67,6 +67,8 @@ namespace ptens{
   public: // ----- Constructors ------------------------------------------------------------------------------
 
 
+    Ptensors0(){}
+
     Ptensors0(const int _nc, const int _dev=0):
       RtensorPackB(1,_nc,_dev)/*, nc(_nc)*/{}
 
@@ -239,6 +241,10 @@ namespace ptens{
   public: // ---- Access -------------------------------------------------------------------------------------
 
 
+    int getn() const{
+      return size();
+    }
+
     //int get_nc() const{
     //return nc;
     //}
@@ -328,6 +334,7 @@ namespace ptens{
 	for(int i=0; i<size(); i++)
 	  R.view1_of(i).add(view_of(i));
       }
+
       GPUCODE(CUDA_STREAM(Ptensors0_reduce0_cu(R,*this,0,nc,stream)));
       return R;
     }

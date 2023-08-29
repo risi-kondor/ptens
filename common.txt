@@ -10,6 +10,8 @@ CNINE_INCLUDES+=-I$(CNINE_ROOT)/objects/scalar -I$(CNINE_ROOT)/objects/matrix -I
 CNINE_INCLUDES+=-I$(CNINE_ROOT)/objects/tensor_views -I$(CNINE_ROOT)/objects/tensor_array 
 CNINE_INCLUDES+=-I$(CNINE_ROOT)/objects/backendA -I$(CNINE_ROOT)/objects/backendB 
 CNINE_INCLUDES+=-I$(CNINE_ROOT)/objects/tensor_array/cell_maps -I$(CNINE_ROOT)/objects/tensor_array/cell_ops 
+CNINE_INCLUDES+=-I$(CNINE_ROOT)/objects/ntensor 
+CNINE_INCLUDES+=-I$(CNINE_ROOT)/objects/ntensor/functions 
 
 CNINE_INCLUDEDIR=$(CNINE_ROOT)/include
 CNINE_CUDADIR=$(CNINE_ROOT)/cuda
@@ -19,7 +21,7 @@ CUDADIR=$(ROOTDIR)/cuda
 TENSORSDIR=$(ROOTDIR)/tensors
 LAYERSDIR=$(ROOTDIR)/layers
 
-CFLAGS= -std=c++14 -O3 # -ferror-limit=1  
+CFLAGS= -std=c++17 -O3 # -ferror-limit=1  
 INCLUDE= -I $(ROOTDIR)/include 
 LIBS= -lstdc++ -lm -lpthread 
 

@@ -17,8 +17,13 @@
 #include <fstream>
 #include <chrono>
 #include <ctime>
+#include <unordered_set>
 
 #include "CnineSession.hpp"
+#include "object_bank.hpp"
+
+#include "Ptens_base.hpp"
+#include "SubgraphObj.hpp"
 
 
 namespace ptens{
@@ -26,10 +31,12 @@ namespace ptens{
   class PtensSession{
   public:
 
-    ofstream logfile;
-
     cnine::cnine_session* cnine_session=nullptr;
 
+    ofstream logfile;
+    //cnine::object_bank<Subgraph,SubgraphObj> subgraph_bank([]
+    //(const Subgraph& x){return new SubgraphObj(x);});
+    std::unordered_set<SubgraphObj> subgraphs;
 
 
     PtensSession(const int _nthreads=1){

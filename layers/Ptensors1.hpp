@@ -83,6 +83,10 @@ namespace ptens{
       RtensorPackB(2,_nc,_dev), /*nc(_nc),*/ atoms(_atoms){
     }
 
+    //template<typename FILLTYPE, typename = typename std::enable_if<std::is_base_of<cnine::fill_pattern, FILLTYPE>::value, FILLTYPE>::type>
+    Ptensors1(const AtomsPack& _atoms, const int _nc, const cnine::fill_zero& dummy, const int _dev=0):
+      Ptensors1(zero(_atoms,_nc,_dev)){}
+
     template<typename FILLTYPE, typename = typename std::enable_if<std::is_base_of<cnine::fill_pattern, FILLTYPE>::value, FILLTYPE>::type>
     Ptensors1(const int _n, const int _k, const int _nc, const FILLTYPE& dummy, const int _dev=0):
       RtensorPackB(_n,{_k,_nc},dummy,_dev), atoms(_n,_k) /*, nc(_nc)*/{}
@@ -189,16 +193,14 @@ namespace ptens{
     Ptensors1(const Ptensors1& x):
       RtensorPackB(x),
       cnine::diff_class<Ptensors1>(x),
-      atoms(x.atoms)
-      /*,nc(x.nc)*/{
+      atoms(x.atoms){
       PTENS_COPY_WARNING();
     }
 	
     Ptensors1(Ptensors1&& x):
       RtensorPackB(std::move(x)),
       cnine::diff_class<Ptensors1>(std::move(x)),
-      atoms(std::move(x.atoms))
-      /*,nc(x.nc)*/{
+      atoms(std::move(x.atoms)){
       PTENS_MOVE_WARNING();
     }
 
@@ -669,6 +671,7 @@ namespace ptens{
 	return y.str();
       }
       ostringstream oss;
+      //oss<<atoms<<endl;
       for(int i=0; i<size(); i++){
 	oss<<indent<<(*this)(i)<<endl;
 	//oss<<indent<<"Ptensor "<<i<<" "<<Atoms(atoms(i))<<":"<<endl;

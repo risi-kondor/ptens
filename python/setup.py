@@ -53,13 +53,14 @@ def main():
                      cwd + cnine_folder + '/objects/tensor_array/cell_maps',
                      cwd + cnine_folder + '/objects/tensor_array/cell_ops',
                      cwd + cnine_folder + '/objects/ntensor',
+                     cwd + cnine_folder + '/objects/ntensor/functions',
                      cwd + '/../include',
                      cwd + '/../tensors',
                      cwd + '/../layers'
                      ]
 
 
-    _cxx_compile_args = ['-std=c++14',
+    _cxx_compile_args = ['-std=c++17',
                          '-Wno-sign-compare',
                          '-Wno-deprecated-declarations',
                          '-Wno-unused-variable',

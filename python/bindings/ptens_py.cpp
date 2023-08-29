@@ -7,6 +7,8 @@
 #include "PtensSession.hpp"
 
 #include "Hgraph.hpp"
+#include "Ggraph.hpp"
+#include "Subgraph.hpp"
 #include "Ptensor0.hpp"
 #include "Ptensor1.hpp"
 #include "Ptensor2.hpp"
@@ -24,7 +26,13 @@
 #include "OuterLayers.hpp"
 #include "ConcatLayers.hpp"
 
-ptens::PtensSession ptens_session;
+#include "SubgraphLayer0.hpp"
+#include "SubgraphLayer1.hpp"
+
+
+namespace ptens{ 
+  PtensSession ptens_session;
+}
 
 PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
 
@@ -36,6 +44,8 @@ PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
 
   #include "AtomsPack_py.cpp"
   #include "Hgraph_py.cpp"
+  #include "Ggraph_py.cpp"
+  #include "Subgraph_py.cpp"
 
   #include "Ptensor0_py.cpp"
   #include "Ptensor1_py.cpp"
@@ -48,5 +58,7 @@ PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
   #include "LinmapFunctions_py.cpp"
   #include "MsgFunctions_py.cpp"
   #include "OuterFunctions_py.cpp"
+
+  #include "SubgraphLayer0_py.cpp"
 
 }

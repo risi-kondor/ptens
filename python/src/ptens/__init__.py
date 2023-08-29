@@ -36,6 +36,11 @@ from ptens.ptensors1 import ptensors1 as ptensors1
 from ptens.ptensors2 import ptensors2 as ptensors2
 
 from ptens.graph import graph as graph
-import ptens.modules as modules
+from ptens.ggraph import ggraph as ggraph
+from ptens.subgraph import subgraph as subgraph
+
+from ptens.subgraph_layer0 import subgraph_layer0 as subgraph_layer0
+
+#import ptens.modules as modules
 
 from ptens.functions import *

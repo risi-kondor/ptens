@@ -32,6 +32,10 @@ under a custom license that can be found in the file LICENSE.TXT
    gather.rst 
    unite.rst
 
+   ggraph.rst
+   subgraph.rst
+   subgraph_layer0.rst
+
 
 Indices and tables
 ==================
