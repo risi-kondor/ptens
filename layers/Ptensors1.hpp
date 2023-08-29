@@ -74,7 +74,7 @@ namespace ptens{
   public: // ----- Constructors ------------------------------------------------------------------------------
 
 
-    //Ptensors1(){}
+    Ptensors1(){}
 
     Ptensors1(const int _nc, const int _dev=0):
       RtensorPackB(2,_nc,_dev) /*, nc(_nc)*/{}
@@ -243,6 +243,12 @@ namespace ptens{
     //rtensor view_as_matrix() const{
     //return rtensor::view_of_blob({tail/nc,nc},get_arr(),dev);
     //}
+
+    // should never be invoked!
+    Ptensors1(const rtensor& A):
+      RtensorPackB(A), atoms(A.dim(0)){
+      //nc=A.dim(1);
+    }
 
     Ptensors1(const rtensor& A, const AtomsPack& _atoms):
       RtensorPackB(A,_atoms.dims1(A.dim(1))), atoms(_atoms){

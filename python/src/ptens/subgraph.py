@@ -19,13 +19,10 @@ from ptens_base import subgraph as _subgraph
 class subgraph:
 
     @classmethod
-    def from_edge_index(self,M,n=-1,labels=None,m=None):
+    def from_edge_index(self,M,n=-1,labels=None):
         G=subgraph()
         if labels is None:
-            if m is None:
-                G.obj=_subgraph.edge_index(M,n)
-            else:
-                G.obj=_subgraph.edge_index(M,n,m)
+            G.obj=_subgraph.edge_index(M,n)
         else:
             G.obj=_subgraph.edge_index(M,labels,n)
         return G
@@ -38,6 +35,25 @@ class subgraph:
         else:
             G.obj=_subgraph.matrix(M,labels)
         return G
+
+    @classmethod
+    def trivial(self):
+        G=subgraph()
+        G.obj=_subgraph.trivial()
+        return G;
+
+    @classmethod
+    def edge(self):
+        G=subgraph()
+        G.obj=_subgraph.edge()
+        return G;
+
+    @classmethod
+    def triangle(self):
+        G=subgraph()
+        G.obj=_subgraph.triangle()
+        return G;
+
 
     def torch(self):
         return self.obj.dense()

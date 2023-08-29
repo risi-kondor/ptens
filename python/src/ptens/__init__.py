@@ -40,6 +40,7 @@ from ptens.ggraph import ggraph as ggraph
 from ptens.subgraph import subgraph as subgraph
 
 from ptens.subgraph_layer0 import subgraph_layer0 as subgraph_layer0
+from ptens.subgraph_layer1 import subgraph_layer1 as subgraph_layer1
 
 #import ptens.modules as modules
 

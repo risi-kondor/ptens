@@ -60,5 +60,6 @@ PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
   #include "OuterFunctions_py.cpp"
 
   #include "SubgraphLayer0_py.cpp"
+  #include "SubgraphLayer1_py.cpp"
 
 }

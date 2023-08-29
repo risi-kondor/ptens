@@ -25,8 +25,8 @@ import ptens.ptensors2
 class subgraph_layer0(torch.Tensor):
 
     @classmethod
-    def from_matrix(self,G,T,atoms=None):
-        return Subgraph_layer0_fromMxFn.apply(G,T,atoms)
+    def from_matrix(self,G,T):
+        return SubgraphLayer0_fromMxFn.apply(G,T)
             
     @classmethod
     def dummy(self):
@@ -37,26 +37,27 @@ class subgraph_layer0(torch.Tensor):
     @classmethod
     def raw(self,G, _nc, device='cpu'):
         R=subgraph_layer0(1)
-        R.obj=_subgraph_layer0.raw(G,_nc,ptens.device_id(device))
+        R.obj=_subgraph_layer0.raw(G.obj,_nc,ptens.device_id(device))
         return R
 
     @classmethod
     def zeros(self,G, _nc, device='cpu'):
         R=subgraph_layer0(1)
-        R.obj=_subgraph_layer0.zero(G,_nc,ptens.device_id(device))
+        R.obj=_subgraph_layer0.zero(G.obj,_nc,ptens.device_id(device))
         return R
 
     @classmethod
-    def randn(self,G, _nc, _sigma=1.0, device='cpu'):
+    def randn(self,G, _nc, device='cpu'):
         R=subgraph_layer0(1)
-        R.obj=_subgraph_layer0.gaussian(G,_nc,_sigma,ptens.device_id(device))
+        R.obj=_subgraph_layer0.gaussian(G.obj,_nc,ptens.device_id(device))
         return R
 
     @classmethod
     def sequential(self,G, _nc, device='cpu'):
         R=subgraph_layer0(1)
-        R.obj=_subgraph_layer0.sequential(G,_nc,ptens.device_id(device))
+        R.obj=_subgraph_layer0.sequential(G.obj,_nc,ptens.device_id(device))
         return R
+
 
     #def randn_like(self,sigma=1.0):
      #   return subgraph_layer0.randn(self.get_atoms(),self.get_nc(),sigma,self.get_dev())
@@ -101,7 +102,7 @@ class subgraph_layer0(torch.Tensor):
         return Subgraph_layer0_getFn.apply(self,i)
     
     def torch(self):
-        return Subgraph_layer0_toMxFn.apply(self)
+        return SubgraphLayer0_toMxFn.apply(self)
 
     def to(self, device='cpu'):
         return Subgraph_layer0_toFn.apply(self,device)
@@ -112,10 +113,10 @@ class subgraph_layer0(torch.Tensor):
 
 
     def __add__(self,y):
-        return Subgraph_layer0_addFn.apply(self,y)
+        return SubgraphLayer0_addFn.apply(self,y)
 
     def __mul__(self,y):
-        return Subgraph_layer0_mprodFn.apply(self,y)
+        return SubgraphLayer0_mprodFn.apply(self,y)
 
     def linear(self,y,b):
         return Subgraph_layer0_linearFn.apply(self,y,b)
@@ -193,24 +194,20 @@ class subgraph_layer0(torch.Tensor):
 # ------------------------------------------------------------------------------------------------------------
 
 
-class Subgraph_layer0_fromMxFn(torch.autograd.Function):
+class SubgraphLayer0_fromMxFn(torch.autograd.Function):
 
     @staticmethod
-    def forward(ctx,x,atoms):
+    def forward(ctx,G,x):
         R=subgraph_layer0(1)
-        if atoms:
-            R.obj=_subgraph_layer0(x,atoms)
-        else:
-            R.obj=_subgraph_layer0(x)
-        ctx.r=R.obj
+        R.obj=_subgraph_layer0(G.obj,x)
         return R
 
     @staticmethod
     def backward(ctx,g):
-        return ctx.r.get_grad().torch(), None
+        return None, ctx.r.get_grad().torch()
 
 
-class Subgraph_layer0_toMxFn(torch.autograd.Function):
+class SubgraphLayer0_toMxFn(torch.autograd.Function):
 
     @staticmethod
     def forward(ctx,x):
@@ -259,7 +256,7 @@ class Subgraph_layer0_toFn(torch.autograd.Function):
         return subgraph_layer0.dummy(), None
         
 
-class Subgraph_layer0_addFn(torch.autograd.Function):
+class SubgraphLayer0_addFn(torch.autograd.Function):
     
     @staticmethod
     def forward(ctx,x,y):

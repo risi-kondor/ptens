@@ -51,6 +51,24 @@ namespace ptens{
     SubgraphLayer(const Ggraph& _G, const Subgraph& _S, const IPACK& ipack, const int nc, const int _dev=0):
       G(_G), S(_S), TLAYER(ipack,nc,cnine::fill_zero(),_dev){}
 
+    template<typename IPACK>
+    SubgraphLayer(const Ggraph& _G, const Subgraph& _S, const IPACK& _ipack, const int _nc, const cnine::fill_raw& dummy, const int nc, const int _dev=0):
+      G(_G), S(_S), TLAYER(TLAYER::raw(_ipack,_nc,_dev)){}
+
+    template<typename IPACK>
+    SubgraphLayer(const Ggraph& _G, const Subgraph& _S, const IPACK& _ipack, const int _nc, const cnine::fill_zero& dummy, const int nc, const int _dev=0):
+      G(_G), S(_S), TLAYER(TLAYER::zero(_ipack,_nc,_dev)){}
+
+    template<typename IPACK>
+    SubgraphLayer(const Ggraph& _G, const Subgraph& _S, const IPACK& _ipack, const int _nc, const cnine::fill_gaussian& dummy, const int nc, const int _dev=0):
+      G(_G), S(_S), TLAYER(TLAYER::gaussian(_ipack,_nc,_dev)){}
+
+    template<typename IPACK>
+    SubgraphLayer(const Ggraph& _G, const Subgraph& _S, const IPACK& _ipack, const int _nc, const cnine::fill_sequential& dummy, const int nc, const int _dev=0):
+      G(_G), S(_S), TLAYER(TLAYER::sequential(_ipack,_nc,_dev)){}
+
+
+
     SubgraphLayer(const Ggraph& _G, const rtensor& x):
       G(_G), S(Subgraph::trivial()), TLAYER(x){}
 
