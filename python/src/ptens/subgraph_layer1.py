@@ -173,6 +173,11 @@ class subgraph_layer1(torch.Tensor):
     def unite2(self,G,normalized=False):
         return Subgraph_layer1_Unite2Fn.apply(self,G,normalized)
 
+
+    @classmethod
+    def gather(self,x,S):
+        return SubgraphLayer1_GatherFn.apply(x,S)
+    
     
     # ---- I/O ----------------------------------------------------------------------------------------------
 
@@ -470,125 +475,25 @@ class Subgraph_layer1_Linmaps2Fn(torch.autograd.Function):
         return subgraph_layer1(1), None
 
 
-class Subgraph_layer1_Transfer0Fn(torch.autograd.Function):
+
+
+class SubgraphLayer1_GatherFn(torch.autograd.Function):
 
     @staticmethod
-    def forward(ctx,x,atoms,G,normalized=False):
-        R=ptens.ptensors0.zeros(atoms,x.obj.get_nc(),x.obj.get_dev())
-        if(normalized):
-            ptens_base.add_msg_n(R.obj,x.obj,G.obj)
-        else:
-            ptens_base.add_msg(R.obj,x.obj,G.obj)
-        ctx.normalized=normalized
-        ctx.x=x.obj
-        ctx.r=R.obj
-        ctx.G=G.obj
-        return R
-        
-    @staticmethod
-    def backward(ctx,g):
-        if(ctx.normalized):
-            ptens_base.add_msg_back_n(ctx.x.gradp(),ctx.r.gradp(),ctx.G)
-        else:
-            ptens_base.add_msg_back(ctx.x.gradp(),ctx.r.gradp(),ctx.G)
-        return subgraph_layer1.dummy(), None, None, None
-
-
-class Subgraph_layer1_Transfer1Fn(torch.autograd.Function):
-
-    @staticmethod
-    def forward(ctx,x,atoms,G,normalized=False):
-        R=ptens.subgraph_layer1.zeros(atoms,x.obj.get_nc()*2,x.obj.get_dev())
-        if(normalized):
-            ptens_base.add_msg_n(R.obj,x.obj,G.obj)
-        else:
-            ptens_base.add_msg(R.obj,x.obj,G.obj)
-        ctx.normalized=normalized
-        ctx.x=x.obj
-        ctx.r=R.obj
-        ctx.G=G.obj
-        return R
-        
-    @staticmethod
-    def backward(ctx,g):
-        if(ctx.normalized):
-            ptens_base.add_msg_back_n(ctx.x.gradp(),ctx.r.gradp(),ctx.G)
-        else:
-            ptens_base.add_msg_back(ctx.x.gradp(),ctx.r.gradp(),ctx.G)
-        return subgraph_layer1.dummy(), None, None, None
-
-
-class Subgraph_layer1_Transfer2Fn(torch.autograd.Function):
-
-    @staticmethod
-    def forward(ctx,x,atoms,G,normalized=False):
-        R=ptens.ptensors2.zeros(atoms,x.obj.get_nc()*5,x.obj.get_dev())
-        if(normalized):
-            ptens_base.add_msg_n(R.obj,x.obj,G.obj)
-        else:
-            ptens_base.add_msg(R.obj,x.obj,G.obj)
-        ctx.normalized=normalized
-        ctx.x=x.obj
-        ctx.r=R.obj
-        ctx.G=G.obj
-        return R
-        
-    @staticmethod
-    def backward(ctx,g):
-        if(ctx.normalized):
-            ptens_base.add_msg_back_n(ctx.x.gradp(),ctx.r.gradp(),ctx.G)
-        else:
-            ptens_base.add_msg_back(ctx.x.gradp(),ctx.r.gradp(),ctx.G)
-        return subgraph_layer1.dummy(), None, None, None
-
-
-class Subgraph_layer1_Unite1Fn(torch.autograd.Function):
-
-    @staticmethod
-    def forward(ctx,x,G,normalized=False):
+    def forward(ctx,x,S):
+        ctx.x=x
         r=ptens.subgraph_layer1(1)
-        if(normalized):
-            r.obj=ptens_base.unite1_n(x.obj,G.obj)
-        else:
-            r.obj=ptens_base.unite1(x.obj,G.obj)
-        r.obj=ptens_base.unite1(x.obj,G.obj)
-        ctx.normalized=normalized
+        r.obj=_subgraph_layer1(x.obj,S.obj)
         ctx.x=x.obj
         ctx.r=r.obj
-        ctx.G=G.obj
         return r
         
     @staticmethod
     def backward(ctx,g):
-        if(ctx.normalized):
-            ptens_base.unite1to1_back_n(ctx.x.gradp(),ctx.r.gradp(),ctx.G)
-        else:
-            ptens_base.unite1to1_back(ctx.x.gradp(),ctx.r.gradp(),ctx.G)
-        return subgraph_layer1.dummy(), None, None 
+        r.obj.add_gather_back(x.obj)
+        return subgraph_layer0.dummy(), None, None
 
 
-class Subgraph_layer1_Unite2Fn(torch.autograd.Function):
-
-    @staticmethod
-    def forward(ctx,x,G,normalized=False):
-        r=ptens.ptensors2(1)
-        if(normalized):
-            r.obj=ptens_base.unite2_n(x.obj,G.obj)
-        else:
-            r.obj=ptens_base.unite2(x.obj,G.obj)
-        ctx.normalized=normalized
-        ctx.x=x.obj
-        ctx.r=r.obj
-        ctx.G=G.obj
-        return r
-        
-    @staticmethod
-    def backward(ctx,g):
-        if(ctx.normalized):
-            ptens_base.unite1to2_back_n(ctx.x.gradp(),ctx.r.gradp(),ctx.G)
-        else:
-            ptens_base.unite1to2_back(ctx.x.gradp(),ctx.r.gradp(),ctx.G)
-        return subgraph_layer1.dummy(), None, None
 
 
 class Subgraph_layer1_Outer0Fn(torch.autograd.Function):

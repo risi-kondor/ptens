@@ -60,6 +60,10 @@ namespace ptens{
       return obj->dense();
     }
 
+    bool operator==(const Ggraph& x) const{
+      return obj==x.obj;
+    }
+
 
   public: // ---- I/O -----------------------------------------------------------------------------------------
 

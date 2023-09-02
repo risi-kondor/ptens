@@ -68,16 +68,38 @@ namespace ptens{
       G(_G), S(_S), TLAYER(TLAYER::sequential(_ipack,_nc,_dev)){}
 
 
-
-    SubgraphLayer(const Ggraph& _G, const rtensor& x):
-      G(_G), S(Subgraph::trivial()), TLAYER(x){}
-
-
   public: // ---- Copying ------------------------------------------------------------------------------------------------
 
 
     SubgraphLayer(const SubgraphLayer<TLAYER>& x):
       TLAYER(x), G(x.G), S(x.S){}
+
+
+  public: // ---- Transport ----------------------------------------------------------------------------------
+
+
+    //SubgraphLayer(const SubgraphLayer<TLAYER>& x, const int _dev):
+    //TLAYER(x,_dev), G(x.G), S(x.S){}
+
+
+  public: // ---- Conversions --------------------------------------------------------------------------------------------
+
+
+    SubgraphLayer(const Ggraph& _G, const rtensor& x):
+      G(_G), S(Subgraph::trivial()), TLAYER(x){}
+
+    SubgraphLayer(TLAYER&& x, const Ggraph& _G, const Subgraph& _S):
+      TLAYER(std::move(x)), G(_G), S(_S){}
+
+
+  public: // ---- Operations ---------------------------------------------------------------------------------------------
+
+
+    void add(const SubgraphLayer<TLAYER>& x){
+      PTENS_ASSRT(G==x.G);
+      PTENS_ASSRT(S==x.S);
+      TLAYER::add(x);
+    }
 
 
   public: // ---- Message passing ----------------------------------------------------------------------------------------

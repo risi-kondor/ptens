@@ -75,6 +75,10 @@ namespace ptens{
   public: // ---- Access --------------------------------------------------------------------------------------
 
 
+    bool operator==(const Subgraph& x) const{
+      return &(*obj)==&(*x.obj);
+    }
+
     cnine::RtensorA dense() const{
       return obj->dense();
     }

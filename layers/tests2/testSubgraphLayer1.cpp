@@ -29,7 +29,10 @@ int main(int argc, char** argv){
   Ggraph G=Ggraph::random(10);
   cout<<G<<endl;
 
+  Subgraph trivial=Subgraph::trivial();
+  cout<<trivial<<endl;
   Subgraph edge=Subgraph::edge();
+  cout<<edge<<endl;
   Subgraph triangle=Subgraph::triangle();
   cout<<triangle<<endl;
 

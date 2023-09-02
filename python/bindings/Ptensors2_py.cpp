@@ -124,9 +124,8 @@ pybind11::class_<Ptensors2/*,cnine::RtensorPack*/>(m,"ptensors2")
   .def("add_ReLU_back",[](Ptensors2& x, const cnine::loose_ptr<Ptensors2>& g, const float alpha){
       x.get_grad().add_ReLU_back(g,x,alpha);})
 
-  .def("inp",&Ptensors2::inp)
-  .def("diff2",&Ptensors2::diff2)
-
+  .def("inp",[](const Ptensors2& x, const Ptensors2& y){return x.inp(y);})
+  .def("diff2",[](const Ptensors2& x, const Ptensors2& y){return x.diff2(y);})
 
 // ---- I/O --------------------------------------------------------------------------------------------------
 

@@ -145,23 +145,23 @@ namespace ptens{
 
 
     static Ptensors0 zeros_like(const Ptensors0& x){
-      return Ptensors0(RtensorPackB::zeros_like(x),x.atoms);//,x.nc);
+      return Ptensors0(RtensorPackB::zeros_like(x),x.atoms);
     }
 
     static Ptensors0* new_zeros_like(const Ptensors0& x){
-      return new Ptensors0(RtensorPackB::zeros_like(x),x.atoms);//,x.nc);
+      return new Ptensors0(RtensorPackB::zeros_like(x),x.atoms);
     }
 
     static Ptensors0 gaussian_like(const Ptensors0& x){
-      return Ptensors0(RtensorPackB::gaussian_like(x),x.atoms);//,x.nc);
+      return Ptensors0(RtensorPackB::gaussian_like(x),x.atoms);
     }
 
     static Ptensors0 randn_like(const Ptensors0& x){
-      return Ptensors0(RtensorPackB::gaussian_like(x),x.atoms);//,x.nc);
+      return Ptensors0(RtensorPackB::gaussian_like(x),x.atoms);
     }
 
     static Ptensors0 sequential_like(const Ptensors0& x){
-      return Ptensors0(RtensorPackB::gaussian_like(x),x.atoms);//,x.nc);
+      return Ptensors0(RtensorPackB::gaussian_like(x),x.atoms);
     }
 
 
@@ -350,6 +350,10 @@ namespace ptens{
       return R;
     }
 
+
+  public: // ---- Indexed reductions ---------------------------------------------------------------------------------
+
+
     RtensorPackB reduce0(const AindexPack& list) const{
       TimedFn T("Ptensors0","reduce0",*this,list,list.size()*nc);
       int N=list.size();
@@ -365,6 +369,18 @@ namespace ptens{
       return R;
     }
 
+    void reduce0_back(const RtensorPackB& x, const AindexPack& list){
+      TimedFn T("Ptensors0","reduce0_back",*this,x,list,list.size()*nc);
+      if(dev==0){
+	int N=list.size();
+	for(int i=0; i<N; i++){
+	  view_of(list.tens(i),list.ix(i))+=x.view1_of(i);
+	}
+      }
+      GPUCODE(CUDA_STREAM(Ptensors0_broadcast0_cu(*this,x,list,0,stream)));
+    }
+
+    // Deprecated 
     RtensorPackB reduce0(const AindexPack& list, const int offs, const int n) const{
       TimedFn T("Ptensors0","reduce0",*this,list,list.size()*nc);
       int N=list.size();
@@ -402,16 +418,9 @@ namespace ptens{
       GPUCODE(CUDA_STREAM(Ptensors0_broadcast0_cu(*this,x,offs,stream)));
     }
 
-    void broadcast0(const RtensorPackB& x, const AindexPack& list){
-      TimedFn T("Ptensors0","brcast0",*this,x,list,list.size()*nc);
-      if(dev==0){
-	int N=list.size();
-	for(int i=0; i<N; i++){
-	  view_of(list.tens(i),list.ix(i))+=x.view1_of(i);
-	}
-      }
-      GPUCODE(CUDA_STREAM(Ptensors0_broadcast0_cu(*this,x,list,0,stream)));
-    }
+
+  public: // ---- Indexed broadcasting -------------------------------------------------------------------------------
+
 
     void broadcast0(const RtensorPackB& x, const AindexPack& list, const int offs){
       TimedFn T("Ptensors0","brcast0",*this,x,list,list.size()*nc);
@@ -424,6 +433,31 @@ namespace ptens{
       GPUCODE(CUDA_STREAM(Ptensors0_broadcast0_cu(*this,x,list,offs,stream)));
     }
 
+    RtensorPackB broadcast0_back(const AindexPack& list, const int offs, const int n) const{
+      TimedFn T("Ptensors0","brcast0_back",*this,list,list.size()*nc);
+      int N=list.size();
+      RtensorPackB R(N,Gdims(n),cnine::fill_zero(),dev);
+      if(dev==0){
+	for(int i=0; i<N; i++){
+	  if(list.nix(i)==0) continue;
+	  R.view1_of(i)=view_of(list.tix(i),offs,n);
+	}
+      }
+      GPUCODE(CUDA_STREAM(Ptensors0_reduce0_cu(R,*this,list,offs,n,stream)));
+      return R;
+    }
+
+    // deprecated 
+    void broadcast0(const RtensorPackB& x, const AindexPack& list){
+      TimedFn T("Ptensors0","brcast0",*this,x,list,list.size()*nc);
+      if(dev==0){
+	int N=list.size();
+	for(int i=0; i<N; i++){
+	  view_of(list.tens(i),list.ix(i))+=x.view1_of(i);
+	}
+      }
+      GPUCODE(CUDA_STREAM(Ptensors0_broadcast0_cu(*this,x,list,0,stream)));
+    }
 
 
   public: // ---- I/O ----------------------------------------------------------------------------------------

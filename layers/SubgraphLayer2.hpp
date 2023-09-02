@@ -12,15 +12,15 @@
  *
  */
 
-#ifndef _ptens_SubgraphLayer1
-#define _ptens_SubgraphLayer1
+#ifndef _ptens_SubgraphLayer2
+#define _ptens_SubgraphLayer2
 
 #include "Hgraph.hpp"
 #include "Subgraph.hpp"
 #include "FindPlantedSubgraphs.hpp"
 #include "TransferMap.hpp"
 #include "EMPlayers2.hpp"
-#include "SubgraphLayer0.hpp"
+#include "SubgraphLayer2.hpp"
 
 
 namespace ptens{
@@ -28,10 +28,11 @@ namespace ptens{
   template<typename TLAYER> 
   class SubgraphLayer0;
   template<typename TLAYER> 
-  class SubgraphLayer2;
+  class SubgraphLayer1;
+
 
   template<typename TLAYER> 
-  class SubgraphLayer1: public SubgraphLayer<TLAYER>{
+  class SubgraphLayer2: public SubgraphLayer<TLAYER>{
   public:
 
     typedef cnine::RtensorA rtensor;
@@ -50,26 +51,26 @@ namespace ptens{
   public: 
 
     //template<typename IPACK>
-    //SubgraphLayer1(const Ggraph& _G, const Subgraph& _S, const IPACK& ipack, const int nc, const int _dev=0):
+    //SubgraphLayer2(const Ggraph& _G, const Subgraph& _S, const IPACK& ipack, const int nc, const int _dev=0):
     //G(_G), S(_S), TLAYER(ipack,nc,cnine::fill_zero(),_dev){}
 
 
   public: // ---- Named Constructors ------------------------------------------------------------------------------------------
 
 
-    static SubgraphLayer1<TLAYER> zeros_like(const SubgraphLayer1<TLAYER>& x){
-      return SubgraphLayer1(TLAYER::zeros_like(x),x.G,x.S);
+    static SubgraphLayer2<TLAYER> zeros_like(const SubgraphLayer2<TLAYER>& x){
+      return SubgraphLayer2(TLAYER::zeros_like(x),x.G,x.S);
     }
 
-    static SubgraphLayer1<TLAYER> randn_like(const SubgraphLayer1<TLAYER>& x){
-      return SubgraphLayer1(TLAYER::randn_like(x),x.G,x.S);
+    static SubgraphLayer2<TLAYER> randn_like(const SubgraphLayer2<TLAYER>& x){
+      return SubgraphLayer2(TLAYER::randn_like(x),x.G,x.S);
     }
 
 
   public: // ---- Transport ----------------------------------------------------------------------------------
 
 
-    SubgraphLayer1(const SubgraphLayer1<TLAYER>& x, const int _dev):
+    SubgraphLayer2(const SubgraphLayer2<TLAYER>& x, const int _dev):
       SubgraphLayer<TLAYER>(TLAYER(x,_dev),x.G,x.S){}
 
 
@@ -77,38 +78,37 @@ namespace ptens{
 
 
     template<typename TLAYER2>
-    SubgraphLayer1(const SubgraphLayer0<TLAYER2>& x, const Subgraph& _S):
-      SubgraphLayer1(x.G,_S,AtomsPack(FindPlantedSubgraphs(*x.G.obj,*_S.obj)),x.get_nc(),x.dev){
-      emp01(*this,x,TransferMap(x.atoms,atoms));
+    SubgraphLayer2(const SubgraphLayer0<TLAYER2>& x, const Subgraph& _S):
+      SubgraphLayer2(x.G,_S,AtomsPack(FindPlantedSubgraphs(*x.G.obj,*_S.obj)),2*x.get_nc(),x.dev){
+      emp02(*this,x,TransferMap(x.atoms,atoms));
     }
 
     template<typename TLAYER2>
     void gather_back(SubgraphLayer0<TLAYER2>& x){
-      emp10(x.get_grad(),get_grad(),TransferMap(x.atoms,atoms));
+      emp02_back(x.get_grad(),get_grad(),TransferMap(x.atoms,atoms));
     }
 
     template<typename TLAYER2>
-    SubgraphLayer1(const SubgraphLayer1<TLAYER2>& x, const Subgraph& _S):
-      SubgraphLayer1(x.G,_S,AtomsPack(FindPlantedSubgraphs(*x.G.obj,*_S.obj)),2*x.get_nc(),x.dev){
-      emp11(*this,x,TransferMap(x.atoms,atoms));
+    SubgraphLayer2(const SubgraphLayer1<TLAYER2>& x, const Subgraph& _S):
+      SubgraphLayer2(x.G,_S,AtomsPack(FindPlantedSubgraphs(*x.G.obj,*_S.obj)),5*x.get_nc(),x.dev){
+      emp12(*this,x,TransferMap(x.atoms,atoms));
     }
 
     template<typename TLAYER2>
     void gather_back(SubgraphLayer1<TLAYER2>& x){
-      emp11_back(x.get_grad(),get_grad(),TransferMap(x.atoms,atoms));
+      emp12_back(x.get_grad(),get_grad(),TransferMap(x.atoms,atoms));
     }
 
     template<typename TLAYER2>
-    SubgraphLayer1(const SubgraphLayer2<TLAYER2>& x, const Subgraph& _S):
-      SubgraphLayer1(x.G,_S,AtomsPack(FindPlantedSubgraphs(*x.G.obj,*_S.obj)),5*x.get_nc(),x.dev){
-      emp21(*this,x,TransferMap(x.atoms,atoms)); 
+    SubgraphLayer2(const SubgraphLayer2<TLAYER2>& x, const Subgraph& _S):
+      SubgraphLayer2(x.G,_S,AtomsPack(FindPlantedSubgraphs(*x.G.obj,*_S.obj)),15*x.get_nc(),x.dev){
+      emp22(*this,x,TransferMap(x.atoms,atoms));
     }
 
     template<typename TLAYER2>
     void gather_back(SubgraphLayer2<TLAYER2>& x){
-      emp21_back(x.get_grad(),get_grad(),TransferMap(x.atoms,atoms));
+      emp22_back(x.get_grad(),get_grad(),TransferMap(x.atoms,atoms));
     }
-
 
 
   public: 
@@ -126,17 +126,3 @@ namespace ptens{
 }
 
 #endif 
-    //template<typename LAYER>
-    //TransferMap overlaps(const LAYER& x){
-    //return TransferMap(atoms,x.atoms);
-    //}
-
-    //SubgraphLayer0<TLAYER> transfer0(const Subgraph& _S){
-    //SubgraphLayer0<TLAYER> R(G,_S,getn(),get_nc());
-    //emp10(R,*this,TransferMap(atoms,R.atoms));
-    //}
-
-    //SubgraphLayer1<TLAYER> transfer1(const Subgraph& _S){
-    //SubgraphLayer1<TLAYER> R(G,_S,FindPlantedSubgraphs(G,_S),get_nc());
-    //emp11(R,*this,TransferMap(atoms,R.atoms));
-    //}

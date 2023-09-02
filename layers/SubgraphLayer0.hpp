@@ -26,6 +26,8 @@ namespace ptens{
 
   template<typename TLAYER> 
   class SubgraphLayer1;
+  template<typename TLAYER> 
+  class SubgraphLayer2;
 
 
   template<typename TLAYER> 
@@ -40,7 +42,10 @@ namespace ptens{
     using TLAYER::atoms;
     using TLAYER::getn;
     using TLAYER::get_nc;
+    using TLAYER::get_grad;
     using TLAYER::tensor;
+    using TLAYER::inp;
+    using TLAYER::diff2;
 
 
   public: 
@@ -58,11 +63,23 @@ namespace ptens{
     //G(_G), S(Subgraph::trivial()), TLAYER(x){}
 
 
-  public: // ---- Copying ------------------------------------------------------------------------------------------------
+  public: // ---- Named Constructors ------------------------------------------------------------------------------------------
 
 
-    SubgraphLayer0(const SubgraphLayer0& x):
-      SubgraphLayer<TLAYER>(x){}
+    static SubgraphLayer0<TLAYER> zeros_like(const SubgraphLayer0<TLAYER>& x){
+      return SubgraphLayer0(TLAYER::zeros_like(x),x.G,x.S);
+    }
+
+    static SubgraphLayer0<TLAYER> randn_like(const SubgraphLayer0<TLAYER>& x){
+      return SubgraphLayer0(TLAYER::randn_like(x),x.G,x.S);
+    }
+
+
+  public: // ---- Transport ----------------------------------------------------------------------------------
+
+
+    SubgraphLayer0(const SubgraphLayer0<TLAYER>& x, const int _dev):
+      SubgraphLayer<TLAYER>(TLAYER(x,_dev),x.G,x.S){}
 
 
   public: // ---- Message passing ----------------------------------------------------------------------------------------
@@ -71,13 +88,34 @@ namespace ptens{
     template<typename TLAYER2>
     SubgraphLayer0(const SubgraphLayer0<TLAYER2>& x, const Subgraph& _S):
       SubgraphLayer0(x.G,_S,AtomsPack(x.getn()),x.get_nc(),x.dev){
-      emp00(*this,x,TransferMap(x.atoms,atoms));
+      emp00(*this,x,TransferMap(x.atoms,atoms)); // probably swap x.atoms and atoms 
+    }
+
+    template<typename TLAYER2>
+    void gather_back(SubgraphLayer0<TLAYER2>& x){
+      emp00(x.get_grad(),get_grad(),TransferMap(x.atoms,atoms)); 
     }
 
     template<typename TLAYER2>
     SubgraphLayer0(const SubgraphLayer1<TLAYER2>& x, const Subgraph& _S):
       SubgraphLayer0(x.G,_S,AtomsPack(x.getn()),x.get_nc(),x.dev){
       emp10(*this,x,TransferMap(x.atoms,atoms));
+    }
+
+    template<typename TLAYER2>
+    void gather_back(SubgraphLayer1<TLAYER2>& x){
+      emp01(x.get_grad(),get_grad(),TransferMap(x.atoms,atoms));
+    }
+
+    template<typename TLAYER2>
+    SubgraphLayer0(const SubgraphLayer2<TLAYER2>& x, const Subgraph& _S):
+      SubgraphLayer0(x.G,_S,AtomsPack(x.getn()),2*x.get_nc(),x.dev){
+      emp20(*this,x,TransferMap(x.atoms,atoms));
+    }
+
+    template<typename TLAYER2>
+    void gather_back(SubgraphLayer2<TLAYER2>& x){
+      emp20_back(x.get_grad(),get_grad(),TransferMap(x.atoms,atoms));
     }
 
 

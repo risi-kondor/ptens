@@ -28,6 +28,7 @@
 
 #include "SubgraphLayer0.hpp"
 #include "SubgraphLayer1.hpp"
+#include "SubgraphLayer2.hpp"
 
 
 namespace ptens{ 
@@ -61,5 +62,6 @@ PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
 
   #include "SubgraphLayer0_py.cpp"
   #include "SubgraphLayer1_py.cpp"
+  #include "SubgraphLayer2_py.cpp"
 
 }

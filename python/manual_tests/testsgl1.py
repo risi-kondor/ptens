@@ -1,11 +1,14 @@
 import torch
 import ptens
 
-G=ptens.ggraph.random(3,0.5)
-S=ptens.subgraph.triangle()
-#M=torch.randn(5,3)
-#A=ptens.subgraph_layer0.from_matrix(G,M)
 
-A=ptens.subgraph_layer1.sequential(G,S,[[0,1,2],[0,1,2],[0,1,2]],3)
+G=ptens.ggraph.random(5,0.5)
+M=torch.randn(5,3)
+f0=ptens.subgraph_layer0.from_matrix(G,M)
+print(f0)
 
-print(A)
+S=ptens.subgraph.trivial()
+f1=ptens.subgraph_layer0.gather(f0,S)
+f1.obj.gather_back(f0.obj)
+
+print(f0)
