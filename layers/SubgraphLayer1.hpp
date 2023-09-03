@@ -84,7 +84,7 @@ namespace ptens{
 
     template<typename TLAYER2>
     void gather_back(SubgraphLayer0<TLAYER2>& x){
-      emp10(x.get_grad(),get_grad(),TransferMap(x.atoms,atoms));
+      emp10(x.get_grad(),get_grad(),TransferMap(atoms,x.atoms));
     }
 
     template<typename TLAYER2>
@@ -95,7 +95,7 @@ namespace ptens{
 
     template<typename TLAYER2>
     void gather_back(SubgraphLayer1<TLAYER2>& x){
-      emp11_back(x.get_grad(),get_grad(),TransferMap(x.atoms,atoms));
+      emp11_back(x.get_grad(),get_grad(),TransferMap(atoms,x.atoms));
     }
 
     template<typename TLAYER2>
@@ -106,7 +106,7 @@ namespace ptens{
 
     template<typename TLAYER2>
     void gather_back(SubgraphLayer2<TLAYER2>& x){
-      emp21_back(x.get_grad(),get_grad(),TransferMap(x.atoms,atoms));
+      emp21_back(x.get_grad(),get_grad(),TransferMap(atoms,x.atoms));
     }
 
 

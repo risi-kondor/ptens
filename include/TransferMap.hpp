@@ -27,6 +27,8 @@ namespace ptens{
   public:
     
     typedef cnine::SparseRmatrix SparseRmatrix;
+    typedef cnine::Tensor<int> IntMatrix;
+
     using SparseRmatrix::SparseRmatrix;
 
 
@@ -158,6 +160,34 @@ namespace ptens{
 
 
   public: // ---- Intersects --------------------------------------------------------------------------------------------
+
+
+    pair<IntMatrix,IntMatrix> intersects(const IntMatrix& inputs, const IntMatrix& outputs, const bool self=0) const{
+      PTENS_ASSRT(outputs.dims[0]==n);
+      PTENS_ASSRT(inputs.dims[0]==m);
+      int N=size();
+      int kin=inputs.dims[1];
+      int kout=outputs.dims[1];
+
+      IntMatrix in_indices({N,kin,kin},cnine::fill_zero());
+      IntMatrix out_indices({N,kout,kout},cnine::fill_zero());
+      int t=0;
+      forall_edges([&](const int i, const int j, const float v){
+	  for(int a=0; a<kin; a++){
+	    int x=inputs(j,a);
+	    int s=0;
+	    for(int b=0; b<kout; b++){
+	      if(outputs(i,b)==x){
+		in_indices.set(t,s,a,1.0);
+		out_indices.set(t,s,b,1.0);
+		s++;
+		break;
+	      }
+	    }
+	  }
+	  t++;
+	});
+    }
 
 
     pair<AindexPack,AindexPack> intersects(const AtomsPack& inputs, const AtomsPack& outputs, const bool self=0) const{

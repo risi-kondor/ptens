@@ -99,13 +99,16 @@ namespace ptens{
   public: // ----- Constructors ------------------------------------------------------------------------------
 
 
-    //Ptensors2(){}
+    Ptensors2(){}
 
     Ptensors2(const int _nc, const int _dev=0):
       RtensorPackB(3,_nc,_dev) /*, nc(_nc)*/{}
 
     Ptensors2(const AtomsPack& _atoms, const int _nc, const int _dev=0):
       RtensorPackB(3,_nc,_dev), /*nc(_nc),*/ atoms(_atoms){}
+
+    Ptensors2(const AtomsPack& _atoms, const int _nc, const cnine::fill_zero& dummy, const int _dev=0):
+      Ptensors2(zero(_atoms,_nc,_dev)){}
 
     template<typename FILLTYPE, typename = typename std::enable_if<std::is_base_of<cnine::fill_pattern, FILLTYPE>::value, FILLTYPE>::type>
     Ptensors2(const int _n, const int _k, const int _nc, const FILLTYPE& dummy, const int _dev=0):
@@ -257,6 +260,11 @@ namespace ptens{
       RtensorPackB(A,_atoms.dims2(A.dim(1))), atoms(_atoms){
       nc=A.dim(1);
     }
+
+    //Ptensors2(const rtensor& A):
+    //CNINE_UNIMPL();
+    //RtensorPackB(A), atoms(A.dim(0)){
+    //}
 
     #ifdef _WITH_ATEN
     Ptensors2(const at::Tensor& T, const AtomsPack& _atoms):

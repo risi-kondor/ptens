@@ -5,7 +5,7 @@ typedef SubgraphLayer2<Ptensors2> SGlayer2;
 
 pybind11::class_<SGlayer2>(m,"subgraph_layer1")
 
-  .def(pybind11::init<ptens::Ggraph&, const at::Tensor&>())
+//.def(pybind11::init<ptens::Ggraph&, const at::Tensor&>())
 
   .def_static("dummy",[]() {return SGlayer2();})
 

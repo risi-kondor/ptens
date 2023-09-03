@@ -239,10 +239,10 @@ namespace ptens{
     //return rtensor::view_of_blob({tail/nc,nc},get_arr(),dev);
     //}
 
-    // should never be invoked!
-    Ptensors1(const rtensor& A):
-      RtensorPackB(A), atoms(A.dim(0)){
-    }
+    //Ptensors1(const rtensor& A):
+    //CNINE_UNIMPL();
+    //RtensorPackB(A), atoms(A.dim(0)){
+    //}
 
     Ptensors1(const rtensor& A, const AtomsPack& _atoms):
       RtensorPackB(A,_atoms.dims1(A.dim(1))), atoms(_atoms){

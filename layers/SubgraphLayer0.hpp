@@ -75,6 +75,13 @@ namespace ptens{
     }
 
 
+  public: // ---- Conversions --------------------------------------------------------------------------------------------
+
+
+    SubgraphLayer0(const Ggraph& _G, const rtensor& x):
+      SubgraphLayer<TLAYER>(TLAYER(x),_G,Subgraph::trivial()){}
+
+
   public: // ---- Transport ----------------------------------------------------------------------------------
 
 
@@ -88,12 +95,12 @@ namespace ptens{
     template<typename TLAYER2>
     SubgraphLayer0(const SubgraphLayer0<TLAYER2>& x, const Subgraph& _S):
       SubgraphLayer0(x.G,_S,AtomsPack(x.getn()),x.get_nc(),x.dev){
-      emp00(*this,x,TransferMap(x.atoms,atoms)); // probably swap x.atoms and atoms 
+      emp00(*this,x,TransferMap(x.atoms,atoms));
     }
 
     template<typename TLAYER2>
     void gather_back(SubgraphLayer0<TLAYER2>& x){
-      emp00(x.get_grad(),get_grad(),TransferMap(x.atoms,atoms)); 
+      emp00(x.get_grad(),get_grad(),TransferMap(atoms,x.atoms)); 
     }
 
     template<typename TLAYER2>
@@ -104,7 +111,7 @@ namespace ptens{
 
     template<typename TLAYER2>
     void gather_back(SubgraphLayer1<TLAYER2>& x){
-      emp01(x.get_grad(),get_grad(),TransferMap(x.atoms,atoms));
+      emp01(x.get_grad(),get_grad(),TransferMap(atoms,x.atoms));
     }
 
     template<typename TLAYER2>
@@ -115,7 +122,7 @@ namespace ptens{
 
     template<typename TLAYER2>
     void gather_back(SubgraphLayer2<TLAYER2>& x){
-      emp20_back(x.get_grad(),get_grad(),TransferMap(x.atoms,atoms));
+      emp20_back(x.get_grad(),get_grad(),TransferMap(atoms,x.atoms));
     }
 
 

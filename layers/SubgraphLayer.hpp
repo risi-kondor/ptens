@@ -85,8 +85,8 @@ namespace ptens{
   public: // ---- Conversions --------------------------------------------------------------------------------------------
 
 
-    SubgraphLayer(const Ggraph& _G, const rtensor& x):
-      G(_G), S(Subgraph::trivial()), TLAYER(x){}
+    //SubgraphLayer(const Ggraph& _G, const rtensor& x):
+    //G(_G), S(Subgraph::trivial()), TLAYER(x){}
 
     SubgraphLayer(TLAYER&& x, const Ggraph& _G, const Subgraph& _S):
       TLAYER(std::move(x)), G(_G), S(_S){}
