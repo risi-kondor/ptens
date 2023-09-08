@@ -54,6 +54,7 @@ namespace ptens{
     //int nc=0;
     AtomsPack atoms;
     //bool is_view=false;
+    rtensor norms;
 
 
     ~Ptensors0(){

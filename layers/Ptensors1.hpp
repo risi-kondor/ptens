@@ -59,6 +59,7 @@ namespace ptens{
     typedef cnine::RtensorPackB RtensorPackB;
 
     AtomsPack atoms;
+    rtensor norms;
 
 
     ~Ptensors1(){
@@ -79,8 +80,14 @@ namespace ptens{
     Ptensors1(const AtomsPack& _atoms, const int _nc, const int _dev=0):
       RtensorPackB(2,_nc,_dev), /*nc(_nc),*/ atoms(_atoms){}
 
+    //Ptensors1(shared_ptr<cnine::Tensor<int> > atoms_ptr, const int _nc, const int _dev=0):
+    //RtensorPackB(2,_nc,_dev), /*nc(_nc),*/ atoms(atoms_ptr){}
+
     Ptensors1(const AtomsPack& _atoms, const int _nc, const cnine::fill_zero& dummy, const int _dev=0):
       Ptensors1(zero(_atoms,_nc,_dev)){}
+
+    Ptensors1(const cnine::Tensor<int>& M, const int _nc, const cnine::fill_zero& dummy, const int _dev=0):
+      RtensorPackB(M.dims[0],{M.dims[1],_nc},dummy,_dev), atoms(M){}
 
     template<typename FILLTYPE, typename = typename std::enable_if<std::is_base_of<cnine::fill_pattern, FILLTYPE>::value, FILLTYPE>::type>
     Ptensors1(const int _n, const int _k, const int _nc, const FILLTYPE& dummy, const int _dev=0):
@@ -286,11 +293,12 @@ namespace ptens{
       return atoms.view();
     }
 
-
+    /*
     int getk() const{
       PTENS_ASSRT(atoms.k>=0);
       return atoms.k;
     }
+    */
 
     int k_of(const int i) const{
       return dim_of(i,0);

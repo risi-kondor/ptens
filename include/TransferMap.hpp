@@ -187,6 +187,7 @@ namespace ptens{
 	  }
 	  t++;
 	});
+      return make_pair(in_indices, out_indices);
     }
 
 

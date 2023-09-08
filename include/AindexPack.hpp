@@ -31,7 +31,6 @@ namespace ptens{
     int count1=0;
     int count2=0;
 
-    //cnine::GatherMap const* bmap=nullptr; // hack
     std::shared_ptr<cnine::GatherMap> bmap;
 
 

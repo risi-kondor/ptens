@@ -21,6 +21,7 @@
 #include "AtomsPack.hpp"
 #include "AindexPack.hpp"
 #include "Hgraph.hpp"
+#include "Tensor.hpp"
 
 
 namespace ptens{
@@ -61,6 +62,13 @@ namespace ptens{
       }
     }
 
+    int nmatches() const{
+      int t=0;
+      for(auto p:matches)
+	p->for_each_maximal_path([&](const vector<int>& x){t++;});
+      return t;
+    }
+
     operator AindexPack(){
       AindexPack R;
       int i=0;
@@ -75,6 +83,17 @@ namespace ptens{
       for(auto p:matches)
 	p->for_each_maximal_path([&](const vector<int>& x){
 	    R.push_back(x);});
+      return R;
+    }
+
+    operator cnine::Tensor<int>(){
+      int N=nmatches();
+      cnine::Tensor<int> R(cnine::Gdims(N,n));
+      int t=0;
+      for(auto p:matches)
+	p->for_each_maximal_path([&](const vector<int>& x){
+	    for(int i=0; i<n; i++) R.set(t,i,x[i]);
+	    t++;});
       return R;
     }
 
@@ -141,6 +160,30 @@ namespace ptens{
       auto newpack=new cnine::array_pool<int>(FindPlantedSubgraphs(G,H));
       G.subgraphlist_cache[H]=newpack;
       return *newpack;
+    }
+  };
+
+
+  class CachedPlantedSubgraphsMx{
+  public:
+
+    typedef Hgraph Graph;
+
+    shared_ptr<cnine::Tensor<int> > ptr;
+
+    CachedPlantedSubgraphsMx(const Graph& G, const Graph& H){
+      //if(!G.subgraphlist_cache) G.subgraphlist_cache=new HgraphSubgraphListCache; 
+      auto it=G.subgraphlistmx_cache.find(H);
+      if(it!=G.subgraphlistmx_cache.end()) ptr=it->second;
+      else{
+	shared_ptr<cnine::Tensor<int> > A(new cnine::Tensor<int>(FindPlantedSubgraphs(G,H)));
+	G.subgraphlistmx_cache[H]=A;
+	ptr=A;
+      }
+    }
+
+    operator const cnine::Tensor<int>&() const{
+      return *ptr;
     }
 
   };

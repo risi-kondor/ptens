@@ -152,6 +152,9 @@ class subgraph_layer0(torch.Tensor):
     def mult_channels(self,y):
         return Subgraph_layer0_mult_channelsFn.apply(self,y)
 
+    def normalize_channels(self):
+	return SubgraphLayer0_normalize_channels.apply(self)
+    
 
     # ---- Message passing -----------------------------------------------------------------------------------
     
@@ -386,7 +389,21 @@ class Subgraph_layer0_scaleFn(torch.autograd.Function):
         ctx.x.add_scale_back0(ctx.r.gradp(),ctx.y)
         return subgraph_layer0.dummy(), ctx.x.scale_back1(ctx.r.gradp())
 
+class SubgraphLayer0_normalize_channels(torch.autograph.Function):
 
+    @staticmethod
+    def forward(ctx,x):
+        r=subgraph_layer0(1)
+	r.obj=x.obj.normalize_columns()
+        ctx.x=x.obj
+        ctx.r=r.obj
+	return r;
+
+    @staticmethod
+    def backward(ctx,g):
+	ctx.x.normalize_columns_back(ctx.r)
+	return subgraph_layer0.dummy()
+    
 class Subgraph_layer0_linearFn(torch.autograd.Function):
     
     @staticmethod

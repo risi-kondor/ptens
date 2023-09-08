@@ -77,6 +77,17 @@ pybind11::class_<SGlayer0>(m,"subgraph_layer0")
       g.add_mprod_back1_to(R,x);
       return R.torch();})
 
+  .def("normalize_channels",[](SGlayer0& x){
+      x.norms=x.inv_channel_norms();
+      auto R=SGlayer0::zeros_like(x);
+      R.add_scale_channels(x,x.norms.view1());
+      return R;
+    })
+  .def("normalize_channels_back",[](SGlayer0& x, SGlayer0& g){
+      x.get_grad().add_scale_channels(g.get_grad(),x.norms.view1());
+    })
+      
+
 /*
   .def("add_scale",[](SGlayer0& r, const SGlayer0& x, at::Tensor& y){
       RtensorA Y(y);

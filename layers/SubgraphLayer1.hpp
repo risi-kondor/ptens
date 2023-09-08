@@ -78,7 +78,8 @@ namespace ptens{
 
     template<typename TLAYER2>
     SubgraphLayer1(const SubgraphLayer0<TLAYER2>& x, const Subgraph& _S):
-      SubgraphLayer1(x.G,_S,AtomsPack(FindPlantedSubgraphs(*x.G.obj,*_S.obj)),x.get_nc(),x.dev){
+      //SubgraphLayer1(x.G,_S,AtomsPack(CachedPlantedSubgraphs()(*x.G.obj,*_S.obj)),x.get_nc(),x.dev){
+      SubgraphLayer1(x.G,_S,CachedPlantedSubgraphsMx(*x.G.obj,*_S.obj),x.get_nc(),x.dev){
       emp01(*this,x,TransferMap(x.atoms,atoms));
     }
 
@@ -89,7 +90,8 @@ namespace ptens{
 
     template<typename TLAYER2>
     SubgraphLayer1(const SubgraphLayer1<TLAYER2>& x, const Subgraph& _S):
-      SubgraphLayer1(x.G,_S,AtomsPack(FindPlantedSubgraphs(*x.G.obj,*_S.obj)),2*x.get_nc(),x.dev){
+      //SubgraphLayer1(x.G,_S,AtomsPack(CachedPlantedSubgraphs()(*x.G.obj,*_S.obj)),2*x.get_nc(),x.dev){
+      SubgraphLayer1(x.G,_S,CachedPlantedSubgraphsMx(*x.G.obj,*_S.obj),2*x.get_nc(),x.dev){
       emp11(*this,x,TransferMap(x.atoms,atoms));
     }
 
@@ -100,7 +102,7 @@ namespace ptens{
 
     template<typename TLAYER2>
     SubgraphLayer1(const SubgraphLayer2<TLAYER2>& x, const Subgraph& _S):
-      SubgraphLayer1(x.G,_S,AtomsPack(FindPlantedSubgraphs(*x.G.obj,*_S.obj)),5*x.get_nc(),x.dev){
+      SubgraphLayer1(x.G,_S,CachedPlantedSubgraphsMx(*x.G.obj,*_S.obj),5*x.get_nc(),x.dev){
       emp21(*this,x,TransferMap(x.atoms,atoms)); 
     }
 

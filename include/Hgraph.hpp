@@ -17,13 +17,13 @@
 #include <set>
 #include "Ptens_base.hpp"
 #include "SparseRmatrix.hpp"
+#include "Tensor.hpp"
 //#include "SparseRmatrixB.hpp"
 #include "AtomsPack.hpp"
 #include "AindexPack.hpp"
 #include "GatherMap.hpp"
 #include "labeled_tree.hpp"
 #include "map_of_lists.hpp"
-
 
 namespace ptens{
 
@@ -46,6 +46,7 @@ namespace ptens{
     mutable vector<AtomsPack*> _nhoods; 
     mutable AtomsPack* _edges=nullptr;
     mutable unordered_map<BaseMatrix,cnine::array_pool<int>*> subgraphlist_cache;
+    mutable unordered_map<BaseMatrix,shared_ptr<cnine::Tensor<int> > > subgraphlistmx_cache;
     //mutable HgraphSubgraphListCache* subgraphlist_cache=nullptr;
 
     ~Hgraph(){

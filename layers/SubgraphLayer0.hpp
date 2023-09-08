@@ -46,6 +46,8 @@ namespace ptens{
     using TLAYER::tensor;
     using TLAYER::inp;
     using TLAYER::diff2;
+    using TLAYER::inv_channel_norms;
+    using TLAYER::add_scale_channels;
 
 
   public: 

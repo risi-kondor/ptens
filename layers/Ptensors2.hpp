@@ -84,9 +84,8 @@ namespace ptens{
     typedef cnine::Rtensor2_view Rtensor2_view;
     typedef cnine::Rtensor3_view Rtensor3_view;
 
-    //int nc;
     AtomsPack atoms;
-    //bool is_view=false;
+    rtensor norms;
 
 
     ~Ptensors2(){
@@ -109,6 +108,9 @@ namespace ptens{
 
     Ptensors2(const AtomsPack& _atoms, const int _nc, const cnine::fill_zero& dummy, const int _dev=0):
       Ptensors2(zero(_atoms,_nc,_dev)){}
+
+    Ptensors2(const cnine::Tensor<int>& M, const int _nc, const cnine::fill_zero& dummy, const int _dev=0):
+      RtensorPackB(M.dims[0],{M.dims[1],M.dims[1],_nc},dummy,_dev), atoms(M){}
 
     template<typename FILLTYPE, typename = typename std::enable_if<std::is_base_of<cnine::fill_pattern, FILLTYPE>::value, FILLTYPE>::type>
     Ptensors2(const int _n, const int _k, const int _nc, const FILLTYPE& dummy, const int _dev=0):
