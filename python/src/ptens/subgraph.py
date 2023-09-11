@@ -54,6 +54,17 @@ class subgraph:
         G.obj=_subgraph.triangle()
         return G;
 
+    @classmethod
+    def cycle(self,n):
+        G=subgraph()
+        G.obj=_subgraph.cycle(n)
+        return G;
+
+    @classmethod
+    def star(self,n):
+        G=subgraph()
+        G.obj=_subgraph.star(n)
+        return G;
 
     def torch(self):
         return self.obj.dense()

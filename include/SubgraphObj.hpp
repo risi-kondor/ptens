@@ -40,6 +40,14 @@ namespace ptens{
     SubgraphObj(const int _n):
       SubgraphObj(_n,_n){}
 
+    SubgraphObj(const vector<pair<int,int> >& list): 
+      SubgraphObj(list.size()){
+      for(auto p:list){
+	set(p.first,p.second,1.0);
+	set(p.second,p.first,1.0);
+      }
+    }
+
     SubgraphObj(const int _n, const initializer_list<pair<int,int> >& list): 
       SubgraphObj(_n){
       for(auto p:list){

@@ -47,6 +47,9 @@ namespace ptens{
     Subgraph(const int _n):
       obj(ptens_session.subgraphs.emplace(_n).first){}
 
+    Subgraph(const vector<pair<int,int> >& list): 
+      obj(ptens_session.subgraphs.emplace(list).first){}
+
     Subgraph(const int _n, const initializer_list<pair<int,int> >& list): 
       obj(ptens_session.subgraphs.emplace(_n,list).first){}
 
@@ -70,6 +73,21 @@ namespace ptens{
 
     static Subgraph triangle(){
       return Subgraph(3,{{0,1},{1,2},{2,0}});}
+
+    static Subgraph cycle(const int n){
+      vector<pair<int,int> > v;
+      for(int i=0; i<n-1; i++)
+	v.push_back(pair<int,int>(i,i+1));
+      v.push_back(pair<int,int>(n-1,0));
+      return Subgraph(v);
+    }
+
+    static Subgraph star(const int n){
+      vector<pair<int,int> > v(n-1);
+      for(int i=0; i<n-1; i++)
+	v[i]=pair<int,int>(0,i+1);
+      return Subgraph(v);
+    }
 
 
   public: // ---- Access --------------------------------------------------------------------------------------

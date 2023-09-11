@@ -5,6 +5,8 @@ pybind11::class_<Subgraph>(m,"subgraph")
   .def_static("trivial",&Subgraph::trivial)
   .def_static("edge",&Subgraph::edge)
   .def_static("triangle",&Subgraph::triangle)
+  .def_static("cycle",&Subgraph::cycle)
+  .def_static("star",&Subgraph::star)
 
   .def_static("edge_index",[](const at::Tensor& x, int n=-1){
       return Subgraph::edge_index(cnine::RtensorA(x),n);})

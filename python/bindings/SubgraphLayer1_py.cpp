@@ -25,7 +25,15 @@ pybind11::class_<SGlayer1>(m,"subgraph_layer1")
 // ---- Conversions, transport, etc. ------------------------------------------------------------------------
 
 
+  .def("ptensors1",[](const SGlayer1& x){return Ptensors1(x);})
+  .def("toPtensors1_back",[](SGlayer1& x, Ptensors1& r){
+      if(!x.grad) x.grad=new Ptensors1(r.get_grad());
+      else x.grad->add(r.get_grad());})
+
   .def("get_grad",&SGlayer1::get_grad)
+
+  .def("get_gradp",&Ptensors1::get_gradp)
+  .def("add_to_grad",[](Ptensors1& x, const cnine::loose_ptr<Ptensors1>& y){x.add_to_grad(y);})
 
 
 // ---- Access ----------------------------------------------------------------------------------------------
@@ -59,6 +67,7 @@ pybind11::class_<SGlayer1>(m,"subgraph_layer1")
 
 
   .def("add",[](SGlayer1& x, const SGlayer1& y){x.add(y);})
+  .def("add",[](SGlayer1& x, const Ptensors1& y){x.Ptensors1::add(y);})
 
   .def("add_concat_back",[](SGlayer1& x, SGlayer1& g, const int offs){
       x.get_grad().add_channels(g.get_grad(),offs);})
