@@ -124,19 +124,19 @@ class subgraph_layer0(torch.Tensor):
         return SubgraphLayer0_mprodFn.apply(self,y)
 
     def linear(self,y,b):
-        return Subgraph_layer0_linearFn.apply(self,y,b)
+        return SubgraphLayer0_linearFn.apply(self,y,b)
 
     def concat(self,y):
-        return Subgraph_layer0_concatFn.apply(self,y)
+        return SubgraphLayer0_concatFn.apply(self,y)
 
     def relu(self,alpha=0.5):
-        return Subgraph_layer0_ReLUFn.apply(self,alpha)
+        return SubgraphLayer0_ReLUFn.apply(self,alpha)
         
     def inp(self,y):
-        return Subgraph_layer0_inpFn.apply(self,y)
+        return SubgraphLayer0_inpFn.apply(self,y)
     
     def diff2(self,y):
-        return Subgraph_layer0_diff2Fn.apply(self,y)
+        return SubgraphLayer0_diff2Fn.apply(self,y)
 
     def outer(self,y):
         if isinstance(y,ptens.subgraph_layer0):
@@ -270,11 +270,9 @@ class SubgraphLayer0_toFn(torch.autograd.Function):
         
 
 class SubgraphLayer0_addFn(torch.autograd.Function):
-    
     @staticmethod
     def forward(ctx,x,y):
         R=subgraph_layer0(1)
-        _subgraph_layer0(x.obj)
         R.obj=_subgraph_layer0(x.obj)
         R.obj.add(y.obj)
         ctx.x=x.obj
@@ -286,10 +284,10 @@ class SubgraphLayer0_addFn(torch.autograd.Function):
     def backward(ctx,g):
         ctx.x.add_to_grad(ctx.r.get_gradp())
         ctx.y.add_to_grad(ctx.r.get_gradp())
-        return subgraph_layer0.dummy(),subgraph_layer0.dummy()
+        return subgraph_layer0(1),subgraph_layer0(1)
 
 
-class Subgraph_layer0_inpFn(torch.autograd.Function):
+class SubgraphLayer0_inpFn(torch.autograd.Function):
     
     @staticmethod
     def forward(ctx,x,y):
@@ -304,7 +302,7 @@ class Subgraph_layer0_inpFn(torch.autograd.Function):
         return subgraph_layer0.dummy(), subgraph_layer0.dummy()
 
 
-class Subgraph_layer0_diff2Fn(torch.autograd.Function):
+class SubgraphLayer0_diff2Fn(torch.autograd.Function):
     
     @staticmethod
     def forward(ctx,x,y):
@@ -321,7 +319,7 @@ class Subgraph_layer0_diff2Fn(torch.autograd.Function):
         return subgraph_layer0.dummy(), subgraph_layer0.dummy()
 
 
-class Subgraph_layer0_concatFn(torch.autograd.Function):
+class SubgraphLayer0_concatFn(torch.autograd.Function):
     
     @staticmethod
     def forward(ctx,x,y):
@@ -422,7 +420,7 @@ class Subgraph_layer0_linearFn(torch.autograd.Function):
 
 
 
-class Subgraph_layer0_ReLUFn(torch.autograd.Function):
+class SubgraphLayer0_ReLUFn(torch.autograd.Function):
     
     @staticmethod
     def forward(ctx,x,alpha):

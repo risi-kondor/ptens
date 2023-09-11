@@ -25,15 +25,15 @@ pybind11::class_<SGlayer1>(m,"subgraph_layer1")
 // ---- Conversions, transport, etc. ------------------------------------------------------------------------
 
 
+  .def("get_grad",&SGlayer1::get_grad)
+  .def("get_gradp",&Ptensors1::get_gradp)
+  .def("add_to_grad",[](SGlayer1& x, const cnine::loose_ptr<Ptensors1>& y){x.add_to_grad(y);})
+
   .def("ptensors1",[](const SGlayer1& x){return Ptensors1(x);})
   .def("toPtensors1_back",[](SGlayer1& x, Ptensors1& r){
       if(!x.grad) x.grad=new Ptensors1(r.get_grad());
       else x.grad->add(r.get_grad());})
 
-  .def("get_grad",&SGlayer1::get_grad)
-
-  .def("get_gradp",&Ptensors1::get_gradp)
-  .def("add_to_grad",[](Ptensors1& x, const cnine::loose_ptr<Ptensors1>& y){x.add_to_grad(y);})
 
 
 // ---- Access ----------------------------------------------------------------------------------------------
@@ -125,6 +125,8 @@ pybind11::class_<SGlayer1>(m,"subgraph_layer1")
 
   .def("add_ReLU",[](SGlayer1& r, const SGlayer1& x, const float alpha){
       r.add_ReLU(x,alpha);})
+  .def("add_ReLU_back",[](SGlayer1& x, SGlayer1& r, const float alpha){
+      x.get_grad().add_ReLU_back(r.get_grad(),x,alpha);})
 
   .def("inp",[](const SGlayer1& x, const SGlayer1& y){return x.inp(y);})
   .def("diff2",[](const SGlayer1& x, const SGlayer1& y){return x.diff2(y);})
@@ -135,3 +137,7 @@ pybind11::class_<SGlayer1>(m,"subgraph_layer1")
   .def("str",&SGlayer1::str,py::arg("indent")="")
   .def("__str__",&SGlayer1::str,py::arg("indent")="")
   .def("__repr__",&SGlayer1::str,py::arg("indent")="");
+
+
+
+//pybind11::class_<loose_ptr<SGlayer1> >(m,"subgraph_layer1_lptr");

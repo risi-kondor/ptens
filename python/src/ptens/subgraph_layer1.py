@@ -117,22 +117,22 @@ class subgraph_layer1(torch.Tensor):
         return SubgraphLayer1_addFn.apply(self,y)
 
     def __mul__(self,y):
-        return Subgraph_layer1_mprodFn.apply(self,y)
+        return SubgraphLayer1_mprodFn.apply(self,y)
 
     def linear(self,y,b):
-        return Subgraph_layer1_linearFn.apply(self,y,b)
+        return SubgraphLayer1_linearFn.apply(self,y,b)
 
     def concat(self,y):
-        return Subgraph_layer1_concatFn.apply(self,y)
+        return SubgraphLayer1_concatFn.apply(self,y)
     
     def relu(self,alpha=0.5):
-        return Subgraph_layer1_ReLUFn.apply(self,alpha)
+        return SubgraphLayer1_ReLUFn.apply(self,alpha)
         
     def inp(self,y):
-        return Subgraph_layer1_inpFn.apply(self,y)
+        return SubgraphLayer1_inpFn.apply(self,y)
     
     def diff2(self,y):
-        return ptens.Subgraph_layer1_diff2Fn.apply(self,y)
+        return ptens.SubgraphLayer1_diff2Fn.apply(self,y)
 
     def outer(self,y):
         if isinstance(y,ptens.ptensors0):
@@ -291,7 +291,7 @@ class SubgraphLayer1_addFn(torch.autograd.Function):
         return subgraph_layer1(1),subgraph_layer1(1)
 
 
-class Subgraph_layer1_ReLUFn(torch.autograd.Function):
+class SubgraphLayer1_ReLUFn(torch.autograd.Function):
     
     @staticmethod
     def forward(ctx,x,alpha):
@@ -304,7 +304,7 @@ class Subgraph_layer1_ReLUFn(torch.autograd.Function):
 
     @staticmethod
     def backward(ctx,g):
-        ctx.x.add_ReLU_back(ctx.r.gradp(),ctx.alpha)
+        ctx.x.add_ReLU_back(ctx.r,ctx.alpha)
         return subgraph_layer1.dummy(), None
 
 
