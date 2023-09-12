@@ -74,7 +74,7 @@ namespace ptens{
     SubgraphLayer(const SubgraphLayer<TLAYER>& x):
       TLAYER(x), G(x.G), S(x.S){}
 
-
+    
   public: // ---- Transport ----------------------------------------------------------------------------------
 
 

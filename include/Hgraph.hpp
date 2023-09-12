@@ -470,7 +470,7 @@ namespace ptens{
 
     string str(const string indent="") const{
       ostringstream oss;
-      oss<<indent<<"Hgraph on "<<n<<" vertices:"<<endl;
+      oss<<indent<<"Graph with "<<n<<" vertices:"<<endl;
       oss<<dense().str(indent+"  ")<<endl;
       if(is_labeled) oss<<labels.str(indent+"  ")<<endl;
       return oss.str();

@@ -3,9 +3,9 @@ typedef SubgraphLayer1<Ptensors1> SGlayer1;
 typedef SubgraphLayer2<Ptensors2> SGlayer2;
 
 
-pybind11::class_<SGlayer1>(m,"subgraph_layer1")
+pybind11::class_<SGlayer1,Ptensors1>(m,"subgraph_layer1")
 
-//.def(pybind11::init<ptens::Ggraph&, const at::Tensor&>())
+  .def(pybind11::init<const SGlayer0&, const int>())
 
   .def_static("dummy",[]() {return SGlayer1();})
 
@@ -21,12 +21,17 @@ pybind11::class_<SGlayer1>(m,"subgraph_layer1")
   .def_static("zeros_like",&SGlayer1::zeros_like)
   .def_static("randn_like",&SGlayer1::randn_like)
 
+  .def("zeros",&SGlayer1::zeros_like)
+
 
 // ---- Conversions, transport, etc. ------------------------------------------------------------------------
 
 
   .def("get_grad",&SGlayer1::get_grad)
   .def("get_gradp",&Ptensors1::get_gradp)
+  .def("gradp",&Ptensors1::get_gradp)
+  .def("add_to_grad",[](SGlayer1& x, const Ptensors1& y){x.add_to_grad(y);})
+  .def("add_to_grad",[](SGlayer1& x, const Ptensors1& y, const float c){x.add_to_grad(y,c);})
   .def("add_to_grad",[](SGlayer1& x, const cnine::loose_ptr<Ptensors1>& y){x.add_to_grad(y);})
 
   .def("ptensors1",[](const SGlayer1& x){return Ptensors1(x);})
@@ -34,6 +39,10 @@ pybind11::class_<SGlayer1>(m,"subgraph_layer1")
       if(!x.grad) x.grad=new Ptensors1(r.get_grad());
       else x.grad->add(r.get_grad());})
 
+  .def("to_device",[](SGlayer1& x, const int dev){return SGlayer1(x,dev);})
+  .def("to_device_back",[](SGlayer1& x, SGlayer1& g, const int dev){
+      if(!x.grad) x.grad=new Ptensors1(g.get_grad(),dev);
+      else x.grad->add(g.get_grad(),dev);})
 
 
 // ---- Access ----------------------------------------------------------------------------------------------
@@ -46,11 +55,6 @@ pybind11::class_<SGlayer1>(m,"subgraph_layer1")
 
   .def("atoms_of",[](const SGlayer1& x, const int i){return vector<int>(x.atoms_of(i));})
   .def("push_back",&SGlayer1::push_back)
-
-  .def("to_device",&SGlayer1::to_device)
-  .def("move_to_device_back",[](SGlayer1& x, SGlayer1& g, const int dev){
-      if(!x.grad) x.grad=new SGlayer1(g.get_grad(),dev);
-      else x.grad->add(SGlayer1(g.get_grad(),dev));})
 
 
 // ---- Operations -------------------------------------------------------------------------------------------
@@ -68,10 +72,16 @@ pybind11::class_<SGlayer1>(m,"subgraph_layer1")
 
   .def("add",[](SGlayer1& x, const SGlayer1& y){x.add(y);})
   .def("add",[](SGlayer1& x, const Ptensors1& y){x.Ptensors1::add(y);})
+  .def("plus",[](const SGlayer1& x, const SGlayer1& y){
+      SGlayer1 r(x); r.add(y); return r;})
 
   .def("add_concat_back",[](SGlayer1& x, SGlayer1& g, const int offs){
       x.get_grad().add_channels(g.get_grad(),offs);})
 
+  .def("mprod",[](const SGlayer1& x, at::Tensor& y){
+      SGlayer1 r(x.G,x.S,x.atoms,y.size(1),x.dev);
+      r.add_mprod(x,RtensorA::view(y));
+      return r;})
   .def("add_mprod",[](SGlayer1& r, const SGlayer1& x, at::Tensor& y){
       r.add_mprod(x,RtensorA::view(y));})
   .def("add_mprod_back0",[](SGlayer1& x, SGlayer1& g, at::Tensor& M){
@@ -82,6 +92,39 @@ pybind11::class_<SGlayer1>(m,"subgraph_layer1")
       g.add_mprod_back1_to(R,x);
       return R.torch();})
 
+  .def("add_linear",[](SGlayer1& r, const SGlayer1& x, at::Tensor& y, at::Tensor& b){
+      r.add_linear(x,RtensorA::view(y),RtensorA::view(b));})
+  .def("add_linear_back0",[](SGlayer1& x, SGlayer1& g, at::Tensor& y){
+      x.get_grad().add_mprod_back0(g.get_grad(),RtensorA::view(y));})
+  .def("linear_back1",[](SGlayer1& x, SGlayer1& _g){
+      auto& g=_g.get_grad();
+      RtensorA R=RtensorA::zero({x.nc,g.nc},g.dev);
+      g.add_linear_back1_to(R,x);
+      return R.torch();})
+  .def("linear_back2",[](SGlayer1& x, SGlayer1& _g){
+      auto& g=_g.get_grad();
+      RtensorA R=RtensorA::zero({g.nc},g.dev);
+      g.add_linear_back2_to(R);
+      return R.torch();})
+
+  .def("inp",[](const SGlayer1& x, const SGlayer1& y){return x.inp(y);})
+  .def("diff2",[](const SGlayer1& x, const SGlayer1& y){return x.diff2(y);})
+
+  .def("ReLU",[](const SGlayer1& x, const float alpha){
+      auto r=x.zeros(); r.add_ReLU(x,alpha); return r;})
+  .def("add_ReLU_back",[](SGlayer1& x, SGlayer1& r, const float alpha){
+      x.get_grad().add_ReLU_back(r.get_grad(),x,alpha);})
+
+
+// ---- I/O --------------------------------------------------------------------------------------------------
+
+  .def("str",&SGlayer1::str,py::arg("indent")="")
+  .def("__str__",&SGlayer1::str,py::arg("indent")="")
+  .def("__repr__",&SGlayer1::str,py::arg("indent")="");
+
+
+
+//pybind11::class_<loose_ptr<SGlayer1> >(m,"subgraph_layer1_lptr");
 /*
   .def("add_scale",[](SGlayer1& r, const SGlayer1& x, at::Tensor& y){
       RtensorA Y(y);
@@ -108,36 +151,5 @@ pybind11::class_<SGlayer1>(m,"subgraph_layer1")
       r.get_grad().add_scale_channels(g,RtensorA::view(y).view1());}) // changed 
 */
 
-  .def("add_linear",[](SGlayer1& r, const SGlayer1& x, at::Tensor& y, at::Tensor& b){
-      r.add_linear(x,RtensorA::view(y),RtensorA::view(b));})
-  .def("add_linear_back0",[](SGlayer1& x, SGlayer1& g, at::Tensor& y){
-      x.get_grad().add_mprod_back0(g.get_grad(),RtensorA::view(y));})
-  .def("linear_back1",[](SGlayer1& x, SGlayer1& _g){
-      auto& g=_g.get_grad();
-      RtensorA R=RtensorA::zero({x.nc,g.nc},g.dev);
-      g.add_linear_back1_to(R,x);
-      return R.torch();})
-  .def("linear_back2",[](SGlayer1& x, SGlayer1& _g){
-      auto& g=_g.get_grad();
-      RtensorA R=RtensorA::zero({g.nc},g.dev);
-      g.add_linear_back2_to(R);
-      return R.torch();})
-
-  .def("add_ReLU",[](SGlayer1& r, const SGlayer1& x, const float alpha){
-      r.add_ReLU(x,alpha);})
-  .def("add_ReLU_back",[](SGlayer1& x, SGlayer1& r, const float alpha){
-      x.get_grad().add_ReLU_back(r.get_grad(),x,alpha);})
-
-  .def("inp",[](const SGlayer1& x, const SGlayer1& y){return x.inp(y);})
-  .def("diff2",[](const SGlayer1& x, const SGlayer1& y){return x.diff2(y);})
-
-
-// ---- I/O --------------------------------------------------------------------------------------------------
-
-  .def("str",&SGlayer1::str,py::arg("indent")="")
-  .def("__str__",&SGlayer1::str,py::arg("indent")="")
-  .def("__repr__",&SGlayer1::str,py::arg("indent")="");
-
-
-
-//pybind11::class_<loose_ptr<SGlayer1> >(m,"subgraph_layer1_lptr");
+//.def("add_ReLU",[](SGlayer1& r, const SGlayer1& x, const float alpha){
+//    r.add_ReLU(x,alpha);})

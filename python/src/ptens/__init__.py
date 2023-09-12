@@ -39,8 +39,9 @@ from ptens.graph import graph as graph
 from ptens.ggraph import ggraph as ggraph
 from ptens.subgraph import subgraph as subgraph
 
-from ptens.subgraph_layer0 import subgraph_layer0 as subgraph_layer0
-from ptens.subgraph_layer1 import subgraph_layer1 as subgraph_layer1
+from ptens.subgraphlayer0 import subgraphlayer0 as subgraphlayer0
+from ptens.subgraphlayer1 import subgraphlayer1 as subgraphlayer1
+from ptens.subgraphlayer2 import subgraphlayer2 as subgraphlayer2
 
 #import ptens.modules as modules
 
