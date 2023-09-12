@@ -38,6 +38,9 @@ namespace ptens{
     typedef SubgraphLayer<TLAYER> BASE;
 
     using BASE::BASE;
+    using BASE::atoms;
+    using BASE::G;
+    using BASE::S;
     using TLAYER::dev;
     using TLAYER::atoms;
     using TLAYER::getn;
@@ -76,6 +79,13 @@ namespace ptens{
       return SubgraphLayer0(TLAYER::randn_like(x),x.G,x.S);
     }
 
+    SubgraphLayer0<TLAYER> zeros() const{
+      return SubgraphLayer0(TLAYER::zeros_like(*this),G,S);
+    }
+
+    SubgraphLayer0<TLAYER> zeros(const int _nc) const{
+      return SubgraphLayer0(TLAYER::zeros_like(*this,_nc),G,S);
+    }
 
   public: // ---- Conversions --------------------------------------------------------------------------------------------
 

@@ -19,7 +19,7 @@ pybind11::class_<SGlayer1,Ptensors1>(m,"subgraph_layer1")
       return SGlayer1(G,S,v,_nc,cnine::fill_sequential(),_dev);}, py::arg("graph"),py::arg("subgraph"),py::arg("atoms"),py::arg("nc"),py::arg("device")=0)
 
   .def_static("zeros_like",&SGlayer1::zeros_like)
-  .def_static("randn_like",&SGlayer1::randn_like)
+//.def_static("randn_like",&SGlayer1::randn_like)
 
   .def("zeros",&SGlayer1::zeros_like)
 
@@ -75,6 +75,12 @@ pybind11::class_<SGlayer1,Ptensors1>(m,"subgraph_layer1")
   .def("plus",[](const SGlayer1& x, const SGlayer1& y){
       SGlayer1 r(x); r.add(y); return r;})
 
+  .def("concat",[](SGlayer1& x, SGlayer1& y){
+      auto r=x.zeros(x.get_nc()+y.get_nc());
+      r.add_to_channels(x,0);
+      r.add_to_channels(y,x.get_nc());
+      return r;
+    })
   .def("add_concat_back",[](SGlayer1& x, SGlayer1& g, const int offs){
       x.get_grad().add_channels(g.get_grad(),offs);})
 
@@ -92,6 +98,10 @@ pybind11::class_<SGlayer1,Ptensors1>(m,"subgraph_layer1")
       g.add_mprod_back1_to(R,x);
       return R.torch();})
 
+  .def("linear",[](const SGlayer1& x, at::Tensor& y, at::Tensor& b){
+      SGlayer1 r(x.G,x.S,x.atoms,y.size(1),x.dev);
+      r.add_linear(x,RtensorA::view(y),RtensorA::view(b));
+      return r;})
   .def("add_linear",[](SGlayer1& r, const SGlayer1& x, at::Tensor& y, at::Tensor& b){
       r.add_linear(x,RtensorA::view(y),RtensorA::view(b));})
   .def("add_linear_back0",[](SGlayer1& x, SGlayer1& g, at::Tensor& y){

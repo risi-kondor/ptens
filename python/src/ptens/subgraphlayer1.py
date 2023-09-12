@@ -126,10 +126,10 @@ class subgraphlayer1(subgraphlayer):
         return SubgraphLayer_mprodFn.apply(self,y)
 
     def linear(self,y,b):
-        return SubgraphLayer1_linearFn.apply(self,y,b)
+        return SubgraphLayer_linearFn.apply(self,y,b)
 
     def concat(self,y):
-        return SubgraphLayer1_concatFn.apply(self,y)
+        return SubgraphLayer_concatFn.apply(self,y)
     
     def relu(self,alpha=0.1):
         return SubgraphLayer_ReLUFn.apply(self,alpha)
@@ -277,23 +277,20 @@ class subgraphlayer1(subgraphlayer):
 #         return subgraphlayer1.dummy(), subgraphlayer1.dummy()
 
 
-
-class Subgraph_layer1_concatFn(torch.autograd.Function):
-    
-    @staticmethod
-    def forward(ctx,x,y):
-        r=subgraphlayer1(1)
-        r.obj=_subgraph_layer1.concat(x.obj,y.obj)
-        ctx.x=x.obj
-        ctx.y=y.obj
-        ctx.r=r.obj
-        return r
-
-    @staticmethod
-    def backward(ctx,g):
-        ctx.x.add_concat_back(ctx.r,0)
-        ctx.y.add_concat_back(ctx.r,ctx.x.get_nc())
-        return subgraphlayer1(1),subgraphlayer1(1)
+# class Subgraph_layer1_concatFn(torch.autograd.Function):
+#     @staticmethod
+#     def forward(ctx,x,y):
+#         r=subgraphlayer1(1)
+#         r.obj=_subgraph_layer1.concat(x.obj,y.obj)
+#         ctx.x=x.obj
+#         ctx.y=y.obj
+#         ctx.r=r.obj
+#         return r
+#     @staticmethod
+#     def backward(ctx,g):
+#         ctx.x.add_concat_back(ctx.r,0)
+#         ctx.y.add_concat_back(ctx.r,ctx.x.get_nc())
+#         return subgraphlayer1(1),subgraphlayer1(1)
 
 
 # class Subgraph_layer1_mprodFn(torch.autograd.Function):
@@ -311,21 +308,19 @@ class Subgraph_layer1_concatFn(torch.autograd.Function):
 #         return subgraphlayer1(1), ctx.x.mprod_back1(ctx.r.gradp())
 
 
-class Subgraph_layer1_linearFn(torch.autograd.Function):
-    
-    @staticmethod
-    def forward(ctx,x,y,b):
-        R=ptens.subgraphlayer1.zeros(x.obj.view_of_atoms(),y.size(1),x.obj.get_dev())
-        R.obj.add_linear(x.obj,y,b)
-        ctx.x=x.obj
-        ctx.y=y
-        ctx.r=R.obj
-        return R
-
-    @staticmethod
-    def backward(ctx,g):
-        ctx.x.add_linear_back0(ctx.r.gradp(),ctx.y)
-        return subgraphlayer1.dummy(), ctx.x.linear_back1(ctx.r.gradp()), ctx.x.linear_back2(ctx.r.gradp())
+# class Subgraph_layer1_linearFn(torch.autograd.Function):
+#     @staticmethod
+#     def forward(ctx,x,y,b):
+#         R=ptens.subgraphlayer1.zeros(x.obj.view_of_atoms(),y.size(1),x.obj.get_dev())
+#         R.obj.add_linear(x.obj,y,b)
+#         ctx.x=x.obj
+#         ctx.y=y
+#         ctx.r=R.obj
+#         return R
+#     @staticmethod
+#     def backward(ctx,g):
+#         ctx.x.add_linear_back0(ctx.r.gradp(),ctx.y)
+#         return subgraphlayer1.dummy(), ctx.x.linear_back1(ctx.r.gradp()), ctx.x.linear_back2(ctx.r.gradp())
 
 
 class Subgraph_layer1_scaleFn(torch.autograd.Function):
@@ -431,7 +426,6 @@ class Subgraph_layer1_Linmaps2Fn(torch.autograd.Function):
 
 
 class SubgraphLayer1_GatherFn(torch.autograd.Function):
-
     @staticmethod
     def forward(ctx,x,S):
         ctx.x=x
@@ -440,7 +434,6 @@ class SubgraphLayer1_GatherFn(torch.autograd.Function):
         ctx.x=x.obj
         ctx.r=r.obj
         return r
-        
     @staticmethod
     def backward(ctx,g):
         r.obj.add_gather_back(x.obj)
@@ -449,40 +442,40 @@ class SubgraphLayer1_GatherFn(torch.autograd.Function):
 
 
 
-class Subgraph_layer1_Outer0Fn(torch.autograd.Function):
+# class Subgraph_layer1_Outer0Fn(torch.autograd.Function):
 
-    @staticmethod
-    def forward(ctx,x,y):
-        r=ptens.subgraphlayer1(1)
-        r.obj=ptens_base.outer(x.obj,y.obj)
-        ctx.x=x.obj
-        ctx.y=y.obj
-        ctx.r=r.obj
-        return r
+#     @staticmethod
+#     def forward(ctx,x,y):
+#         r=ptens.subgraphlayer1(1)
+#         r.obj=ptens_base.outer(x.obj,y.obj)
+#         ctx.x=x.obj
+#         ctx.y=y.obj
+#         ctx.r=r.obj
+#         return r
         
-    @staticmethod
-    def backward(ctx,g):
-        ptens_base.add_outer_back0(ctx.x.gradp(),ctx.r.gradp(),ctx.y)
-        ptens_base.add_outer_back1(ctx.y.gradp(),ctx.r.gradp(),ctx.x)
-        return subgraphlayer1.dummy(), ptens.ptensors0.dummy()
+#     @staticmethod
+#     def backward(ctx,g):
+#         ptens_base.add_outer_back0(ctx.x.gradp(),ctx.r.gradp(),ctx.y)
+#         ptens_base.add_outer_back1(ctx.y.gradp(),ctx.r.gradp(),ctx.x)
+#         return subgraphlayer1.dummy(), ptens.ptensors0.dummy()
 
 
-class Subgraph_layer1_Outer1Fn(torch.autograd.Function):
+# class Subgraph_layer1_Outer1Fn(torch.autograd.Function):
 
-    @staticmethod
-    def forward(ctx,x,y):
-        r=ptens.ptensors2(1)
-        r.obj=ptens_base.outer(x.obj,y.obj)
-        ctx.x=x.obj
-        ctx.y=y.obj
-        ctx.r=r.obj
-        return r
+#     @staticmethod
+#     def forward(ctx,x,y):
+#         r=ptens.ptensors2(1)
+#         r.obj=ptens_base.outer(x.obj,y.obj)
+#         ctx.x=x.obj
+#         ctx.y=y.obj
+#         ctx.r=r.obj
+#         return r
         
-    @staticmethod
-    def backward(ctx,g):
-        ptens_base.add_outer_back0(ctx.x.gradp(),ctx.r.gradp(),ctx.y)
-        ptens_base.add_outer_back1(ctx.y.gradp(),ctx.r.gradp(),ctx.x)
-        return subgraphlayer1.dummy(), subgraphlayer1.dummy()
+#     @staticmethod
+#     def backward(ctx,g):
+#         ptens_base.add_outer_back0(ctx.x.gradp(),ctx.r.gradp(),ctx.y)
+#         ptens_base.add_outer_back1(ctx.y.gradp(),ctx.r.gradp(),ctx.x)
+#         return subgraphlayer1.dummy(), subgraphlayer1.dummy()
 
 
 

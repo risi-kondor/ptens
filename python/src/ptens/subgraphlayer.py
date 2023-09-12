@@ -49,6 +49,22 @@ class SubgraphLayer_toDeviceFn(torch.autograd.Function):
         return subgraphlayer.dummy(), None
 
 
+class SubgraphLayer_concatFn(torch.autograd.Function):
+    @staticmethod
+    def forward(ctx,x,y):
+        r=x.dummy()
+        r.obj=x.obj.concat(y.obj)
+        ctx.x=x.obj
+        ctx.y=y.obj
+        ctx.r=r.obj
+        return r
+    @staticmethod
+    def backward(ctx,g):
+        ctx.x.add_concat_back(ctx.r,0)
+        ctx.y.add_concat_back(ctx.r,ctx.x.get_nc())
+        return subgraphlayer0(1),subgraphlayer0(1)
+
+
 class SubgraphLayer_plusFn(torch.autograd.Function):
     @staticmethod
     def forward(ctx,x,y):
@@ -69,7 +85,7 @@ class SubgraphLayer_plusFn(torch.autograd.Function):
      @staticmethod
      def forward(ctx,x,y):
          r=x.dummy()
-         r.obj=x.obj.mprod(y)
+         r.obj=x.obj.mprod(y.obj)
          ctx.x=x.obj
          ctx.y=y
          ctx.r=r.obj
@@ -78,6 +94,21 @@ class SubgraphLayer_plusFn(torch.autograd.Function):
      def backward(ctx,g):
          ctx.x.add_mprod_back0(ctx.r.gradp(),ctx.y)
          return subgraphlayer.dummy(), ctx.x.mprod_back1(ctx.r.gradp())
+
+
+class SubgraphLayer_linearFn(torch.autograd.Function):
+    @staticmethod
+    def forward(ctx,x,y,b):
+        r=x.dummy()
+        r.obj=x.obj.linear(y,b)
+        ctx.x=x.obj
+        ctx.y=y
+        ctx.r=r.obj
+        return R
+    @staticmethod
+    def backward(ctx,g):
+        ctx.x.add_linear_back0(ctx.r.gradp(),ctx.y)
+        return subgraphlayer.dummy(), ctx.x.linear_back1(ctx.r.gradp()), ctx.x.linear_back2(ctx.r.gradp())
 
 
 class SubgraphLayer_inpFn(torch.autograd.Function):

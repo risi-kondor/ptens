@@ -232,6 +232,10 @@ namespace ptens{
       return Ptensors2(RtensorPackB::zeros_like(x),x.atoms);//,x.nc);
     }
 
+    static Ptensors2 zeros_like(const Ptensors2& x, const int _nc){
+      return Ptensors2(RtensorPackB::zeros_like(x,_nc),x.atoms);
+    }
+
     static Ptensors2* new_zeros_like(const Ptensors2& x){
       return new Ptensors2(RtensorPackB::zeros_like(x),x.atoms);//,x.nc);
     }

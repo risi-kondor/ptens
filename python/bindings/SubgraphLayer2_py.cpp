@@ -72,6 +72,12 @@ pybind11::class_<SGlayer2>(m,"subgraph_layer2")
   .def("plus",[](const SGlayer2& x, const SGlayer2& y){
       SGlayer2 r(x); r.add(y); return r;})
 
+  .def("concat",[](SGlayer2& x, SGlayer2& y){
+      auto r=x.zeros(x.get_nc()+y.get_nc());
+      r.add_to_channels(x,0);
+      r.add_to_channels(y,x.get_nc());
+      return r;
+    })
   .def("add_concat_back",[](SGlayer2& x, SGlayer2& g, const int offs){
       x.get_grad().add_channels(g.get_grad(),offs);})
 
@@ -89,6 +95,10 @@ pybind11::class_<SGlayer2>(m,"subgraph_layer2")
       g.add_mprod_back1_to(R,x);
       return R.torch();})
 
+  .def("linear",[](const SGlayer2& x, at::Tensor& y, at::Tensor& b){
+      SGlayer2 r(x.G,x.S,x.atoms,y.size(1),x.dev);
+      r.add_linear(x,RtensorA::view(y),RtensorA::view(b));
+      return r;})
   .def("add_linear",[](SGlayer2& r, const SGlayer2& x, at::Tensor& y, at::Tensor& b){
       r.add_linear(x,RtensorA::view(y),RtensorA::view(b));})
   .def("add_linear_back0",[](SGlayer2& x, SGlayer2& g, at::Tensor& y){

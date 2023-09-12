@@ -74,8 +74,14 @@ pybind11::class_<SGlayer0>(m,"subgraph_layer0")
   .def("plus",[](const SGlayer0& x, const SGlayer0& y){
       SGlayer0 r(x); r.add(y); return r;})
 
-//  .def("add_concat_back",[](SGlayer0& x, SGlayer0& g, const int offs){
-//      x.get_grad().add_channels(g.get_grad(),offs);})
+  .def("concat",[](SGlayer0& x, SGlayer0& y){
+      auto r=x.zeros(x.get_nc()+y.get_nc());
+      r.add_to_channels(x,0);
+      r.add_to_channels(y,x.get_nc());
+      return r;
+    })
+  .def("add_concat_back",[](SGlayer0& x, SGlayer0& g, const int offs){
+      x.get_grad().add_channels(g.get_grad(),offs);})
 
   .def("mprod",[](const SGlayer0& x, at::Tensor& y){
       SGlayer0 r(x.G,x.S,x.atoms,y.size(1),x.dev);
@@ -89,21 +95,12 @@ pybind11::class_<SGlayer0>(m,"subgraph_layer0")
       auto& g=_g.get_grad();
       RtensorA R=RtensorA::zero({x.nc,g.nc},g.dev);
       g.add_mprod_back1_to(R,x);
-      return R.torch();})
+      return R.torch();})      
 
-  .def("normalize_channels",[](SGlayer0& x){
-      x.norms=x.inv_channel_norms();
-      auto R=SGlayer0::zeros_like(x);
-      R.add_scale_channels(x,x.norms.view1());
-      return R;
-    })
-  .def("normalize_channels_back",[](SGlayer0& x, SGlayer0& g){
-      x.get_grad().add_scale_channels(g.get_grad(),x.norms.view1());
-    })
-      
-
-//.def("linear",[](const SGlayer0& x, at::Tensor& y, at::Tensor& b){
-//    r.add_linear(x,RtensorA::view(y),RtensorA::view(b));})
+  .def("linear",[](const SGlayer0& x, at::Tensor& y, at::Tensor& b){
+      SGlayer0 r(x.G,x.S,x.atoms,y.size(1),x.dev);
+      r.add_linear(x,RtensorA::view(y),RtensorA::view(b));
+      return r;})
   .def("add_linear_back0",[](SGlayer0& x, SGlayer0& g, at::Tensor& y){
       x.get_grad().add_mprod_back0(g.get_grad(),RtensorA::view(y));})
   .def("linear_back1",[](SGlayer0& x, SGlayer0& _g){
@@ -116,6 +113,16 @@ pybind11::class_<SGlayer0>(m,"subgraph_layer0")
       RtensorA R=RtensorA::zero({g.nc},g.dev);
       g.add_linear_back2_to(R);
       return R.torch();})
+
+  .def("normalize_channels",[](SGlayer0& x){
+      x.norms=x.inv_channel_norms();
+      auto R=SGlayer0::zeros_like(x);
+      R.add_scale_channels(x,x.norms.view1());
+      return R;
+    })
+  .def("normalize_channels_back",[](SGlayer0& x, SGlayer0& g){
+      x.get_grad().add_scale_channels(g.get_grad(),x.norms.view1());
+    })
 
   .def("inp",[](const SGlayer0& x, const SGlayer0& y){return x.inp(y);})
   .def("diff2",[](const SGlayer0& x, const SGlayer0& y){return x.diff2(y);})

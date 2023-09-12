@@ -149,6 +149,10 @@ namespace ptens{
       return Ptensors0(RtensorPackB::zeros_like(x),x.atoms);
     }
 
+    static Ptensors0 zeros_like(const Ptensors0& x, const int _nc){
+      return Ptensors0(RtensorPackB::zeros_like(x,_nc),x.atoms);
+    }
+
     static Ptensors0* new_zeros_like(const Ptensors0& x){
       return new Ptensors0(RtensorPackB::zeros_like(x),x.atoms);
     }

@@ -212,8 +212,12 @@ namespace ptens{
   public: // ---- Spawning -----------------------------------------------------------------------------------
 
 
-   static Ptensors1 zeros_like(const Ptensors1& x){
-     return Ptensors1(RtensorPackB::zeros_like(x),x.atoms);
+    static Ptensors1 zeros_like(const Ptensors1& x){
+      return Ptensors1(RtensorPackB::zeros_like(x),x.atoms);
+    }
+
+    static Ptensors1 zeros_like(const Ptensors1& x, const int _nc){
+      return Ptensors1(RtensorPackB::zeros_like(x,_nc),x.atoms);
     }
 
     static Ptensors1* new_zeros_like(const Ptensors1& x){

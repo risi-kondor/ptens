@@ -71,6 +71,10 @@ namespace ptens{
       return SubgraphLayer1(TLAYER::zeros_like(*this),G,S);
     }
 
+    SubgraphLayer1<TLAYER> zeros(const int _nc) const{
+      return SubgraphLayer1(TLAYER::zeros_like(*this,_nc),G,S);
+    }
+
 
   public: // ---- Transport ----------------------------------------------------------------------------------
 
