@@ -221,7 +221,6 @@ namespace ptens{
     }
 
     static Ptensors1* new_zeros_like(const Ptensors1& x){
-      cout<<123<<endl;
       return new Ptensors1(RtensorPackB::zeros_like(x),x.atoms);
     }
 

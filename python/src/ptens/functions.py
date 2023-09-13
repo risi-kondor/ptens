@@ -13,7 +13,7 @@
 #
 
 
-def cat(x,y):
+def concat(x,y):
     return x.concat(y)
 
 def linear(x,y,b):

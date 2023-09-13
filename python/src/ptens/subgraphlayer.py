@@ -78,10 +78,10 @@ class SubgraphLayer_plusFn(torch.autograd.Function):
     def backward(ctx,g):
         ctx.x.add_to_grad(ctx.r.gradp())
         ctx.y.add_to_grad(ctx.r.gradp())
-        return subgraphlayer.dummy(),subgraphlayer.dummy(()
+        return subgraphlayer.dummy(),subgraphlayer.dummy()
 
 
- class SubgraphLayer_mprodFn(torch.autograd.Function):
+class SubgraphLayer_mprodFn(torch.autograd.Function):
      @staticmethod
      def forward(ctx,x,y):
          r=x.dummy()

@@ -57,6 +57,10 @@ class ptensors1(torch.Tensor):
         R.obj=_ptensors1.sequential(_atoms,_nc,ptens.device_id(device))
         return R
 
+    @classmethod
+    def cat(self,*args):
+        return Ptensors1_catFn.apply(self,*args)
+
 
     # ----- Access -------------------------------------------------------------------------------------------
 
@@ -121,6 +125,9 @@ class ptensors1(torch.Tensor):
 
     def concat(self,y):
         return Ptensors1_concatFn.apply(self,y)
+    
+#    def cat(self,y):
+#        return Ptensors1_catFn.apply(self,y)
     
     def relu(self,alpha=0.5):
         return Ptensors1_ReLUFn.apply(self,alpha)
@@ -334,6 +341,28 @@ class Ptensors1_concatFn(torch.autograd.Function):
         ctx.x.add_concat_back(ctx.r,0)
         ctx.y.add_concat_back(ctx.r,ctx.x.get_nc())
         return ptensors1(1),ptensors1(1)
+
+
+class Ptensors1_catFn(torch.autograd.Function):
+    
+    @staticmethod
+    def forward(ctx,dummy,*args):
+        r=ptensors1(1)
+        print(args)
+        ctx.args=[x.obj for x in args]
+        r.obj=_ptensors1.cat(ctx.args)
+        ctx.r=r.obj
+        return r
+
+    @staticmethod
+    def backward(ctx,g):
+        offs=0
+        dummies=[]
+        for x in ctx.args:
+            x.add_cat_back(ctx.r,offs)
+            offs=offs+len(x)
+            dummies.append(ptensors1(1))
+        return None, *dummies
 
 
 class Ptensors1_mprodFn(torch.autograd.Function):

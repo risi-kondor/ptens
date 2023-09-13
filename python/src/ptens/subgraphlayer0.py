@@ -309,7 +309,7 @@ class SubgraphLayer0_toMxFn(torch.autograd.Function):
 #     @staticmethod
 #     def backward(ctx,g):
 #         ctx.x.add_mprod_back0(ctx.r.gradp(),ctx.y)
-        return subgraphlayer0.dummy(), ctx.x.mprod_back1(ctx.r.gradp())
+#        return subgraphlayer0.dummy(), ctx.x.mprod_back1(ctx.r.gradp())
 
 
 class Subgraph_layer0_mult_channelsFn(torch.autograd.Function):

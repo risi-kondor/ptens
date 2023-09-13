@@ -28,6 +28,10 @@ pybind11::class_<Ptensors1/*,cnine::RtensorPack*/>(m,"ptensors1")
 
   .def_static("concat",&Ptensors1::concat)
 
+  .def_static("cat",&Ptensors1::cat)
+  .def("add_cat_back",[](Ptensors1& x, Ptensors1& r, const int offs){
+      x.get_grad().add_subpack(r.get_grad(),offs);})
+
 
 // ---- Conversions, transport, etc. ------------------------------------------------------------------------
 
@@ -46,6 +50,7 @@ pybind11::class_<Ptensors1/*,cnine::RtensorPack*/>(m,"ptensors1")
 
 
   .def("get_dev",&Ptensors1::get_dev)
+  .def("__len__",&Ptensors1::size)
   .def("get_nc",&Ptensors1::get_nc)
   .def("get_atoms",[](const Ptensors1& x){return x.atoms.as_vecs();})
   .def("get_atomsref",&Ptensors1::get_atomsref)
