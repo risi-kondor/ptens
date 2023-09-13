@@ -27,6 +27,9 @@ namespace ptens{
   public:
 
     //int k=-1;
+    typedef cnine::array_pool<int> BASE;
+    using  BASE::BASE;
+
 
   public: // ---- Constructors ------------------------------------------------------------------------------
 
@@ -176,6 +179,17 @@ namespace ptens{
       for(int i=0; i<size(); i++)
 	R.push_back({size_of(i),size_of(i),nc});
       return R;
+    }
+
+
+  public: // ---- Concatenation ------------------------------------------------------------------------------
+
+
+    static AtomsPack cat(const vector<reference_wrapper<AtomsPack> >& list){
+      return AtomsPack(cnine::array_pool<int>::cat
+	(cnine::mapcar<reference_wrapper<AtomsPack>,reference_wrapper<array_pool<int> > >
+	  (list,[](const reference_wrapper<AtomsPack>& x){
+	    return reference_wrapper<array_pool<int> >(x.get());})));
     }
 
 

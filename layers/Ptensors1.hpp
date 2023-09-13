@@ -361,6 +361,20 @@ namespace ptens{
     }
 
 
+  public: // ---- Concatenation ------------------------------------------------------------------------------
+
+
+    static Ptensors1 cat(const vector<reference_wrapper<Ptensors1> >& list){
+      vector<reference_wrapper<AtomsPack> > v;
+      for(auto& p:list)
+	v.push_back(p.get().atoms);
+      return Ptensors1(cnine::RtensorPackB::cat
+	(cnine::mapcar<reference_wrapper<Ptensors1>,reference_wrapper<RtensorPackB> >
+	  (list,[](const reference_wrapper<Ptensors1>& x){
+	    return reference_wrapper<RtensorPackB>(x.get());})),AtomsPack::cat(v));
+    }
+
+
   public: // ---- Cumulative operations ----------------------------------------------------------------------
 
 
