@@ -105,6 +105,9 @@ class subgraphlayer2(subgraphlayer):
     def randn_like(self,sigma=1.0):
         return subgraphlayer2.randn(self.get_atoms(),self.get_nc(),sigma,self.get_dev())
 
+    def torch(self):
+        return SubgraphLayer2_toMxFn.apply(self)
+
     def to(self, device='cpu'):
         return SubgraphLayer_toDeviceFn.apply(self,device)
 
@@ -180,6 +183,29 @@ class subgraphlayer2(subgraphlayer):
 # ------------------------------------------------------------------------------------------------------------
 
     
+class SubgraphLayer2_fromMxFn(torch.autograd.Function): #TODO 
+    @staticmethod
+    def forward(ctx,G,x):
+        R=subgraphlayer1(1)
+        R.obj=_subgraph_layer2(G.obj,x)
+        return R
+    @staticmethod
+    def backward(ctx,g):
+        return None, ctx.r.get_grad().torch()
+
+
+class SubgraphLayer2_toMxFn(torch.autograd.Function):
+    @staticmethod
+    def forward(ctx,x):
+        ctx.x=x.obj
+        return x.obj.torch()
+    @staticmethod
+    def backward(ctx,g):
+       R=subgraphlayer2(1)
+       ctx.x.torch_back(g)
+       return R
+    
+
 
 # class Subgraph_layer2_getFn(torch.autograd.Function):
 #     @staticmethod

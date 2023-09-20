@@ -129,7 +129,7 @@ namespace ptens{
     }
 
     void gather_back(Ptensors0& x){
-      emp20(x.get_grad(),get_grad(),TransferMap(atoms,x.atoms)); 
+      emp02_back(x.get_grad(),get_grad(),TransferMap(atoms,x.atoms)); 
     }
 
     SubgraphLayer2(const Ptensors1& x, const Ggraph& _G, const Subgraph& _S):
@@ -138,7 +138,7 @@ namespace ptens{
     }
 
     void gather_back(Ptensors1& x){
-      emp21(x.get_grad(),get_grad(),TransferMap(atoms,x.atoms)); 
+      emp12_back(x.get_grad(),get_grad(),TransferMap(atoms,x.atoms)); 
     }
 
     SubgraphLayer2(const Ptensors2& x, const Ggraph& _G, const Subgraph& _S):
@@ -147,7 +147,7 @@ namespace ptens{
     }
 
     void gather_back(Ptensors2& x){
-      emp22(x.get_grad(),get_grad(),TransferMap(atoms,x.atoms)); 
+      emp22_back(x.get_grad(),get_grad(),TransferMap(atoms,x.atoms)); 
     }
 
 

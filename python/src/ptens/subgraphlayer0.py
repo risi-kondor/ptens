@@ -186,7 +186,7 @@ class subgraphlayer0(torch.Tensor):
 # ------------------------------------------------------------------------------------------------------------
 
 
-class SubgraphLayer0_fromMxFn(torch.autograd.Function):
+class SubgraphLayer0_fromMxFn(torch.autograd.Function): #TODO 
     @staticmethod
     def forward(ctx,G,x):
         R=subgraphlayer0(1)

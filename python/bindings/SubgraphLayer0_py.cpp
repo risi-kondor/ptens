@@ -38,7 +38,7 @@ pybind11::class_<SGlayer0,Ptensors0>(m,"subgraph_layer0")
 
   .def("torch",[](const SGlayer0& x){return x.tensor().torch();})
   .def("torch_back",[](SGlayer0& x, const at::Tensor& g){
-      x.get_grad().add(cnine::RtensorPackB(g));})
+      x.get_grad().add(Ptensors0(g,x.atoms));})
 
   .def("to_device",[](SGlayer0& x, const int dev){return SGlayer0(x,dev);})
   .def("to_device_back",[](SGlayer0& x, SGlayer0& g, const int dev){

@@ -111,7 +111,7 @@ class subgraphlayer1(subgraphlayer):
         return subgraphlayer1.randn(self.get_atoms(),self.get_nc(),sigma,self.get_dev())
 
     def torch(self):
-        return Subgraph_layer1_toMxFn.apply(self)
+        return SubgraphLayer1_toMxFn.apply(self)
 
     def ptensors1(self):
         return SubgraphLayer1_toPtensors1Fn.apply(self)
@@ -191,6 +191,30 @@ class subgraphlayer1(subgraphlayer):
 
 
 # ------------------------------------------------------------------------------------------------------------
+
+
+class SubgraphLayer1_fromMxFn(torch.autograd.Function): #TODO 
+    @staticmethod
+    def forward(ctx,G,x):
+        R=subgraphlayer1(1)
+        R.obj=_subgraph_layer1(G.obj,x)
+        return R
+    @staticmethod
+    def backward(ctx,g):
+        return None, ctx.r.get_grad().torch()
+
+
+class SubgraphLayer1_toMxFn(torch.autograd.Function):
+    @staticmethod
+    def forward(ctx,x):
+        ctx.x=x.obj
+        return x.obj.torch()
+    @staticmethod
+    def backward(ctx,g):
+       R=subgraphlayer1(1)
+       ctx.x.torch_back(g)
+       return R
+    
 
 
 # class SubgraphLayer1_toPtensors1Fn(torch.autograd.Function):

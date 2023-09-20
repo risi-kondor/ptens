@@ -35,6 +35,10 @@ pybind11::class_<SGlayer2,Ptensors2>(m,"subgraph_layer2")
       if(!x.grad) x.grad=new Ptensors2(r.get_grad());
       else x.grad->add(r.get_grad());})
 
+  .def("torch",[](const SGlayer2& x){return x.tensor().torch();})
+  .def("torch_back",[](SGlayer2& x, const at::Tensor& g){
+      x.get_grad().add(Ptensors2(g,x.atoms));})
+
   .def("to_device",[](SGlayer2& x, const int dev){return SGlayer2(x,dev);})
   .def("move_to_device_back",[](SGlayer2& x, SGlayer2& g, const int dev){
       if(!x.grad) x.grad=new Ptensors2(g.get_grad(),dev);

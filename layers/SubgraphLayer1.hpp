@@ -105,6 +105,8 @@ namespace ptens{
 
     template<typename TLAYER2>
     void gather_back(SubgraphLayer1<TLAYER2>& x){
+      //x.get_grad();
+      //cout<<"voided"<<endl;
       emp11_back(x.get_grad(),get_grad(),TransferMap(atoms,x.atoms));
     }
 
@@ -135,7 +137,7 @@ namespace ptens{
     }
 
     void gather_back(Ptensors1& x){
-      emp11(x.get_grad(),get_grad(),TransferMap(atoms,x.atoms)); 
+      emp11_back(x.get_grad(),get_grad(),TransferMap(atoms,x.atoms)); 
     }
 
     SubgraphLayer1(const Ptensors2& x, const Ggraph& _G, const Subgraph& _S):
@@ -144,7 +146,7 @@ namespace ptens{
     }
 
     void gather_back(Ptensors2& x){
-      emp12(x.get_grad(),get_grad(),TransferMap(atoms,x.atoms)); 
+      emp21_back(x.get_grad(),get_grad(),TransferMap(atoms,x.atoms)); 
     }
 
 
