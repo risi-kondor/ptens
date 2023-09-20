@@ -66,6 +66,10 @@ class subgraphlayer0(torch.Tensor):
     def gather(self,x,S):
         return SubgraphLayer0_GatherFn.apply(x,S)
 
+    @classmethod
+    def gather_from_ptensors(self,x,G,S):
+        return SubgraphLayer0_GatherFromPtensorsFn.apply(x,G,S)
+
 
     # ----- Access -------------------------------------------------------------------------------------------
 
@@ -443,7 +447,6 @@ class SubgraphLayer0_normalize_channels(torch.autograd.Function):
 
 
 class SubgraphLayer0_GatherFn(torch.autograd.Function):
-
     @staticmethod
     def forward(ctx,x,S):
         ctx.x=x
@@ -452,11 +455,25 @@ class SubgraphLayer0_GatherFn(torch.autograd.Function):
         ctx.x=x.obj
         ctx.r=r.obj
         return r
-        
     @staticmethod
     def backward(ctx,g):
-        r.obj.add_gather_back(x.obj)
+        ctx.r.gather_back(ctx.x)
         return subgraphlayer0.dummy(), None, None
+
+
+class SubgraphLayer0_GatherFromPtensorsFn(torch.autograd.Function):
+    @staticmethod
+    def forward(ctx,x,G,S):
+        ctx.x=x
+        r=ptens.subgraphlayer0(1)
+        r.obj=_subgraph_layer0(x.obj,G.obj,S.obj)
+        ctx.x=x.obj
+        ctx.r=r.obj
+        return r
+    @staticmethod
+    def backward(ctx,g):
+        ctx.r.gather_back(ctx.x)
+        return subgraphlayer0.dummy(), None, None, None 
 
 
 class Subgraph_layer0_Outer0Fn(torch.autograd.Function):

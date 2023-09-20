@@ -3,7 +3,7 @@ typedef SubgraphLayer1<Ptensors1> SGlayer1;
 typedef SubgraphLayer2<Ptensors2> SGlayer2;
 
 
-pybind11::class_<SGlayer2>(m,"subgraph_layer2")
+pybind11::class_<SGlayer2,Ptensors2>(m,"subgraph_layer2")
 
 //.def(pybind11::init<ptens::Ggraph&, const at::Tensor&>())
 
@@ -67,6 +67,15 @@ pybind11::class_<SGlayer2>(m,"subgraph_layer2")
   .def(pybind11::init<const SGlayer2&, const Subgraph&>())
   .def("gather_back",[](SGlayer2& r, SGlayer2& x){r.gather_back(x);})
 
+  .def(pybind11::init<const Ptensors0&, const Ggraph&, const Subgraph&>())
+  .def("gather_back",[](SGlayer2& r, Ptensors0& x){r.gather_back(x);})
+
+  .def(pybind11::init<const Ptensors1&, const Ggraph&, const Subgraph&>())
+  .def("gather_back",[](SGlayer2& r, Ptensors1& x){r.gather_back(x);})
+
+  .def(pybind11::init<const Ptensors2&, const Ggraph&, const Subgraph&>())
+  .def("gather_back",[](SGlayer1& r, Ptensors2& x){r.gather_back(x);})
+
 
   .def("add",[](SGlayer2& x, const SGlayer2& y){x.add(y);})
   .def("plus",[](const SGlayer2& x, const SGlayer2& y){
@@ -128,7 +137,7 @@ pybind11::class_<SGlayer2>(m,"subgraph_layer2")
 
   .def("str",&SGlayer2::str,py::arg("indent")="")
   .def("__str__",&SGlayer2::str,py::arg("indent")="")
-  .def("__repr__",&SGlayer2::str,py::arg("indent")="");
+  .def("__repr__",&SGlayer2::repr);
 
 
 //pybind11::class_<loose_ptr<SGlayer2> >(m,"subgraph_layer2_lptr");

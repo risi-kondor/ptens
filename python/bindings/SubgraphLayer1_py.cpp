@@ -69,6 +69,15 @@ pybind11::class_<SGlayer1,Ptensors1>(m,"subgraph_layer1")
   .def(pybind11::init<const SGlayer2&, const Subgraph&>())
   .def("gather_back",[](SGlayer1& r, SGlayer2& x){r.gather_back(x);})
 
+  .def(pybind11::init<const Ptensors0&, const Ggraph&, const Subgraph&>())
+  .def("gather_back",[](SGlayer1& r, Ptensors0& x){r.gather_back(x);})
+
+  .def(pybind11::init<const Ptensors1&, const Ggraph&, const Subgraph&>())
+  .def("gather_back",[](SGlayer1& r, Ptensors1& x){r.gather_back(x);})
+
+  .def(pybind11::init<const Ptensors2&, const Ggraph&, const Subgraph&>())
+  .def("gather_back",[](SGlayer1& r, Ptensors2& x){r.gather_back(x);})
+
 
   .def("add",[](SGlayer1& x, const SGlayer1& y){x.add(y);})
   .def("add",[](SGlayer1& x, const Ptensors1& y){x.Ptensors1::add(y);})
@@ -130,7 +139,7 @@ pybind11::class_<SGlayer1,Ptensors1>(m,"subgraph_layer1")
 
   .def("str",&SGlayer1::str,py::arg("indent")="")
   .def("__str__",&SGlayer1::str,py::arg("indent")="")
-  .def("__repr__",&SGlayer1::str,py::arg("indent")="");
+  .def("__repr__",&SGlayer1::repr);
 
 
 

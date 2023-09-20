@@ -373,6 +373,14 @@ namespace ptens{
 	    return reference_wrapper<RtensorPackB>(x.get());})),AtomsPack::cat(v));
     }
 
+    static Ptensors1 sum(const vector<reference_wrapper<Ptensors1> >& list){
+      if(list.size()==0) return Ptensors1();
+      Ptensors1 R(list[0].get());
+      for(int i=1; i<list.size(); i++)
+	R.add(list[i].get());
+      return R;
+    }
+
 
   public: // ---- Cumulative operations ----------------------------------------------------------------------
 

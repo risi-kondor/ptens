@@ -138,7 +138,46 @@ namespace ptens{
     }
 
 
+    SubgraphLayer0(const Ptensors0& x, const Ggraph& _G, const Subgraph& _S):
+      SubgraphLayer0(_G,_S,CachedPlantedSubgraphsMx(*_G.obj,*_S.obj),x.get_nc(),x.dev){
+      emp00(*this,x,TransferMap(x.atoms,atoms));
+    }
+
+    void gather_back(Ptensors0& x){
+      emp00(x.get_grad(),get_grad(),TransferMap(atoms,x.atoms)); 
+    }
+
+    SubgraphLayer0(const Ptensors1& x, const Ggraph& _G, const Subgraph& _S):
+      SubgraphLayer0(_G,_S,CachedPlantedSubgraphsMx(*_G.obj,*_S.obj),x.get_nc(),x.dev){
+      emp10(*this,x,TransferMap(x.atoms,atoms));
+    }
+
+    void gather_back(Ptensors1& x){
+      emp01(x.get_grad(),get_grad(),TransferMap(atoms,x.atoms));
+    }
+
+    SubgraphLayer0(const Ptensors2& x, const Ggraph& _G, const Subgraph& _S):
+      SubgraphLayer0(_G,_S,CachedPlantedSubgraphsMx(*_G.obj,*_S.obj),2*x.get_nc(),x.dev){
+      emp20(*this,x,TransferMap(x.atoms,atoms));
+    }
+
+    void gather_back(Ptensors2& x){
+      emp20_back(x.get_grad(),get_grad(),TransferMap(atoms,x.atoms));
+    }
+
   public:
+
+  public: // ---- I/O ----------------------------------------------------------------------------------------
+
+
+    string classname() const{
+      return "SubgraphLayer0";
+    }
+
+    string repr() const{
+      if(dev==0) return "<SubgraphLayer0[N="+to_string(getn())+"]>";
+      else return "<SubgraphLayer0[N="+to_string(getn())+"][G]>";
+    }
 
 
   };

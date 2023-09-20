@@ -73,6 +73,12 @@ namespace ptens{
     Ptensors0(const int _nc, const int _dev=0):
       RtensorPackB(1,_nc,_dev)/*, nc(_nc)*/{}
 
+    Ptensors0(const AtomsPack& _atoms, const int _nc, const int _dev=0):
+      RtensorPackB(1,_nc,_dev), atoms(_atoms){}
+
+    //Ptensors0(const AtomsPack& _atoms, const int _nc, const cnine::fill_zero& dummy, const int _dev=0):
+    //RtensorPackB(_atoms.size(), cnine::Gdims({_nc}), dummy, _dev), atoms(_atoms){}
+
     template<typename FILLTYPE, typename = typename std::enable_if<std::is_base_of<cnine::fill_pattern, FILLTYPE>::value, FILLTYPE>::type>
     Ptensors0(const int _n, const int _nc, const FILLTYPE& dummy, const int _dev=0):
       RtensorPackB(_n, cnine::Gdims({_nc}), dummy, _dev), atoms(_n)/*, nc(_nc)*/{}
@@ -80,6 +86,11 @@ namespace ptens{
     template<typename FILLTYPE, typename = typename std::enable_if<std::is_base_of<cnine::fill_pattern, FILLTYPE>::value, FILLTYPE>::type>
     Ptensors0(const AtomsPack& _atoms, const int _nc, const FILLTYPE& dummy, const int _dev=0):
       RtensorPackB(_atoms.size(), cnine::Gdims({_nc}), dummy, _dev), atoms(_atoms) /*, nc(_nc)*/{
+    }
+
+    template<typename FILLTYPE, typename = typename std::enable_if<std::is_base_of<cnine::fill_pattern, FILLTYPE>::value, FILLTYPE>::type>
+    Ptensors0(const cnine::Tensor<int>& M, const int _nc, const FILLTYPE& dummy, const int _dev=0):
+      RtensorPackB(M.dim(0), cnine::Gdims({_nc}), dummy, _dev), atoms(M){
     }
 
 
@@ -115,6 +126,20 @@ namespace ptens{
 
     static Ptensors0 zero(const AtomsPack& _atoms, const int _nc, const int _dev=0){
       return Ptensors0(_atoms,_nc,cnine::fill_zero(),_dev);}
+
+    /*
+    static Ptensors0 zero(const AtomsPack& _atoms, const int _nc, const int _dev=0){
+      Ptensors0 R(_atoms,_nc,_dev);
+      R.reserve_zero(_atoms.tsize0()*_nc);
+      R.dir=IntTensor::raw({_atoms.size(),3});
+      R.tail=0;
+      for(int i=0; i<_atoms.size(); i++){
+	R.dir.set_row(i,{R.tail,1,_nc});
+	R.tail+=_nc;
+      }
+      return R;
+    }
+    */
 
     static Ptensors0 gaussian(const AtomsPack& _atoms, const int _nc, const int _dev=0){
       return Ptensors0(_atoms,_nc,cnine::fill_gaussian(),_dev);}
@@ -309,6 +334,28 @@ namespace ptens{
     }
 
 
+  public: // ---- Concatenation and summation ----------------------------------------------------------------
+
+
+    static Ptensors0 cat(const vector<reference_wrapper<Ptensors0> >& list){
+      vector<reference_wrapper<AtomsPack> > v;
+      for(auto& p:list)
+	v.push_back(p.get().atoms);
+      return Ptensors0(cnine::RtensorPackB::cat
+	(cnine::mapcar<reference_wrapper<Ptensors0>,reference_wrapper<RtensorPackB> >
+	  (list,[](const reference_wrapper<Ptensors0>& x){
+	    return reference_wrapper<RtensorPackB>(x.get());})),AtomsPack::cat(v));
+    }
+
+    static Ptensors0 sum(const vector<reference_wrapper<Ptensors0> >& list){
+      if(list.size()==0) return Ptensors0();
+      Ptensors0 R(list[0].get());
+      for(int i=1; i<list.size(); i++)
+	R.add(list[i].get());
+      return R;
+    }
+
+
   public: // ---- Cumulative operations ----------------------------------------------------------------------
 
 
@@ -326,6 +373,16 @@ namespace ptens{
       PTENS_ASSRT(x.size()==N);
       for(int i=0; i<N; i++)
 	view_of(i)+=x.view_of(i,offs,nc);
+    }
+
+    Ptensors0 average(){
+      Ptensors0 R(1,get_nc(),cnine::fill_zero(),dev);
+      matrix_view().avg0_into(R.matrix_view().slice0(0));
+      return R;
+    }
+
+    void add_average_back(const Ptensors0& g){
+      matrix_view().add_broadcast0(g.matrix_view().slice0(0),1.0/getn());
     }
 
 

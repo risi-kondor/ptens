@@ -88,7 +88,6 @@ namespace ptens{
 
     template<typename TLAYER2>
     SubgraphLayer1(const SubgraphLayer0<TLAYER2>& x, const Subgraph& _S):
-      //SubgraphLayer1(x.G,_S,AtomsPack(CachedPlantedSubgraphs()(*x.G.obj,*_S.obj)),x.get_nc(),x.dev){
       SubgraphLayer1(x.G,_S,CachedPlantedSubgraphsMx(*x.G.obj,*_S.obj),x.get_nc(),x.dev){
       emp01(*this,x,TransferMap(x.atoms,atoms));
     }
@@ -100,7 +99,6 @@ namespace ptens{
 
     template<typename TLAYER2>
     SubgraphLayer1(const SubgraphLayer1<TLAYER2>& x, const Subgraph& _S):
-      //SubgraphLayer1(x.G,_S,AtomsPack(CachedPlantedSubgraphs()(*x.G.obj,*_S.obj)),2*x.get_nc(),x.dev){
       SubgraphLayer1(x.G,_S,CachedPlantedSubgraphsMx(*x.G.obj,*_S.obj),2*x.get_nc(),x.dev){
       emp11(*this,x,TransferMap(x.atoms,atoms));
     }
@@ -122,6 +120,33 @@ namespace ptens{
     }
 
 
+    SubgraphLayer1(const Ptensors0& x, const Ggraph& _G, const Subgraph& _S):
+      SubgraphLayer1(_G,_S,CachedPlantedSubgraphsMx(*_G.obj,*_S.obj),x.get_nc(),x.dev){
+      emp01(*this,x,TransferMap(x.atoms,atoms));
+    }
+
+    void gather_back(Ptensors0& x){
+      emp10(x.get_grad(),get_grad(),TransferMap(atoms,x.atoms)); 
+    }
+
+    SubgraphLayer1(const Ptensors1& x, const Ggraph& _G, const Subgraph& _S):
+      SubgraphLayer1(_G,_S,CachedPlantedSubgraphsMx(*_G.obj,*_S.obj),2*x.get_nc(),x.dev){
+      emp11(*this,x,TransferMap(x.atoms,atoms));
+    }
+
+    void gather_back(Ptensors1& x){
+      emp11(x.get_grad(),get_grad(),TransferMap(atoms,x.atoms)); 
+    }
+
+    SubgraphLayer1(const Ptensors2& x, const Ggraph& _G, const Subgraph& _S):
+      SubgraphLayer1(_G,_S,CachedPlantedSubgraphsMx(*_G.obj,*_S.obj),5*x.get_nc(),x.dev){
+      emp21(*this,x,TransferMap(x.atoms,atoms));
+    }
+
+    void gather_back(Ptensors2& x){
+      emp12(x.get_grad(),get_grad(),TransferMap(atoms,x.atoms)); 
+    }
+
 
   public: 
 
@@ -129,6 +154,18 @@ namespace ptens{
 
 
   public:
+
+  public: // ---- I/O ----------------------------------------------------------------------------------------
+
+
+    string classname() const{
+      return "SubgraphLayer1";
+    }
+
+    string repr() const{
+      if(dev==0) return "<SubgraphLayer1[N="+to_string(getn())+"]>";
+      else return "<SubgraphLayer1[N="+to_string(getn())+"][G]>";
+    }
 
 
 

@@ -39,6 +39,14 @@ pybind11::class_<Ptensors0/*,cnine::RtensorPack*/>(m,"ptensors0")
       return Ptensors0::sequential(_atoms,_nc,_dev);}, py::arg("atoms"),py::arg("nc"),py::arg("device")=0)
 
   .def_static("concat",&Ptensors0::concat)
+  .def("add_concat_back",[](Ptensors0& x, Ptensors0& g, const int offs){
+      x.get_grad().add_channels(g.get_grad(),offs);})
+
+  .def_static("cat",&Ptensors0::cat)
+  .def("add_cat_back",[](Ptensors0& x, Ptensors0& r, const int offs){
+      x.get_grad().add_subpack(r.get_grad(),offs);})
+
+  .def_static("sum",&Ptensors0::cat)
 
 
 // ---- Conversions, transport, etc. ------------------------------------------------------------------------
@@ -86,8 +94,9 @@ pybind11::class_<Ptensors0/*,cnine::RtensorPack*/>(m,"ptensors0")
 
   .def("add",[](Ptensors0& x, const Ptensors0& y){x.add(y);})
 
-  .def("add_concat_back",[](Ptensors0& x, Ptensors0& g, const int offs){
-      x.get_grad().add_channels(g.get_grad(),offs);})
+  .def("average",&Ptensors0::average)
+  .def("average_back",[](Ptensors0& x, Ptensors0& r){
+      x.get_grad().add_average_back(r.get_grad());})
 
   .def("add_mprod",[](Ptensors0& r, const Ptensors0& x, at::Tensor& y){
       r.add_mprod(x,RtensorA::view(y));})
@@ -155,7 +164,7 @@ pybind11::class_<Ptensors0/*,cnine::RtensorPack*/>(m,"ptensors0")
 
   .def("str",&Ptensors0::str,py::arg("indent")="")
   .def("__str__",&Ptensors0::str,py::arg("indent")="")
-  .def("__repr__",&Ptensors0::str,py::arg("indent")="");
+  .def("__repr__",&Ptensors0::repr);
 
 
 pybind11::class_<loose_ptr<Ptensors0> >(m,"ptensors0_lptr");

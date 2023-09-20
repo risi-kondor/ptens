@@ -58,6 +58,14 @@ class ptensors0(torch.Tensor):
         R.obj=_ptensors0.sequential(_atoms,_nc,ptens.device_id(device))
         return R
 
+    @classmethod
+    def cat(self,*args):
+        return Ptensors0_catFn.apply(self,*args)
+
+    @classmethod
+    def sum(self,*args):
+        return Ptensors0_sumFn.apply(self,*args)
+
     def randn_like(self,sigma=1.0):
         return ptensors0.randn(self.get_atoms(),self.get_nc(),sigma,self.get_dev())
 
@@ -145,6 +153,9 @@ class ptensors0(torch.Tensor):
 
     def mult_channels(self,y):
         return Ptensors0_mult_channelsFn.apply(self,y)
+
+    def avg_pool(self):
+        return Ptensors0_averageFn.apply(self)
 
 
     # ---- Message passing -----------------------------------------------------------------------------------
@@ -329,6 +340,58 @@ class Ptensors0_concatFn(torch.autograd.Function):
         return ptensors0(1),ptensors0(1)
 
     
+class Ptensors0_catFn(torch.autograd.Function):
+    
+    @staticmethod
+    def forward(ctx,dummy,*args):
+        r=ptensors1(1)
+        ctx.args=[x.obj for x in args]
+        r.obj=_ptensors0.cat(ctx.args)
+        ctx.r=r.obj
+        return r
+
+    @staticmethod
+    def backward(ctx,g):
+        offs=0
+        dummies=[]
+        for x in ctx.args:
+            x.add_cat_back(ctx.r,offs)
+            offs=offs+len(x)
+            dummies.append(ptensors1(1))
+        return None, *dummies
+
+
+class Ptensors0_sumFn(torch.autograd.Function):
+    @staticmethod
+    def forward(ctx,dummy,*args):
+        r=ptensors0(1)
+        ctx.args=[x.obj for x in args]
+        r.obj=_ptensors0.sum(ctx.args)
+        ctx.r=r.obj
+        return r
+    @staticmethod
+    def backward(ctx,g):
+        dummies=[]
+        for x in ctx.args:
+            x.add_to_grad(ctx.r.get_gradp())
+            dummies.append(ptensors0(1))
+        return None, *dummies
+
+
+class Ptensors0_averageFn(torch.autograd.Function):
+    @staticmethod
+    def forward(ctx,x):
+        r=ptensors0(1)
+        r.obj=_ptensors0.average(x.obj)
+        ctx.x=x.obj
+        ctx.r=r.obj
+        return r
+    @staticmethod
+    def backward(ctx,g):
+        ctx.x.add_average_back(ctx.r)
+        return ptensors0(1)
+
+
 class Ptensors0_mprodFn(torch.autograd.Function):
     
     @staticmethod

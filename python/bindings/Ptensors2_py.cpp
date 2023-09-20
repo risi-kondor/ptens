@@ -28,6 +28,12 @@ pybind11::class_<Ptensors2/*,cnine::RtensorPack*/>(m,"ptensors2")
 
   .def_static("concat",&Ptensors2::concat)
 
+  .def_static("cat",&Ptensors2::cat)
+  .def("add_cat_back",[](Ptensors2& x, Ptensors2& r, const int offs){
+      x.get_grad().add_subpack(r.get_grad(),offs);})
+
+  .def_static("sum",&Ptensors2::cat)
+
 
 // ---- Conversions, transport, etc. ------------------------------------------------------------------------
 
@@ -132,7 +138,7 @@ pybind11::class_<Ptensors2/*,cnine::RtensorPack*/>(m,"ptensors2")
 
   .def("str",&Ptensors2::str,py::arg("indent")="")
   .def("__str__",&Ptensors2::str,py::arg("indent")="")
-  .def("__repr__",&Ptensors2::str,py::arg("indent")="");
+  .def("__repr__",&Ptensors2::repr);
 
 
 

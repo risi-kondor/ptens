@@ -57,6 +57,14 @@ class ptensors2(torch.Tensor):
         R.obj=_ptensors2.sequential(_atoms,_nc,ptens.device_id(device))
         return R
 
+    @classmethod
+    def cat(self,*args):
+        return Ptensors2_catFn.apply(self,*args)
+
+    @classmethod
+    def sum(self,*args):
+        return Ptensors2_sumFn.apply(self,*args)
+
     def randn_like(self,sigma=1.0):
         return ptensors2.randn(self.get_atoms(),self.get_nc(),sigma,self.get_dev())
 
@@ -332,6 +340,44 @@ class Ptensors2_concatFn(torch.autograd.Function):
         ctx.x.add_concat_back(ctx.r,0)
         ctx.y.add_concat_back(ctx.r,ctx.x.get_nc())
         return ptensors2(1),ptensors2(1)
+
+
+class Ptensors2_catFn(torch.autograd.Function):
+    
+    @staticmethod
+    def forward(ctx,dummy,*args):
+        r=ptensors2(1)
+        ctx.args=[x.obj for x in args]
+        r.obj=_ptensors2.cat(ctx.args)
+        ctx.r=r.obj
+        return r
+
+    @staticmethod
+    def backward(ctx,g):
+        offs=0
+        dummies=[]
+        for x in ctx.args:
+            x.add_cat_back(ctx.r,offs)
+            offs=offs+len(x)
+            dummies.append(ptensors1(1))
+        return None, *dummies
+
+
+class Ptensors0_sumFn(torch.autograd.Function):
+    @staticmethod
+    def forward(ctx,dummy,*args):
+        r=ptensors2(1)
+        ctx.args=[x.obj for x in args]
+        r.obj=_ptensors2.sum(ctx.args)
+        ctx.r=r.obj
+        return r
+    @staticmethod
+    def backward(ctx,g):
+        dummies=[]
+        for x in ctx.args:
+            x.add_to_grad(ctx.r.get_gradp())
+            dummies.append(ptensors2(1))
+        return None, *dummies
 
 
 class Ptensors2_mprodFn(torch.autograd.Function):

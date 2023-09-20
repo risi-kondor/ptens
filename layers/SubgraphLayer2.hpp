@@ -123,6 +123,34 @@ namespace ptens{
     }
 
 
+    SubgraphLayer2(const Ptensors0& x, const Ggraph& _G, const Subgraph& _S):
+      SubgraphLayer2(_G,_S,CachedPlantedSubgraphsMx(*_G.obj,*_S.obj),2*x.get_nc(),x.dev){
+      emp02(*this,x,TransferMap(x.atoms,atoms));
+    }
+
+    void gather_back(Ptensors0& x){
+      emp20(x.get_grad(),get_grad(),TransferMap(atoms,x.atoms)); 
+    }
+
+    SubgraphLayer2(const Ptensors1& x, const Ggraph& _G, const Subgraph& _S):
+      SubgraphLayer2(_G,_S,CachedPlantedSubgraphsMx(*_G.obj,*_S.obj),5*x.get_nc(),x.dev){
+      emp12(*this,x,TransferMap(x.atoms,atoms));
+    }
+
+    void gather_back(Ptensors1& x){
+      emp21(x.get_grad(),get_grad(),TransferMap(atoms,x.atoms)); 
+    }
+
+    SubgraphLayer2(const Ptensors2& x, const Ggraph& _G, const Subgraph& _S):
+      SubgraphLayer2(_G,_S,CachedPlantedSubgraphsMx(*_G.obj,*_S.obj),15*x.get_nc(),x.dev){
+      emp22(*this,x,TransferMap(x.atoms,atoms));
+    }
+
+    void gather_back(Ptensors2& x){
+      emp22(x.get_grad(),get_grad(),TransferMap(atoms,x.atoms)); 
+    }
+
+
   public: 
 
 
@@ -130,6 +158,18 @@ namespace ptens{
 
   public:
 
+
+  public: // ---- I/O ----------------------------------------------------------------------------------------
+
+
+    string classname() const{
+      return "SubgraphLayer2";
+    }
+
+    string repr() const{
+      if(dev==0) return "<SubgraphLayer2[N="+to_string(getn())+"]>";
+      else return "<SubgraphLayer2[N="+to_string(getn())+"][G]>";
+    }
 
 
 

@@ -61,6 +61,10 @@ class ptensors1(torch.Tensor):
     def cat(self,*args):
         return Ptensors1_catFn.apply(self,*args)
 
+    @classmethod
+    def sum(self,*args):
+        return Ptensors1_sumFn.apply(self,*args)
+
 
     # ----- Access -------------------------------------------------------------------------------------------
 
@@ -348,7 +352,6 @@ class Ptensors1_catFn(torch.autograd.Function):
     @staticmethod
     def forward(ctx,dummy,*args):
         r=ptensors1(1)
-        print(args)
         ctx.args=[x.obj for x in args]
         r.obj=_ptensors1.cat(ctx.args)
         ctx.r=r.obj
@@ -361,6 +364,23 @@ class Ptensors1_catFn(torch.autograd.Function):
         for x in ctx.args:
             x.add_cat_back(ctx.r,offs)
             offs=offs+len(x)
+            dummies.append(ptensors1(1))
+        return None, *dummies
+
+
+class Ptensors1_sumFn(torch.autograd.Function):
+    @staticmethod
+    def forward(ctx,dummy,*args):
+        r=ptensors1(1)
+        ctx.args=[x.obj for x in args]
+        r.obj=_ptensors1.sum(ctx.args)
+        ctx.r=r.obj
+        return r
+    @staticmethod
+    def backward(ctx,g):
+        dummies=[]
+        for x in ctx.args:
+            x.add_to_grad(ctx.r.get_gradp())
             dummies.append(ptensors1(1))
         return None, *dummies
 

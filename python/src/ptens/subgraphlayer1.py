@@ -64,6 +64,10 @@ class subgraphlayer1(subgraphlayer):
     def gather(self,x,S):
         return SubgraphLayer1_GatherFn.apply(x,S)
 
+    @classmethod
+    def gather_from_ptensors(self,x,G,S):
+        return SubgraphLayer1_GatherFromPtensorsFn.apply(x,G,S)
+
 
     # ----- Access -------------------------------------------------------------------------------------------
 
@@ -436,8 +440,23 @@ class SubgraphLayer1_GatherFn(torch.autograd.Function):
         return r
     @staticmethod
     def backward(ctx,g):
-        r.obj.add_gather_back(x.obj)
-        return subgraph_layer0.dummy(), None, None
+        ctx.r.gather_back(ctx.x)
+        return subgraphlayer1.dummy(), None, None
+
+
+class SubgraphLayer1_GatherFromPtensorsFn(torch.autograd.Function):
+    @staticmethod
+    def forward(ctx,x,G,S):
+        ctx.x=x
+        r=ptens.subgraphlayer1(1)
+        r.obj=_subgraph_layer1(x.obj,G.obj,S.obj)
+        ctx.x=x.obj
+        ctx.r=r.obj
+        return r
+    @staticmethod
+    def backward(ctx,g):
+        ctx.r.gather_back(ctx.x)
+        return subgraphlayer1.dummy(), None, None, None 
 
 
 
