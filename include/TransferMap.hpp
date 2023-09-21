@@ -19,6 +19,7 @@
 #include "Tensor.hpp"
 #include "array_pool.hpp"
 #include "AindexPack.hpp"
+#include "GatherMap.hpp"
 
 
 namespace ptens{
@@ -30,6 +31,8 @@ namespace ptens{
     typedef cnine::Tensor<int> IntMatrix;
 
     using SparseRmatrix::SparseRmatrix;
+
+    mutable shared_ptr<cnine::GatherMap> bmap;
 
 
   public: // ---- Construct from overlaps ------------------------------------------------------------------------------
@@ -161,7 +164,8 @@ namespace ptens{
 
   public: // ---- Intersects --------------------------------------------------------------------------------------------
 
-
+    // for future use 
+    /*  
     pair<IntMatrix,IntMatrix> intersects(const IntMatrix& inputs, const IntMatrix& outputs, const bool self=0) const{
       PTENS_ASSRT(outputs.dims[0]==n);
       PTENS_ASSRT(inputs.dims[0]==m);
@@ -187,9 +191,10 @@ namespace ptens{
 	  }
 	  t++;
 	});
+      out_indices.bmap=get_bmap();
       return make_pair(in_indices, out_indices);
     }
-
+    */
 
     pair<AindexPack,AindexPack> intersects(const AtomsPack& inputs, const AtomsPack& outputs, const bool self=0) const{
       //cout<<n<<" "<<m<<" "<<inputs.size()<<" "<<outputs.size()<<endl;
@@ -215,11 +220,47 @@ namespace ptens{
 	}, self);
       //out_indices.bmap=new cnine::GatherMap(get_bmap());
       //if(!bmap) bmap=std::shared_ptr<cnine::GatherMap>(new cnine::GatherMap(broadcast_map())); 
-      //out_indices.bmap=bmap; //new cnine::GatherMap(get_bmap());
+      out_indices.bmap=get_bmap();
       return make_pair(in_indices, out_indices);
     }
 
 
+    std::shared_ptr<cnine::GatherMap> get_bmap() const{
+      if(bmap) return bmap; 
+
+      int nlists=0;
+      int nedges=0;
+      for(auto q:lists)
+	if(q.second->size()>0){
+	  nlists++;
+	  nedges+=q.second->size();
+	}
+      
+      cnine::GatherMap* R=new cnine::GatherMap(nlists,nedges);
+      int i=0;
+      int m=0;
+      int tail=3*nlists;
+      for(auto q:lists){
+	int len=q.second->size();
+	if(len==0) continue;
+	R->arr[3*i]=tail;
+	R->arr[3*i+1]=len;
+	R->arr[3*i+2]=q.first;
+	int j=0;
+	for(auto p:*q.second){
+	  R->arr[tail+2*j]=m++;
+	  *reinterpret_cast<float*>(R->arr+tail+2*j+1)=p.second;
+	  j++;
+	}
+	tail+=2*len;
+	i++;
+      }
+      
+      bmap=std::shared_ptr<cnine::GatherMap>(R);
+      return bmap;
+    }
+
+    
   };
 
 }
