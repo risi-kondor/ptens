@@ -218,8 +218,6 @@ namespace ptens{
 	  out_indices.count2+=_out.size()*_out.size();
 	    
 	}, self);
-      //out_indices.bmap=new cnine::GatherMap(get_bmap());
-      //if(!bmap) bmap=std::shared_ptr<cnine::GatherMap>(new cnine::GatherMap(broadcast_map())); 
       out_indices.bmap=get_bmap();
       return make_pair(in_indices, out_indices);
     }

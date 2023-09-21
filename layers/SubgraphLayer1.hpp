@@ -105,8 +105,6 @@ namespace ptens{
 
     template<typename TLAYER2>
     void gather_back(SubgraphLayer1<TLAYER2>& x){
-      //x.get_grad();
-      //cout<<"voided"<<endl;
       emp11_back(x.get_grad(),get_grad(),TransferMap(atoms,x.atoms));
     }
 
@@ -124,7 +122,6 @@ namespace ptens{
 
     SubgraphLayer1(const Ptensors0& x, const Ggraph& _G, const Subgraph& _S):
       SubgraphLayer1(_G,_S,CachedPlantedSubgraphsMx(*_G.obj,*_S.obj),x.get_nc(),x.dev){
-      cout<<997<<endl;
       emp01(*this,x,TransferMap(x.atoms,atoms));
     }
 
@@ -134,7 +131,6 @@ namespace ptens{
 
     SubgraphLayer1(const Ptensors1& x, const Ggraph& _G, const Subgraph& _S):
       SubgraphLayer1(_G,_S,CachedPlantedSubgraphsMx(*_G.obj,*_S.obj),2*x.get_nc(),x.dev){
-      cout<<998<<endl;
       emp11(*this,x,TransferMap(x.atoms,atoms));
     }
 
