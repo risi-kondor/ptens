@@ -53,7 +53,7 @@ namespace ptens{
 
     AindexPack(AindexPack&& x):
       array_pool<int>(std::move(x)){
-      bmap=x.bmap; x.bmap=nullptr;
+      bmap=x.bmap; //x.bmap=nullptr;
       _max_nix=x._max_nix;
       count1=x.count1;
       count2=x.count2;

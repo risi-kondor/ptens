@@ -34,6 +34,7 @@ namespace ptens{
   void emp01(DEST& r, const SRC& x, const TransferMap& map){
     if(map.is_empty()) return;
     auto [map0,map1]=map.intersects(x.atoms,r.atoms);
+    cout<<"ll"<<map1.bmap<<endl;
     r.broadcast0(x.reduce0(map0),map1,0);
   }
 
@@ -49,6 +50,7 @@ namespace ptens{
     if(map.is_empty()) return;
     int nc=x.get_nc();
     auto [map0,map1]=map.intersects(x.atoms,r.atoms);
+    cout<<"llp"<<map1.bmap<<endl;
     r.broadcast0(x.reduce0(map0),map1,0);
     r.broadcast1(x.reduce1(map0),map1,nc);
   }

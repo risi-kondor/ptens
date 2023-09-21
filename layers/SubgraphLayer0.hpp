@@ -42,7 +42,6 @@ namespace ptens{
     using BASE::G;
     using BASE::S;
     using TLAYER::dev;
-    using TLAYER::atoms;
     using TLAYER::getn;
     using TLAYER::get_nc;
     using TLAYER::get_grad;

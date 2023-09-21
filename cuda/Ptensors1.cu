@@ -557,7 +557,9 @@ namespace ptens{
     int dev=R.dev;
     PTENS_ASSRT(R.dev==1);
     PTENS_ASSRT(x.dev==1);
+    cout<<list.bmap<<endl;
     if(list.get_bmap().n==0) return;
+    cout<<445<<endl;
     const_cast<AindexPack&>(list).to_device(1);
     PTENS_ASSRT(list.dev==1);
     int n=cnine::roundup(std::max(R.nc,list.max_nix()+1),32);
@@ -595,6 +597,7 @@ namespace ptens{
     int dev=R.dev;
     PTENS_ASSRT(R.dev==1);
     PTENS_ASSRT(x.dev==1);
+    cout<<"ss"<<list.bmap<<endl;
     if(list.get_bmap().n==0) return;
     const_cast<AindexPack&>(list).to_device(1);
     PTENS_ASSRT(list.dev==1);
