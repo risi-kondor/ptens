@@ -9,7 +9,7 @@ import ptens
 from ptens import ptensors0, ptensors1, ptensors2, graph
 from warnings import warn
 from ptens_base import atomspack
-from ptens.functions import linear, linmaps0, outer, unite1, unite2, gather, relu, cat
+from ptens.functions import linear, linmaps0, outer, unite1, unite2, gather, relu #, cat
 ######################################## Functions ###########################################
 def get_edge_maps(edge_index: torch.Tensor, num_nodes: Optional[int] = None) -> Tuple[ptens.graph,ptens.graph]:
   if num_nodes is None:
