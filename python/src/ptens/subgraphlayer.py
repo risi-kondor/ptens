@@ -104,11 +104,11 @@ class SubgraphLayer_linearFn(torch.autograd.Function):
         ctx.x=x.obj
         ctx.y=y
         ctx.r=r.obj
-        return R
+        return r
     @staticmethod
     def backward(ctx,g):
-        ctx.x.add_linear_back0(ctx.r.gradp(),ctx.y)
-        return subgraphlayer.dummy(), ctx.x.linear_back1(ctx.r.gradp()), ctx.x.linear_back2(ctx.r.gradp())
+        ctx.x.add_linear_back0(ctx.r,ctx.y)
+        return subgraphlayer.dummy(), ctx.x.linear_back1(ctx.r), ctx.x.linear_back2(ctx.r)
 
 
 class SubgraphLayer_inpFn(torch.autograd.Function):
