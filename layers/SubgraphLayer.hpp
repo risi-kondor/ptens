@@ -43,6 +43,9 @@ namespace ptens{
 
     SubgraphLayer(){}
 
+    SubgraphLayer(const Ggraph& _G, const Subgraph& _S, TLAYER&& x):
+      TLAYER(std::move(x)), G(_G), S(_S){}
+
     template<typename FILLTYPE, typename = typename std::enable_if<std::is_base_of<cnine::fill_pattern, FILLTYPE>::value, FILLTYPE>::type>
     SubgraphLayer(const Ggraph& _G, const int nc, const FILLTYPE& dummy, const int _dev=0):
     G(_G), S(Subgraph::trivial()), TLAYER(_G.getn(),nc,dummy,_dev){}

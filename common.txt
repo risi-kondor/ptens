@@ -39,3 +39,10 @@ endif
 ifdef WITH_CUBLAS
 MACROS+=-D_WITH_CUBLAS
 endif 
+
+ifdef EIGENDIR
+MACROS+=-D_WITH_EIGEN
+endif 
+
+MACROS+=-DWITH_FAKE_GRAD
+

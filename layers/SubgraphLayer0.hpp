@@ -19,6 +19,7 @@
 //#include "Subgraph.hpp"
 //#include "TransferMap.hpp"
 #include "SubgraphLayer.hpp"
+#include "FindPlantedSubgraphs.hpp"
 #include "EMPlayers2.hpp"
 
 
@@ -164,7 +165,14 @@ namespace ptens{
       emp20_back(x.get_grad(),get_grad(),TransferMap(atoms,x.atoms));
     }
 
-  public:
+
+  public: // ---- Operations --------------------------------------------------------------------------------
+
+
+    SubgraphLayer0 permute(const cnine::permutation& pi){
+      return SubgraphLayer0(G.permute(pi),S,Ptensors0::permute(pi));
+    }
+
 
   public: // ---- I/O ----------------------------------------------------------------------------------------
 

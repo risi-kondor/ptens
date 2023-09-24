@@ -16,6 +16,7 @@
 
 #include <set>
 #include "Ptens_base.hpp"
+#include "cpermutation.hpp"
 #include "SparseRmatrix.hpp"
 #include "Tensor.hpp"
 //#include "SparseRmatrixB.hpp"
@@ -98,16 +99,30 @@ namespace ptens{
       }
     }
 
-    Hgraph(const cnine::RtensorA& M, int n):
+    Hgraph(const cnine::RtensorA& _edges, int n):
       Hgraph(n){
-      PTENS_ASSRT(M.ndims()==2);
-      PTENS_ASSRT(M.get_dim(0)==2);
+      PTENS_ASSRT(_edges.ndims()==2);
+      PTENS_ASSRT(_edges.get_dim(0)==2);
       //if(n==-1) n=M.max()+1;else 
-      PTENS_ASSRT(M.max()<n);
-      int nedges=M.get_dim(1);
+      PTENS_ASSRT(_edges.max()<n);
+      int nedges=_edges.get_dim(1);
       for(int i=0; i<nedges; i++)
-	set(M(0,i),M(1,i),1.0);
+	set(_edges(0,i),_edges(1,i),1.0);
     }
+
+    Hgraph(const cnine::RtensorA& _edges, const cnine::RtensorA& L, int n):
+      Hgraph(n,L){
+      PTENS_ASSRT(_edges.ndims()==2);
+      PTENS_ASSRT(_edges.get_dim(0)==2);
+      //if(n==-1) n=_edges.max()+1;else 
+      PTENS_ASSRT(_edges.max()<n);
+      int nedges=_edges.get_dim(1);
+      for(int i=0; i<nedges; i++)
+	set(_edges(0,i),_edges(1,i),1.0);
+    }
+
+    Hgraph(const cnine::RtensorA& M, const cnine::RtensorA& L):
+      SparseRmatrix(M), labels(L), is_labeled(true){}
 
 
   public: // ---- Named Constructors -------------------------------------------------------------------------
@@ -359,6 +374,18 @@ namespace ptens{
 
 
   public: // ---- Operations ---------------------------------------------------------------------------------
+
+
+    Hgraph permute(const cnine::permutation pi) const{
+      RtensorA A({2,nedges()},cnine::fill_zero());
+      int t=0;
+      for_each_edge([&](const int i, const int j, const float v){
+	  A.set(0,t,(float)pi(i));
+	  A.set(1,t,(float)pi(j));
+	  t++;
+	});
+      return Hgraph(A,getn());
+    }
 
 
     AtomsPack merge(const AtomsPack& x) const{

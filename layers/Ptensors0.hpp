@@ -226,8 +226,8 @@ namespace ptens{
   public: // ----- Conversions -------------------------------------------------------------------------------
 
 
-    //Ptensors0(cnine::RtensorPack&& x, const AtomsPack& _atoms, const int _nc):
-    //RtensorPackB(std::move(x),_nc), atoms(_atoms)/*, nc(_nc)*/{}
+    Ptensors0(const RtensorPackB& x, const AtomsPack& _atoms):
+      RtensorPackB(x), atoms(_atoms){}
 
     Ptensors0(RtensorPackB&& x, const AtomsPack& _atoms): //, const int _nc):
       RtensorPackB(std::move(x)), atoms(_atoms)/*, nc(_nc)*/{}
@@ -331,6 +331,10 @@ namespace ptens{
       PTENS_ASSRT(y.size()==N);
       for(int i=0; i<N; i++)
 	lambda(view_of(i),x.view_of(i),y.view_of(i));
+    }
+
+    Ptensors0 permute(const cnine::permutation& pi){
+      return Ptensors0(*this,atoms.permute(pi));
     }
 
 

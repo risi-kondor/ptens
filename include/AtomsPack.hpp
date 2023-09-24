@@ -19,7 +19,7 @@
 #include "array_pool.hpp"
 #include "labeled_forest.hpp"
 #include "Atoms.hpp"
-
+#include "cpermutation.hpp"
 
 namespace ptens{
 
@@ -194,6 +194,18 @@ namespace ptens{
 
 
   public: // ---- Operations ---------------------------------------------------------------------------------
+
+
+    AtomsPack permute(const cnine::permutation& pi){
+      PTENS_ASSRT(dev==0);
+      array_pool<int> A;
+      A.dir=dir;
+      A.reserve(tail);
+      A.tail=tail;
+      for(int i=0; i<tail; i++)
+	A.arr[i]=pi(arr[i]);
+      return A;
+    }
 
     /*
     vector<int> intersect(const int i, const vector<int>& I) const{

@@ -65,6 +65,14 @@ namespace ptens{
     }
 
 
+  public: // ---- Operations ----------------------------------------------------------------------------------
+
+
+    Ggraph permute(const cnine::permutation& pi) const{
+      return Ggraph(new Hgraph(obj->permute(pi)));
+    }
+
+
   public: // ---- I/O -----------------------------------------------------------------------------------------
 
 

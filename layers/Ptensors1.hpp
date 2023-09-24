@@ -59,7 +59,7 @@ namespace ptens{
     typedef cnine::RtensorPackB RtensorPackB;
 
     AtomsPack atoms;
-    rtensor norms;
+    //rtensor norms;
 
 
     ~Ptensors1(){
@@ -243,6 +243,9 @@ namespace ptens{
     //Ptensors1(cnine::RtensorPack&& x, const AtomsPack& _atoms)://, const int _nc):
       //RtensorPackB(std::move(x)), atoms(_atoms)/*, nc(_nc)*/{}
 
+    Ptensors1(const RtensorPackB& x, const AtomsPack& _atoms):
+      RtensorPackB(x), atoms(_atoms){}
+
     Ptensors1(RtensorPackB&& x, const AtomsPack& _atoms):
       RtensorPackB(std::move(x)), atoms(_atoms){}
 
@@ -342,6 +345,14 @@ namespace ptens{
       return Ptensor1(tensor_of(i),atoms_of(i));
     }
 
+    // only works if each ref domain is of size K
+    cnine::Rtensor3_view view3(const int K) const{
+      int n=getn();
+      int nc=get_nc();
+      PTENS_ASSRT(tail==n*K*nc);
+      return cnine::Rtensor3_view(get_arr(),n,K,nc,K*nc,nc,1);
+    }
+
     int push_back(const Ptensor1& x){
       if(size()==0) nc=x.get_nc();
       else assert(nc==x.get_nc());
@@ -357,6 +368,10 @@ namespace ptens{
       PTENS_ASSRT(y.size()==N);
       for(int i=0; i<N; i++)
 	lambda(view_of(i),x.view_of(i),y.view_of(i));
+    }
+
+    Ptensors1 permute(const cnine::permutation& pi){
+      return Ptensors1(*this,atoms.permute(pi));
     }
 
 
@@ -756,7 +771,6 @@ namespace ptens{
       }
       GPUCODE(CUDA_STREAM(Ptensors1_broadcast1_cu(*this,x,list,0,stream)));
     }
-
 
 
   public: // ---- I/O ----------------------------------------------------------------------------------------

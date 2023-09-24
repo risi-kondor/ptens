@@ -5,6 +5,11 @@ CNINE_ROOT=$(ROOTDIR)/../cnine/
 #GELIB_SO3CG_DEBUG=t
 
 
+# ---- EIGEN OPTIONS ------------------------------------
+
+EIGENDIR=/usr/local/include
+
+
 # ---- CUDA OPTIONS ----------------------------------
 
 #WITH_CUDA=t

@@ -18,6 +18,8 @@
 #include "Ptens_base.hpp"
 #include "SparseRmatrix.hpp"
 #include "Hgraph.hpp"
+#include "Tensor.hpp"
+#include "SymmEigendecomposition.hpp"
 
 
 namespace ptens{
@@ -28,10 +30,13 @@ namespace ptens{
 
     typedef Hgraph BASE;
     typedef cnine::SparseRmatrix BaseMatrix;
-
+    typedef cnine::Tensor<float> rtensor;
 
     //using BaseMatrix::BaseMatrix;
     using BASE::BASE;
+
+    cnine::Tensor<float> evecs;
+    vector<int> eblocks;
 
 
   public: // ---- Constructors -------------------------------------------------------------------------------
@@ -56,17 +61,65 @@ namespace ptens{
       }
     }
 
+    SubgraphObj(const int _n, const initializer_list<pair<int,int> >& list, const RtensorA& _labels): 
+      Hgraph(_n,list,_labels){}
+
     //SubgraphObj(const cnine::RtensorA& A):
     //SubgraphObj(A){}
 
-    SubgraphObj(const int n, const cnine::RtensorA& M):
-      SubgraphObj(n){
-      PTENS_ASSRT(M.ndims()==2);
-      PTENS_ASSRT(M.get_dim(0)==2);
-      PTENS_ASSRT(M.max()<n);
-      int nedges=M.get_dim(1);
-      for(int i=0; i<nedges; i++)
-	set(M(0,i),M(1,i),1.0);
+
+    SubgraphObj(const int n, const cnine::RtensorA& _edges):
+      SubgraphObj(_edges,n){}
+    //PTENS_ASSRT(_edges.ndims()==2);
+    //PTENS_ASSRT(_edges.get_dim(0)==2);
+    //PTENS_ASSRT(_edges.max()<n);
+    //int nedges=_edges.get_dim(1);
+    //for(int i=0; i<nedges; i++)
+    //set(_edges(0,i),_edges(1,i),1.0);
+    //}
+
+    SubgraphObj(const int n, const cnine::RtensorA& _edges, const cnine::RtensorA& _labels):
+      Hgraph(_edges,_labels,n){}
+
+    SubgraphObj(const int n, const cnine::RtensorA& _edges, const cnine::RtensorA& _evecs, const cnine::RtensorA& evals):
+      Hgraph(_edges,n), evecs(_evecs){
+      make_eblocks(evals);}
+
+    SubgraphObj(const int n, const cnine::RtensorA& _edges, const cnine::RtensorA& _labels, const cnine::RtensorA& _evecs, const cnine::RtensorA& evals):
+      Hgraph(_edges,_labels,n), evecs(_evecs){
+      make_eblocks(evals);}
+
+
+  public: 
+
+    void make_eigenbasis(){
+      if(eblocks.size()>0) return;
+      int n=getn();
+
+      cnine::Tensor<float> L=cnine::Tensor<float>::zero({n,n});
+      L.view2().add(dense().view2()); 
+      for(int i=0; i<n; i++){
+	float t=0; 
+	for(int j=0; j<n; j++) t+=L(i,j);
+	L.inc(i,i,-t);
+      }
+
+      auto eigen=cnine::SymmEigendecomposition<float>(L);
+      evecs=eigen.U();
+      make_eblocks(eigen.lambda());
+    }
+
+    void make_eblocks(const cnine::Tensor<float>& evals){
+      PTENS_ASSRT(evals.dims.size()==1);
+      PTENS_ASSRT(getn()==evals.dims[0]);
+      eblocks.clear();
+      int j=0;
+      for(int i=0; i<evals.dims[0];){
+	float t=evals(i);
+	int start=i;
+	while(i<evals.dims[0] && std::abs(evals(i)-t)<10e-5) i++;
+	eblocks.push_back(i-start);
+      }
     }
 
 
@@ -87,6 +140,7 @@ namespace std{
   struct hash<ptens::SubgraphObj>{
   public:
     size_t operator()(const ptens::SubgraphObj& x) const{
+      if(x.is_labeled) return (hash<cnine::SparseRmatrix>()(x)<<1)^hash<cnine::RtensorA>()(x.labels);
       return hash<cnine::SparseRmatrix>()(x);
     }
   };

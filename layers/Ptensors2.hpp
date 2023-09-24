@@ -256,11 +256,11 @@ namespace ptens{
   public: // ----- Conversions -------------------------------------------------------------------------------
 
 
-    //Ptensors2(RtensorPack&& x, const AtomsPack& _atoms, const int _nc):
-    //RtensorPack(std::move(x)), atoms(_atoms), nc(_nc){}
+    Ptensors2(const RtensorPackB& x, const AtomsPack& _atoms):
+      RtensorPackB(x), atoms(_atoms){}
 
-    Ptensors2(RtensorPackB&& x, const AtomsPack& _atoms)://, const int _nc):
-      RtensorPackB(std::move(x)), atoms(_atoms)/*, nc(_nc)*/{}
+    Ptensors2(RtensorPackB&& x, const AtomsPack& _atoms):
+      RtensorPackB(std::move(x)), atoms(_atoms){}
 
     Ptensors2(const rtensor& A, const AtomsPack& _atoms):
       RtensorPackB(A,_atoms.dims2(A.dim(1))), atoms(_atoms){
@@ -370,6 +370,9 @@ namespace ptens{
 	lambda(view_of(i),x.view_of(i),y.view_of(i));
     }
 
+    Ptensors2 permute(const cnine::permutation& pi){
+      return Ptensors2(*this,atoms.permute(pi));
+    }
 
   public: // ---- Concatenation ------------------------------------------------------------------------------
 

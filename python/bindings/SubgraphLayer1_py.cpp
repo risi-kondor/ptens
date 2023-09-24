@@ -130,6 +130,11 @@ pybind11::class_<SGlayer1,Ptensors1>(m,"subgraph_layer1")
       g.add_linear_back2_to(R);
       return R.torch();})
 
+  .def("autobahn",[](const SGlayer1& x, at::Tensor& W){
+      return x.autobahn(RtensorA::view(W));})
+  .def("add_autobahn_back0",[](SGlayer1& x, SGlayer1& r, at::Tensor& W){
+      x.add_autobahn_back0(r,RtensorA::view(W));})
+
   .def("inp",[](const SGlayer1& x, const SGlayer1& y){return x.inp(y);})
   .def("diff2",[](const SGlayer1& x, const SGlayer1& y){return x.diff2(y);})
 

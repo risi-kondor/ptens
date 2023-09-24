@@ -151,12 +151,12 @@ namespace ptens{
     }
 
 
-  public: 
+  public: // ---- Operations --------------------------------------------------------------------------------
 
 
-
-
-  public:
+    SubgraphLayer2 permute(const cnine::permutation& pi){
+      return SubgraphLayer2(G.permute(pi),S,Ptensors2::permute(pi));
+    }
 
 
   public: // ---- I/O ----------------------------------------------------------------------------------------
