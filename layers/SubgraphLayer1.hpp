@@ -182,8 +182,8 @@ namespace ptens{
       SubgraphLayer1<TLAYER> R(TLAYER::zeros_like(*this,W.dims[2]),G,S);
       add_to_each_eigenslice(R.view3(K),view3(K),[&]
 	(cnine::Rtensor2_view rslice, cnine::Rtensor2_view xslice, const int b){
-	  rslice.add_matmul_AA(xslice,W.view3().slice0(b));
-	  rslice.add_broadcast0(B.view2().slice0(b));	
+	  rslice.add_matmul_AA(xslice,W.view3().slice0(b)); // OK
+	  rslice.add_broadcast0(B.view2().slice0(b)); // OK	
 	});
       return R;
     }
@@ -201,7 +201,7 @@ namespace ptens{
 
       add_to_each_eigenslice(get_grad().view3(K),r.get_grad().view3(K),[&]
 	(cnine::Rtensor2_view rslice, cnine::Rtensor2_view xslice, const int b){
-	  rslice.add_matmul_AT(xslice,W.view3().slice0(b));
+	  rslice.add_matmul_AT(xslice,W.view3().slice0(b)); // OK
 	});
     }
 
@@ -219,7 +219,7 @@ namespace ptens{
 
       for_each_eigenslice(view3(K),r.get_grad().view3(K),[&]
 	(cnine::Rtensor2_view xslice, cnine::Rtensor2_view rslice, const int b){
-	  W.view3().slice0(b).add_matmul_TA(xslice,rslice);
+	  W.view3().slice0(b).add_matmul_TA(xslice,rslice); // OK
 	  rslice.sum0_into(B.view2().slice0(b)); 
 	});
     }
