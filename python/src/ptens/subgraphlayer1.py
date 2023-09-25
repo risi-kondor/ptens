@@ -11,6 +11,9 @@
 # must be accompanied by a verbatim copy of the license. 
 #
 #
+
+from typing import Literal
+
 import torch
 
 import ptens_base 
@@ -351,6 +354,24 @@ class SubgraphLayer1_toMxFn(torch.autograd.Function):
 #         return subgraphlayer1.dummy(), ctx.x.linear_back1(ctx.r.gradp()), ctx.x.linear_back2(ctx.r.gradp())
 
 
+class Subgraph_layer1_autobahnFn(torch.autograd.Function):
+     @staticmethod
+     def forward(ctx,x,w,b):
+         r=ptens.subgraphlayer1(1)
+	 r.obj=ptens.autobahn(x,w,b)
+         ctx.x=x.obj
+         ctx.w=w
+         ctx.b=b
+         return r
+     @staticmethod
+     def backward(ctx,g):
+         wg=torch.zeros_like(ctx.w)
+         bg=torch.zeros_like(ctx.b)
+         ctx.x.add_autobahn_back0(ctx.r,ctx.w)
+         ctx.x.add_autobahn_back1(wg,bg,ctx.r)
+         return subgraphlayer1.dummy(),wg,bg
+
+
 class Subgraph_layer1_scaleFn(torch.autograd.Function):
     
     @staticmethod
@@ -481,6 +502,26 @@ class SubgraphLayer1_GatherFromPtensorsFn(torch.autograd.Function):
     def backward(ctx,g):
         ctx.r.gather_back(ctx.x)
         return subgraphlayer1.dummy(), None, None, None 
+
+
+
+class Autobahn(torch.nn.Module):
+
+  def __init__(self, S:subgraph, in_channels: int, out_channels: int) -> None:
+    super().__init__()
+    #This follows Glorot initialization for weights.
+    M=S.
+    self.w = torch.nn.parameter.Parameter(torch.empty(in_channels,out_channels),requires_grad=True)
+    self.b = torch.nn.parameter.Parameter(torch.empty(out_channels),requires_grad=True)
+    self.reset_parameters()
+
+  def reset_parameters(self):
+    if not isinstance(self.w,torch.nn.parameter.UninitializedParameter):
+      self.w = torch.nn.init.xavier_uniform_(self.w)
+      self.b = torch.nn.init.zeros_(self.b)
+
+  def forward(self, x:subgraphlayer1) -> subgraphlayer1:
+    return x.autobahn(self.w,self.b)
 
 
 

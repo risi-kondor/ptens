@@ -87,6 +87,14 @@ namespace ptens{
   public: // ---- Message passing ----------------------------------------------------------------------------------------
 
 
+    int n_eblocks() const{
+      return S.n_eblocks();
+    }
+
+
+  public: // ---- Message passing ----------------------------------------------------------------------------------------
+
+
     template<typename TLAYER2>
     SubgraphLayer1(const SubgraphLayer0<TLAYER2>& x, const Subgraph& _S):
       SubgraphLayer1(x.G,_S,CachedPlantedSubgraphsMx(*x.G.obj,*_S.obj),x.get_nc(),x.dev){
@@ -160,26 +168,171 @@ namespace ptens{
   public: // ---- Autobahn -----------------------------------------------------------------------------------
 
 
-    SubgraphLayer1<TLAYER> autobahn(const cnine::Tensor<float>& W) const{
+    SubgraphLayer1<TLAYER> autobahn(const cnine::RtensorA& W, const cnine::RtensorA& B) const{
       S.make_eigenbasis();
+      int K=S.getn();
       PTENS_ASSRT(W.dims.size()==3);
       PTENS_ASSRT(W.dims[0]==S.obj->eblocks.size());
       PTENS_ASSRT(W.dims[1]==get_nc());
+      PTENS_ASSRT(B.dims.size()==2);
+      PTENS_ASSRT(B.dims[0]==S.obj->eblocks.size());
+      PTENS_ASSRT(B.dims[1]==W.dims[2]);
+      //add_autobahn(R,*this,S.obj->evecs.view2(),S.obj->eblocks,W.view3(),B.view2());
+
       SubgraphLayer1<TLAYER> R(TLAYER::zeros_like(*this,W.dims[2]),G,S);
-      add_autobahn(R,*this,S.obj->evecs.view2(),S.obj->eblocks,W.view3());
+      add_to_each_eigenslice(R.view3(K),view3(K),[&]
+	(cnine::Rtensor2_view rslice, cnine::Rtensor2_view xslice, const int b){
+	  rslice.add_matmul_AA(xslice,W.view3().slice0(b));
+	  rslice.add_broadcast0(B.view2().slice0(b));	
+	});
       return R;
     }
+
     
-    void add_autobahn_back0(SubgraphLayer1<TLAYER>& r, const cnine::Tensor<float>& W){
+    void add_autobahn_back0(SubgraphLayer1<TLAYER>& r, const cnine::RtensorA& W){
       S.make_eigenbasis();
+      int K=S.getn();
       PTENS_ASSRT(W.dims.size()==3);
       PTENS_ASSRT(W.dims[0]==S.obj->eblocks.size());
       PTENS_ASSRT(W.dims[1]==get_nc());
       PTENS_ASSRT(W.dims[2]==r.get_nc());
-      cnine::Rtensor3_view Wt(W.mem(),W.dims[0],W.dims[2],W.dims[1],W.strides[0],W.strides[2],W.strides[1],W.dev);
-      add_autobahn(get_grad(),r.get_grad(),S.obj->evecs.view2(),S.obj->eblocks,Wt);
+      //cnine::Rtensor3_view Wt(W.mem(),W.dims[0],W.dims[2],W.dims[1],W.strides[0],W.strides[2],W.strides[1],W.dev);
+      //add_autobahn(get_grad(),r.get_grad(),S.obj->evecs.view2(),S.obj->eblocks,Wt);
+
+      add_to_each_eigenslice(get_grad().view3(K),r.get_grad().view3(K),[&]
+	(cnine::Rtensor2_view rslice, cnine::Rtensor2_view xslice, const int b){
+	  rslice.add_matmul_AT(xslice,W.view3().slice0(b));
+	});
     }
 
+
+    void add_autobahn_back1_to(const cnine::RtensorA& W, const cnine::RtensorA& B, SubgraphLayer1<TLAYER>& r){
+      S.make_eigenbasis();
+      int K=S.getn();
+      PTENS_ASSRT(W.dims.size()==3);
+      PTENS_ASSRT(W.dims[0]==S.obj->eblocks.size());
+      PTENS_ASSRT(W.dims[1]==get_nc());
+      PTENS_ASSRT(W.dims[2]==r.get_nc());
+      PTENS_ASSRT(B.dims.size()==2);
+      PTENS_ASSRT(B.dims[0]==S.obj->eblocks.size());
+      PTENS_ASSRT(B.dims[1]==r.get_nc());
+
+      for_each_eigenslice(view3(K),r.get_grad().view3(K),[&]
+	(cnine::Rtensor2_view xslice, cnine::Rtensor2_view rslice, const int b){
+	  W.view3().slice0(b).add_matmul_TA(xslice,rslice);
+	  rslice.sum0_into(B.view2().slice0(b)); 
+	});
+    }
+
+
+    void for_each_eigenslice(const cnine::Rtensor3_view x, const cnine::Rtensor3_view y,
+      std::function<void(const cnine::Rtensor2_view& xslice, const cnine::Rtensor2_view& yslice, const int b)> lambda) const{
+      S.make_eigenbasis();
+      int N=x.n0;
+      int K=x.n1;
+      int xnc=x.n2;
+      int ync=y.n2;
+      int nblocks=S.obj->eblocks.size();
+
+      cnine::Rtensor2_view E=S.obj->evecs.view2();
+      const auto& blocks=S.obj->eblocks;
+
+      PTENS_ASSRT(y.n0==N);
+      PTENS_ASSRT(y.n1==K);
+      PTENS_ASSRT(E.n0==K);
+      PTENS_ASSRT(E.n1==K);
+      PTENS_ASSRT(x.dev==y.dev);
+
+      auto X=cnine::Tensor<float>::zero({N,K,xnc},x.dev);
+      X.view3().add_mprod(E.transp(),x);
+
+      auto Y=cnine::Tensor<float>::zero({N,K,ync},x.dev);
+      Y.view3().add_mprod(E.transp(),y);
+
+      int offs=0;
+      for(int b=0; b<nblocks; b++){
+	for(int i=offs; i<offs+blocks[b]; i++)
+	  lambda(X.view3().slice1(i),Y.view3().slice1(i),b);
+	offs+=blocks[b];
+      }
+    }
+
+
+    void add_to_each_eigenslice(cnine::Rtensor3_view r, const cnine::Rtensor3_view x,
+      std::function<void(const cnine::Rtensor2_view& rslice, const cnine::Rtensor2_view& xslice, const int b)> lambda) const{
+      S.make_eigenbasis();
+      int N=r.n0;
+      int K=r.n1;
+      int nc=r.n2;
+      int xnc=x.n2;
+      int nblocks=S.obj->eblocks.size();
+
+      cnine::Rtensor2_view E=S.obj->evecs.view2();
+      const auto& blocks=S.obj->eblocks;
+
+      PTENS_ASSRT(x.n0==N);
+      PTENS_ASSRT(x.n1==K);
+      PTENS_ASSRT(E.n0==K);
+      PTENS_ASSRT(E.n1==K);
+      PTENS_ASSRT(r.dev==x.dev);
+
+      auto A=cnine::Tensor<float>::zero({N,K,xnc},x.dev);
+      A.view3().add_mprod(E.transp(),x);
+
+      auto B=cnine::Tensor<float>::zero({N,K,nc},x.dev);
+      int offs=0;
+      for(int b=0; b<nblocks; b++){
+	for(int i=offs; i<offs+blocks[b]; i++)
+	  lambda(B.view3().slice1(i),A.view3().slice1(i),b);
+	offs+=blocks[b];
+      }
+
+      r.add_mprod(E,B.view3());
+    }
+
+
+
+
+
+  public: // ---- I/O ----------------------------------------------------------------------------------------
+
+
+    string classname() const{
+      return "SubgraphLayer1";
+    }
+
+    string repr() const{
+      if(dev==0) return "<SubgraphLayer1[N="+to_string(getn())+"]>";
+      else return "<SubgraphLayer1[N="+to_string(getn())+"][G]>";
+    }
+
+
+
+
+  };
+
+}
+
+#endif 
+
+
+    //template<typename LAYER>
+    //TransferMap overlaps(const LAYER& x){
+    //return TransferMap(atoms,x.atoms);
+    //}
+
+    //SubgraphLayer0<TLAYER> transfer0(const Subgraph& _S){
+    //SubgraphLayer0<TLAYER> R(G,_S,getn(),get_nc());
+    //emp10(R,*this,TransferMap(atoms,R.atoms));
+    //}
+
+    //SubgraphLayer1<TLAYER> transfer1(const Subgraph& _S){
+    //SubgraphLayer1<TLAYER> R(G,_S,FindPlantedSubgraphs(G,_S),get_nc());
+    //emp11(R,*this,TransferMap(atoms,R.atoms));
+    //}
+
+
+    /*
     static void add_autobahn(Ptensors1& R, const Ptensors1& x, 
       const cnine::Rtensor2_view& E, const vector<int> blocks, const cnine::Rtensor3_view& W){
       int N=R.getn();
@@ -211,38 +364,52 @@ namespace ptens{
     }
 
 
+    static void add_autobahn(Ptensors1& R, const Ptensors1& x, const cnine::Rtensor2_view& E, 
+      const vector<int> blocks, const cnine::Rtensor3_view& W, const cnine::Rtensor2_view& B){
+      int N=R.getn();
+      int K=E.n0;
+      int nc=R.get_nc();
+      int xnc=x.get_nc();
+      int nblocks=blocks.size();
 
-  public: // ---- I/O ----------------------------------------------------------------------------------------
+      PTENS_ASSRT(x.getn()==N);
+      PTENS_ASSRT(R.tail==N*K*nc);
+      PTENS_ASSRT(x.tail==N*K*xnc);
+      PTENS_ASSRT(W.n0==nblocks);
+      PTENS_ASSRT(W.n1==xnc);
+      PTENS_ASSRT(W.n2==nc);
+      PTENS_ASSRT(E.n1==K);
+      PTENS_ASSRT(B.n0==nblocks);
+      PTENS_ASSRT(W.n1==nc);
 
+      auto A=cnine::Tensor<float>::zero({N,K,xnc},x.dev);
+      A.view3().add_mprod(E.transp(),x.view3(K));
 
-    string classname() const{
-      return "SubgraphLayer1";
+      auto B=cnine::Tensor<float>::zero({N,K,nc},x.dev);
+      int offs=0;
+      for(int b=0; b<nblocks; b++){
+	for(int i=offs; i<offs+blocks[b]; i++){
+	  B.view3().slice1(i).add_matmul_AA(A.view3().slice1(i),W.slice0(b));
+	  B.view3().slice1(i).add_broadcast0(B.slice0(b));	
+	}
+	offs+=blocks[b];
+      }
+
+      R.view3(K).add_mprod(E,B.view3());
     }
+    */
+    /*
+    void add_autobahn_back2_to(const cnine::TensorView<float>& B, const SubgraphLayer1<TLAYER>& r){
+      S.make_eigenbasis();
+      PTENS_ASSRT(B.dims.size()==2);
+      PTENS_ASSRT(B.dims[0]==S.obj->eblocks.size());
+      PTENS_ASSRT(B.dims[1]==r.get_nc());
 
-    string repr() const{
-      if(dev==0) return "<SubgraphLayer1[N="+to_string(getn())+"]>";
-      else return "<SubgraphLayer1[N="+to_string(getn())+"][G]>";
+      for_each_eigenslice(view3(),r.get_grad().view3(),[&]
+	(Rtensor2_view xslice, Rtensor2_view rslice, const int b){
+	  W.view3().slice0(b)
+	    rslice.sum0_into(B.slice0(b)); 
+	});
     }
+    */
 
-
-
-
-  };
-
-}
-
-#endif 
-    //template<typename LAYER>
-    //TransferMap overlaps(const LAYER& x){
-    //return TransferMap(atoms,x.atoms);
-    //}
-
-    //SubgraphLayer0<TLAYER> transfer0(const Subgraph& _S){
-    //SubgraphLayer0<TLAYER> R(G,_S,getn(),get_nc());
-    //emp10(R,*this,TransferMap(atoms,R.atoms));
-    //}
-
-    //SubgraphLayer1<TLAYER> transfer1(const Subgraph& _S){
-    //SubgraphLayer1<TLAYER> R(G,_S,FindPlantedSubgraphs(G,_S),get_nc());
-    //emp11(R,*this,TransferMap(atoms,R.atoms));
-    //}

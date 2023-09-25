@@ -109,6 +109,11 @@ namespace ptens{
       make_eblocks(eigen.lambda());
     }
 
+    void set_evecs(const cnine::TensorView<float>& _evecs, const cnine::TensorView<float>& _evals) const{
+      const_cast<SubgraphObj&>(*this).evecs=_evecs;
+      const_cast<SubgraphObj&>(*this).make_eblocks(_evals);
+    }
+
     void make_eblocks(const cnine::Tensor<float>& evals){
       PTENS_ASSRT(evals.dims.size()==1);
       PTENS_ASSRT(getn()==evals.dims[0]);

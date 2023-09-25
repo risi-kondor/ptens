@@ -123,9 +123,13 @@ namespace ptens{
       return obj->getn();
     }
 
-    int n_eigenblocks() const{
+    int n_eblocks() const{
       make_eigenbasis();
       return obj->eblocks.size();
+    }
+
+    void set_evecs(const cnine::TensorView<float>& _evecs, const cnine::TensorView<float>& _evals) const{
+      obj->set_evecs(_evecs,_evals);
     }
 
     bool operator==(const Subgraph& x) const{

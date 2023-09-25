@@ -12,6 +12,8 @@
 #
 #
 import torch
+import torch.linalg
+
 import ptens_base
 from ptens_base import subgraph as _subgraph
 
@@ -52,6 +54,7 @@ class subgraph:
     def triangle(self):
         G=subgraph()
         G.obj=_subgraph.triangle()
+	set_evecs()
         return G;
 
     @classmethod
@@ -66,8 +69,28 @@ class subgraph:
         G.obj=_subgraph.star(n)
         return G;
 
+
+    # ---- Access -----------------------------------------------------------------------------------------------
+
+
+    def n_espaces(self):
+	return self.obj.n_eblocks()
+
+    def set_evecs(self):
+	if n_espaces()>0:
+	    return
+	L=torch()
+	L=torch.diag(torch.sum(L,1))-L
+	E,V=torch.linalg.eig(L)
+	print(E,V)
+	#self.obj.set_evecs(V,E)
+    
     def torch(self):
         return self.obj.dense()
+
+
+    # ---- I/O --------------------------------------------------------------------------------------------------
+
 
     def __str__(self):
         return self.obj.__str__()
