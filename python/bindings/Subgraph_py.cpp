@@ -18,10 +18,11 @@ pybind11::class_<Subgraph>(m,"subgraph")
   .def_static("matrix",[](const at::Tensor& x, const at::Tensor& L){
       return Subgraph(cnine::RtensorA(x),cnine::RtensorA(L));})
 
+  .def("has_espaces",&Subgraph::has_espaces)
   .def("n_eblocks",&Subgraph::n_eblocks)
 
   .def("set_evecs",[](Subgraph& S, const at::Tensor& V, const at::Tensor& E){
-      S.set_evecs(Tensor<float>(V), Tensor<float>(E));})
+      S.set_evecs(RtensorA(V),RtensorA(E));})
 
   .def("dense",[](const Subgraph& G){return G.dense().torch();})
 

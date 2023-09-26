@@ -92,6 +92,11 @@ namespace ptens{
 
   public: 
 
+
+    bool has_espaces() const{
+      return eblocks.size()>0;
+    }
+
     void make_eigenbasis(){
       if(eblocks.size()>0) return;
       int n=getn();
@@ -109,7 +114,7 @@ namespace ptens{
       make_eblocks(eigen.lambda());
     }
 
-    void set_evecs(const cnine::TensorView<float>& _evecs, const cnine::TensorView<float>& _evals) const{
+    void set_evecs(const cnine::Tensor<float>& _evecs, const cnine::Tensor<float>& _evals) const{
       const_cast<SubgraphObj&>(*this).evecs=_evecs;
       const_cast<SubgraphObj&>(*this).make_eblocks(_evals);
     }

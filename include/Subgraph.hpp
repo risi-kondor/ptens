@@ -123,12 +123,16 @@ namespace ptens{
       return obj->getn();
     }
 
+    bool has_espaces() const{
+      return obj->has_espaces();
+    }
+
     int n_eblocks() const{
       make_eigenbasis();
       return obj->eblocks.size();
     }
 
-    void set_evecs(const cnine::TensorView<float>& _evecs, const cnine::TensorView<float>& _evals) const{
+    void set_evecs(const cnine::Tensor<float>& _evecs, const cnine::Tensor<float>& _evals) const{
       obj->set_evecs(_evecs,_evals);
     }
 

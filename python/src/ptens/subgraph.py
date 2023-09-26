@@ -54,7 +54,7 @@ class subgraph:
     def triangle(self):
         G=subgraph()
         G.obj=_subgraph.triangle()
-	set_evecs()
+        set_evecs()
         return G;
 
     @classmethod
@@ -74,16 +74,15 @@ class subgraph:
 
 
     def n_espaces(self):
-	return self.obj.n_eblocks()
+        return self.obj.n_eblocks()
 
     def set_evecs(self):
-	if n_espaces()>0:
-	    return
-	L=torch()
-	L=torch.diag(torch.sum(L,1))-L
-	E,V=torch.linalg.eig(L)
-	print(E,V)
-	#self.obj.set_evecs(V,E)
+        if self.obj.has_espaces()>0:
+            return
+        L=self.torch()
+        L=torch.diag(torch.sum(L,1))-L
+        U,S,V=torch.linalg.svd(L)
+        self.obj.set_evecs(U,S)
     
     def torch(self):
         return self.obj.dense()
