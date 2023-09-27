@@ -76,6 +76,10 @@ namespace ptens{
       return SubgraphLayer1(TLAYER::zeros_like(*this,_nc),G,S);
     }
 
+    static SubgraphLayer1<TLAYER> like(const SubgraphLayer1& x, const cnine::RtensorA& M){
+      return SubgraphLayer1(x.G,x.S,TLAYER::like(x,M));
+    }
+
 
   public: // ---- Transport ----------------------------------------------------------------------------------
 

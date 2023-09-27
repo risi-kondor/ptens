@@ -236,7 +236,11 @@ namespace ptens{
       return Ptensors1(RtensorPackB::sequential_like(x),x.atoms);
     }
 
-    
+    static Ptensors1 like(const Ptensors1& x, const cnine::RtensorA& M){
+      return Ptensors1(M,x.atoms);
+    }
+      
+
   public: // ----- Conversions -------------------------------------------------------------------------------
 
 

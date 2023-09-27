@@ -42,6 +42,8 @@ pybind11::class_<SGlayer1,Ptensors1>(m,"subgraph_layer1")
   .def("torch",[](const SGlayer1& x){return x.tensor().torch();})
   .def("torch_back",[](SGlayer1& x, const at::Tensor& g){
       x.get_grad().add(Ptensors1(g,x.atoms));})
+  .def_static("like",[](const SGlayer1& x, const at::Tensor& M){
+      return SGlayer1::like(x,RtensorA(M));})
 
   .def("to_device",[](SGlayer1& x, const int dev){return SGlayer1(x,dev);})
   .def("to_device_back",[](SGlayer1& x, SGlayer1& g, const int dev){

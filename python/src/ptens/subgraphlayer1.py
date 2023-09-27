@@ -34,6 +34,10 @@ class subgraphlayer1(subgraphlayer):
         return SubgraphLayer1_fromMxFn.apply(G,S,atoms,M)
 
     @classmethod
+    def like(self,x,M):
+        return SubgraphLayer1_likeFn.apply(x,M)
+
+    @classmethod
     def dummy(self):
         R=subgraphlayer1(1)
         #R.obj=_subgraphlayer1.dummy()
@@ -219,6 +223,17 @@ class SubgraphLayer1_toMxFn(torch.autograd.Function):
        return R
     
 
+class SubgraphLayer1_likeFn(torch.autograd.Function):
+    @staticmethod
+    def forward(ctx,x,M):
+        R=subgraphlayer1(1)
+        R.obj=_subgraph_layer1.like(x.obj,M)
+        return R
+    @staticmethod
+    def backward(ctx,g):
+        return None, ctx.r.get_grad().torch()
+
+
 
 # class SubgraphLayer1_toPtensors1Fn(torch.autograd.Function):
 #     @staticmethod
@@ -376,7 +391,7 @@ class Subgraph_layer1_scaleFn(torch.autograd.Function):
     
     @staticmethod
     def forward(ctx,x,y):
-        R=ptens.ptensors0.zeros(x.obj.view_of_atoms(),x.obj.get_nc(),x.obj.get_dev())
+        R=ptens.ptensors1.zeros(x.obj.view_of_atoms(),x.obj.get_nc(),x.obj.get_dev())
         R.obj.add_scale(x.obj,y)
         ctx.x=x.obj
         ctx.y=y

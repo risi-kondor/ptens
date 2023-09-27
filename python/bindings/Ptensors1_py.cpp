@@ -50,6 +50,7 @@ pybind11::class_<Ptensors1/*,cnine::RtensorPack*/>(m,"ptensors1")
       x.get_grad().view_of_tensor(i).add(RtensorA::view(T));})
 
 
+
 // ---- Access ----------------------------------------------------------------------------------------------
 
 
