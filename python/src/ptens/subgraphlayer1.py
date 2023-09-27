@@ -373,7 +373,7 @@ class Subgraph_layer1_autobahnFn(torch.autograd.Function):
      @staticmethod
      def forward(ctx,x,w,b):
          r=ptens.subgraphlayer1(1)
-	 r.obj=ptens.autobahn(x,w,b)
+         r.obj=ptens.autobahn(x,w,b)
          ctx.x=x.obj
          ctx.w=w
          ctx.b=b
@@ -518,25 +518,6 @@ class SubgraphLayer1_GatherFromPtensorsFn(torch.autograd.Function):
         ctx.r.gather_back(ctx.x)
         return subgraphlayer1.dummy(), None, None, None 
 
-
-
-class Autobahn(torch.nn.Module):
-
-  def __init__(self, S:subgraph, in_channels: int, out_channels: int) -> None:
-    super().__init__()
-    #This follows Glorot initialization for weights.
-    M=S.
-    self.w = torch.nn.parameter.Parameter(torch.empty(in_channels,out_channels),requires_grad=True)
-    self.b = torch.nn.parameter.Parameter(torch.empty(out_channels),requires_grad=True)
-    self.reset_parameters()
-
-  def reset_parameters(self):
-    if not isinstance(self.w,torch.nn.parameter.UninitializedParameter):
-      self.w = torch.nn.init.xavier_uniform_(self.w)
-      self.b = torch.nn.init.zeros_(self.b)
-
-  def forward(self, x:subgraphlayer1) -> subgraphlayer1:
-    return x.autobahn(self.w,self.b)
 
 
 
