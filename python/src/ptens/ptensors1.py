@@ -28,6 +28,10 @@ class ptensors1(torch.Tensor):
         return Ptensors1_fromMxFn.apply(T,atoms)
 
     @classmethod
+    def like(self,x,M):
+        return Ptensors1_likeFn.apply(x,M)
+
+    @classmethod
     def dummy(self):
         R=ptensors1(1)
         R.obj=_ptensors1.dummy()
@@ -225,6 +229,17 @@ class Ptensors1_toMxFn(torch.autograd.Function):
         ctx.x.add_to_grad(_ptensors1(g,ctx.x.get_atoms()))
         return R
     
+class Ptensors1_likeFn(torch.autograd.Function):
+    @staticmethod
+    def forward(ctx,x,M):
+        r=ptensors1(1)
+        r.obj=_ptensors1.like(x.obj,M)
+        ctx.r=r.obj
+        return r
+    @staticmethod
+    def backward(ctx,g):
+        return None, ctx.r.get_grad().torch()
+
 
 class Ptensors1_getFn(torch.autograd.Function):
 

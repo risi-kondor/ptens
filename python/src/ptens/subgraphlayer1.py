@@ -226,9 +226,10 @@ class SubgraphLayer1_toMxFn(torch.autograd.Function):
 class SubgraphLayer1_likeFn(torch.autograd.Function):
     @staticmethod
     def forward(ctx,x,M):
-        R=subgraphlayer1(1)
-        R.obj=_subgraph_layer1.like(x.obj,M)
-        return R
+        r=subgraphlayer1(1)
+        r.obj=_subgraph_layer1.like(x.obj,M)
+        ctx.r=r.obj
+        return r
     @staticmethod
     def backward(ctx,g):
         return None, ctx.r.get_grad().torch()

@@ -62,7 +62,10 @@ pybind11::class_<Ptensors1/*,cnine::RtensorPack*/>(m,"ptensors1")
   .def("view_of_atoms",&Ptensors1::view_of_atoms)
 
   .def("__getitem__",[](const Ptensors1& x, const int i){return x(i);})
+
   .def("torch",[](const Ptensors1& x){return x.tensor().torch();})
+  .def_static("like",[](const Ptensors1& x, const at::Tensor& M){
+      return Ptensors1::like(x,RtensorA(M));})
 
   .def("atoms_of",[](const Ptensors1& x, const int i){return vector<int>(x.atoms_of(i));})
   .def("push_back",&Ptensors1::push_back)
