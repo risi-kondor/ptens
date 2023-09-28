@@ -14,7 +14,9 @@
 
 #include "Cnine_base.cpp"
 #include "PtensSession.hpp"
-#include "PtensGraph.hpp"
+#include "Ggraph.hpp"
+
+#include "Subgraph.hpp"
 
 using namespace ptens;
 using namespace cnine;
@@ -24,8 +26,11 @@ PtensSession ptens::ptens_session;
 
 int main(int argc, char** argv){
 
-  Graph M=Graph::random(10,0.2);
+  Ggraph M=Ggraph::random(10,0.2);
   cout<<M<<endl;
+
+  Subgraph A=Subgraph::star(5);
+  cout<<A.dense()<<endl;
 
   /*
   CSRmatrix<float> Md=M.csrmatrix();

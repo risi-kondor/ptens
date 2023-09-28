@@ -46,7 +46,8 @@ namespace ptens{
       SubgraphObj(_n,_n){}
 
     SubgraphObj(const vector<pair<int,int> >& list): 
-      SubgraphObj(list.size()){
+      SubgraphObj([](const vector<pair<int,int> >& list){
+	  int t=0; for(auto& p: list) t=std::max(std::max(p.first,p.second),t); return t+1;}(list)){
       for(auto p:list){
 	set(p.first,p.second,1.0);
 	set(p.second,p.first,1.0);
