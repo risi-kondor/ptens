@@ -144,6 +144,7 @@ namespace ptens{
 
     SubgraphLayer1(const Ptensors1& x, const Ggraph& _G, const Subgraph& _S):
       SubgraphLayer1(_G,_S,CachedPlantedSubgraphsMx(*_G.obj,*_S.obj),2*x.get_nc(),x.dev){
+      cnine::ftimer timer("SubgraphLayer1 from Ptensors1");
       emp11(*this,x,TransferMap(x.atoms,atoms));
     }
 
