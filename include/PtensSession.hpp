@@ -65,9 +65,6 @@ namespace ptens{
 
     ~PtensSession(){
 
-      for(auto& p: call_log)
-	logfile<<p.str()<<endl;
-
       cout<<"Shutting down ptens."<<endl;
       std::time_t timet = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
       logfile<<endl<<"Ptens session shut down at "<<std::ctime(&timet)<<endl<<endl<<endl;
