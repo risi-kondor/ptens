@@ -25,6 +25,11 @@
 #include "GatherMap.hpp"
 #include "labeled_tree.hpp"
 #include "map_of_lists.hpp"
+#include "ftimer.hpp"
+//#include "PtensLoggedTimer.hpp"
+
+extern cnine::CnineLog cnine::cnine_log;
+
 
 namespace ptens{
 
@@ -174,6 +179,7 @@ namespace ptens{
     }
 
     static Hgraph overlaps(const cnine::array_pool<int>& x, const cnine::array_pool<int>& y){
+      cnine::ftimer timer("Hgraph::overlaps");
       Hgraph R(x.size(),y.size());
       //auto t0 = std::chrono::system_clock::now();
       if(y.size()<10){
@@ -405,6 +411,7 @@ namespace ptens{
 
 
     pair<AindexPack,AindexPack> intersects(const AtomsPack& inputs, const AtomsPack& outputs, const bool self=0) const{
+      cnine::ftimer timer("Hgraph::intersects");
       PTENS_ASSRT(outputs.size()==n);
       PTENS_ASSRT(inputs.size()==m);
       AindexPack in_indices;

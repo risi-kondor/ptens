@@ -16,12 +16,17 @@
 #include "Hgraph.hpp"
 #include "AtomsPack.hpp"
 
+#include "Cnine_base.cpp"
+
 using namespace ptens;
 using namespace cnine;
 
+//PtensSession ptens::ptens_session;
+
+
 int main(int argc, char** argv){
 
-  cnine_session session;
+  //cnine_session session;
 
   AtomsPack x({{0,1},{1,2,3},{5}});
   AtomsPack y({{0},{1,2,3},{4,5},{6}});

@@ -28,6 +28,7 @@
 
 namespace ptens{
 
+
   class PtensSession{
   public:
 
@@ -61,7 +62,11 @@ namespace ptens{
       
     }
 
+
     ~PtensSession(){
+
+      for(auto& p: call_log)
+	logfile<<p.str()<<endl;
 
       cout<<"Shutting down ptens."<<endl;
       std::time_t timet = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
