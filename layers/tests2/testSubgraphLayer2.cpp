@@ -56,11 +56,11 @@ int main(int argc, char** argv){
   SubgraphLayer1<Ptensors1> f1d(f0d,S);
   //cout<<f1<<endl;
 
-  SubgraphLayer1<Ptensors1> f2=f1.autobahn(W);
-  SubgraphLayer1<Ptensors1> f2d=f1d.autobahn(W);
-  SubgraphLayer1<Ptensors1> f2dd=f2d.permute(pi.inv());
-  cout<<f2<<endl;
+  //SubgraphLayer1<Ptensors1> f2=f1.autobahn(W);
+  //SubgraphLayer1<Ptensors1> f2d=f1d.autobahn(W);
+  //SubgraphLayer1<Ptensors1> f2dd=f2d.permute(pi.inv());
+  //cout<<f2<<endl;
   //cout<<f2d<<endl;
-  cout<<f2dd<<endl;
+  //cout<<f2dd<<endl;
 
 }

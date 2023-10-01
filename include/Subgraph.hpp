@@ -15,8 +15,8 @@
 #ifndef _ptens_Subgraph
 #define _ptens_Subgraph
 
-#include "SparseRmatrix.hpp"
 #include "PtensSession.hpp"
+#include "SubgraphObj.hpp"
 
 
 namespace ptens{
@@ -27,9 +27,8 @@ namespace ptens{
   class Subgraph{
   public:
 
-    typedef cnine::SparseRmatrix BaseMatrix;
-
     unordered_set<SubgraphObj>::iterator obj;
+    //shared_ptr<SubgraphObj> obj;
     
 
   public: // ---- Constructors -------------------------------------------------------------------------------
@@ -53,15 +52,15 @@ namespace ptens{
     Subgraph(const int _n, const initializer_list<pair<int,int> >& list): 
       obj(ptens_session.subgraphs.emplace(_n,list).first){}
 
-    Subgraph(const int _n, const initializer_list<pair<int,int> >& list, const cnine::RtensorA& labels): 
-      obj(ptens_session.subgraphs.emplace(_n,list,labels).first){}
+    //Subgraph(const int _n, const initializer_list<pair<int,int> >& list, const cnine::RtensorA& labels): 
+    //obj(ptens_session.subgraphs.emplace(_n,list,labels).first){}
 
 
-    Subgraph(const cnine::RtensorA& M):
-      obj(ptens_session.subgraphs.emplace(M).first){}
+    //Subgraph(const cnine::RtensorA& M):
+    //obj(ptens_session.subgraphs.emplace(M).first){}
 
-    Subgraph(const cnine::RtensorA& M, const cnine::RtensorA& L):
-      obj(ptens_session.subgraphs.emplace(M,L).first){}
+    //Subgraph(const cnine::RtensorA& M, const cnine::RtensorA& L):
+    //obj(ptens_session.subgraphs.emplace(M,L).first){}
 
 
 
@@ -141,7 +140,7 @@ namespace ptens{
     }
 
     cnine::RtensorA dense() const{
-      return obj->dense();
+      return obj->dense().rtensor();
     }
 
     void make_eigenbasis() const{

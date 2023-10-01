@@ -5,10 +5,8 @@ typedef SubgraphLayer2<Ptensors2> SGlayer2;
 
 pybind11::class_<SGlayer0,Ptensors0>(m,"subgraph_layer0")
 
-  .def(pybind11::init<ptens::Ggraph&, const at::Tensor&>())
-//.def(pybind11::init<const SGlayer0&, const int>())
 
-//.def_static("dummy",[]() {return SGlayer0();})
+  .def(pybind11::init<ptens::Ggraph&, const at::Tensor&>())
 
   .def_static("raw",[](const Ggraph& G, const int _nc, const int _dev){
       return SGlayer0(G,_nc,cnine::fill_raw(),_dev);}, py::arg("graph"),py::arg("nc"),py::arg("device")=0)
@@ -20,7 +18,6 @@ pybind11::class_<SGlayer0,Ptensors0>(m,"subgraph_layer0")
     return SGlayer0(G,_nc,cnine::fill_sequential(),_dev);}, py::arg("graph"),py::arg("nc"),py::arg("device")=0)
 
   .def_static("zeros_like",&SGlayer0::zeros_like)
-//  .def_static("randn_like",&SGlayer0::randn_like)
 
 
 // ---- Conversions, transport, etc. ------------------------------------------------------------------------
@@ -35,6 +32,7 @@ pybind11::class_<SGlayer0,Ptensors0>(m,"subgraph_layer0")
   .def("toPtensors0_back",[](SGlayer0& x, Ptensors0& r){
       if(!x.grad) x.grad=new Ptensors0(r.get_grad());
       else x.grad->add(r.get_grad());})
+
 
   .def("torch",[](const SGlayer0& x){return x.tensor().torch();})
   .def("torch_back",[](SGlayer0& x, const at::Tensor& g){
@@ -147,8 +145,6 @@ pybind11::class_<SGlayer0,Ptensors0>(m,"subgraph_layer0")
   .def("str",&SGlayer0::str,py::arg("indent")="")
   .def("__str__",&SGlayer0::str,py::arg("indent")="")
   .def("__repr__",&SGlayer0::repr);
-
-
 
 
 

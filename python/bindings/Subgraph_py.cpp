@@ -14,9 +14,9 @@ pybind11::class_<Subgraph>(m,"subgraph")
   .def_static("edge_index",[](const at::Tensor& x, const at::Tensor& l, const int n){
       return Hgraph::edge_index(cnine::RtensorA(x),cnine::RtensorA(l),n);})
 
-  .def_static("matrix",[](const at::Tensor& x){return Subgraph(cnine::RtensorA(x));})
-  .def_static("matrix",[](const at::Tensor& x, const at::Tensor& L){
-      return Subgraph(cnine::RtensorA(x),cnine::RtensorA(L));})
+//.def_static("matrix",[](const at::Tensor& x){return Subgraph(cnine::RtensorA(x));})
+//.def_static("matrix",[](const at::Tensor& x, const at::Tensor& L){
+//    return Subgraph(cnine::RtensorA(x),cnine::RtensorA(L));})
 
   .def("has_espaces",&Subgraph::has_espaces)
   .def("n_eblocks",&Subgraph::n_eblocks)

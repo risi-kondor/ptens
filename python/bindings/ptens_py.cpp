@@ -24,7 +24,7 @@
 #include "LinmapLayers.hpp"
 #include "EMPlayers.hpp"
 #include "OuterLayers.hpp"
-#include "ConcatLayers.hpp"
+// //#include "ConcatLayers.hpp"
 
 #include "SubgraphLayer0.hpp"
 #include "SubgraphLayer1.hpp"
@@ -44,7 +44,7 @@ PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
   
 
   #include "AtomsPack_py.cpp"
-  #include "Hgraph_py.cpp"
+  //  #include "Hgraph_py.cpp"
   #include "Ggraph_py.cpp"
   #include "Subgraph_py.cpp"
 

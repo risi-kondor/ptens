@@ -73,7 +73,7 @@ namespace ptens{
     }
 
     static SubgraphLayer1<TLAYER> like(const SubgraphLayer1& x, const cnine::RtensorA& M){
-      return SubgraphLayer1(x.G,x.S,TLAYER::like(x,M));
+      return SubgraphLayer1(TLAYER::like(x,M),x.G,x.S);
     }
 
 
@@ -96,8 +96,8 @@ namespace ptens{
 
 
     template<typename TLAYER2>
-    SubgraphLayer1(const Subgraph& _S, const SubgraphLayer0<TLAYER2>& x):
-      SubgraphLayer1(x.G,_S,x.G->subgraphs_matrix(_S),x.get_nc(),x.dev){
+    SubgraphLayer1(const SubgraphLayer0<TLAYER2>& x, const Subgraph& _S):
+      SubgraphLayer1(x.G,_S,x.G.subgraphs_matrix(_S),x.get_nc(),x.dev){
       emp01(*this,x,TransferMap(x.atoms,atoms));
     }
 
@@ -107,8 +107,8 @@ namespace ptens{
     }
 
     template<typename TLAYER2>
-    SubgraphLayer1(const Subgraph& _S, const SubgraphLayer1<TLAYER2>& x):
-      SubgraphLayer1(x.G,_S,x.G->subgraphs_matrix(_S),2*x.get_nc(),x.dev){
+    SubgraphLayer1(const SubgraphLayer1<TLAYER2>& x, const Subgraph& _S):
+      SubgraphLayer1(x.G,_S,x.G.subgraphs_matrix(_S),2*x.get_nc(),x.dev){
       emp11(*this,x,TransferMap(x.atoms,atoms));
     }
 
@@ -118,8 +118,8 @@ namespace ptens{
     }
 
     template<typename TLAYER2>
-    SubgraphLayer1(const Subgraph& _S, const SubgraphLayer2<TLAYER2>& x):
-      SubgraphLayer1(x.G,_S,x.G->subgraphs_matrix(_S),5*x.get_nc(),x.dev){
+    SubgraphLayer1(const SubgraphLayer2<TLAYER2>& x, const Subgraph& _S):
+      SubgraphLayer1(x.G,_S,x.G.subgraphs_matrix(_S),5*x.get_nc(),x.dev){
       emp21(*this,x,TransferMap(x.atoms,atoms)); 
     }
 
@@ -133,7 +133,7 @@ namespace ptens{
 
 
     SubgraphLayer1(const Ptensors0& x, const Ggraph& _G, const Subgraph& _S):
-      SubgraphLayer1(_G,_S,_G.subgraphsmx(_S),x.get_nc(),x.dev){
+      SubgraphLayer1(_G,_S,_G.subgraphs_matrix(_S),x.get_nc(),x.dev){
       emp01(*this,x,TransferMap(x.atoms,atoms));
     }
 
@@ -142,7 +142,7 @@ namespace ptens{
     }
 
     SubgraphLayer1(const Ptensors1& x, const Ggraph& _G, const Subgraph& _S):
-      SubgraphLayer1(_G,_S,_G.subgraphsmx(_S),2*x.get_nc(),x.dev){
+      SubgraphLayer1(_G,_S,_G.subgraphs_matrix(_S),2*x.get_nc(),x.dev){
       cnine::ftimer timer("SubgraphLayer1 from Ptensors1");
       emp11(*this,x,TransferMap(x.atoms,atoms));
     }
@@ -152,7 +152,7 @@ namespace ptens{
     }
 
     SubgraphLayer1(const Ptensors2& x, const Ggraph& _G, const Subgraph& _S):
-      SubgraphLayer1(_G,_S,_G.subgraphsmx(_S),5*x.get_nc(),x.dev){
+      SubgraphLayer1(_G,_S,_G.subgraphs_matrix(_S),5*x.get_nc(),x.dev){
       emp21(*this,x,TransferMap(x.atoms,atoms));
     }
 

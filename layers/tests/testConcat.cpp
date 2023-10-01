@@ -15,7 +15,7 @@
 #include "CnineSession.hpp"
 #include "Hgraph.hpp"
 
-#include "ConcatLayers.hpp"
+//#include "ConcatLayers.hpp"
 
 
 using namespace ptens;
@@ -32,10 +32,10 @@ int main(int argc, char** argv){
   Hgraph G=Hgraph::random(N,0.3);
   cout<<G.dense()<<endl;
 
-  Ptensors0 A=Ptensors0::sequential(N,1);
-  cout<<A<<endl;
+  //Ptensors0 A=Ptensors0::sequential(N,1);
+  //cout<<A<<endl;
 
-  auto B=concat(A,G);
-  cout<<B<<endl;
+  //auto B=concat(A,G);
+  //cout<<B<<endl;
 
 }

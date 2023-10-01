@@ -30,6 +30,6 @@ int main(int argc, char** argv){
   cout<<M<<endl;
 
   Subgraph A=Subgraph::star(5);
-  cout<<A.dense()<<endl;
+  cout<<A<<endl;
 
 }

@@ -22,7 +22,7 @@ CUDADIR=$(ROOTDIR)/cuda
 TENSORSDIR=$(ROOTDIR)/tensors
 LAYERSDIR=$(ROOTDIR)/layers
 
-CFLAGS= -std=c++17 -O3 # -ferror-limit=1  
+CFLAGS= -std=c++17 -O3 -ferror-limit=1  
 INCLUDE= -I $(ROOTDIR)/include 
 LIBS= -lstdc++ -lm -lpthread 
 

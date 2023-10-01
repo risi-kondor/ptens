@@ -144,13 +144,6 @@ pybind11::class_<Ptensors0/*,cnine::RtensorPack*/>(m,"ptensors0")
       g->add_linear_back2_to(R);
       return R.torch();})
 
-  
-
-//.def("add_gather",[](Ptensors0& r const Ptensors0& x, const Hgraph& G){
-//      r.add_gather(x,G);})
-//  .def("add_gather_back",[](Ptensors0& r const Ptensors0& x, const Hgraph& G){
-//      r.add_gather(x,G);})
-
   .def("add_ReLU",[](Ptensors0& r, const Ptensors0& x, const float alpha){
       r.add_ReLU(x,alpha);})
   .def("add_ReLU_back",[](Ptensors0& x, const cnine::loose_ptr<Ptensors0>& g, const float alpha){

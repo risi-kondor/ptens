@@ -16,6 +16,7 @@
 
 #include "Hgraph.hpp"
 #include "GgraphObj.hpp"
+#include "Subgraph.hpp"
 
 
 namespace ptens{
@@ -48,9 +49,16 @@ namespace ptens{
     static Ggraph random(const int _n, const float p=0.5){
       return new BASE(BASE::random(_n,p));}
 
-    //static Ggraph edges(const cnine::RtensorA& M, int n=-1){
-    //if(n==-1) n=M.max()+1;
-    //return new BASE(M,n);}
+    static Ggraph edges(int n, const cnine::Tensor<int>& M){
+      if(n==-1) n=M.max()+1;
+      return new BASE(n,M);
+    }
+
+    // replace this
+    static Ggraph edges(int n, const cnine::RtensorA& M){
+      if(n==-1) n=M.max()+1;
+      return new BASE(n,M);
+    }
 
 
   public: // ---- Access --------------------------------------------------------------------------------------
@@ -60,9 +68,9 @@ namespace ptens{
       return obj->getn();
     }
 
-    //cnine::RtensorA dense() const{
-    //return obj->dense();
-    //}
+    cnine::RtensorA dense() const{
+      return obj->dense().rtensor();
+    }
 
     bool operator==(const Ggraph& x) const{
       return obj==x.obj;
@@ -74,6 +82,14 @@ namespace ptens{
 
     Ggraph permute(const cnine::permutation& pi) const{
       return Ggraph(new BASE(obj->permute(pi)));
+    }
+
+    //cnine::array_pool<int> subgraphs_list(const Subgraph& H) const{
+    //return obj->subgraphs_list(*H.obj);
+    //}
+
+    cnine::Tensor<int>& subgraphs_matrix(const Subgraph& H) const{
+      return obj->subgraphs_matrix(*H.obj);
     }
 
 
