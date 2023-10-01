@@ -5,6 +5,7 @@ CNINE_INCLUDES+=-I$(CNINE_ROOT)/algorithms
 CNINE_INCLUDES+=-I$(CNINE_ROOT)/combinatorial
 CNINE_INCLUDES+=-I$(CNINE_ROOT)/containers
 CNINE_INCLUDES+=-I$(CNINE_ROOT)/math
+CNINE_INCLUDES+=-I$(CNINE_ROOT)/utility
 CNINE_INCLUDES+=-I$(CNINE_ROOT)/wrappers
 CNINE_INCLUDES+=-I$(CNINE_ROOT)/objects/scalar -I$(CNINE_ROOT)/objects/matrix -I$(CNINE_ROOT)/objects/tensor 
 CNINE_INCLUDES+=-I$(CNINE_ROOT)/objects/tensor_views -I$(CNINE_ROOT)/objects/tensor_array 
