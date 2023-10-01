@@ -15,8 +15,8 @@ def main():
     # os.environ['CUDA_HOME']='/usr/local/cuda'
     #os.environ["CC"] = "clang"
 
-    # compile_with_cuda = False  
-    compile_with_cuda = True
+    compile_with_cuda = False  
+    # compile_with_cuda = True
 
     copy_warnings = False
     torch_convert_warnings = False
@@ -39,6 +39,7 @@ def main():
 		     cwd + cnine_folder + '/combinatorial',
 		     cwd + cnine_folder + '/containers',
 		     cwd + cnine_folder + '/math',
+		     cwd + cnine_folder + '/utility',
 		     cwd + cnine_folder + '/wrappers',
                      cwd + cnine_folder + '/include/cmaps',
                      cwd + cnine_folder + '/objects/scalar',

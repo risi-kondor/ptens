@@ -19,7 +19,7 @@
 #include "Ptensors1.hpp"
 #include "Ptensors2.hpp"
 #include "Hgraph.hpp"
-#include "ftimer.hpp"
+#include "flog.hpp"
 
 
 namespace ptens{
@@ -50,7 +50,7 @@ namespace ptens{
     if(map.is_empty()) return;
     int nc=x.get_nc();
     auto [map0,map1]=map.intersects(x.atoms,r.atoms);
-    cnine::ftimer timer("ptens::emp11");
+    cnine::flog timer("ptens::emp11");
     r.broadcast0(x.reduce0(map0),map1,0);
     r.broadcast1(x.reduce1(map0),map1,nc);
   }
@@ -60,7 +60,7 @@ namespace ptens{
     if(map.is_empty()) return;
     int nc=r.get_nc();
     auto [map0,map1]=map.intersects(x.atoms,r.atoms);
-    cnine::ftimer timer("ptens::emp11_back");
+    cnine::flog timer("ptens::emp11_back");
     r.reduce0_back(x.broadcast0_back(map0,0,nc),map1);
     r.reduce1_back(x.broadcast1_back(map0,nc,nc),map1);
   }

@@ -17,7 +17,7 @@
 
 #include "Hgraph.hpp"
 #include "Subgraph.hpp"
-#include "FindPlantedSubgraphs.hpp"
+#include "PtensFindPlantedSubgraphs.hpp"
 #include "TransferMap.hpp"
 #include "EMPlayers2.hpp"
 #include "SubgraphLayer2.hpp"

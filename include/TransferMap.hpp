@@ -20,7 +20,7 @@
 #include "array_pool.hpp"
 #include "AindexPack.hpp"
 #include "GatherMap.hpp"
-#include "ftimer.hpp"
+#include "flog.hpp"
 
 
 namespace ptens{
@@ -41,7 +41,7 @@ namespace ptens{
 
     TransferMap(const cnine::Tensor<int>& y, const cnine::Tensor<int>& x):
       TransferMap(x.dim(1),y.dim(1)){
-      cnine::ftimer timer("TransferMap::TransferMap(const Tensor<int>&, const Tensor<int>&)");
+      cnine::flog timer("TransferMap::TransferMap(const Tensor<int>&, const Tensor<int>&)");
       CNINE_ASSRT(x.ndims()==2);
       CNINE_ASSRT(y.ndims()==2);
       const int kx=x.dims[1];
@@ -65,7 +65,7 @@ namespace ptens{
 
     TransferMap(const cnine::Tensor<int>& y, const cnine::array_pool<int>& x):
       TransferMap(x.size(),y.dims[0]){
-      cnine::ftimer timer("TransferMap::TransferMap(const Tensor<int>&, const AtomsPack&)");
+      cnine::flog timer("TransferMap::TransferMap(const Tensor<int>&, const AtomsPack&)");
       CNINE_ASSRT(y.ndims()==2);
       const int ky=y.dims[1];
 
@@ -88,7 +88,7 @@ namespace ptens{
       
     TransferMap(const cnine::array_pool<int>& y, const cnine::Tensor<int>& x):
       TransferMap(x.dims[0],y.size()){
-      cnine::ftimer timer("TransferMap::TransferMap(const AtomsPack&, const Tensor<int>&)");
+      cnine::flog timer("TransferMap::TransferMap(const AtomsPack&, const Tensor<int>&)");
       CNINE_ASSRT(x.ndims()==2);
       const int kx=x.dims[1];
 
@@ -110,7 +110,7 @@ namespace ptens{
 
     TransferMap(const cnine::array_pool<int>& y, const cnine::array_pool<int>& x):
       TransferMap(x.size(),y.size()){
-      cnine::ftimer timer("TransferMap::TransferMap(const AtomsPack&, const AtomsPack&)");
+      cnine::flog timer("TransferMap::TransferMap(const AtomsPack&, const AtomsPack&)");
       if(y.size()<10){
 	for(int i=0; i<x.size(); i++){
 	  auto v=x(i);

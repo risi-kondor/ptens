@@ -22,7 +22,7 @@
 #include "AindexPack.hpp"
 #include "Hgraph.hpp"
 #include "Tensor.hpp"
-#include "ftimer.hpp"
+#include "flog.hpp"
 
 
 namespace ptens{
@@ -118,7 +118,7 @@ namespace ptens{
       for(auto& p:G.row(w)){
 	auto it=std::find(assignment.begin(),assignment.end(),p.first);
 	if(it==assignment.end()) continue;
-	if(p.second!=H(v,Htraversal[it-assignment.begin()].first)) return false;
+	if(p.second!=H(v,Htraversal[it-assignment.begin()].first)) return false; // incorrect!!
       }
 
       assignment[v]=w;
@@ -155,7 +155,7 @@ namespace ptens{
     typedef Hgraph Graph;
 
     cnine::array_pool<int> operator()(const Graph& G, const Graph& H){
-      cnine::ftimer timer("CachedPlantedSubgraphs");
+      cnine::flog timer("CachedPlantedSubgraphs");
       //if(!G.subgraphlist_cache) G.subgraphlist_cache=new HgraphSubgraphListCache; 
       auto it=G.subgraphlist_cache.find(H);
       if(it!=G.subgraphlist_cache.end()) return *it->second;
@@ -174,7 +174,7 @@ namespace ptens{
     shared_ptr<cnine::Tensor<int> > ptr;
 
     CachedPlantedSubgraphsMx(const Graph& G, const Graph& H){
-      cnine::ftimer timer("CachedPlantedSubgraphsMx");
+      cnine::flog timer("CachedPlantedSubgraphsMx");
       //if(!G.subgraphlist_cache) G.subgraphlist_cache=new HgraphSubgraphListCache; 
       auto it=G.subgraphlistmx_cache.find(H);
       if(it!=G.subgraphlistmx_cache.end()) ptr=it->second;

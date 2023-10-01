@@ -19,7 +19,7 @@
 //#include "Subgraph.hpp"
 //#include "TransferMap.hpp"
 #include "SubgraphLayer.hpp"
-#include "FindPlantedSubgraphs.hpp"
+#include "PtensFindPlantedSubgraphs.hpp"
 #include "EMPlayers2.hpp"
 
 

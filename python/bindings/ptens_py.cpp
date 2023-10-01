@@ -18,7 +18,7 @@
 
 #include "LinmapFunctions.hpp"
 #include "MsgFunctions.hpp"
-#include "FindPlantedSubgraphs.hpp"
+#include "PtensFindPlantedSubgraphs.hpp"
 
 #include "GatherLayers.hpp"
 #include "LinmapLayers.hpp"
