@@ -32,17 +32,4 @@ int main(int argc, char** argv){
   Subgraph A=Subgraph::star(5);
   cout<<A.dense()<<endl;
 
-  /*
-  CSRmatrix<float> Md=M.csrmatrix();
-  cout<<Md<<endl;
-
-  GatherMap Mg=M.broadcast_map();
-  cout<<Mg<<endl;
-  //for(int i=0; i<5; i++)
-  //cout<<M.nhoods(i)<<endl;
-
-  auto E=M.edges();
-  cout<<E<<endl;
-  */
-
 }

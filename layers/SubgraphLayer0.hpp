@@ -55,17 +55,6 @@ namespace ptens{
 
   public: 
 
-    // 
-    //template<typename IPACK>
-    //SubgraphLayer0(const Hgraph& _G, const Subgraph& _S, const IPACK& ipack, const int nc, const int _dev=0):
-    //G(_G), S(_S), TLAYER(ipack,nc,cnine::fill_zero(),_dev){}
-
-    //template<typename FILLTYPE, typename = typename std::enable_if<std::is_base_of<cnine::fill_pattern, FILLTYPE>::value, FILLTYPE>::type>
-    //SubgraphLayer0(const Hgraph& _G, const int nc, const FILLTYPE& dummy, const int _dev=0):
-    //G(_G), S(Subgraph::trivial()), TLAYER(_G.getn(),nc,dummy,_dev){}
-
-    //SubgraphLayer0(const Hgraph& _G, const rtensor& x):
-    //G(_G), S(Subgraph::trivial()), TLAYER(x){}
 
 
   public: // ---- Named Constructors ------------------------------------------------------------------------------------------
@@ -87,11 +76,12 @@ namespace ptens{
       return SubgraphLayer0(TLAYER::zeros_like(*this,_nc),G,S);
     }
 
+
   public: // ---- Conversions --------------------------------------------------------------------------------------------
 
 
     SubgraphLayer0(const Ggraph& _G, const rtensor& x):
-      SubgraphLayer<TLAYER>(TLAYER(x),_G,Subgraph::trivial()){}
+      SubgraphLayer<TLAYER>(TLAYER(x),_G.obj,Subgraph::trivial()){}
 
 
   public: // ---- Transport ----------------------------------------------------------------------------------
@@ -101,12 +91,12 @@ namespace ptens{
       SubgraphLayer<TLAYER>(TLAYER(x,_dev),x.G,x.S){}
 
 
-  public: // ---- Message passing ----------------------------------------------------------------------------------------
+  public: // ---- Message passing between subgraph layers -----------------------------------------------------
 
 
     template<typename TLAYER2>
-    SubgraphLayer0(const SubgraphLayer0<TLAYER2>& x, const Subgraph& _S):
-      SubgraphLayer0(x.G,_S,AtomsPack(x.getn()),x.get_nc(),x.dev){
+    SubgraphLayer0(const Subgraph& s, const SubgraphLayer0<TLAYER2>& x):
+      SubgraphLayer0(x.G,s,AtomsPack(x.getn()),x.get_nc(),x.dev){
       emp00(*this,x,TransferMap(x.atoms,atoms));
     }
 
@@ -116,8 +106,8 @@ namespace ptens{
     }
 
     template<typename TLAYER2>
-    SubgraphLayer0(const SubgraphLayer1<TLAYER2>& x, const Subgraph& _S):
-      SubgraphLayer0(x.G,_S,AtomsPack(x.getn()),x.get_nc(),x.dev){
+    SubgraphLayer0(const Subgraph& s, const SubgraphLayer1<TLAYER2>& x):
+      SubgraphLayer0(x.G,s,AtomsPack(x.getn()),x.get_nc(),x.dev){
       emp10(*this,x,TransferMap(x.atoms,atoms));
     }
 
@@ -127,8 +117,8 @@ namespace ptens{
     }
 
     template<typename TLAYER2>
-    SubgraphLayer0(const SubgraphLayer2<TLAYER2>& x, const Subgraph& _S):
-      SubgraphLayer0(x.G,_S,AtomsPack(x.getn()),2*x.get_nc(),x.dev){
+    SubgraphLayer0(const Subgraph& s, const SubgraphLayer2<TLAYER2>& x):
+      SubgraphLayer0(x.G,s,AtomsPack(x.getn()),2*x.get_nc(),x.dev){
       emp20(*this,x,TransferMap(x.atoms,atoms));
     }
 
@@ -138,8 +128,11 @@ namespace ptens{
     }
 
 
-    SubgraphLayer0(const Ptensors0& x, const Ggraph& _G, const Subgraph& _S):
-      SubgraphLayer0(_G,_S,CachedPlantedSubgraphsMx(*_G.obj,*_S.obj),x.get_nc(),x.dev){
+  public: // ---- Message passing from Ptensor layers ---------------------------------------------------------
+
+
+    SubgraphLayer0(const Ggraph& g, const Subgraph& s, const Ptensors0& x):
+      SubgraphLayer0(g.obj,s,g.subgraphsmx(s),x.get_nc(),x.dev){
       emp00(*this,x,TransferMap(x.atoms,atoms));
     }
 
@@ -147,8 +140,8 @@ namespace ptens{
       emp00(x.get_grad(),get_grad(),TransferMap(atoms,x.atoms)); 
     }
 
-    SubgraphLayer0(const Ptensors1& x, const Ggraph& _G, const Subgraph& _S):
-      SubgraphLayer0(_G,_S,CachedPlantedSubgraphsMx(*_G.obj,*_S.obj),x.get_nc(),x.dev){
+    SubgraphLayer0(const Ggraph& g, const Subgraph& s, const Ptensors1& x):
+      SubgraphLayer0(g,s,g.subgraphsmx(s),x.get_nc(),x.dev){
       emp10(*this,x,TransferMap(x.atoms,atoms));
     }
 
@@ -156,8 +149,8 @@ namespace ptens{
       emp01(x.get_grad(),get_grad(),TransferMap(atoms,x.atoms));
     }
 
-    SubgraphLayer0(const Ptensors2& x, const Ggraph& _G, const Subgraph& _S):
-      SubgraphLayer0(_G,_S,CachedPlantedSubgraphsMx(*_G.obj,*_S.obj),2*x.get_nc(),x.dev){
+    SubgraphLayer0(const Ggraph& g, const Subgraph& s, const Ptensors2& x):
+      SubgraphLayer0(g,s,g.subgraphs_matrix(s),2*x.get_nc(),x.dev){
       emp20(*this,x,TransferMap(x.atoms,atoms));
     }
 

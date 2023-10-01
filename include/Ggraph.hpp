@@ -15,6 +15,7 @@
 #define _Ptens_Graph
 
 #include "Hgraph.hpp"
+#include "GgraphObj.hpp"
 
 
 namespace ptens{
@@ -23,30 +24,33 @@ namespace ptens{
   class Ggraph{
   public:
 
-    shared_ptr<Hgraph> obj;
+    //typedef Hgraph BASE;
+    typedef GgraphObj BASE;
+
+    shared_ptr<BASE> obj;
 
     Ggraph():
-      obj(new Hgraph()){};
+      obj(new BASE()){};
 
-    Ggraph(Hgraph* x):
+    Ggraph(BASE* x):
       obj(x){}
 
     Ggraph(const initializer_list<pair<int,int> >& list, const int n=-1): 
-      obj(new Hgraph(n,list)){};
+      obj(new BASE(n,list)){};
 
     Ggraph(const cnine::RtensorA& M):
-      obj(new Hgraph(M)){}
+      obj(new BASE(cnine::Tensor<float>(M))){}
 
 
   public: //  ---- Named constructors -------------------------------------------------------------------------
 
 
     static Ggraph random(const int _n, const float p=0.5){
-      return new Hgraph(Hgraph::random(_n,p));}
+      return new BASE(BASE::random(_n,p));}
 
-    static Ggraph edges(const cnine::RtensorA& M, int n=-1){
-      if(n==-1) n=M.max()+1;
-      return new Hgraph(M,n);}
+    //static Ggraph edges(const cnine::RtensorA& M, int n=-1){
+    //if(n==-1) n=M.max()+1;
+    //return new BASE(M,n);}
 
 
   public: // ---- Access --------------------------------------------------------------------------------------
@@ -56,9 +60,9 @@ namespace ptens{
       return obj->getn();
     }
 
-    cnine::RtensorA dense() const{
-      return obj->dense();
-    }
+    //cnine::RtensorA dense() const{
+    //return obj->dense();
+    //}
 
     bool operator==(const Ggraph& x) const{
       return obj==x.obj;
@@ -69,7 +73,7 @@ namespace ptens{
 
 
     Ggraph permute(const cnine::permutation& pi) const{
-      return Ggraph(new Hgraph(obj->permute(pi)));
+      return Ggraph(new BASE(obj->permute(pi)));
     }
 
 

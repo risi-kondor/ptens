@@ -17,7 +17,7 @@
 
 #include "Hgraph.hpp"
 #include "Subgraph.hpp"
-#include "PtensFindPlantedSubgraphs.hpp"
+//#include "PtensFindPlantedSubgraphs.hpp"
 #include "TransferMap.hpp"
 #include "EMPlayers2.hpp"
 #include "SubgraphLayer0.hpp"
@@ -52,10 +52,6 @@ namespace ptens{
 
   public: 
 
-    //template<typename IPACK>
-    //SubgraphLayer1(const Ggraph& _G, const Subgraph& _S, const IPACK& ipack, const int nc, const int _dev=0):
-    //G(_G), S(_S), TLAYER(ipack,nc,cnine::fill_zero(),_dev){}
-
 
   public: // ---- Named Constructors ------------------------------------------------------------------------------------------
 
@@ -88,7 +84,7 @@ namespace ptens{
       SubgraphLayer<TLAYER>(TLAYER(x,_dev),x.G,x.S){}
 
 
-  public: // ---- Message passing ----------------------------------------------------------------------------------------
+  public: // ---- Access --------------------------------------------------------------------------------------
 
 
     int n_eblocks() const{
@@ -96,12 +92,12 @@ namespace ptens{
     }
 
 
-  public: // ---- Message passing ----------------------------------------------------------------------------------------
+  public: // ---- Message passing between subgraph layers -----------------------------------------------------
 
 
     template<typename TLAYER2>
-    SubgraphLayer1(const SubgraphLayer0<TLAYER2>& x, const Subgraph& _S):
-      SubgraphLayer1(x.G,_S,CachedPlantedSubgraphsMx(*x.G.obj,*_S.obj),x.get_nc(),x.dev){
+    SubgraphLayer1(const Subgraph& _S, const SubgraphLayer0<TLAYER2>& x):
+      SubgraphLayer1(x.G,_S,x.G->subgraphs_matrix(_S),x.get_nc(),x.dev){
       emp01(*this,x,TransferMap(x.atoms,atoms));
     }
 
@@ -111,8 +107,8 @@ namespace ptens{
     }
 
     template<typename TLAYER2>
-    SubgraphLayer1(const SubgraphLayer1<TLAYER2>& x, const Subgraph& _S):
-      SubgraphLayer1(x.G,_S,CachedPlantedSubgraphsMx(*x.G.obj,*_S.obj),2*x.get_nc(),x.dev){
+    SubgraphLayer1(const Subgraph& _S, const SubgraphLayer1<TLAYER2>& x):
+      SubgraphLayer1(x.G,_S,x.G->subgraphs_matrix(_S),2*x.get_nc(),x.dev){
       emp11(*this,x,TransferMap(x.atoms,atoms));
     }
 
@@ -122,8 +118,8 @@ namespace ptens{
     }
 
     template<typename TLAYER2>
-    SubgraphLayer1(const SubgraphLayer2<TLAYER2>& x, const Subgraph& _S):
-      SubgraphLayer1(x.G,_S,CachedPlantedSubgraphsMx(*x.G.obj,*_S.obj),5*x.get_nc(),x.dev){
+    SubgraphLayer1(const Subgraph& _S, const SubgraphLayer2<TLAYER2>& x):
+      SubgraphLayer1(x.G,_S,x.G->subgraphs_matrix(_S),5*x.get_nc(),x.dev){
       emp21(*this,x,TransferMap(x.atoms,atoms)); 
     }
 
@@ -133,8 +129,11 @@ namespace ptens{
     }
 
 
+  public: // ---- Message passing from Ptensor layers ---------------------------------------------------------
+
+
     SubgraphLayer1(const Ptensors0& x, const Ggraph& _G, const Subgraph& _S):
-      SubgraphLayer1(_G,_S,CachedPlantedSubgraphsMx(*_G.obj,*_S.obj),x.get_nc(),x.dev){
+      SubgraphLayer1(_G,_S,_G.subgraphsmx(_S),x.get_nc(),x.dev){
       emp01(*this,x,TransferMap(x.atoms,atoms));
     }
 
@@ -143,7 +142,7 @@ namespace ptens{
     }
 
     SubgraphLayer1(const Ptensors1& x, const Ggraph& _G, const Subgraph& _S):
-      SubgraphLayer1(_G,_S,CachedPlantedSubgraphsMx(*_G.obj,*_S.obj),2*x.get_nc(),x.dev){
+      SubgraphLayer1(_G,_S,_G.subgraphsmx(_S),2*x.get_nc(),x.dev){
       cnine::ftimer timer("SubgraphLayer1 from Ptensors1");
       emp11(*this,x,TransferMap(x.atoms,atoms));
     }
@@ -153,7 +152,7 @@ namespace ptens{
     }
 
     SubgraphLayer1(const Ptensors2& x, const Ggraph& _G, const Subgraph& _S):
-      SubgraphLayer1(_G,_S,CachedPlantedSubgraphsMx(*_G.obj,*_S.obj),5*x.get_nc(),x.dev){
+      SubgraphLayer1(_G,_S,_G.subgraphsmx(_S),5*x.get_nc(),x.dev){
       emp21(*this,x,TransferMap(x.atoms,atoms));
     }
 

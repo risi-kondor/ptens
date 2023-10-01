@@ -35,7 +35,7 @@ namespace ptens{
     using TLAYER::get_nc;
     using TLAYER::tensor;
 
-    const Ggraph G;
+    const shared_ptr<GgraphObj> G;
     const Subgraph S;
 
 
@@ -43,32 +43,29 @@ namespace ptens{
 
     SubgraphLayer(){}
 
-    SubgraphLayer(const Ggraph& _G, const Subgraph& _S, TLAYER&& x):
-      TLAYER(std::move(x)), G(_G), S(_S){}
-
     template<typename FILLTYPE, typename = typename std::enable_if<std::is_base_of<cnine::fill_pattern, FILLTYPE>::value, FILLTYPE>::type>
     SubgraphLayer(const Ggraph& _G, const int nc, const FILLTYPE& dummy, const int _dev=0):
-    G(_G), S(Subgraph::trivial()), TLAYER(_G.getn(),nc,dummy,_dev){}
+    G(_G.obj), S(Subgraph::trivial()), TLAYER(_G.getn(),nc,dummy,_dev){}
 
     template<typename IPACK>
     SubgraphLayer(const Ggraph& _G, const Subgraph& _S, const IPACK& ipack, const int nc, const int _dev=0):
-      G(_G), S(_S), TLAYER(ipack,nc,cnine::fill_zero(),_dev){}
+      G(_G.obj), S(_S), TLAYER(ipack,nc,cnine::fill_zero(),_dev){}
 
     template<typename IPACK>
     SubgraphLayer(const Ggraph& _G, const Subgraph& _S, const IPACK& _ipack, const int _nc, const cnine::fill_raw& dummy, const int nc, const int _dev=0):
-      G(_G), S(_S), TLAYER(TLAYER::raw(_ipack,_nc,_dev)){}
+      G(_G.obj), S(_S), TLAYER(TLAYER::raw(_ipack,_nc,_dev)){}
 
     template<typename IPACK>
     SubgraphLayer(const Ggraph& _G, const Subgraph& _S, const IPACK& _ipack, const int _nc, const cnine::fill_zero& dummy, const int nc, const int _dev=0):
-      G(_G), S(_S), TLAYER(TLAYER::zero(_ipack,_nc,_dev)){}
+      G(_G.obj), S(_S), TLAYER(TLAYER::zero(_ipack,_nc,_dev)){}
 
     template<typename IPACK>
     SubgraphLayer(const Ggraph& _G, const Subgraph& _S, const IPACK& _ipack, const int _nc, const cnine::fill_gaussian& dummy, const int nc, const int _dev=0):
-      G(_G), S(_S), TLAYER(TLAYER::gaussian(_ipack,_nc,_dev)){}
+      G(_G.obj), S(_S), TLAYER(TLAYER::gaussian(_ipack,_nc,_dev)){}
 
     template<typename IPACK>
     SubgraphLayer(const Ggraph& _G, const Subgraph& _S, const IPACK& _ipack, const int _nc, const cnine::fill_sequential& dummy, const int nc, const int _dev=0):
-      G(_G), S(_S), TLAYER(TLAYER::sequential(_ipack,_nc,_dev)){}
+      G(_G.obj), S(_S), TLAYER(TLAYER::sequential(_ipack,_nc,_dev)){}
 
 
   public: // ---- Copying ------------------------------------------------------------------------------------------------
@@ -91,8 +88,15 @@ namespace ptens{
     //SubgraphLayer(const Ggraph& _G, const rtensor& x):
     //G(_G), S(Subgraph::trivial()), TLAYER(x){}
 
-    SubgraphLayer(TLAYER&& x, const Ggraph& _G, const Subgraph& _S):
+    //SubgraphLayer(TLAYER&& x, const Ggraph& _G, const Subgraph& _S):
+    //TLAYER(std::move(x)), G(_G.obj), S(_S){}
+
+    SubgraphLayer(TLAYER&& x, const GgraphObj& _G, const Subgraph& _S):
       TLAYER(std::move(x)), G(_G), S(_S){}
+
+    //this can be confuse with message passing 
+    //SubgraphLayer(const Ggraph& _G, const Subgraph& _S, TLAYER&& x):
+    //TLAYER(std::move(x)), G(_G.obj), S(_S){}
 
 
   public: // ---- Operations ---------------------------------------------------------------------------------------------
