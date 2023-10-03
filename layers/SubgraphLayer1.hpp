@@ -99,7 +99,6 @@ namespace ptens{
     template<typename TLAYER2>
     SubgraphLayer1(const SubgraphLayer0<TLAYER2>& x, const Subgraph& _S):
       SubgraphLayer1(x.G,_S,x.G.subgraphs(_S),x.get_nc(),x.dev){
-      auto a=overlaps(x.atoms);
       emp01(*this,x,overlaps(x.atoms));
     }
 

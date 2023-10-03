@@ -42,17 +42,35 @@ int main(int argc, char** argv){
   SubgraphLayer0<Ptensors0> f0(G,nc,cnine::fill_gaussian());
   cout<<f0<<endl;
 
+
   SubgraphLayer1<Ptensors1> f1(f0,triangle);
   cout<<"f1 done"<<endl;
 
-  {
-    SubgraphLayer1<Ptensors1> f2(f0,square);
-    cout<<"f2 done"<<endl;
-  }
+  SubgraphLayer1<Ptensors1> f2(f0,square);
+  cout<<"f2 done"<<endl;
 
   SubgraphLayer1<Ptensors1> f1d(f0,triangle);
   cout<<"f1d done"<<endl;
 
 
+  Ptensors1 g1=Ptensors1::cat({f1,f2});
+  cout<<"g1 done"<<endl;
 
+  Ptensors1 g2=Ptensors1::cat({f1,f2});
+  cout<<"g2 done"<<endl;
+
+
+  SubgraphLayer1<Ptensors1> f3(g1,G,triangle);
+  cout<<"f3 done"<<endl;
+
+  SubgraphLayer1<Ptensors1> f4(g1,G,square);
+  cout<<"f4 done"<<endl;
+
+
+  Ptensors1 g3=Ptensors1::cat({f3,f4});
+  cout<<"g3 done"<<endl;
+
+
+
+  cout<<endl;
 }

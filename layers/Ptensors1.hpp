@@ -75,7 +75,7 @@ namespace ptens{
     //RtensorPackB(2,_nc,_dev){}
 
     Ptensors1(const AtomsPack& _atoms, const int _nc, const int _dev=0):
-      Ptensors(_nc,_dev){
+      Ptensors1(_nc,_dev){
       atoms=_atoms;
     }
 
@@ -471,6 +471,8 @@ namespace ptens{
       if(dev==0){
 	for(int i=0; i<N; i++){
 	  if(list.nix(i)==0) continue;
+	  //cout<<view_of(list.tens(i),list.ix(i))<<endl;
+	  //cout<<R.view1_of(i)<<endl;
 	  view_of(list.tens(i),list.ix(i)).sum0_into(R.view1_of(i));
 	}
       }

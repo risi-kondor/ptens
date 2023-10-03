@@ -27,6 +27,9 @@ namespace ptens{
     
     shared_ptr<TransferMapObj<AtomsPackObj> > obj;
 
+    TransferMap(){
+      PTENS_ASSRT(false);}
+
     TransferMap(const shared_ptr<TransferMapObj<AtomsPackObj> >& x):
       obj(x){}
 
