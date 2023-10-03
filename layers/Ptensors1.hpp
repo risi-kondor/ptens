@@ -25,6 +25,7 @@
 #include "Ptensors0.hpp"
 #include "diff_class.hpp"
 
+#include "Ptensors.hpp"
 #include "PtensLoggedTimer.hpp"
 
 
@@ -46,7 +47,8 @@ namespace ptens{
   extern void Ptensors1_broadcast1_cu(cnine::RtensorPackB& R, const cnine::RtensorPackB& x, const AindexPack& list, const int offs, const cudaStream_t& stream);
   #endif
 
-  class Ptensors1: public cnine::RtensorPackB, public cnine::diff_class<Ptensors1>{
+
+  class Ptensors1: public Ptensors, public cnine::diff_class<Ptensors1>{
   public:
 
     typedef cnine::Gdims Gdims;
@@ -58,7 +60,9 @@ namespace ptens{
     typedef cnine::Rtensor3_view Rtensor3_view;
     typedef cnine::RtensorPackB RtensorPackB;
 
-    AtomsPack atoms;
+    using Ptensors::Ptensors;
+
+    //AtomsPack atoms;
     //rtensor norms;
 
 
@@ -75,23 +79,27 @@ namespace ptens{
     Ptensors1(){}
 
     Ptensors1(const int _nc, const int _dev=0):
-      RtensorPackB(2,_nc,_dev) /*, nc(_nc)*/{}
+      Ptensors(2,_nc,_dev){}
+    //RtensorPackB(2,_nc,_dev){}
 
     Ptensors1(const AtomsPack& _atoms, const int _nc, const int _dev=0):
-      RtensorPackB(2,_nc,_dev), /*nc(_nc),*/ atoms(_atoms){}
-
-    //Ptensors1(shared_ptr<cnine::Tensor<int> > atoms_ptr, const int _nc, const int _dev=0):
-    //RtensorPackB(2,_nc,_dev), /*nc(_nc),*/ atoms(atoms_ptr){}
+      Ptensors(_nc,_dev){
+      atoms=_atoms;
+    }
 
     Ptensors1(const AtomsPack& _atoms, const int _nc, const cnine::fill_zero& dummy, const int _dev=0):
       Ptensors1(zero(_atoms,_nc,_dev)){}
 
-    Ptensors1(const cnine::Tensor<int>& M, const int _nc, const cnine::fill_zero& dummy, const int _dev=0):
-      RtensorPackB(M.dims[0],{M.dims[1],_nc},dummy,_dev), atoms(M){}
+    template<typename FILLTYPE, typename = typename std::enable_if<std::is_base_of<cnine::fill_pattern, FILLTYPE>::value, FILLTYPE>::type>
+    Ptensors1(const AtomsPack& _atoms, const int _nc, const FILLTYPE& dummy, const int _dev=0):
+      Ptensors(_atoms, cnine::Gdims({_nc}), dummy, _dev){}
 
     template<typename FILLTYPE, typename = typename std::enable_if<std::is_base_of<cnine::fill_pattern, FILLTYPE>::value, FILLTYPE>::type>
     Ptensors1(const int _n, const int _k, const int _nc, const FILLTYPE& dummy, const int _dev=0):
-      RtensorPackB(_n,{_k,_nc},dummy,_dev), atoms(_n,_k){}
+      Ptensors(AtomsPack(_n,_k),{_k,_nc},dummy,_dev){}
+
+    Ptensors1(const cnine::Tensor<int>& M, const int _nc, const cnine::fill_zero& dummy, const int _dev=0):
+      Ptensors(AtomsPack(M), cnine::Gdims({M.dims[1],_nc}), dummy, _dev){}
 
 
   public: // ----- Constructors ------------------------------------------------------------------------------
@@ -193,16 +201,14 @@ namespace ptens{
 
 
     Ptensors1(const Ptensors1& x):
-      RtensorPackB(x),
-      cnine::diff_class<Ptensors1>(x),
-      atoms(x.atoms){
+      Ptensors(x),
+      cnine::diff_class<Ptensors1>(x){
       PTENS_COPY_WARNING();
     }
 	
     Ptensors1(Ptensors1&& x):
-      RtensorPackB(std::move(x)),
-      cnine::diff_class<Ptensors1>(std::move(x)),
-      atoms(std::move(x.atoms)){
+      Ptensors(std::move(x)),
+      cnine::diff_class<Ptensors1>(std::move(x)){
       PTENS_MOVE_WARNING();
     }
 
@@ -247,11 +253,11 @@ namespace ptens{
     //Ptensors1(cnine::RtensorPack&& x, const AtomsPack& _atoms)://, const int _nc):
       //RtensorPackB(std::move(x)), atoms(_atoms)/*, nc(_nc)*/{}
 
-    Ptensors1(const RtensorPackB& x, const AtomsPack& _atoms):
-      RtensorPackB(x), atoms(_atoms){}
+    //Ptensors1(const RtensorPackB& x, const AtomsPack& _atoms):
+    //RtensorPackB(x), atoms(_atoms){}
 
-    Ptensors1(RtensorPackB&& x, const AtomsPack& _atoms):
-      RtensorPackB(std::move(x)), atoms(_atoms){}
+    //Ptensors1(RtensorPackB&& x, const AtomsPack& _atoms):
+    //RtensorPackB(std::move(x)), atoms(_atoms){}
 
     //rtensor view_as_matrix() const{
     //return rtensor::view_of_blob({tail/nc,nc},get_arr(),dev);
@@ -263,38 +269,29 @@ namespace ptens{
     //}
 
     Ptensors1(const rtensor& A, const AtomsPack& _atoms):
-      RtensorPackB(A,_atoms.dims1(A.dim(1))), atoms(_atoms){
-    }
+      Ptensors(RtensorPackB(A,_atoms.dims1(A.dim(1))),_atoms){}
 
-    #ifdef _WITH_ATEN
-    Ptensors1(const at::Tensor& T, const AtomsPack& _atoms):
-      Ptensors1(rtensor::regular(T),_atoms){}
-    #endif 
+    //#ifdef _WITH_ATEN
+    //Ptensors1(const at::Tensor& T, const AtomsPack& _atoms):
+    //Ptensors1(rtensor::regular(T),_atoms){}
+    //#endif 
 
 
   public: // ---- Transport ----------------------------------------------------------------------------------
 
 
-    Ptensors1(const Ptensors1& x, const int _dev):
-      RtensorPackB(x,_dev),
-      atoms(x.atoms){}
+    //Ptensors1(const Ptensors1& x, const int _dev):
+    //RtensorPackB(x,_dev),
+    //atoms(x.atoms){}
 
     Ptensors1& to_device(const int _dev){
-      RtensorPackB::to_device(_dev);
+      Ptensors::to_device(_dev);
       return *this;
     }
 
 
   public: // ----- Access ------------------------------------------------------------------------------------
 
-
-    int getn() const{
-      return size();
-    }
-
-    //int get_nc() const{
-    //return nc;
-    //}
 
     AtomsPack& get_atomsref(){
       return atoms;
@@ -313,14 +310,6 @@ namespace ptens{
 
     int k_of(const int i) const{
       return dim_of(i,0);
-    }
-
-    Atoms atoms_of(const int i) const{
-      return Atoms(atoms(i));
-    }
-
-    rtensor tensor_of(const int i) const{
-      return RtensorPackB::operator()(i);
     }
 
     Rtensor2_view view_of(const int i) const{

@@ -90,34 +90,34 @@ namespace ptens{
     template<typename TLAYER2>
     SubgraphLayer2(const SubgraphLayer0<TLAYER2>& x, const Subgraph& _S):
       SubgraphLayer2(x.G,_S,x.G.subgraphs_matrix(_S),2*x.get_nc(),x.dev){
-      emp02(*this,x,TransferMap(x.atoms,atoms));
+      emp02(*this,x,TransferMap<AtomsPack>(x.atoms,atoms));
     }
 
     template<typename TLAYER2>
     void gather_back(SubgraphLayer0<TLAYER2>& x){
-      emp02_back(x.get_grad(),get_grad(),TransferMap(atoms,x.atoms));
+      emp02_back(x.get_grad(),get_grad(),TransferMap<AtomsPack>(atoms,x.atoms));
     }
 
     template<typename TLAYER2>
     SubgraphLayer2(const SubgraphLayer1<TLAYER2>& x, const Subgraph& _S):
       SubgraphLayer2(x.G,_S,x.G.subgraphs_matrix(_S),5*x.get_nc(),x.dev){
-      emp12(*this,x,TransferMap(x.atoms,atoms));
+      emp12(*this,x,TransferMap<AtomsPack>(x.atoms,atoms));
     }
 
     template<typename TLAYER2>
     void gather_back(SubgraphLayer1<TLAYER2>& x){
-      emp12_back(x.get_grad(),get_grad(),TransferMap(atoms,x.atoms));
+      emp12_back(x.get_grad(),get_grad(),TransferMap<AtomsPack>(atoms,x.atoms));
     }
 
     template<typename TLAYER2>
     SubgraphLayer2(const SubgraphLayer2<TLAYER2>& x, const Subgraph& _S):
       SubgraphLayer2(x.G,_S,x.G.subgraphs_matrix(_S),15*x.get_nc(),x.dev){
-      emp22(*this,x,TransferMap(x.atoms,atoms));
+      emp22(*this,x,TransferMap<AtomsPack>(x.atoms,atoms));
     }
 
     template<typename TLAYER2>
     void gather_back(SubgraphLayer2<TLAYER2>& x){
-      emp22_back(x.get_grad(),get_grad(),TransferMap(atoms,x.atoms));
+      emp22_back(x.get_grad(),get_grad(),TransferMap<AtomsPack>(atoms,x.atoms));
     }
 
 
@@ -126,29 +126,29 @@ namespace ptens{
 
     SubgraphLayer2(const Ptensors0& x, const Ggraph& _G, const Subgraph& _S):
       SubgraphLayer2(_G,_S,_G.subgraphs_matrix(_S),2*x.get_nc(),x.dev){
-      emp02(*this,x,TransferMap(x.atoms,atoms));
+      emp02(*this,x,TransferMap<AtomsPack>(x.atoms,atoms));
     }
 
     void gather_back(Ptensors0& x){
-      emp02_back(x.get_grad(),get_grad(),TransferMap(atoms,x.atoms)); 
+      emp02_back(x.get_grad(),get_grad(),TransferMap<AtomsPack>(atoms,x.atoms)); 
     }
 
     SubgraphLayer2(const Ptensors1& x, const Ggraph& _G, const Subgraph& _S):
       SubgraphLayer2(_G,_S,_G.subgraphs_matrix(_S),5*x.get_nc(),x.dev){
-      emp12(*this,x,TransferMap(x.atoms,atoms));
+      emp12(*this,x,TransferMap<AtomsPack>(x.atoms,atoms));
     }
 
     void gather_back(Ptensors1& x){
-      emp12_back(x.get_grad(),get_grad(),TransferMap(atoms,x.atoms)); 
+      emp12_back(x.get_grad(),get_grad(),TransferMap<AtomsPack>(atoms,x.atoms)); 
     }
 
     SubgraphLayer2(const Ptensors2& x, const Ggraph& _G, const Subgraph& _S):
       SubgraphLayer2(_G,_S,_G.subgraphs_matrix(_S),15*x.get_nc(),x.dev){
-      emp22(*this,x,TransferMap(x.atoms,atoms));
+      emp22(*this,x,TransferMap<AtomsPack>(x.atoms,atoms));
     }
 
     void gather_back(Ptensors2& x){
-      emp22_back(x.get_grad(),get_grad(),TransferMap(atoms,x.atoms)); 
+      emp22_back(x.get_grad(),get_grad(),TransferMap<AtomsPack>(atoms,x.atoms)); 
     }
 
 
@@ -156,7 +156,7 @@ namespace ptens{
 
 
     SubgraphLayer2 permute(const cnine::permutation& pi){
-      return SubgraphLayer2(G.permute(pi),S,Ptensors2::permute(pi));
+      return SubgraphLayer2(Ptensors2::permute(pi),G.permute(pi),S);
     }
 
 

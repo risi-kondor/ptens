@@ -15,7 +15,7 @@
 #include "CnineSession.hpp"
 
 #include "LinmapLayers.hpp"
-//#include "ConcatLayers.hpp"
+#include "ConcatLayers.hpp"
 #include "EMPlayers.hpp"
 
 using namespace ptens;

@@ -1,5 +1,5 @@
 /*
- * This file is part of ptens, a C++/CUDA library for permutation 
+ * THIS FILE IS part of ptens, a C++/CUDA library for permutation 
  * equivariant message passing. 
  *  
  * Copyright (c) 2023, Imre Risi Kondor
@@ -15,7 +15,7 @@
 #include "CnineSession.hpp"
 
 #include "LinmapLayers.hpp"
-//#include "ConcatLayers.hpp"
+#include "ConcatLayers.hpp"
 #include "EMPlayers.hpp"
 
 using namespace ptens;
