@@ -88,8 +88,12 @@ namespace ptens{
     //return obj->subgraphs_list(*H.obj);
     //}
 
-    cnine::Tensor<int>& subgraphs_matrix(const Subgraph& H) const{
-      return obj->subgraphs_matrix(*H.obj);
+    //cnine::Tensor<int>& subgraphs_matrix(const Subgraph& H) const{
+    //return obj->subgraphs_matrix(*H.obj);
+    //}
+
+    AtomsPack subgraphs(const Subgraph& H) const{
+      return obj->subgraphs(*H.obj);
     }
 
 

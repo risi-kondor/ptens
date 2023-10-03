@@ -18,7 +18,7 @@
 #include <map>
 
 #include "observable.hpp"
-#include "shared_object_bank.hpp"
+#include "pindexed_object_bank.hpp"
 #include "array_pool.hpp"
 #include "labeled_forest.hpp"
 #include "cpermutation.hpp"
@@ -36,7 +36,8 @@ namespace ptens{
     using  BASE::BASE;
 
 
-    cnine::shared_object_bank<AtomsPackObj,TransferMapObj<AtomsPackObj> > overlap_maps;
+    //cnine::shared_object_bank<AtomsPackObj,TransferMapObj<AtomsPackObj> > overlap_maps;
+    cnine::pindexed_object_bank<AtomsPackObj,TransferMap> overlap_maps2;
 
 
   public: // ---- Constructors ------------------------------------------------------------------------------
@@ -44,22 +45,26 @@ namespace ptens{
 
     AtomsPackObj():
       observable(this),
-      overlap_maps([this](const AtomsPackObj& x)
-	{return new TransferMapObj<AtomsPackObj>(x,*this);}){}
+      //overlap_maps([this](const AtomsPackObj& x)
+      //{return new TransferMapObj<AtomsPackObj>(x,*this);}),
+      overlap_maps2([this](const AtomsPackObj& x)
+	{return TransferMap(new TransferMapObj<AtomsPackObj>(x,*this));}){}
 
 
   public: // ---- Constructors ------------------------------------------------------------------------------
 
 
     AtomsPackObj(const int N):
-      observable(this){
+      AtomsPackObj(){
+      //observable(this){
       //k=1;
       for(int i=0; i<N; i++)
 	push_back(vector<int>({i}));
     }
 
     AtomsPackObj(const int N, const int k):
-      observable(this){
+      AtomsPackObj(){
+      //observable(this){
       //k=_k;
       vector<int> v;
       for(int j=0; j<k; j++) 
@@ -70,19 +75,22 @@ namespace ptens{
     }
 
     AtomsPackObj(const vector<vector<int> >& x):
-      observable(this){
+      AtomsPackObj(){
+      //observable(this){
       for(auto& p:x)
 	push_back(p);
     }
 
     AtomsPackObj(const initializer_list<initializer_list<int> >& x):
-      observable(this){
+      AtomsPackObj(){
+      //observable(this){
       for(auto& p:x)
 	push_back(p);
     }
 
     AtomsPackObj(const cnine::labeled_forest<int>& forest):
-      observable(this){
+      AtomsPackObj(){
+      //observable(this){
       for(auto p:forest)
 	p->for_each_maximal_path([&](const vector<int>& x){
 	    push_back(x);});
@@ -111,13 +119,21 @@ namespace ptens{
 
     AtomsPackObj(const AtomsPackObj& x):
       array_pool(x),
-      observable(this){
+      observable(this),
+      //overlap_maps([this](const AtomsPackObj& x)
+      //{return new TransferMapObj<AtomsPackObj>(x,*this);}),
+      overlap_maps2([this](const AtomsPackObj& x)
+	{return TransferMap(new TransferMapObj<AtomsPackObj>(x,*this));}){
       PTENS_COPY_WARNING();
     }
 
     AtomsPackObj(AtomsPackObj&& x):
       array_pool(std::move(x)),
-      observable(this){
+      observable(this),
+      //overlap_maps([this](const AtomsPackObj& x)
+      //{return new TransferMapObj<AtomsPackObj>(x,*this);}),
+      overlap_maps2([this](const AtomsPackObj& x)
+	{return TransferMap(new TransferMapObj<AtomsPackObj>(x,*this));}){
       PTENS_MOVE_WARNING();
     }
 
@@ -134,11 +150,16 @@ namespace ptens{
 
     AtomsPackObj(cnine::array_pool<int>&& x):
       cnine::array_pool<int>(std::move(x)),
-      observable(this){}
+      observable(this),
+      //overlap_maps([this](const AtomsPackObj& x)
+      //{return new TransferMapObj<AtomsPackObj>(x,*this);}),
+      overlap_maps2([this](const AtomsPackObj& x)
+	{return TransferMap(new TransferMapObj<AtomsPackObj>(x,*this));}){}
 
     AtomsPackObj(const cnine::Tensor<int>& M):
-      cnine::array_pool<int>(M),
-      observable(this){}
+      AtomsPackObj(cnine::array_pool<int>(M)){}
+    //cnine::array_pool<int>(M),
+    //observable(this){}
 
 
   public: // ---- Views --------------------------------------------------------------------------------------
@@ -218,7 +239,8 @@ namespace ptens{
     
     // create map for messages from y
     TransferMap overlaps(const AtomsPackObj& y){
-      return TransferMap(overlap_maps(y));
+      return overlap_maps2(y);
+      //return TransferMap(overlap_maps(y));
       //return TransferMap<AtomsPackObj>(y,*this);
     }
 

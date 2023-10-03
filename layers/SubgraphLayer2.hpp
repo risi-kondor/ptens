@@ -90,7 +90,7 @@ namespace ptens{
 
     template<typename TLAYER2>
     SubgraphLayer2(const SubgraphLayer0<TLAYER2>& x, const Subgraph& _S):
-      SubgraphLayer2(x.G,_S,x.G.subgraphs_matrix(_S),2*x.get_nc(),x.dev){
+      SubgraphLayer2(x.G,_S,x.G.subgraphs(_S),2*x.get_nc(),x.dev){
       emp02(*this,x,overlaps(x.atoms));
     }
 
@@ -101,7 +101,7 @@ namespace ptens{
 
     template<typename TLAYER2>
     SubgraphLayer2(const SubgraphLayer1<TLAYER2>& x, const Subgraph& _S):
-      SubgraphLayer2(x.G,_S,x.G.subgraphs_matrix(_S),5*x.get_nc(),x.dev){
+      SubgraphLayer2(x.G,_S,x.G.subgraphs(_S),5*x.get_nc(),x.dev){
       emp12(*this,x,overlaps(x.atoms));
     }
 
@@ -112,7 +112,7 @@ namespace ptens{
 
     template<typename TLAYER2>
     SubgraphLayer2(const SubgraphLayer2<TLAYER2>& x, const Subgraph& _S):
-      SubgraphLayer2(x.G,_S,x.G.subgraphs_matrix(_S),15*x.get_nc(),x.dev){
+      SubgraphLayer2(x.G,_S,x.G.subgraphs(_S),15*x.get_nc(),x.dev){
       emp22(*this,x,overlaps(x.atoms));
     }
 
@@ -126,7 +126,7 @@ namespace ptens{
 
 
     SubgraphLayer2(const Ptensors0& x, const Ggraph& _G, const Subgraph& _S):
-      SubgraphLayer2(_G,_S,_G.subgraphs_matrix(_S),2*x.get_nc(),x.dev){
+      SubgraphLayer2(_G,_S,_G.subgraphs(_S),2*x.get_nc(),x.dev){
       emp02(*this,x,overlaps(x.atoms));
     }
 
@@ -135,7 +135,7 @@ namespace ptens{
     }
 
     SubgraphLayer2(const Ptensors1& x, const Ggraph& _G, const Subgraph& _S):
-      SubgraphLayer2(_G,_S,_G.subgraphs_matrix(_S),5*x.get_nc(),x.dev){
+      SubgraphLayer2(_G,_S,_G.subgraphs(_S),5*x.get_nc(),x.dev){
       emp12(*this,x,overlaps(x.atoms));
     }
 
@@ -144,7 +144,7 @@ namespace ptens{
     }
 
     SubgraphLayer2(const Ptensors2& x, const Ggraph& _G, const Subgraph& _S):
-      SubgraphLayer2(_G,_S,_G.subgraphs_matrix(_S),15*x.get_nc(),x.dev){
+      SubgraphLayer2(_G,_S,_G.subgraphs(_S),15*x.get_nc(),x.dev){
       emp22(*this,x,overlaps(x.atoms));
     }
 

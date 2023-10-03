@@ -269,10 +269,6 @@ namespace ptens{
   public: // ----- Access ------------------------------------------------------------------------------------
 
 
-    //AtomsPack view_of_atoms(){
-    //return atoms.view();
-    //}
-
     int k_of(const int i) const{
       return dim_of(i,0);
     }

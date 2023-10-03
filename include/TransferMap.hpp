@@ -30,8 +30,8 @@ namespace ptens{
     TransferMap(const shared_ptr<TransferMapObj<AtomsPackObj> >& x):
       obj(x){}
 
-    //TransferMap(TransferMapObj<AtomsPackObj>* x):
-    //obj(x){}
+    TransferMap(TransferMapObj<AtomsPackObj>* x):
+      obj(x){}
 
     //TransferMap(const ATOMSPACK& _in_atoms, const ATOMSPACK& _out_atoms):
     //obj(new TransferMapObj(_in_atoms,_out_atoms){}

@@ -19,6 +19,8 @@
 #include "FindPlantedSubgraphs.hpp"
 #include "SubgraphObj.hpp"
 #include "RtensorA.hpp"
+#include "AtomsPack.hpp"
+
 
 namespace ptens{
 
@@ -28,8 +30,9 @@ namespace ptens{
 
     typedef cnine::sparse_graph<int,float,float> BASE;
 
-    mutable unordered_map<SubgraphObj,cnine::array_pool<int>*> subgraphlist_cache;
-    mutable unordered_map<SubgraphObj,shared_ptr<cnine::Tensor<int> > > subgraphlistmx_cache;
+    //mutable unordered_map<SubgraphObj,cnine::array_pool<int>*> subgraphlist_cache;
+    //mutable unordered_map<SubgraphObj,shared_ptr<cnine::Tensor<int> > > subgraphlistmx_cache;
+    mutable unordered_map<SubgraphObj,AtomsPack> subgraphapack_cache;
 
     using BASE::BASE;
 
@@ -107,7 +110,7 @@ namespace ptens{
       return *newpack;
     }
     */
-
+    /*
     cnine::Tensor<int>& subgraphs_matrix(const SubgraphObj& H){
       cnine::flog timer("CachedPlantedSubgraphsMx");
       auto it=subgraphlistmx_cache.find(H);
@@ -116,6 +119,18 @@ namespace ptens{
 	shared_ptr<cnine::Tensor<int> > p(new cnine::Tensor<int>(cnine::FindPlantedSubgraphs<float>(*this,H)));
 	subgraphlistmx_cache[H]=p;
 	return *p;
+      }
+    }
+    */
+
+    AtomsPack subgraphs(const SubgraphObj& H){
+      cnine::flog timer("CachedPlantedSubgraphApack");
+      auto it=subgraphapack_cache.find(H);
+      if(it!=subgraphapack_cache.end()) return it->second;
+      else{
+	subgraphapack_cache[H]=AtomsPack(new AtomsPackObj
+	  (cnine::Tensor<int>(cnine::FindPlantedSubgraphs<float>(*this,H))));
+	return subgraphapack_cache[H];
       }
     }
 

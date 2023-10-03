@@ -130,7 +130,7 @@ namespace ptens{
 
 
     SubgraphLayer0(const Ptensors0& x, const Ggraph& g, const Subgraph& s):
-      SubgraphLayer0(g,s,g.subgraphs_matrix(s),x.get_nc(),x.dev){
+      SubgraphLayer0(g,s,g.subgraphs(s),x.get_nc(),x.dev){
       emp00(*this,x,overlaps(x.atoms));
     }
 
@@ -139,7 +139,7 @@ namespace ptens{
     }
 
     SubgraphLayer0(const Ptensors1& x, const Ggraph& g, const Subgraph& s):
-      SubgraphLayer0(g,s,g.subgraphs_matrix(s),x.get_nc(),x.dev){
+      SubgraphLayer0(g,s,g.subgraphs(s),x.get_nc(),x.dev){
       emp10(*this,x,overlaps(x.atoms));
     }
 
@@ -148,7 +148,7 @@ namespace ptens{
     }
 
     SubgraphLayer0(const Ptensors2& x, const Ggraph& g, const Subgraph& s):
-      SubgraphLayer0(g,s,g.subgraphs_matrix(s),2*x.get_nc(),x.dev){
+      SubgraphLayer0(g,s,g.subgraphs(s),2*x.get_nc(),x.dev){
       emp20(*this,x,overlaps(x.atoms));
     }
 
