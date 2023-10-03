@@ -14,253 +14,148 @@
 #ifndef _ptens_AtomsPack
 #define _ptens_AtomsPack
 
-#include <map>
-
-#include "array_pool.hpp"
-#include "labeled_forest.hpp"
-#include "cpermutation.hpp"
-#include "Atoms.hpp"
-#include "TransferMap.hpp"
+#include "AtomsPackObj.hpp"
 
 
 namespace ptens{
 
-  class AtomsPack: public cnine::array_pool<int>{
+  class AtomsPack{
   public:
 
-    //int k=-1;
-    typedef cnine::array_pool<int> BASE;
-    using  BASE::BASE;
+    shared_ptr<AtomsPackObj> obj;
 
 
   public: // ---- Constructors ------------------------------------------------------------------------------
 
 
-    AtomsPack(){}
+    AtomsPack():
+      obj(new AtomsPackObj()){}
 
+    AtomsPack(AtomsPackObj* _obj):
+      obj(_obj){}
 
-  public: // ---- Constructors ------------------------------------------------------------------------------
+    AtomsPack(const int N):
+      obj(new AtomsPackObj(N)){}
 
+    AtomsPack(const int N, const int k):
+      obj(new AtomsPackObj(N,k)){}
 
-    AtomsPack(const int N){
-      //k=1;
-      for(int i=0; i<N; i++)
-	push_back(vector<int>({i}));
-    }
+    AtomsPack(const vector<vector<int> >& x):
+      obj(new AtomsPackObj(x)){}
 
-    AtomsPack(const int N, const int k){
-      //k=_k;
-      vector<int> v;
-      for(int j=0; j<k; j++) 
-	  v.push_back(j);
-      for(int i=0; i<N; i++){
-	push_back(v);
-      }
-    }
+    AtomsPack(const initializer_list<initializer_list<int> >& x):
+      obj(new AtomsPackObj(x)){}
 
-    AtomsPack(const vector<vector<int> >& x){
-      for(auto& p:x)
-	push_back(p);
-    }
-
-    AtomsPack(const initializer_list<initializer_list<int> >& x){
-      for(auto& p:x)
-	push_back(p);
-    }
-
-    AtomsPack(const cnine::labeled_forest<int>& forest){
-      for(auto p:forest)
-	p->for_each_maximal_path([&](const vector<int>& x){
-	    push_back(x);});
-    }
+    AtomsPack(const cnine::labeled_forest<int>& forest):
+      obj(new AtomsPackObj(forest)){}
 
 
   public: // ---- Static Constructors ------------------------------------------------------------------------
 
 
     static AtomsPack random(const int n, const float p=0.5){
-      AtomsPack R;
-      uniform_real_distribution<double> distr(0,1);
-      for(int i=0; i<n; i++){
-	vector<int> v;
-	for(int j=0; j<n; j++)
-	  if(distr(rndGen)<p)
-	    v.push_back(j);
-	R.push_back(v);
-      }
-      return R;
+      return AtomsPack(new AtomsPackObj(AtomsPackObj::random(n,p)));
     }
-
-    /*
-    AtomsPack(const Nhoods& N){
-      for(int i=0; i<N.nhoods.size(); i++){
-	vector<int> v;
-	for(int q: *N.nhoods[i])
-	  v.push_back(q);
-	push_back(v);
-      }
-    }
-    */
 
 
   public: // ---- Copying ------------------------------------------------------------------------------------
 
 
-    AtomsPack(const AtomsPack& x):
-      array_pool(x)/*, k(x.k)*/{
-      PTENS_COPY_WARNING();
-    }
-
-    AtomsPack(AtomsPack&& x):
-      array_pool(std::move(x))/*, k(x.k)*/{
-      PTENS_MOVE_WARNING();
-    }
-
-    AtomsPack& operator=(const AtomsPack& x){
-      PTENS_ASSIGN_WARNING();
-      cnine::array_pool<int>::operator=(x);
-      /*k=x.k;*/
-      return *this;
-    }
-
-
-
   public: // ---- Conversions --------------------------------------------------------------------------------
 
 
-    AtomsPack(cnine::array_pool<int>&& x/*, const int _k=-1*/):
-      cnine::array_pool<int>(std::move(x))/*, k(_k)*/{}
+    AtomsPack(cnine::array_pool<int>&& x):
+      obj(new AtomsPackObj(std::move(x))){}
 
-    AtomsPack(const cnine::Tensor<int>& M/*, const int _k=-1*/):
-      cnine::array_pool<int>(M)/*, k(_k)*/{}
+    AtomsPack(const cnine::Tensor<int>& M):
+      obj(new AtomsPackObj(M)){}
 
 
   public: // ---- Views --------------------------------------------------------------------------------------
 
 
-    AtomsPack view(){
-      //return AtomsPack(cnine::array_pool<int>::view(),-1); // hack
-      return AtomsPack(cnine::array_pool<int>::view());
-    }
-
-
   public: // ---- Access -------------------------------------------------------------------------------------
 
 
+    int size() const{
+      return obj->size();
+    }
+
+    int size_of(const int i) const{
+      return obj->size_of(i);
+    }
+
+    vector<int> operator()(const int i) const{
+      return (*obj)(i);
+    }
+
     Atoms operator[](const int i) const{
-      return Atoms(cnine::array_pool<int>::operator()(i));
+      return (*obj)[i];
+    }
+
+    void push_back(const vector<int>& v){
+      obj->push_back(v);
+    }
+
+    void push_back(const set<int>& v){
+      obj->push_back(v);
+    }
+
+    void push_back(const initializer_list<int>& v){
+      push_back(vector<int>(v));
     }
 
     int tsize0() const{
-      return size();
+      return obj->tsize0();
     }
 
     int tsize1() const{
-      int t=0;
-      for(int i=0; i<size(); i++)
-	t+=size_of(i);
-      return t;
+      return obj->tsize1();
     }
 
     int tsize2() const{
-      int t=0;
-      for(int i=0; i<size(); i++)
-	t+=size_of(i)*size_of(i);
-      return t;
+      return obj->tsize2();
+    }
+
+    vector<vector<int> > as_vecs() const{
+      return obj->as_vecs();
+    }
+
+    bool operator==(const AtomsPack& x) const{
+      return (*obj)==(*x.obj);
     }
 
     cnine::array_pool<int> dims1(const int nc) const{
-      array_pool<int> R;
-      for(int i=0; i<size(); i++)
-	R.push_back({size_of(i),nc});
-      return R;
+      return obj->dims1(nc);
     }
 
     cnine::array_pool<int> dims2(const int nc) const{
-      array_pool<int> R;
-      for(int i=0; i<size(); i++)
-	R.push_back({size_of(i),size_of(i),nc});
-      return R;
+      return obj->dims1(nc);
     }
 
 
   public: // ---- Concatenation ------------------------------------------------------------------------------
 
-
+    
     static AtomsPack cat(const vector<reference_wrapper<AtomsPack> >& list){
-      return AtomsPack(cnine::array_pool<int>::cat
-	(cnine::mapcar<reference_wrapper<AtomsPack>,reference_wrapper<array_pool<int> > >
+      return new AtomsPackObj(AtomsPackObj::cat
+	(cnine::mapcar<reference_wrapper<AtomsPack>,reference_wrapper<AtomsPackObj> >
 	  (list,[](const reference_wrapper<AtomsPack>& x){
-	    return reference_wrapper<array_pool<int> >(x.get());})));
+	    return reference_wrapper<AtomsPackObj>(*x.get().obj);})));
     }
-
+    
 
   public: // ---- Operations ---------------------------------------------------------------------------------
 
 
     AtomsPack permute(const cnine::permutation& pi){
-      PTENS_ASSRT(dev==0);
-      array_pool<int> A;
-      A.dir=dir;
-      A.reserve(tail);
-      A.tail=tail;
-      for(int i=0; i<tail; i++)
-	A.arr[i]=pi(arr[i]);
-      return A;
-    }
-
+      return AtomsPack(new AtomsPackObj(obj->permute(pi)));
+    } 
     
     // create map for messages from y
-    TransferMap<AtomsPack> overlaps(const AtomsPack& y){
-      return TransferMap<AtomsPack>(y,*this);
+    TransferMap overlaps(const AtomsPack& y){
+      return obj->overlaps(*y.obj);
     }
-
-    /*
-      cnine::flog timer("AtomsPack::overlaps");
-
-      TransferMap<AtomsPack> T(size(),y.size());
-
-      if(y.size()<10){
-	for(int i=0; i<size(); i++){
-	  auto v=(*this)(i);
-	  for(int j=0; j<y.size(); j++){
-	    auto w=y(j);
-	    if([&](){for(auto p:v) if(std::find(w.begin(),w.end(),p)!=w.end()) return true; return false;}())
-	      T.set(i,j,1.0);
-	  }
-	}
-      }else{
-	unordered_map<int,vector<int> > map;
-	for(int j=0; j<y.size(); j++){
-	  auto w=y(j);             
-	  for(auto p:w){
-	    auto it=map.find(p);
-	    if(it==map.end()) map[p]=vector<int>({j});
-	    else it->second.push_back(j);
-	  }
-	}          
-	for(int i=0; i<size(); i++){
-	  auto v=(*this)(i);
-	  for(auto p:v){
-	    auto it=map.find(p);
-	    if(it!=map.end())
-	      for(auto q:it->second)
-		T.set(i,q,1.0);
-	  }
-	}
-      }
-      return T;
-    }
-    */
-
-    /*
-    vector<int> intersect(const int i, const vector<int>& I) const{
-      vector<int> r;
-      for(auto p: I)
-	if(includes(i,p)) r.push_back(p);
-      return r;
-    }
-    */
 
 
   public: // ---- I/O ----------------------------------------------------------------------------------------
@@ -270,20 +165,9 @@ namespace ptens{
       return "AtomsPack";
     }
 
-
-    /*
     string str(const string indent="") const{
-      ostringstream oss;
-      fo
-      oss<<"(";
-      for(int i=0; i<size()-1; i++)
-	oss<<(*this)[i]<<",";
-      if(size()>0) oss<<(*this)[size()-1];
-      oss<<")";
-      return oss.str();
+      return obj->str(indent);
     }
-    */
-
 
     friend ostream& operator<<(ostream& stream, const AtomsPack& v){
       stream<<v.str(); return stream;}

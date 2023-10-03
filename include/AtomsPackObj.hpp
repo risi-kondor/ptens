@@ -11,11 +11,14 @@
  * must be accompanied by a verbatim copy of the license. 
  */
 
-#ifndef _ptens_AtomsPack
-#define _ptens_AtomsPack
+
+#ifndef _ptens_AtomsPackObj
+#define _ptens_AtomsPackObj
 
 #include <map>
 
+#include "observable.hpp"
+#include "shared_object_bank.hpp"
 #include "array_pool.hpp"
 #include "labeled_forest.hpp"
 #include "cpermutation.hpp"
@@ -25,30 +28,38 @@
 
 namespace ptens{
 
-  class AtomsPack: public cnine::array_pool<int>{
+
+  class AtomsPackObj: public cnine::array_pool<int>, public cnine::observable<AtomsPackObj>{
   public:
 
-    //int k=-1;
     typedef cnine::array_pool<int> BASE;
     using  BASE::BASE;
 
 
-  public: // ---- Constructors ------------------------------------------------------------------------------
-
-
-    AtomsPack(){}
+    cnine::shared_object_bank<AtomsPackObj,TransferMapObj<AtomsPackObj> > overlap_maps;
 
 
   public: // ---- Constructors ------------------------------------------------------------------------------
 
 
-    AtomsPack(const int N){
+    AtomsPackObj():
+      observable(this),
+      overlap_maps([this](const AtomsPackObj& x)
+	{return new TransferMapObj<AtomsPackObj>(x,*this);}){}
+
+
+  public: // ---- Constructors ------------------------------------------------------------------------------
+
+
+    AtomsPackObj(const int N):
+      observable(this){
       //k=1;
       for(int i=0; i<N; i++)
 	push_back(vector<int>({i}));
     }
 
-    AtomsPack(const int N, const int k){
+    AtomsPackObj(const int N, const int k):
+      observable(this){
       //k=_k;
       vector<int> v;
       for(int j=0; j<k; j++) 
@@ -58,17 +69,20 @@ namespace ptens{
       }
     }
 
-    AtomsPack(const vector<vector<int> >& x){
+    AtomsPackObj(const vector<vector<int> >& x):
+      observable(this){
       for(auto& p:x)
 	push_back(p);
     }
 
-    AtomsPack(const initializer_list<initializer_list<int> >& x){
+    AtomsPackObj(const initializer_list<initializer_list<int> >& x):
+      observable(this){
       for(auto& p:x)
 	push_back(p);
     }
 
-    AtomsPack(const cnine::labeled_forest<int>& forest){
+    AtomsPackObj(const cnine::labeled_forest<int>& forest):
+      observable(this){
       for(auto p:forest)
 	p->for_each_maximal_path([&](const vector<int>& x){
 	    push_back(x);});
@@ -78,8 +92,8 @@ namespace ptens{
   public: // ---- Static Constructors ------------------------------------------------------------------------
 
 
-    static AtomsPack random(const int n, const float p=0.5){
-      AtomsPack R;
+    static AtomsPackObj random(const int n, const float p=0.5){
+      AtomsPackObj R;
       uniform_real_distribution<double> distr(0,1);
       for(int i=0; i<n; i++){
 	vector<int> v;
@@ -91,35 +105,25 @@ namespace ptens{
       return R;
     }
 
-    /*
-    AtomsPack(const Nhoods& N){
-      for(int i=0; i<N.nhoods.size(); i++){
-	vector<int> v;
-	for(int q: *N.nhoods[i])
-	  v.push_back(q);
-	push_back(v);
-      }
-    }
-    */
-
 
   public: // ---- Copying ------------------------------------------------------------------------------------
 
 
-    AtomsPack(const AtomsPack& x):
-      array_pool(x)/*, k(x.k)*/{
+    AtomsPackObj(const AtomsPackObj& x):
+      array_pool(x),
+      observable(this){
       PTENS_COPY_WARNING();
     }
 
-    AtomsPack(AtomsPack&& x):
-      array_pool(std::move(x))/*, k(x.k)*/{
+    AtomsPackObj(AtomsPackObj&& x):
+      array_pool(std::move(x)),
+      observable(this){
       PTENS_MOVE_WARNING();
     }
 
-    AtomsPack& operator=(const AtomsPack& x){
+    AtomsPackObj& operator=(const AtomsPackObj& x){
       PTENS_ASSIGN_WARNING();
       cnine::array_pool<int>::operator=(x);
-      /*k=x.k;*/
       return *this;
     }
 
@@ -128,20 +132,22 @@ namespace ptens{
   public: // ---- Conversions --------------------------------------------------------------------------------
 
 
-    AtomsPack(cnine::array_pool<int>&& x/*, const int _k=-1*/):
-      cnine::array_pool<int>(std::move(x))/*, k(_k)*/{}
+    AtomsPackObj(cnine::array_pool<int>&& x):
+      cnine::array_pool<int>(std::move(x)),
+      observable(this){}
 
-    AtomsPack(const cnine::Tensor<int>& M/*, const int _k=-1*/):
-      cnine::array_pool<int>(M)/*, k(_k)*/{}
+    AtomsPackObj(const cnine::Tensor<int>& M):
+      cnine::array_pool<int>(M),
+      observable(this){}
 
 
   public: // ---- Views --------------------------------------------------------------------------------------
 
 
-    AtomsPack view(){
-      //return AtomsPack(cnine::array_pool<int>::view(),-1); // hack
-      return AtomsPack(cnine::array_pool<int>::view());
-    }
+    //AtomsPackObj view(){
+      //return AtomsPackObj(cnine::array_pool<int>::view(),-1); // hack
+      //return AtomsPackObj(cnine::array_pool<int>::view());
+    //}
 
 
   public: // ---- Access -------------------------------------------------------------------------------------
@@ -187,10 +193,10 @@ namespace ptens{
   public: // ---- Concatenation ------------------------------------------------------------------------------
 
 
-    static AtomsPack cat(const vector<reference_wrapper<AtomsPack> >& list){
-      return AtomsPack(cnine::array_pool<int>::cat
-	(cnine::mapcar<reference_wrapper<AtomsPack>,reference_wrapper<array_pool<int> > >
-	  (list,[](const reference_wrapper<AtomsPack>& x){
+    static AtomsPackObj cat(const vector<reference_wrapper<AtomsPackObj> >& list){
+      return AtomsPackObj(cnine::array_pool<int>::cat
+	(cnine::mapcar<reference_wrapper<AtomsPackObj>,reference_wrapper<array_pool<int> > >
+	  (list,[](const reference_wrapper<AtomsPackObj>& x){
 	    return reference_wrapper<array_pool<int> >(x.get());})));
     }
 
@@ -198,7 +204,7 @@ namespace ptens{
   public: // ---- Operations ---------------------------------------------------------------------------------
 
 
-    AtomsPack permute(const cnine::permutation& pi){
+    AtomsPackObj permute(const cnine::permutation& pi){
       PTENS_ASSRT(dev==0);
       array_pool<int> A;
       A.dir=dir;
@@ -211,81 +217,20 @@ namespace ptens{
 
     
     // create map for messages from y
-    TransferMap<AtomsPack> overlaps(const AtomsPack& y){
-      return TransferMap<AtomsPack>(y,*this);
+    TransferMap overlaps(const AtomsPackObj& y){
+      return TransferMap(overlap_maps(y));
+      //return TransferMap<AtomsPackObj>(y,*this);
     }
-
-    /*
-      cnine::flog timer("AtomsPack::overlaps");
-
-      TransferMap<AtomsPack> T(size(),y.size());
-
-      if(y.size()<10){
-	for(int i=0; i<size(); i++){
-	  auto v=(*this)(i);
-	  for(int j=0; j<y.size(); j++){
-	    auto w=y(j);
-	    if([&](){for(auto p:v) if(std::find(w.begin(),w.end(),p)!=w.end()) return true; return false;}())
-	      T.set(i,j,1.0);
-	  }
-	}
-      }else{
-	unordered_map<int,vector<int> > map;
-	for(int j=0; j<y.size(); j++){
-	  auto w=y(j);             
-	  for(auto p:w){
-	    auto it=map.find(p);
-	    if(it==map.end()) map[p]=vector<int>({j});
-	    else it->second.push_back(j);
-	  }
-	}          
-	for(int i=0; i<size(); i++){
-	  auto v=(*this)(i);
-	  for(auto p:v){
-	    auto it=map.find(p);
-	    if(it!=map.end())
-	      for(auto q:it->second)
-		T.set(i,q,1.0);
-	  }
-	}
-      }
-      return T;
-    }
-    */
-
-    /*
-    vector<int> intersect(const int i, const vector<int>& I) const{
-      vector<int> r;
-      for(auto p: I)
-	if(includes(i,p)) r.push_back(p);
-      return r;
-    }
-    */
 
 
   public: // ---- I/O ----------------------------------------------------------------------------------------
 
 
     string classname() const{
-      return "AtomsPack";
+      return "AtomsPackObj";
     }
 
-
-    /*
-    string str(const string indent="") const{
-      ostringstream oss;
-      fo
-      oss<<"(";
-      for(int i=0; i<size()-1; i++)
-	oss<<(*this)[i]<<",";
-      if(size()>0) oss<<(*this)[size()-1];
-      oss<<")";
-      return oss.str();
-    }
-    */
-
-
-    friend ostream& operator<<(ostream& stream, const AtomsPack& v){
+    friend ostream& operator<<(ostream& stream, const AtomsPackObj& v){
       stream<<v.str(); return stream;}
 
   };

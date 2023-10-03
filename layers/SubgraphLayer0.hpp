@@ -51,6 +51,7 @@ namespace ptens{
     using TLAYER::diff2;
     using TLAYER::inv_channel_norms;
     using TLAYER::add_scale_channels;
+    using TLAYER::overlaps;
 
 
 
@@ -94,34 +95,34 @@ namespace ptens{
     template<typename TLAYER2>
     SubgraphLayer0(const SubgraphLayer0<TLAYER2>& x, const Subgraph& _S):
       SubgraphLayer0(x.G,_S,AtomsPack(x.getn()),x.get_nc(),x.dev){
-      emp00(*this,x,TransferMap<AtomsPack>(x.atoms,atoms));
+      emp00(*this,x,overlaps(x.atoms));
     }
-
+    
     template<typename TLAYER2>
     void gather_back(SubgraphLayer0<TLAYER2>& x){
-      emp00(x.get_grad(),get_grad(),TransferMap<AtomsPack>(atoms,x.atoms)); 
+      emp00(x.get_grad(),get_grad(),x.overlaps(atoms)); 
     }
 
     template<typename TLAYER2>
     SubgraphLayer0(const SubgraphLayer1<TLAYER2>& x, const Subgraph& _S):
       SubgraphLayer0(x.G,_S,AtomsPack(x.getn()),x.get_nc(),x.dev){
-      emp10(*this,x,TransferMap<AtomsPack>(x.atoms,atoms));
+      emp10(*this,x,overlaps(x.atoms));
     }
 
     template<typename TLAYER2>
     void gather_back(SubgraphLayer1<TLAYER2>& x){
-      emp01(x.get_grad(),get_grad(),TransferMap<AtomsPack>(atoms,x.atoms));
+      emp01(x.get_grad(),get_grad(),x.overlaps(atoms));
     }
 
     template<typename TLAYER2>
     SubgraphLayer0(const SubgraphLayer2<TLAYER2>& x, const Subgraph& _S):
       SubgraphLayer0(x.G,_S,AtomsPack(x.getn()),2*x.get_nc(),x.dev){
-      emp20(*this,x,TransferMap<AtomsPack>(x.atoms,atoms));
+      emp20(*this,x,overlaps(x.atoms));
     }
 
     template<typename TLAYER2>
     void gather_back(SubgraphLayer2<TLAYER2>& x){
-      emp20_back(x.get_grad(),get_grad(),TransferMap<AtomsPack>(atoms,x.atoms));
+      emp20_back(x.get_grad(),get_grad(),x.overlaps(atoms));
     }
 
 
@@ -130,29 +131,29 @@ namespace ptens{
 
     SubgraphLayer0(const Ptensors0& x, const Ggraph& g, const Subgraph& s):
       SubgraphLayer0(g,s,g.subgraphs_matrix(s),x.get_nc(),x.dev){
-      emp00(*this,x,TransferMap<AtomsPack>(x.atoms,atoms));
+      emp00(*this,x,overlaps(x.atoms));
     }
 
     void gather_back(Ptensors0& x){
-      emp00(x.get_grad(),get_grad(),TransferMap<AtomsPack>(atoms,x.atoms)); 
+      emp00(x.get_grad(),get_grad(),x.overlaps(atoms)); 
     }
 
     SubgraphLayer0(const Ptensors1& x, const Ggraph& g, const Subgraph& s):
       SubgraphLayer0(g,s,g.subgraphs_matrix(s),x.get_nc(),x.dev){
-      emp10(*this,x,TransferMap<AtomsPack>(x.atoms,atoms));
+      emp10(*this,x,overlaps(x.atoms));
     }
 
     void gather_back(Ptensors1& x){
-      emp01(x.get_grad(),get_grad(),TransferMap<AtomsPack>(atoms,x.atoms));
+      emp01(x.get_grad(),get_grad(),x.overlaps(atoms));
     }
 
     SubgraphLayer0(const Ptensors2& x, const Ggraph& g, const Subgraph& s):
       SubgraphLayer0(g,s,g.subgraphs_matrix(s),2*x.get_nc(),x.dev){
-      emp20(*this,x,TransferMap<AtomsPack>(x.atoms,atoms));
+      emp20(*this,x,overlaps(x.atoms));
     }
 
     void gather_back(Ptensors2& x){
-      emp20_back(x.get_grad(),get_grad(),TransferMap<AtomsPack>(atoms,x.atoms));
+      emp20_back(x.get_grad(),get_grad(),x.overlaps(atoms));
     }
 
 

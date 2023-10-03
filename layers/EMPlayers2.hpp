@@ -25,135 +25,121 @@
 namespace ptens{
 
   template<typename SRC, typename DEST>
-  void emp00(DEST& r, const SRC& x, const TransferMap<AtomsPack>& map){
+  void emp00(DEST& r, const SRC& x, const TransferMap& map){
     if(map.is_empty()) return;
-    //auto [map0,map1]=map.intersects(x.atoms,r.atoms);
-    r.broadcast0(x.reduce0(*map.in_map),*map.out_map,0);
+    r.broadcast0(x.reduce0(map.in()),map.out(),0);
   }
 
   template<typename SRC, typename DEST>
-  void emp01(DEST& r, const SRC& x, const TransferMap<AtomsPack>& map){
+  void emp01(DEST& r, const SRC& x, const TransferMap& map){
     if(map.is_empty()) return;
-    //auto [map0,map1]=map.intersects(x.atoms,r.atoms);
-    r.broadcast0(x.reduce0(*map.in_map),*map.out_map,0);
+    r.broadcast0(x.reduce0(map.in()),map.out(),0);
   }
 
   template<typename SRC, typename DEST>
-  void emp10(DEST& r, const SRC& x, const TransferMap<AtomsPack>& map){
+  void emp10(DEST& r, const SRC& x, const TransferMap& map){
     if(map.is_empty()) return;
-    //auto [map0,map1]=map.intersects(x.atoms,r.atoms);
-    r.broadcast0(x.reduce0(*map.in_map),*map.out_map,0);
+    r.broadcast0(x.reduce0(map.in()),map.out(),0);
   }
 
   template<typename SRC, typename DEST>
-  void emp11(DEST& r, const SRC& x, const TransferMap<AtomsPack>& map){
+  void emp11(DEST& r, const SRC& x, const TransferMap& map){
     if(map.is_empty()) return;
     int nc=x.get_nc();
-    //auto [map0,map1]=map.intersects(x.atoms,r.atoms);
     cnine::flog timer("ptens::emp11");
-    r.broadcast0(x.reduce0(*map.in_map),*map.out_map,0);
-    r.broadcast1(x.reduce1(*map.in_map),*map.out_map,nc);
+    r.broadcast0(x.reduce0(map.in()),map.out(),0);
+    r.broadcast1(x.reduce1(map.in()),map.out(),nc);
   }
 
   template<typename SRC, typename DEST>
-  void emp11_back(DEST& r, const SRC& x, const TransferMap<AtomsPack>& map){
+  void emp11_back(DEST& r, const SRC& x, const TransferMap& map){
     if(map.is_empty()) return;
     int nc=r.get_nc();
-    //auto [map0,map1]=map.intersects(x.atoms,r.atoms);
     cnine::flog timer("ptens::emp11_back");
-    r.reduce0_back(x.broadcast0_back(*map.in_map,0,nc),*map.out_map);
-    r.reduce1_back(x.broadcast1_back(*map.in_map,nc,nc),*map.out_map);
+    r.reduce0_back(x.broadcast0_back(map.in(),0,nc),map.out());
+    r.reduce1_back(x.broadcast1_back(map.in(),nc,nc),map.out());
   }
 
 
   
   template<typename SRC, typename DEST>
-  void emp02(DEST& r, const SRC& x, const TransferMap<AtomsPack>& map){
+  void emp02(DEST& r, const SRC& x, const TransferMap& map){
     if(map.is_empty()) return;
-    //auto [map0,map1]=map.intersects(x.atoms,r.atoms);
-    r.broadcast0(x.reduce0(*map.in_map),*map.out_map);
+    r.broadcast0(x.reduce0(map.in()),map.out());
   }
 
   template<typename SRC, typename DEST>
-  void emp02_back(DEST& r, const SRC& x, const TransferMap<AtomsPack>& map){
+  void emp02_back(DEST& r, const SRC& x, const TransferMap& map){
     if(map.is_empty()) return;
     int nc=r.get_nc();
-    //auto [map0,map1]=map.intersects(x.atoms,r.atoms);
-    r.reduce0_back(x.broadcast0_back(*map.in_map,0,nc),*map.out_map);
+    r.reduce0_back(x.broadcast0_back(map.in(),0,nc),map.out());
   }
 
   template<typename SRC, typename DEST>
-  void emp12(DEST& r, const SRC& x, const TransferMap<AtomsPack>& map){
+  void emp12(DEST& r, const SRC& x, const TransferMap& map){
     if(map.is_empty()) return;
     int nc=x.get_nc();
-    //auto [map0,map1]=map.intersects(x.atoms,r.atoms);
-    r.broadcast0(x.reduce0(*map.in_map),*map.out_map);
-    r.broadcast1(x.reduce1(*map.in_map),*map.out_map,2*nc);
+    r.broadcast0(x.reduce0(map.in()),map.out());
+    r.broadcast1(x.reduce1(map.in()),map.out(),2*nc);
   }
 
   template<typename SRC, typename DEST>
-  void emp12_back(DEST& r, const SRC& x, const TransferMap<AtomsPack>& map){
+  void emp12_back(DEST& r, const SRC& x, const TransferMap& map){
     if(map.is_empty()) return;
     int nc=r.get_nc();
-    //auto [map0,map1]=map.intersects(x.atoms,r.atoms);
-    r.reduce0_back(x.broadcast0_back(*map.in_map,0,nc),*map.out_map);
-    r.reduce1_back(x.broadcast1_back(*map.in_map,2*nc,nc),*map.out_map);
+    r.reduce0_back(x.broadcast0_back(map.in(),0,nc),map.out());
+    r.reduce1_back(x.broadcast1_back(map.in(),2*nc,nc),map.out());
   }
 
   template<typename SRC, typename DEST>
-  void emp22(DEST& r, const SRC& x, const TransferMap<AtomsPack>& map){
+  void emp22(DEST& r, const SRC& x, const TransferMap& map){
     if(map.is_empty()) return;
     int nc=x.get_nc();
-    //auto [map0,map1]=map.intersects(x.atoms,r.atoms);
-    r.broadcast0(x.reduce0(*map.in_map),*map.out_map);
-    r.broadcast1(x.reduce1(*map.in_map),*map.out_map,4*nc);
-    r.broadcast2(x.reduce2(*map.in_map),*map.out_map,13*nc);
+    r.broadcast0(x.reduce0(map.in()),map.out());
+    r.broadcast1(x.reduce1(map.in()),map.out(),4*nc);
+    r.broadcast2(x.reduce2(map.in()),map.out(),13*nc);
   }
 
   template<typename SRC, typename DEST>
-  void emp22_back(DEST& r, const SRC& x, const TransferMap<AtomsPack>& map){
+  void emp22_back(DEST& r, const SRC& x, const TransferMap& map){
     if(map.is_empty()) return;
     int nc=r.get_nc();
-    //auto [map0,map1]=map.intersects(x.atoms,r.atoms);
-    r.reduce0_back(x.broadcast0_back(*map.in_map,0,2*nc),*map.out_map);
-    r.reduce1_back(x.broadcast1_back(*map.in_map,4*nc,3*nc),*map.out_map);
-    r.reduce2_back(x.broadcast2_back(*map.in_map,13*nc,nc),*map.out_map);
+    r.reduce0_back(x.broadcast0_back(map.in(),0,2*nc),map.out());
+    r.reduce1_back(x.broadcast1_back(map.in(),4*nc,3*nc),map.out());
+    r.reduce2_back(x.broadcast2_back(map.in(),13*nc,nc),map.out());
   }
 
   template<typename SRC, typename DEST>
-  void emp20(DEST& r, const SRC& x, const TransferMap<AtomsPack>& map){
+  void emp20(DEST& r, const SRC& x, const TransferMap& map){
     if(map.is_empty()) return;
-    //auto [map0,map1]=map.intersects(x.atoms,r.atoms);
-    r.broadcast0(x.reduce0(*map.in_map),*map.out_map);
+    r.broadcast0(x.reduce0(map.in()),map.out());
   }
 
   template<typename SRC, typename DEST>
-  void emp20_back(DEST& r, const SRC& x, const TransferMap<AtomsPack>& map){
+  void emp20_back(DEST& r, const SRC& x, const TransferMap& map){
     if(map.is_empty()) return;
     int nc=r.get_nc();
-    //auto [map0,map1]=map.intersects(x.atoms,r.atoms);
-    r.reduce0_back(x.broadcast0_back(*map.in_map,0,2*nc),*map.out_map);
+    r.reduce0_back(x.broadcast0_back(map.in(),0,2*nc),map.out());
   }
 
   template<typename SRC, typename DEST>
-  void emp21(DEST& r, const SRC& x, const TransferMap<AtomsPack>& map){
+  void emp21(DEST& r, const SRC& x, const TransferMap& map){
     if(map.is_empty()) return;
     int nc=x.get_nc();
-    //auto [map0,map1]=map.intersects(x.atoms,r.atoms);
-    r.broadcast0(x.reduce0(*map.in_map),*map.out_map);
-    r.broadcast1(x.reduce1(*map.in_map),*map.out_map,2*nc);
+    r.broadcast0(x.reduce0(map.in()),map.out());
+    r.broadcast1(x.reduce1(map.in()),map.out(),2*nc);
   }
 
   template<typename SRC, typename DEST>
-  void emp21_back(DEST& r, const SRC& x, const TransferMap<AtomsPack>& map){
+  void emp21_back(DEST& r, const SRC& x, const TransferMap& map){
     if(map.is_empty()) return;
     int nc=r.get_nc();
-    //auto [map0,map1]=map.intersects(x.atoms,r.atoms);
-    r.reduce0_back(x.broadcast0_back(*map.in_map,0,2*nc),*map.out_map);
-    r.reduce1_back(x.broadcast1_back(*map.in_map,2*nc,3*nc),*map.out_map);
+    r.reduce0_back(x.broadcast0_back(map.in(),0,2*nc),map.out());
+    r.reduce1_back(x.broadcast1_back(map.in(),2*nc,3*nc),map.out());
   }
 
 
+    //auto [map0,map1]=map.intersects(x.atoms,r.atoms);
 
 
 }

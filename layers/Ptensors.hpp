@@ -105,6 +105,11 @@ namespace ptens{
       return size();
     }
 
+    // deprecated 
+    AtomsPack view_of_atoms(){
+      return atoms;
+    }
+
     Atoms atoms_of(const int i) const{
       return Atoms(atoms(i));
     }
@@ -117,8 +122,13 @@ namespace ptens{
   public: // ---- Operations ---------------------------------------------------------------------------------
 
     
-    TransferMap<AtomsPack> overlaps(const AtomsPack& x){
+    TransferMap overlaps(const AtomsPack& x){
       return atoms.overlaps(x);
+    }
+
+    template<typename OBJ>
+    TransferMap overlaps(const OBJ& x){
+      return atoms.overlaps(x.atoms);
     }
 
   };

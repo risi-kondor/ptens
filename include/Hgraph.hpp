@@ -178,6 +178,10 @@ namespace ptens{
       return R;
     }
 
+    static Hgraph overlaps(const AtomsPack& x, const AtomsPack& y){
+      return Hgraph::overlaps(*x.obj,*y.obj);
+    }
+
     static Hgraph overlaps(const cnine::array_pool<int>& x, const cnine::array_pool<int>& y){
       cnine::flog timer("Hgraph::overlaps");
       Hgraph R(x.size(),y.size());

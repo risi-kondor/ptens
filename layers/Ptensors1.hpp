@@ -15,18 +15,10 @@
 #ifndef _ptens_Ptensors1
 #define _ptens_Ptensors1
 
-#include "Ptens_base.hpp"
-
-//#include "Cgraph.hpp"
-#include "RtensorPackB.hpp"
-#include "AtomsPack.hpp"
-#include "AindexPack.hpp"
-#include "Ptensor1.hpp"
-#include "Ptensors0.hpp"
 #include "diff_class.hpp"
-
+#include "Rtensor2_view.hpp"
 #include "Ptensors.hpp"
-#include "PtensLoggedTimer.hpp"
+#include "Ptensor1.hpp"
 
 
 namespace ptens{
@@ -90,6 +82,10 @@ namespace ptens{
     Ptensors1(const AtomsPack& _atoms, const int _nc, const cnine::fill_zero& dummy, const int _dev=0):
       Ptensors1(zero(_atoms,_nc,_dev)){}
 
+    Ptensors1(const cnine::Tensor<int>& M, const int _nc, const cnine::fill_zero& dummy, const int _dev=0):
+      Ptensors(AtomsPack(M), cnine::Gdims({M.dims[1],_nc}), dummy, _dev){}
+
+
     template<typename FILLTYPE, typename = typename std::enable_if<std::is_base_of<cnine::fill_pattern, FILLTYPE>::value, FILLTYPE>::type>
     Ptensors1(const AtomsPack& _atoms, const int _nc, const FILLTYPE& dummy, const int _dev=0):
       Ptensors(_atoms, cnine::Gdims({_nc}), dummy, _dev){}
@@ -97,9 +93,6 @@ namespace ptens{
     template<typename FILLTYPE, typename = typename std::enable_if<std::is_base_of<cnine::fill_pattern, FILLTYPE>::value, FILLTYPE>::type>
     Ptensors1(const int _n, const int _k, const int _nc, const FILLTYPE& dummy, const int _dev=0):
       Ptensors(AtomsPack(_n,_k),{_k,_nc},dummy,_dev){}
-
-    Ptensors1(const cnine::Tensor<int>& M, const int _nc, const cnine::fill_zero& dummy, const int _dev=0):
-      Ptensors(AtomsPack(M), cnine::Gdims({M.dims[1],_nc}), dummy, _dev){}
 
 
   public: // ----- Constructors ------------------------------------------------------------------------------
@@ -250,39 +243,12 @@ namespace ptens{
   public: // ----- Conversions -------------------------------------------------------------------------------
 
 
-    //Ptensors1(cnine::RtensorPack&& x, const AtomsPack& _atoms)://, const int _nc):
-      //RtensorPackB(std::move(x)), atoms(_atoms)/*, nc(_nc)*/{}
-
-    //Ptensors1(const RtensorPackB& x, const AtomsPack& _atoms):
-    //RtensorPackB(x), atoms(_atoms){}
-
-    //Ptensors1(RtensorPackB&& x, const AtomsPack& _atoms):
-    //RtensorPackB(std::move(x)), atoms(_atoms){}
-
-    //rtensor view_as_matrix() const{
-    //return rtensor::view_of_blob({tail/nc,nc},get_arr(),dev);
-    //}
-
-    //Ptensors1(const rtensor& A):
-    //CNINE_UNIMPL();
-    //RtensorPackB(A), atoms(A.dim(0)){
-    //}
-
     Ptensors1(const rtensor& A, const AtomsPack& _atoms):
       Ptensors(RtensorPackB(A,_atoms.dims1(A.dim(1))),_atoms){}
-
-    //#ifdef _WITH_ATEN
-    //Ptensors1(const at::Tensor& T, const AtomsPack& _atoms):
-    //Ptensors1(rtensor::regular(T),_atoms){}
-    //#endif 
 
 
   public: // ---- Transport ----------------------------------------------------------------------------------
 
-
-    //Ptensors1(const Ptensors1& x, const int _dev):
-    //RtensorPackB(x,_dev),
-    //atoms(x.atoms){}
 
     Ptensors1& to_device(const int _dev){
       Ptensors::to_device(_dev);
@@ -297,16 +263,9 @@ namespace ptens{
       return atoms;
     }
 
-    AtomsPack view_of_atoms(){
-      return atoms.view();
-    }
-
-    /*
-    int getk() const{
-      PTENS_ASSRT(atoms.k>=0);
-      return atoms.k;
-    }
-    */
+    //AtomsPack view_of_atoms(){
+    //return atoms.view();
+    //}
 
     int k_of(const int i) const{
       return dim_of(i,0);

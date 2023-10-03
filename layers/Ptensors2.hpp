@@ -15,17 +15,10 @@
 #ifndef _ptens_Ptensors2
 #define _ptens_Ptensors2
 
-#include "Rtensor3_view.hpp"
-
-//#include "Cgraph.hpp"
-#include "RtensorPackB.hpp"
-#include "AtomsPack.hpp"
-#include "AindexPack.hpp"
-#include "Ptensor2.hpp"
 #include "diff_class.hpp"
-
+#include "Rtensor3_view.hpp"
 #include "Ptensors.hpp"
-#include "PtensLoggedTimer.hpp"
+#include "Ptensor2.hpp"
 
 
 namespace ptens{
@@ -259,37 +252,13 @@ namespace ptens{
   public: // ----- Conversions -------------------------------------------------------------------------------
 
 
-    //Ptensors2(const RtensorPackB& x, const AtomsPack& _atoms):
-    //RtensorPackB(x), atoms(_atoms){}
-
-    //Ptensors2(RtensorPackB&& x, const AtomsPack& _atoms):
-    //RtensorPackB(std::move(x)), atoms(_atoms){}
-
     Ptensors2(const rtensor& A, const AtomsPack& _atoms):
       Ptensors(RtensorPackB(A,_atoms.dims2(A.dim(1))),_atoms){
     }
 
-    //Ptensors2(const rtensor& A):
-    //CNINE_UNIMPL();
-    //RtensorPackB(A), atoms(A.dim(0)){
-    //}
-
-    //#ifdef _WITH_ATEN
-    //Ptensors2(const at::Tensor& T, const AtomsPack& _atoms):
-    //Ptensors2(rtensor::regular(T),_atoms){}
-    //#endif 
-
-    //rtensor view_as_matrix() const{
-    //return rtensor::view_of_blob({tail/nc,nc},get_arr(),dev);
-    //}
-
 
   public: // ---- Transport ----------------------------------------------------------------------------------
 
-
-  //Ptensors2(const Ptensors2& x, const int _dev):
-  //RtensorPackB(x,_dev),
-  //atoms(x.atoms)/*,nc(x.nc)*/{}
 
     Ptensors2& to_device(const int _dev){
       Ptensors::to_device(_dev);
@@ -300,9 +269,9 @@ namespace ptens{
   public: // ----- Access ------------------------------------------------------------------------------------
 
 
-    AtomsPack view_of_atoms(){
-      return atoms.view();
-    }
+    //AtomsPack view_of_atoms(){
+    //return atoms.view();
+    //}
 
     int k_of(const int i) const{
       return dim_of(i,0);
