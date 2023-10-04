@@ -54,7 +54,6 @@ class subgraph:
     def triangle(self):
         G=subgraph()
         G.obj=_subgraph.triangle()
-        set_evecs()
         return G;
 
     @classmethod

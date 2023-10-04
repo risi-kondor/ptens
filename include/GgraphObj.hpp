@@ -66,7 +66,14 @@ namespace ptens{
 
 
     GgraphObj(const BASE& x):
-      BASE(x){}
+      BASE(x){
+      //cout<<"conversion"<<endl;
+    }
+
+    //GgraphObj(const GgraphObj& x):
+    //BASE(x){
+    //cout<<"GGraph copied"<<endl;
+    //}
 
 
   public: // ---- Access --------------------------------------------------------------------------------------

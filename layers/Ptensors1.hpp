@@ -74,6 +74,7 @@ namespace ptens{
       Ptensors(2,_nc,_dev){}
     //RtensorPackB(2,_nc,_dev){}
 
+    // this should be improved
     Ptensors1(const AtomsPack& _atoms, const int _nc, const int _dev=0):
       Ptensors1(_nc,_dev){
       atoms=_atoms;

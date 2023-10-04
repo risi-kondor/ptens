@@ -34,6 +34,9 @@ namespace ptens{
     AtomsPack(AtomsPackObj* _obj):
       obj(_obj){}
 
+    AtomsPack(shared_ptr<AtomsPackObj> _obj):
+      obj(_obj){}
+
     AtomsPack(const int N):
       obj(new AtomsPackObj(N)){}
 
@@ -60,6 +63,12 @@ namespace ptens{
 
   public: // ---- Copying ------------------------------------------------------------------------------------
 
+
+    //AtomsPack& operator=(const AtomsPack& x){
+      //cout<<"AtomsPAck::operator="<<endl;
+      //obj=x.obj;
+      //return *this;
+    //}
 
   public: // ---- Conversions --------------------------------------------------------------------------------
 
@@ -138,10 +147,10 @@ namespace ptens{
 
     
     static AtomsPack cat(const vector<reference_wrapper<AtomsPack> >& list){
-      return new AtomsPackObj(AtomsPackObj::cat
+      return AtomsPackObj::cat
 	(cnine::mapcar<reference_wrapper<AtomsPack>,reference_wrapper<AtomsPackObj> >
 	  (list,[](const reference_wrapper<AtomsPack>& x){
-	    return reference_wrapper<AtomsPackObj>(*x.get().obj);})));
+	    return reference_wrapper<AtomsPackObj>(*x.get().obj);}));
     }
     
 

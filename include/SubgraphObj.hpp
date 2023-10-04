@@ -40,6 +40,11 @@ namespace ptens{
     cnine::Tensor<float> evecs;
     vector<int> eblocks;
 
+    SubgraphObj(const SubgraphObj& x):
+      BASE(x),
+      evecs(x.evecs),
+      eblocks(x.eblocks){
+    }
 
   public: // ---- Constructors -------------------------------------------------------------------------------
 

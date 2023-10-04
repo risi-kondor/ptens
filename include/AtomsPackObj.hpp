@@ -50,7 +50,9 @@ namespace ptens{
       overlap_maps2([this](const AtomsPackObj& x)
 	{return TransferMap(new TransferMapObj<AtomsPackObj>(x,*this));}),
       cat_maps([this](const vector<AtomsPackObj*>& v)
-	{return shared_ptr<AtomsPackObj>(new AtomsPackObj(cat_with(v)));}){}
+	{return shared_ptr<AtomsPackObj>(new AtomsPackObj(cat_with(v)));}){
+      //cout<<"Make AtomsPackObj 0"<<endl;
+    }
 
 
   public: // ---- Constructors ------------------------------------------------------------------------------
@@ -62,6 +64,7 @@ namespace ptens{
       //k=1;
       for(int i=0; i<N; i++)
 	push_back(vector<int>({i}));
+      //cout<<"Make AtomsPackObj 1"<<endl;
     }
 
     AtomsPackObj(const int N, const int k):
@@ -74,6 +77,8 @@ namespace ptens{
       for(int i=0; i<N; i++){
 	push_back(v);
       }
+      //cout<<"Make AtomsPackObj 2"<<endl;
+
     }
 
     AtomsPackObj(const vector<vector<int> >& x):
@@ -81,6 +86,7 @@ namespace ptens{
       //observable(this){
       for(auto& p:x)
 	push_back(p);
+      cout<<"Make AtomsPackObj 3"<<endl;
     }
 
     AtomsPackObj(const initializer_list<initializer_list<int> >& x):
@@ -88,6 +94,8 @@ namespace ptens{
       //observable(this){
       for(auto& p:x)
 	push_back(p);
+      cout<<"Make AtomsPackObj 4"<<endl;
+
     }
 
     AtomsPackObj(const cnine::labeled_forest<int>& forest):
@@ -96,6 +104,7 @@ namespace ptens{
       for(auto p:forest)
 	p->for_each_maximal_path([&](const vector<int>& x){
 	    push_back(x);});
+      cout<<"Make AtomsPackObj 5"<<endl;
     }
 
 
@@ -126,6 +135,7 @@ namespace ptens{
 	{return TransferMap(new TransferMapObj<AtomsPackObj>(x,*this));}),
       cat_maps([this](const vector<AtomsPackObj*>& v)
 	{return shared_ptr<AtomsPackObj>(new AtomsPackObj(cat_with(v)));}){
+      //cout<<"AtomsPackCopied!"<<endl;
       PTENS_COPY_WARNING();
     }
 
@@ -137,10 +147,12 @@ namespace ptens{
       cat_maps([this](const vector<AtomsPackObj*>& v)
 	{return shared_ptr<AtomsPackObj>(new AtomsPackObj(cat_with(v)));}){
       PTENS_MOVE_WARNING();
+      //cout<<"AtomsPackMoved!"<<endl;
     }
 
     AtomsPackObj& operator=(const AtomsPackObj& x){
       PTENS_ASSIGN_WARNING();
+      //cout<<"AtomsPackAssigned!"<<endl;
       cnine::array_pool<int>::operator=(x);
       return *this;
     }
@@ -222,14 +234,14 @@ namespace ptens{
     }
     */
 
-    static AtomsPackObj cat(const vector<reference_wrapper<AtomsPackObj> >& list){
+    static shared_ptr<AtomsPackObj> cat(const vector<reference_wrapper<AtomsPackObj> >& list){
       PTENS_ASSRT(list.size()>0);
       vector<AtomsPackObj*> v;
       bool first=true;
       for(auto p:list)
 	if(first) first=false; 
 	else v.push_back(&p.get());
-      return *list.begin()->get().cat_maps(cnine::plist<AtomsPackObj*>(v));
+      return list.begin()->get().cat_maps(cnine::plist<AtomsPackObj*>(v));
     }
 
     AtomsPackObj cat_with(const vector<AtomsPackObj*> list){
