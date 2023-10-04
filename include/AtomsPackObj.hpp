@@ -86,7 +86,7 @@ namespace ptens{
       //observable(this){
       for(auto& p:x)
 	push_back(p);
-      cout<<"Make AtomsPackObj 3"<<endl;
+      //cout<<"Make AtomsPackObj 3"<<endl;
     }
 
     AtomsPackObj(const initializer_list<initializer_list<int> >& x):
