@@ -58,6 +58,8 @@ pybind11::class_<Ptensors1/*,cnine::RtensorPack*/>(m,"ptensors1")
   .def("__len__",&Ptensors1::size)
   .def("get_nc",&Ptensors1::get_nc)
   .def("get_atoms",[](const Ptensors1& x){return x.atoms.as_vecs();})
+  .def("view_of_atoms",[](const Ptensors1& x){return x.atoms;})
+//.def("atoms",&Ptensors1::atoms)
 //.def("get_atomsref",&Ptensors1::get_atomsref)
 //.def("view_of_atoms",&Ptensors1::view_of_atoms)
 

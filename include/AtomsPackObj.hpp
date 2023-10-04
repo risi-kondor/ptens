@@ -39,7 +39,7 @@ namespace ptens{
 
     //cnine::shared_object_bank<AtomsPackObj,TransferMapObj<AtomsPackObj> > overlap_maps;
     cnine::pindexed_object_bank<AtomsPackObj,TransferMap> overlap_maps2;
-    cnine::plist_indexed_object_bank<AtomsPackObj,AtomsPackObj> cat_maps;
+    cnine::plist_indexed_object_bank<AtomsPackObj,shared_ptr<AtomsPackObj>> cat_maps;
 
 
   public: // ---- Constructors ------------------------------------------------------------------------------
@@ -50,7 +50,7 @@ namespace ptens{
       overlap_maps2([this](const AtomsPackObj& x)
 	{return TransferMap(new TransferMapObj<AtomsPackObj>(x,*this));}),
       cat_maps([this](const vector<AtomsPackObj*>& v)
-	{return cat_with(v);}){}
+	{return shared_ptr<AtomsPackObj>(new AtomsPackObj(cat_with(v)));}){}
 
 
   public: // ---- Constructors ------------------------------------------------------------------------------
@@ -125,7 +125,7 @@ namespace ptens{
       overlap_maps2([this](const AtomsPackObj& x)
 	{return TransferMap(new TransferMapObj<AtomsPackObj>(x,*this));}),
       cat_maps([this](const vector<AtomsPackObj*>& v)
-	{return cat_with(v);}){
+	{return shared_ptr<AtomsPackObj>(new AtomsPackObj(cat_with(v)));}){
       PTENS_COPY_WARNING();
     }
 
@@ -135,7 +135,7 @@ namespace ptens{
       overlap_maps2([this](const AtomsPackObj& x)
 	{return TransferMap(new TransferMapObj<AtomsPackObj>(x,*this));}),
       cat_maps([this](const vector<AtomsPackObj*>& v)
-	{return cat_with(v);}){
+	{return shared_ptr<AtomsPackObj>(new AtomsPackObj(cat_with(v)));}){
       PTENS_MOVE_WARNING();
     }
 
@@ -156,7 +156,7 @@ namespace ptens{
       overlap_maps2([this](const AtomsPackObj& x)
 	{return TransferMap(new TransferMapObj<AtomsPackObj>(x,*this));}),
       cat_maps([this](const vector<AtomsPackObj*>& v)
-	{return cat_with(v);}){}
+	{return shared_ptr<AtomsPackObj>(new AtomsPackObj(cat_with(v)));}){}
 
     AtomsPackObj(const cnine::Tensor<int>& M):
       AtomsPackObj(cnine::array_pool<int>(M)){}
@@ -229,11 +229,11 @@ namespace ptens{
       for(auto p:list)
 	if(first) first=false; 
 	else v.push_back(&p.get());
-      return list.begin()->get().cat_maps(cnine::plist<AtomsPackObj*>(v));
+      return *list.begin()->get().cat_maps(cnine::plist<AtomsPackObj*>(v));
     }
 
     AtomsPackObj cat_with(const vector<AtomsPackObj*> list){
-      cout<<"AtomPackObj concatenation"<<endl;
+      //cout<<"AtomPackObj concatenation"<<endl;
       vector<reference_wrapper<cnine::array_pool<int> > > v;
       v.push_back(*this);
       for(auto p:list)

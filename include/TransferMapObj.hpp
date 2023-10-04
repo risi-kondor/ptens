@@ -46,7 +46,7 @@ namespace ptens{
 
 
     ~TransferMapObj(){
-      cout<<"Destroying a TransferMapObj"<<endl;
+      //cout<<"Destroying a TransferMapObj"<<endl;
     }
 
     TransferMapObj(const ATOMSPACK& _in_atoms, const ATOMSPACK& _out_atoms):
@@ -55,7 +55,7 @@ namespace ptens{
       //out_atoms(&_in_atoms),
       in(new AindexPack()),
       out(new AindexPack()){
-      cout<<"Creating new TransferMapObj"<<endl;
+      //cout<<"Creating new TransferMapObj"<<endl;
       make_overlaps(_in_atoms,_out_atoms);
       make_intersects(_in_atoms,_out_atoms);
     }

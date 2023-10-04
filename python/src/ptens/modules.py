@@ -11,6 +11,8 @@ from warnings import warn
 from ptens_base import atomspack
 from ptens.functions import linear, linmaps0, outer, unite1, unite2, gather, relu #, cat
 ######################################## Functions ###########################################
+
+
 def get_edge_maps(edge_index: torch.Tensor, num_nodes: Optional[int] = None) -> Tuple[ptens.graph,ptens.graph]:
   if num_nodes is None:
     num_nodes = int(edge_index.max().item()) + 1
@@ -18,6 +20,7 @@ def get_edge_maps(edge_index: torch.Tensor, num_nodes: Optional[int] = None) -> 
   E_to_G = ptens.graph.from_edge_index(torch.stack([edge_index[1],edge_ids]),n=num_nodes,m=edge_index.size(1))
   G_to_E = ptens.graph.from_edge_index(torch.stack([edge_ids,edge_index[0]]),n=edge_index.size(1),m=num_nodes)
   return E_to_G, G_to_E
+
 
 class MapInfo:
   r"""
@@ -122,7 +125,7 @@ class Linear(torch.nn.Module):
     # TODO: figure out why multiplication is broken.
     return linear(x,self.w,torch.zeros(self.w.size(1),device=self.w.device) if self.b is None else self.b)
 
-class LazyLinear(torch.nn.Module):
+jclass LazyLinear(torch.nn.Module):
   def __init__(self,out_channels: Optional[int] = None, bias: bool = True) -> None:
     r"""
     NOTE: if you do not initialize 'out_channels', it must be initialized before calling 'forward'.

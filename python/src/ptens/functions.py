@@ -94,3 +94,23 @@ class Autobahn(torch.nn.Module):
   def forward(self, x: ptens.subgraphlayer1) -> ptens.subgraphlayer1:
       return x.autobahn(self.w,self.b)
 
+class Linear(torch.nn.Module):
+    
+  def __init__(self, in_channels: int, out_channels: int, bias: bool = True) -> None:
+    super().__init__()
+    #This follows Glorot initialization for weights.
+    self.w = torch.nn.parameter.Parameter(torch.empty(in_channels,out_channels),requires_grad=True)
+    self.b = torch.nn.parameter.Parameter(torch.empty(out_channels),requires_grad=True)
+    self.reset_parameters()
+
+  def reset_parameters(self):
+    if not isinstance(self.w,torch.nn.parameter.UninitializedParameter):
+      self.w = torch.nn.init.xavier_uniform_(self.w)
+      if self.b is not None:
+        self.b = torch.nn.init.zeros_(self.b)
+  def forward(self,x):
+    assert x.get_nc() == self.w.size(0), f'{x.get_nc()} != {self.w.size(0)}'
+    #return x * self.w if self.b is None else linear(x,self.w,self.b)
+    # TODO: figure out why multiplication is broken.
+    return linear(x,self.w,torch.zeros(self.w.size(1),device=self.w.device) if self.b is None else self.b)
+
