@@ -61,7 +61,7 @@ namespace ptens{
 
 
     NodeLayer(const Ggraph& _G, const int _nc, const int _dev=0):
-      NodeLayer(_G,_nc,cnine::fill_zero(),_dev), nc(_nc){}
+      NodeLayer(_G,_nc,cnine::fill_zero(),_dev){}
 
     template<typename FILLTYPE, typename = typename std::enable_if<std::is_base_of<cnine::fill_pattern, FILLTYPE>::value, FILLTYPE>::type>
     NodeLayer(const Ggraph& _G, const int _nc, const FILLTYPE& dummy, const int _dev=0):
