@@ -22,6 +22,16 @@
 
 namespace ptens{
 
+#ifdef _WITH_CUDA
+  extern void NodeLayer_to_Ptensors0_cu(Ptensors0& r, const NodeLayer& x,  const cudaStream_t& stream);
+  extern void NodeLayer_to_Ptensors1_cu(Ptensors1& r, const NodeLayer& x,  const cudaStream_t& stream);
+  extern void NodeLayer_to_Ptensors1B_cu(Ptensors1& r, const NodeLayer& x,  const cudaStream_t& stream);
+  extern void NodeLayer_from_Ptensors0_cu(NodeLayer& x, const Ptensors1& r, const cudaStream_t& stream);
+  extern void NodeLayer_from_Ptensors1_cu(NodeLayer& x, const Ptensors1& r, const cudaStream_t& stream);
+  extern void NodeLayer_from_Ptensors1B_cu(NodeLayer& x, const Ptensors1& r, const cudaStream_t& stream);
+#endif 
+
+
   template<typename TLAYER> 
   class SubgraphLayer0;
   template<typename TLAYER> 
@@ -184,171 +194,191 @@ namespace ptens{
 
 
     void emp_to(Ptensors0& x) const{
-      CNINE_CPUONLY();
       PTENS_ASSRT(x.get_nc()==get_nc());
       auto& xatoms=*x.atoms.obj;
       int N=x.size();
       int constk=x.constk;
 
-      if(constk>0){
-	for(int i=0; i<N; i++){
-	  auto u=x.constk_view_of(i);
-	  for(int j=0; j<constk; j++)
-	    u+=view_of(xatoms(i,j));
-	}
-      }else{
-	for(int i=0; i<N; i++){
-	  auto u=x.view_of(i);
-	  for(int j=0; j<xatoms.size_of(i); j++)
-	    u+=view_of(xatoms(i,j));
+      if(dev>0){
+	if(constk>0){
+	  for(int i=0; i<N; i++){
+	    auto u=x.constk_view_of(i);
+	    for(int j=0; j<constk; j++)
+	      u+=view_of(xatoms(i,j));
+	  }
+	}else{
+	  for(int i=0; i<N; i++){
+	    auto u=x.view_of(i);
+	    for(int j=0; j<xatoms.size_of(i); j++)
+	      u+=view_of(xatoms(i,j));
+	  }
 	}
       }
 
+      GPUCODE(CUDA_STREAM(NodeLayer_to_Ptensors0_cu(x,*this,stream)));
     }
 
     void emp_to(Ptensors1& x) const{
-      CNINE_CPUONLY();
       PTENS_ASSRT(x.get_nc()==2*get_nc());
       auto& xatoms=*x.atoms.obj;
       int N=x.size();
       int constk=x.constk;
 
-      if(constk>0){
-	for(int i=0; i<N; i++){
-	  auto u=x.constk_view_of(i,0,nc);
-	  for(int j=0; j<constk; j++)
-	    u+=repeat0(view_of(xatoms(i,j)),constk);
-	  auto v=x.constk_view_of(i,nc,nc);
-	  for(int j=0; j<constk; j++)
-	    v.slice0(j)+=view_of(xatoms(i,j));
-	}
-      }else{
-	for(int i=0; i<N; i++){
-	  int k=xatoms.size_of(i);
-	  auto u=x.view_of(i,0,nc);
-	  for(int j=0; j<k; j++)
-	    u+=repeat0(view_of(xatoms(i,j)),k);
-	  auto v=x.view_of(i,nc,nc);
-	  for(int j=0; j<k; j++)
-	    v.slice0(j)+=view_of(xatoms(i,j));
+      if(dev>0){
+	if(constk>0){
+	  for(int i=0; i<N; i++){
+	    auto u=x.constk_view_of(i,0,nc);
+	    for(int j=0; j<constk; j++)
+	      u+=repeat0(view_of(xatoms(i,j)),constk);
+	    auto v=x.constk_view_of(i,nc,nc);
+	    for(int j=0; j<constk; j++)
+	      v.slice0(j)+=view_of(xatoms(i,j));
+	  }
+	}else{
+	  for(int i=0; i<N; i++){
+	    int k=xatoms.size_of(i);
+	    auto u=x.view_of(i,0,nc);
+	    for(int j=0; j<k; j++)
+	      u+=repeat0(view_of(xatoms(i,j)),k);
+	    auto v=x.view_of(i,nc,nc);
+	    for(int j=0; j<k; j++)
+	      v.slice0(j)+=view_of(xatoms(i,j));
+	  }
 	}
       }
+
+      GPUCODE(CUDA_STREAM(NodeLayer_to_Ptensors1_cu(x,*this,stream)));
     }
 
+
     void emp_toB(Ptensors1& x) const{ 
-      CNINE_CPUONLY();
       PTENS_ASSRT(x.get_nc()==get_nc()/2);
       auto& xatoms=*x.atoms.obj;
       int N=x.size();
       int constk=x.constk;
 
-      if(constk>0){
-	for(int i=0; i<N; i++){
-	  auto u=x.constk_view_of(i);
-	  for(int j=0; j<constk; j++)
-	    u+=repeat0(block_of(xatoms(i,j),0,nc/2),constk);
-	  for(int j=0; j<constk; j++)
-	    u.slice0(j)+=block_of(xatoms(i,j),nc/2,nc/2);
-	}
-      }else{
-	for(int i=0; i<N; i++){
-	  int k=xatoms.size_of(i);
-	  auto u=x.view_of(i);
-	  for(int j=0; j<k; j++)
-	    u+=repeat0(block_of(xatoms(i,j),0,nc/2),k);
-	  for(int j=0; j<k; j++)
-	    u.slice0(j)+=block_of(xatoms(i,j),nc/2,nc/2);
+      if(dev==0){
+	if(constk>0){
+	  for(int i=0; i<N; i++){
+	    auto u=x.constk_view_of(i);
+	    for(int j=0; j<constk; j++)
+	      u+=repeat0(block_of(xatoms(i,j),0,nc/2),constk);
+	    for(int j=0; j<constk; j++)
+	      u.slice0(j)+=block_of(xatoms(i,j),nc/2,nc/2);
+	  }
+	}else{
+	  for(int i=0; i<N; i++){
+	    int k=xatoms.size_of(i);
+	    auto u=x.view_of(i);
+	    for(int j=0; j<k; j++)
+	      u+=repeat0(block_of(xatoms(i,j),0,nc/2),k);
+	    for(int j=0; j<k; j++)
+	      u.slice0(j)+=block_of(xatoms(i,j),nc/2,nc/2);
+	  }
 	}
       }
+
+      GPUCODE(CUDA_STREAM(NodeLayer_to_Ptensors1B_cu(x,*this,stream)));
     }
 
 
     void emp_from(const Ptensors0& x){
-      CNINE_CPUONLY();
       PTENS_ASSRT(x.get_nc()==get_nc());
       auto& xatoms=*x.atoms.obj;
       int N=x.size();
       int constk=x.constk;
 
-      if(constk>0){
-	for(int i=0; i<N; i++){
-	  auto u=x.constk_view_of(i);
-	  for(int j=0; j<constk; j++)
-	    view_of(xatoms(i,j))+=u;
-	}
-      }else{
-	for(int i=0; i<N; i++){
-	  auto u=x.view_of(i);
-	  for(int j=0; j<xatoms.size_of(i); j++)
-	    view_of(xatoms(i,j))+=u;
+      if(dev==0){
+	if(constk>0){
+	  for(int i=0; i<N; i++){
+	    auto u=x.constk_view_of(i);
+	    for(int j=0; j<constk; j++)
+	      view_of(xatoms(i,j))+=u;
+	  }
+	}else{
+	  for(int i=0; i<N; i++){
+	    auto u=x.view_of(i);
+	    for(int j=0; j<xatoms.size_of(i); j++)
+	      view_of(xatoms(i,j))+=u;
+	  }
 	}
       }
+
+      GPUCODE(CUDA_STREAM(NodeLayer_from_Ptensors0_cu(*this,x,stream)));
     }
 
+
     void emp_from(const Ptensors1& x){
-      CNINE_CPUONLY();
       PTENS_ASSRT(get_nc()==2*x.get_nc());
       auto& xatoms=*x.atoms.obj;
       int N=x.size();
       int constk=x.constk;
 
-      if(constk>0){
-	Tensor<float> t({nc/2},cnine::fill_raw(),dev);
-	for(int i=0; i<N; i++){
-	  t.set_zero();
-	  x.constk_view_of(i).sum0_into(t);
-	  auto xview_i=x.constk_view_of(i);
-	  for(int j=0; j<constk; j++){
-	    block_of(xatoms(i,j),0,nc/2)+=t.view1();
-	    block_of(xatoms(i,j),nc/2,nc/2)+=xview_i.slice0(j);
+      if(dev==0){
+	if(constk>0){
+	  Tensor<float> t({nc/2},cnine::fill_raw(),dev);
+	  for(int i=0; i<N; i++){
+	    t.set_zero();
+	    x.constk_view_of(i).sum0_into(t);
+	    auto xview_i=x.constk_view_of(i);
+	    for(int j=0; j<constk; j++){
+	      block_of(xatoms(i,j),0,nc/2)+=t.view1();
+	      block_of(xatoms(i,j),nc/2,nc/2)+=xview_i.slice0(j);
+	    }
 	  }
-	}
-      }else{
-	Tensor<float> t({nc/2},cnine::fill_raw(),dev);
-	for(int i=0; i<N; i++){
-	  int k=xatoms.size_of(i);
-	  t.set_zero();
-	  x.view_of(i).sum0_into(t);
-	  auto xview_i=x.view_of(i);
-	  for(int j=0; j<k; j++){
-	    block_of(xatoms(i,j),0,nc/2)+=t.view1();
-	    block_of(xatoms(i,j),nc/2,nc/2)+=xview_i.slice0(j);
+	}else{
+	  Tensor<float> t({nc/2},cnine::fill_raw(),dev);
+	  for(int i=0; i<N; i++){
+	    int k=xatoms.size_of(i);
+	    t.set_zero();
+	    x.view_of(i).sum0_into(t);
+	    auto xview_i=x.view_of(i);
+	    for(int j=0; j<k; j++){
+	      block_of(xatoms(i,j),0,nc/2)+=t.view1();
+	      block_of(xatoms(i,j),nc/2,nc/2)+=xview_i.slice0(j);
+	    }
 	  }
 	}
       }
+
+      GPUCODE(CUDA_STREAM(NodeLayer_from_Ptensors1_cu(*this,x,stream)));
     }
 
+
     void emp_fromB(const Ptensors1& x){
-      CNINE_CPUONLY();
       PTENS_ASSRT(get_nc()==x.get_nc()/2);
       auto& xatoms=*x.atoms.obj;
       int N=x.size();
       int constk=x.constk;
 
-      if(constk>0){
-	Tensor<float> t({nc},cnine::fill_raw(),dev);
-	for(int i=0; i<N; i++){
-	  t.set_zero();
-	  x.constk_view_of(i,0,nc).sum0_into(t);
-	  auto xview_i=x.constk_view_of(i,nc,nc);
-	  for(int j=0; j<constk; j++){
-	    view_of(xatoms(i,j))+=t.view1();
-	    view_of(xatoms(i,j))+=xview_i.slice0(j);
+      if(dev==0){
+	if(constk>0){
+	  Tensor<float> t({nc},cnine::fill_raw(),dev);
+	  for(int i=0; i<N; i++){
+	    t.set_zero();
+	    x.constk_view_of(i,0,nc).sum0_into(t);
+	    auto xview_i=x.constk_view_of(i,nc,nc);
+	    for(int j=0; j<constk; j++){
+	      view_of(xatoms(i,j))+=t.view1();
+	      view_of(xatoms(i,j))+=xview_i.slice0(j);
+	    }
 	  }
-	}
-      }else{
-	Tensor<float> t({nc},cnine::fill_raw(),dev);
-	for(int i=0; i<N; i++){
-	  int k=xatoms.size_of(i);
-	  t.set_zero();
-	  x.view_of(i,0,nc).sum0_into(t);
-	  auto xview_i=x.view_of(i,nc,nc);
-	  for(int j=0; j<k; j++){
-	    view_of(xatoms(i,j))+=t.view1();
-	    view_of(xatoms(i,j))+=xview_i.slice0(j);
+	}else{
+	  Tensor<float> t({nc},cnine::fill_raw(),dev);
+	  for(int i=0; i<N; i++){
+	    int k=xatoms.size_of(i);
+	    t.set_zero();
+	    x.view_of(i,0,nc).sum0_into(t);
+	    auto xview_i=x.view_of(i,nc,nc);
+	    for(int j=0; j<k; j++){
+	      view_of(xatoms(i,j))+=t.view1();
+	      view_of(xatoms(i,j))+=xview_i.slice0(j);
+	    }
 	  }
 	}
       }
+
+      GPUCODE(CUDA_STREAM(NodeLayer_from_Ptensors1B_cu(*this,x,stream)));
     }
 
 

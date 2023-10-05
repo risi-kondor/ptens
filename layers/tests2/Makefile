@@ -17,6 +17,7 @@ CUDA_OBJECTS+=$(CNINE_CUDADIR)/RtensorUtils.o
 CUDA_OBJECTS+=$(CUDADIR)/Ptensors0.o
 CUDA_OBJECTS+=$(CUDADIR)/Ptensors1.o
 CUDA_OBJECTS+=$(CUDADIR)/Ptensors2.o
+CUDA_OBJECTS+=$(CUDADIR)/NodeLayer.o
 endif 
 
 $(TESTS): %: %.cpp $(DEPS)

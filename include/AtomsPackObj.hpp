@@ -23,6 +23,9 @@
 #include "array_pool.hpp"
 #include "labeled_forest.hpp"
 #include "cpermutation.hpp"
+#include "map_of_lists.hpp"
+#include "once.hpp"
+
 #include "Atoms.hpp"
 #include "TransferMap.hpp"
 
@@ -44,6 +47,13 @@ namespace ptens{
     cnine::plist_indexed_object_bank<AtomsPackObj,shared_ptr<AtomsPackObj>> cat_maps=
       cnine::plist_indexed_object_bank<AtomsPackObj,shared_ptr<AtomsPackObj>>([this](const vector<AtomsPackObj*>& v)
 	{return shared_ptr<AtomsPackObj>(new AtomsPackObj(cat_with(v)));});
+
+    cnine::once<BASE> gpack=cnine::once<BASE>([&](){
+	BASE R(*this,1);
+	R.dir.move_to_device(1);
+	return R;
+      });
+
 
     int constk=0;
 
@@ -274,6 +284,42 @@ namespace ptens{
 	v.push_back(*p);
       return AtomsPackObj(cnine::array_pool<int>::cat(v));
     }
+
+
+  public: // ---- to_nodes_map -------------------------------------------------------------------------------
+
+
+    cnine::once<shared_ptr<cnine::GatherMap> > to_nodes_map=
+      cnine::once<shared_ptr<cnine::GatherMap> >([&](){
+
+	cnine::map_of_lists2<int,int> lists;
+	for(int i=0; i<size(); i++)
+	  for(int j=0; j<size_of(i); j++)
+	    lists[(*this)(i,j)].push_back(i);
+	int n_dest=lists.size();
+
+	cnine::GatherMap* R=new cnine::GatherMap(n_dest,tail,cnine::fill_raw());
+
+	int i=0;
+	int _tail=3*n_dest;
+	for(auto& p:lists){
+	  vector<int>& list=p.second;
+	  const int n=list.size();
+
+	  R->arr[3*i]=_tail;
+	  R->arr[3*i+1]=n;
+	  R->arr[3*i+2]=p.first;
+
+	  for(int j=0; j<n; j++){
+	    R->arr[tail+2*j]=list[j];
+	    *reinterpret_cast<float*>(R->arr+tail+2*j+1)=1.0;
+	  }
+
+	  i++;
+	  tail+=2*n;
+	}
+	return shared_ptr<cnine::GatherMap>(R);
+      });
 
 
   public: // ---- Operations ---------------------------------------------------------------------------------
