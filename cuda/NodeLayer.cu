@@ -21,7 +21,12 @@ must be accompanied by a verbatim copy of the license.
 #include "Cnine_base.hpp"
 #include "CnineLog.hpp"
 
-extern cnine::CnineLog cnine::cnine_log;
+namespace cnine{
+  //CnineLog cnine_log;
+  extern CnineLog cnine_log;
+}
+//extern cnine::CnineLog cnine::cnine_log;
+
 
 #include "Ptensors0.hpp"
 #include "Ptensors1.hpp"
