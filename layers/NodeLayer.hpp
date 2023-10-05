@@ -61,7 +61,7 @@ namespace ptens{
 
 
     NodeLayer(const Ggraph& _G, const int _nc, const int _dev=0):
-      NodeLayer(_G,_nc,cnine::fill_zero(),_dev){}
+      NodeLayer(_G,_nc,cnine::fill_zero(),_dev), nc(_nc){}
 
     template<typename FILLTYPE, typename = typename std::enable_if<std::is_base_of<cnine::fill_pattern, FILLTYPE>::value, FILLTYPE>::type>
     NodeLayer(const Ggraph& _G, const int _nc, const FILLTYPE& dummy, const int _dev=0):
@@ -121,7 +121,7 @@ namespace ptens{
 
     NodeLayer(const NodeLayer& x, const int _dev):
       BASE(x,_dev),
-      G(x.G){}
+      G(x.G), nc(x.nc){}
 
     NodeLayer& move_to_device(const int _dev){
       BASE::move_to_device(_dev);
@@ -153,7 +153,9 @@ namespace ptens{
 
 
     NodeLayer(const Ggraph& _G, const Ptensors0& x):
-      BASE({_G.getn(),x.get_nc()},cnine::fill_zero(),x.dev),G(_G){
+      BASE({_G.getn(),x.get_nc()},cnine::fill_zero(),x.dev),
+      G(_G),
+      nc(x.get_nc()){
       emp_from(x);}
 
     void gather_back(Ptensors0& x){
@@ -161,7 +163,9 @@ namespace ptens{
 
 
     NodeLayer(const Ggraph& _G, const Ptensors1& x):
-      BASE({_G.getn(),2*x.get_nc()},cnine::fill_zero(),x.dev), G(_G){
+      BASE({_G.getn(),2*x.get_nc()},cnine::fill_zero(),x.dev), 
+      G(_G),
+      nc(2*x.get_nc()){
       emp_from(x);}
 
     void gather_back(Ptensors1& x){
@@ -173,7 +177,9 @@ namespace ptens{
 
     template<typename TLAYER>
     NodeLayer(const SubgraphLayer0<TLAYER>& x):
-      BASE({x.G.getn(),x.get_nc()},cnine::fill_zero(),x.dev),G(x.G){
+      BASE({x.G.getn(),x.get_nc()},cnine::fill_zero(),x.dev),
+      G(x.G),
+      nc(x.get_nc()){
       emp_from(x);}
 
     template<typename TLAYER>
@@ -183,7 +189,9 @@ namespace ptens{
 
     template<typename TLAYER>
     NodeLayer(const SubgraphLayer1<TLAYER>& x):
-      BASE({x.G.getn(),2*x.get_nc()},cnine::fill_zero(),x.dev), G(x.G){
+      BASE({x.G.getn(),2*x.get_nc()},cnine::fill_zero(),x.dev), 
+      G(x.G),
+      nc(x.get_nc()){
       emp_from(x);}
 
     template<typename TLAYER>
