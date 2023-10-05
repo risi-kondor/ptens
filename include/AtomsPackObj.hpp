@@ -297,6 +297,7 @@ namespace ptens{
 	  for(int j=0; j<size_of(i); j++)
 	    lists[(*this)(i,j)].push_back(i);
 	int n_dest=lists.size();
+	cout<<"n_dest="<<n_dest<<endl;
 
 	cnine::GatherMap* R=new cnine::GatherMap(n_dest,tail,cnine::fill_raw());
 
@@ -305,6 +306,7 @@ namespace ptens{
 	for(auto& p:lists){
 	  vector<int>& list=p.second;
 	  const int n=list.size();
+	  cout<<"a"<<i<<endl;
 
 	  R->arr[3*i]=_tail;
 	  R->arr[3*i+1]=n;
