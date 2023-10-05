@@ -67,7 +67,7 @@ pybind11::class_<SGlayer1,Ptensors1>(m,"subgraph_layer1")
 
 
   .def(pybind11::init<const NodeLayer&, const Subgraph&>())
-  .def("gather_back",[](SGlayer0& r, NodeLayer& x){r.gather_back(x);})
+  .def("gather_back",[](SGlayer1& r, NodeLayer& x){r.gather_back(x);})
 
   .def(pybind11::init<const SGlayer0&, const Subgraph&>())
   .def("gather_back",[](SGlayer1& r, SGlayer0& x){r.gather_back(x);})

@@ -386,9 +386,7 @@ class Nodelayer_GatherFromPtensorsFn(torch.autograd.Function):
     @staticmethod
     def forward(ctx,x,G):
         r=ptens.nodelayer(1)
-        print("iosdd")
         r.obj=_nodelayer(G.obj,x.obj)
-        print("donegh")
         ctx.x=x.obj
         ctx.r=r.obj
         return r

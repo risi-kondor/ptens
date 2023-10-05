@@ -135,7 +135,7 @@ __global__ void NodeLayer_from_Ptensors1_kernel(float* rarr, const float* xarr, 
     assert(xdir[3*src+1]==k);
     assert(xdir[3*src+2]==nc);
 
-    for(int j=0; j<k; i++){
+    for(int j=0; j<k; j++){
       tsum+=xarr[offs+nc*j+c];
       if(atomsarr[aoffs+j]==target)
 	rarr[target*2*nc+nc+c]+=xarr[offs+nc*j+c];
@@ -166,7 +166,7 @@ __global__ void NodeLayer_from_Ptensors1B_kernel(float* rarr, const float* xarr,
     assert(xdir[3*src+1]==k);
     assert(xdir[3*src+2]==2*nc);
 
-    for(int j=0; j<k; i++){
+    for(int j=0; j<k; j++){
       tsum+=xarr[offs+2*nc*j+c];
       if(atomsarr[aoffs+j]==target)
 	rarr[target*nc+c]+=xarr[offs+2*nc*j+nc+c];
@@ -243,10 +243,11 @@ namespace ptens{
     PTENS_ASSRT(r.nc==2*x.nc);
     auto atoms=x.atoms.gpu_arrs(1);
     auto gatherMap=x.atoms.gather_to_nodes_map(1);
-
+    
     NodeLayer_from_Ptensors1_kernel<<<r.getn(),x.nc,0,stream>>>
       (r.mem(), x.arrg, x.dir.garr(dev), atoms.first, atoms.second, gatherMap);
     //(r.mem(), x.arrg, x.dir.garr(dev), atoms.arrg, atoms.dir.arrg, x.atoms.obj->to_nodes_map()->get_barr(1));
+
   }
 
   void NodeLayer_from_Ptensors1B_cu(NodeLayer& r, const Ptensors1& x,  const cudaStream_t& stream){
