@@ -73,15 +73,11 @@ namespace ptens{
     typedef cnine::IntTensor IntTensor;
     typedef cnine::RtensorA rtensor;
     typedef cnine::RtensorPackB RtensorPackB;
-    //typedef cnine::RtensorPackB RtensorPack;
     typedef cnine::Rtensor1_view Rtensor1_view;
     typedef cnine::Rtensor2_view Rtensor2_view;
     typedef cnine::Rtensor3_view Rtensor3_view;
 
     using Ptensors::Ptensors;
-
-    //AtomsPack atoms;
-    //rtensor norms;
 
 
     ~Ptensors2(){
@@ -392,7 +388,6 @@ namespace ptens{
 	  view_of(i).diag01().avg0_into(R.view1_of(i).block(nc,nc));
 	}
       }
-      //PTENS_CPUONLY();
       GPUCODE(CUDA_STREAM(Ptensors2_reduce0n_cu(R,*this,0,nc,stream)));
       return R;
     }
@@ -421,7 +416,6 @@ namespace ptens{
 	  view_of(list.tens(i),list.ix(i)).diag01().avg0_into(R.view1_of(i).block(nc,nc));
 	}
       }
-      //PTENS_CPUONLY();
       GPUCODE(CUDA_STREAM(Ptensors2_reduce0n_cu(R,*this,list,0,nc,stream)));
       return R;
     }
@@ -457,7 +451,6 @@ namespace ptens{
 	  R.view2_of(i).block(0,2*nc,-1,nc)+=view_of(i).diag01();
 	}
       }
-      //PTENS_CPUONLY();
       GPUCODE(CUDA_STREAM(Ptensors2_reduce1n_cu(R,*this,0,nc,stream)));
       return R;
     }
@@ -596,8 +589,6 @@ namespace ptens{
     }
 
 
-
-
     RtensorPackB reduce1_n(const AindexPack& list) const{
       TimedFn T("Ptensors2","reduce1_n",*this,list,(list.count1+2*list.count2)*nc);
       int N=list.size();
@@ -613,7 +604,6 @@ namespace ptens{
 	  R.view2_of(i).block(0,2*nc,-1,nc)+=view_of(list.tens(i),list.ix(i)).diag01();
 	}
       }
-      //PTENS_CPUONLY();
       GPUCODE(CUDA_STREAM(Ptensors2_reduce1n_cu(R,*this,list,0,nc,stream)));
       return R;
     }
@@ -699,7 +689,6 @@ namespace ptens{
 	  view_of(i).diag01().add(repeat0(x.view1_of(i).block(nc,nc),k_of(i)),1.0/((float)k_of(i)));
 	}
       }
-      //PTENS_CPUONLY();
       GPUCODE(CUDA_STREAM(Ptensors2_broadcast0Bn_cu(*this,x,0,stream)));
     }
 
@@ -736,7 +725,6 @@ namespace ptens{
 	  view_of(i).diag01()+=x.view2_of(i).block(0,2*nc,-1,nc);
 	}
       }
-      //PTENS_CPUONLY();
       GPUCODE(CUDA_STREAM(Ptensors2_broadcast1Bn_cu(*this,x,0,stream)));
     }
 
@@ -891,7 +879,6 @@ namespace ptens{
 	    add(repeat0(x.view1_of(i).block(nc,nc),list.nix(i)),1.0/((float)list.nix(i)));
 	}
       }
-      //PTENS_CPUONLY();
       GPUCODE(CUDA_STREAM(Ptensors2_broadcast0Bn_cu(*this,x,list,0,stream)));
     }
 
@@ -909,7 +896,6 @@ namespace ptens{
 	  view_of(list.tens(i),list.ix(i)).diag01()+=x.view2_of(i).block(0,2*nc,-1,nc);
 	}
       }
-      //PTENS_CPUONLY();
       GPUCODE(CUDA_STREAM(Ptensors2_broadcast1Bn_cu(*this,x,list,0,stream)));
     }
 

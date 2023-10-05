@@ -276,6 +276,14 @@ namespace ptens{
       return RtensorPackB::view2_of(i).block(0,offs,-1,n);
     }
 
+    Rtensor2_view constk_view_of(const int i) const{
+      return Rtensor2_view(arr+nc*constk*i,constk,nc,nc,1,dev);
+    }
+
+    Rtensor2_view constk_view_of(const int i, const int offs, const int n) const{
+      return Rtensor2_view(arr+nc*constk*i+offs,constk,n,nc,1,dev);
+    }
+
     Ptensor1_xview view_of(const int i, const vector<int>& ix) const{
       vector<int> v=headers(i);
       PTENS_ASSRT(v.size()==3);

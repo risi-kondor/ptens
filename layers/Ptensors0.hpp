@@ -15,10 +15,11 @@
 #ifndef _ptens_Ptensors0
 #define _ptens_Ptensors0
 
-#include "diff_class.hpp"
+//#include "diff_class.hpp"
 #include "Rtensor1_view.hpp"
 #include "Ptensors.hpp"
 #include "Ptensor0.hpp"
+#include "PtensLoggedTimer.hpp"
 
 
 namespace ptens{
@@ -38,7 +39,6 @@ namespace ptens{
     typedef cnine::Gdims Gdims;
     typedef cnine::IntTensor itensor;
     typedef cnine::RtensorA rtensor;
-    //typedef cnine::RtensorPackB RtensorPack;
     typedef cnine::RtensorPackB RtensorPackB;
     typedef cnine::Rtensor1_view Rtensor1_view;
     typedef cnine::Rtensor2_view Rtensor2_view;
@@ -66,15 +66,21 @@ namespace ptens{
 
     template<typename FILLTYPE, typename = typename std::enable_if<std::is_base_of<cnine::fill_pattern, FILLTYPE>::value, FILLTYPE>::type>
     Ptensors0(const AtomsPack& _atoms, const int _nc, const FILLTYPE& dummy, const int _dev=0):
-      Ptensors(_atoms, cnine::Gdims({_nc}), dummy, _dev){}
+      Ptensors(_atoms, cnine::Gdims({_nc}), dummy, _dev){
+      if(atoms.constk()>0) constk=atoms.constk();
+    }
 
     template<typename FILLTYPE, typename = typename std::enable_if<std::is_base_of<cnine::fill_pattern, FILLTYPE>::value, FILLTYPE>::type>
     Ptensors0(const cnine::Tensor<int>& M, const int _nc, const FILLTYPE& dummy, const int _dev=0):
-      Ptensors(AtomsPack(M), cnine::Gdims({_nc}), dummy, _dev){}
+      Ptensors(AtomsPack(M), cnine::Gdims({_nc}), dummy, _dev){
+      if(atoms.constk()>0) constk=atoms.constk();
+    }
 
     template<typename FILLTYPE, typename = typename std::enable_if<std::is_base_of<cnine::fill_pattern, FILLTYPE>::value, FILLTYPE>::type>
     Ptensors0(const int _n, const int _nc, const FILLTYPE& dummy, const int _dev=0):
-      Ptensors(AtomsPack(_n), cnine::Gdims({_nc}), dummy, _dev){}
+      Ptensors(AtomsPack(_n), cnine::Gdims({_nc}), dummy, _dev){
+      constk=1;
+    }
 
 
 
@@ -173,19 +179,14 @@ namespace ptens{
       Ptensors(x),
       cnine::diff_class<Ptensors0>(x){
       PTENS_COPY_WARNING();
-      //#ifdef WITH_FAKE_GRAD
-      //if(x.grad) grad=new Ptensors0(*grad);
-      //#endif 
+      constk=x.constk;
     }
 	
     Ptensors0(Ptensors0&& x):
       Ptensors(std::move(x)),
       cnine::diff_class<Ptensors0>(std::move(x)){
       PTENS_MOVE_WARNING();
-      //#ifdef WITH_FAKE_GRAD
-      //grad=x.grad;
-      //x.grad=nullptr;
-      //#endif 
+      constk=x.constk;
     }
     
     Ptensors0& operator=(const Ptensors0& x)=delete;
@@ -237,6 +238,15 @@ namespace ptens{
     Rtensor1_view view_of(const int i, const vector<int>& ix, const int offs, const int n) const{
       return RtensorPackB::view1_of(i).block(offs,n);
     }
+
+    Rtensor1_view constk_view_of(const int i) const{
+      return Rtensor1_view(arr+nc*i,nc,1,dev);
+    }
+
+    Rtensor1_view constk_view_of(const int i, const int offs, const int n) const{
+      return Rtensor1_view(arr+nc*i+offs,n,1,dev);
+    }
+
 
     Ptensor0 operator()(const int i) const{
       return Ptensor0(tensor_of(i),atoms_of(i));

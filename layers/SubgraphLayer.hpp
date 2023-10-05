@@ -18,6 +18,10 @@
 #include "Ggraph.hpp"
 #include "Subgraph.hpp"
 #include "TransferMap.hpp"
+#include "Ptensors0.hpp"
+#include "Ptensors1.hpp"
+#include "Ptensors2.hpp"
+#include "NodeLayer.hpp"
 
 
 namespace ptens{
@@ -31,7 +35,6 @@ namespace ptens{
     using TLAYER::TLAYER;
     using TLAYER::dev;
     using TLAYER::atoms;
-    //using TLAYER::getn;
     using TLAYER::get_nc;
     using TLAYER::tensor;
 
@@ -85,18 +88,8 @@ namespace ptens{
   public: // ---- Conversions --------------------------------------------------------------------------------------------
 
 
-    //SubgraphLayer(const Ggraph& _G, const rtensor& x):
-    //G(_G), S(Subgraph::trivial()), TLAYER(x){}
-
-    //SubgraphLayer(TLAYER&& x, const Ggraph& _G, const Subgraph& _S):
-    //TLAYER(std::move(x)), G(_G.obj), S(_S){}
-
     SubgraphLayer(TLAYER&& x, const Ggraph& _G, const Subgraph& _S):
       TLAYER(std::move(x)), G(_G), S(_S){}
-
-    //this can be confuse with message passing 
-    //SubgraphLayer(const Ggraph& _G, const Subgraph& _S, TLAYER&& x):
-    //TLAYER(std::move(x)), G(_G.obj), S(_S){}
 
 
   public: // ---- Operations ---------------------------------------------------------------------------------------------

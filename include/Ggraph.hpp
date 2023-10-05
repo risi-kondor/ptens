@@ -49,7 +49,7 @@ namespace ptens{
     static Ggraph random(const int _n, const float p=0.5){
       return new BASE(BASE::random(_n,p));}
 
-    static Ggraph edges(int n, const cnine::Tensor<int>& M){
+    static Ggraph from_edges(int n, const cnine::Tensor<int>& M){
       if(n==-1) n=M.max()+1;
       return new BASE(n,M);
     }

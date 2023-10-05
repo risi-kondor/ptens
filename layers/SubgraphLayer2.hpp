@@ -15,12 +15,9 @@
 #ifndef _ptens_SubgraphLayer2
 #define _ptens_SubgraphLayer2
 
-#include "Hgraph.hpp"
-#include "Subgraph.hpp"
-#include "PtensFindPlantedSubgraphs.hpp"
-#include "TransferMap.hpp"
-#include "EMPlayers2.hpp"
+#include "SubgraphLayer.hpp"
 #include "SubgraphLayer2.hpp"
+#include "EMPlayers2.hpp"
 
 
 namespace ptens{
@@ -49,13 +46,6 @@ namespace ptens{
     using TLAYER::inp;
     using TLAYER::diff2;
     using TLAYER::overlaps;
-
-
-  public: 
-
-    //template<typename IPACK>
-    //SubgraphLayer2(const Ggraph& _G, const Subgraph& _S, const IPACK& ipack, const int nc, const int _dev=0):
-    //G(_G), S(_S), TLAYER(ipack,nc,cnine::fill_zero(),_dev){}
 
 
   public: // ---- Named Constructors ------------------------------------------------------------------------------------------
@@ -172,7 +162,6 @@ namespace ptens{
       if(dev==0) return "<SubgraphLayer2[N="+to_string(getn())+"]>";
       else return "<SubgraphLayer2[N="+to_string(getn())+"][G]>";
     }
-
 
 
   };

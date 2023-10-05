@@ -14,8 +14,8 @@
 #ifndef _Ptens_GraphObj
 #define _Ptens_GraphObj
 
+#include "once.hpp"
 #include "sparse_graph.hpp"
-//#include "PtensFindPlantedSubgraphs.hpp"
 #include "FindPlantedSubgraphs.hpp"
 #include "SubgraphObj.hpp"
 #include "RtensorA.hpp"
@@ -30,18 +30,13 @@ namespace ptens{
 
     typedef cnine::sparse_graph<int,float,float> BASE;
 
-    //mutable unordered_map<SubgraphObj,cnine::array_pool<int>*> subgraphlist_cache;
-    //mutable unordered_map<SubgraphObj,shared_ptr<cnine::Tensor<int> > > subgraphlistmx_cache;
-    mutable unordered_map<SubgraphObj,AtomsPack> subgraphapack_cache;
+    mutable unordered_map<SubgraphObj,AtomsPack> subgraphpack_cache;
 
     using BASE::BASE;
 
 
     GgraphObj(const initializer_list<pair<int,int> >& list, const int n): 
       BASE(n,list){}
-
-    //GgraphObj(const cnine::RtensorA& M):
-    //obj(new Hgraph(M)){}
 
 
   public: //  ---- Named constructors -------------------------------------------------------------------------
@@ -79,19 +74,6 @@ namespace ptens{
   public: // ---- Access --------------------------------------------------------------------------------------
 
 
-    //int getn() const{
-    //return obj->getn();
-    //}
-
-    //cnine::RtensorA dense() const{
-    //return obj->dense();
-    //}
-
-    //bool operator==(const GgraphObj& x) const{
-    //return obj==x.obj;
-    //}
-
-
   public: // ---- Operations ---------------------------------------------------------------------------------
 
 
@@ -105,6 +87,53 @@ namespace ptens{
 	});
       return BASE(getn(),A);
      }
+
+
+    AtomsPack subgraphs(const SubgraphObj& H){
+      auto it=subgraphpack_cache.find(H);
+      if(it!=subgraphpack_cache.end()) return it->second;
+      else{
+	cnine::flog timer("GgraphObj::finding subgraphs");
+	subgraphpack_cache[H]=AtomsPack(new AtomsPackObj
+	  (cnine::Tensor<int>(cnine::FindPlantedSubgraphs<float>(*this,H))));
+	return subgraphpack_cache[H];
+      }
+    }
+
+    cnine::once<AtomsPack> edges=cnine::once<AtomsPack>([&](){
+	auto R=new AtomsPackObj(nedges(),2,cnine::fill_raw());
+	int i=0;
+	for(auto& p:data)
+	  for(auto& q:p.second)
+	    if(p.first<q.first){
+	      R->set(i,0,p.first);
+	      R->set(i,1,q.first);
+	      i++;
+	    }
+	return AtomsPack(R);
+      });
+    
+
+  public: // ---- I/O -----------------------------------------------------------------------------------------
+
+
+    string classname() const{
+      return "ptens::GgraphObj";
+    }
+
+    //string str(const string indent="") const{
+    //return obj->str(indent);
+    //}
+
+    friend ostream& operator<<(ostream& stream, const GgraphObj& x){
+      stream<<x.str(); return stream;}
+
+
+  };
+
+}
+
+#endif 
 
 
     // deprecated 
@@ -129,36 +158,3 @@ namespace ptens{
       }
     }
     */
-
-    AtomsPack subgraphs(const SubgraphObj& H){
-      cnine::flog timer("CachedPlantedSubgraphApack");
-      auto it=subgraphapack_cache.find(H);
-      if(it!=subgraphapack_cache.end()) return it->second;
-      else{
-	subgraphapack_cache[H]=AtomsPack(new AtomsPackObj
-	  (cnine::Tensor<int>(cnine::FindPlantedSubgraphs<float>(*this,H))));
-	return subgraphapack_cache[H];
-      }
-    }
-
-
-  public: // ---- I/O -----------------------------------------------------------------------------------------
-
-
-    string classname() const{
-      return "ptens::GgraphObj";
-    }
-
-    //string str(const string indent="") const{
-    //return obj->str(indent);
-    //}
-
-    friend ostream& operator<<(ostream& stream, const GgraphObj& x){
-      stream<<x.str(); return stream;}
-
-
-  };
-
-}
-
-#endif 

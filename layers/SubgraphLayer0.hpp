@@ -15,11 +15,8 @@
 #ifndef _ptens_SubgraphLayer0
 #define _ptens_SubgraphLayer0
 
-//#include "Hgraph.hpp"
-//#include "Subgraph.hpp"
-//#include "TransferMap.hpp"
 #include "SubgraphLayer.hpp"
-#include "PtensFindPlantedSubgraphs.hpp"
+#include "NodeLayer.hpp"
 #include "EMPlayers2.hpp"
 
 
@@ -92,9 +89,18 @@ namespace ptens{
   public: // ---- Message passing between subgraph layers -----------------------------------------------------
 
 
+    SubgraphLayer0(const NodeLayer& x, const Subgraph& _S):
+      SubgraphLayer0(x.G,_S,x.G.subgraphs(_S),x.get_nc(),x.dev){
+	x.emp_to(*this);
+    }
+
+    void gather_back(NodeLayer& x){
+      x.get_grad().emp_from(get_grad());
+    }
+
     template<typename TLAYER2>
     SubgraphLayer0(const SubgraphLayer0<TLAYER2>& x, const Subgraph& _S):
-      SubgraphLayer0(x.G,_S,AtomsPack(x.getn()),x.get_nc(),x.dev){
+      SubgraphLayer0(x.G,_S,x.G.subgraphs(_S),x.get_nc(),x.dev){
       emp00(*this,x,overlaps(x.atoms));
     }
     
@@ -105,7 +111,7 @@ namespace ptens{
 
     template<typename TLAYER2>
     SubgraphLayer0(const SubgraphLayer1<TLAYER2>& x, const Subgraph& _S):
-      SubgraphLayer0(x.G,_S,AtomsPack(x.getn()),x.get_nc(),x.dev){
+      SubgraphLayer0(x.G,_S,x.G.subgraphs(_S),x.get_nc(),x.dev){
       emp10(*this,x,overlaps(x.atoms));
     }
 
@@ -116,7 +122,7 @@ namespace ptens{
 
     template<typename TLAYER2>
     SubgraphLayer0(const SubgraphLayer2<TLAYER2>& x, const Subgraph& _S):
-      SubgraphLayer0(x.G,_S,AtomsPack(x.getn()),2*x.get_nc(),x.dev){
+      SubgraphLayer0(x.G,_S,x.G.subgraphs(_S),2*x.get_nc(),x.dev){
       emp20(*this,x,overlaps(x.atoms));
     }
 
@@ -183,22 +189,3 @@ namespace ptens{
 }
 
 #endif 
-
-
-    // 
-    //template<typename LAYER>
-    //TransferMap overlaps(const LAYER& x){
-    //  return TransferMap(atoms,x.atoms);
-    //}
-
-
-    //SubgraphLayer0<TLAYER> transfer0(const Subgraph& _S){
-    //SubgraphLayer0<TLAYER> R(G,_S,AtomsPack(getn()),get_nc(),dev);
-    //emp00(R,*this,TransferMap(atoms,R.atoms));
-    //}
-
-    //SubgraphLayer1<TLAYER> transfer1(const Subgraph& _S){
-    //SubgraphLayer1<TLAYER> R(G,_S,FindPlantedSubgraphs(G,_S),get_nc(),dev);
-    //emp11(R,*this,TransferMap(atoms,R.atoms));
-    //}
-

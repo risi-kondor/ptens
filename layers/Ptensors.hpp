@@ -17,15 +17,14 @@
 
 #include "Ptens_base.hpp"
 
-//#include "Cgraph.hpp"
 #include "RtensorPackB.hpp"
 #include "AtomsPack.hpp"
 #include "AindexPack.hpp"
-#include "Ptensor0.hpp"
-#include "loose_ptr.hpp"
+//#include "Ptensor0.hpp"
+//#include "loose_ptr.hpp"
 #include "diff_class.hpp"
 
-#include "PtensLoggedTimer.hpp"
+//#include "PtensLoggedTimer.hpp"
 
 
 namespace ptens{
@@ -34,6 +33,7 @@ namespace ptens{
   public:
 
     AtomsPack atoms;
+    int constk=0;
 
 
   public: // ----- Constructors ------------------------------------------------------------------------------
@@ -53,7 +53,9 @@ namespace ptens{
 
     template<typename FILLTYPE, typename = typename std::enable_if<std::is_base_of<cnine::fill_pattern, FILLTYPE>::value, FILLTYPE>::type>
     Ptensors(const AtomsPack& _atoms, const cnine::Gdims& _dims, const FILLTYPE& dummy, const int _dev=0):
-      RtensorPackB(_atoms.size(), _dims, dummy, _dev), atoms(_atoms){}
+      RtensorPackB(_atoms.size(), _dims, dummy, _dev), atoms(_atoms){
+      if(atoms.constk()>0) constk=atoms.constk();
+    }
 
 
   public: // ----- Copying -----------------------------------------------------------------------------------
@@ -61,11 +63,15 @@ namespace ptens{
 
     Ptensors(const Ptensors& x):
       RtensorPackB(x),
-      atoms(x.atoms){}
+      atoms(x.atoms){
+      constk=x.constk;
+    }
 
     Ptensors(Ptensors&& x):
       RtensorPackB(std::move(x)),
-      atoms(std::move(x.atoms)){}
+      atoms(std::move(x.atoms)){
+      constk=x.constk;
+    }
 
 
   public: // ----- Conversions -------------------------------------------------------------------------------
@@ -73,15 +79,19 @@ namespace ptens{
 
     Ptensors(const RtensorPackB& x, const AtomsPack& _atoms):
       RtensorPackB(x), 
-      atoms(_atoms){}
+      atoms(_atoms){
+      if(atoms.constk()>0) constk=atoms.constk();
+    }
 
     Ptensors(RtensorPackB&& x, const AtomsPack& _atoms):
       RtensorPackB(std::move(x)), 
-      atoms(_atoms){}
+      atoms(_atoms){
+      if(atoms.constk()>0) constk=atoms.constk();
+    }
 
     #ifdef _WITH_ATEN
     Ptensors(const at::Tensor& T, const AtomsPack& _atoms):
-      Ptensors(rtensor::regular(T),_atoms){}
+      Ptensors(rtensor::regular(T),_atoms){} // what does this call?
     #endif 
 
 
@@ -90,7 +100,9 @@ namespace ptens{
 
     Ptensors(const Ptensors& x, const int _dev):
       RtensorPackB(x,_dev),
-      atoms(x.atoms){}
+      atoms(x.atoms){
+      constk=x.constk;
+    }
 
     Ptensors& to_device(const int _dev){
       RtensorPackB::to_device(_dev);

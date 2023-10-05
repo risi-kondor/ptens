@@ -15,12 +15,9 @@
 #ifndef _ptens_SubgraphLayer1
 #define _ptens_SubgraphLayer1
 
-#include "Hgraph.hpp"
-#include "Subgraph.hpp"
-//#include "PtensFindPlantedSubgraphs.hpp"
-#include "TransferMap.hpp"
-#include "EMPlayers2.hpp"
+#include "SubgraphLayer.hpp"
 #include "SubgraphLayer0.hpp"
+#include "EMPlayers2.hpp"
 
 
 namespace ptens{
@@ -49,9 +46,6 @@ namespace ptens{
     using TLAYER::diff2;
     using TLAYER::view3;
     using TLAYER::overlaps;
-
-
-  public: 
 
 
   public: // ---- Named Constructors ------------------------------------------------------------------------------------------
@@ -94,6 +88,16 @@ namespace ptens{
 
 
   public: // ---- Message passing between subgraph layers -----------------------------------------------------
+
+
+    SubgraphLayer1(const NodeLayer& x, const Subgraph& _S):
+      SubgraphLayer1(x.G,_S,x.G.subgraphs(_S),2*x.get_nc(),x.dev){
+	x.emp_to(*this);
+    }
+
+    void gather_back(NodeLayer& x){
+      x.get_grad().emp_fromB(get_grad());
+    }
 
 
     template<typename TLAYER2>
@@ -319,102 +323,3 @@ namespace ptens{
 }
 
 #endif 
-
-
-    //template<typename LAYER>
-    //TransferMap overlaps(const LAYER& x){
-    //return TransferMap(atoms,x.atoms);
-    //}
-
-    //SubgraphLayer0<TLAYER> transfer0(const Subgraph& _S){
-    //SubgraphLayer0<TLAYER> R(G,_S,getn(),get_nc());
-    //emp10(R,*this,TransferMap(atoms,R.atoms));
-    //}
-
-    //SubgraphLayer1<TLAYER> transfer1(const Subgraph& _S){
-    //SubgraphLayer1<TLAYER> R(G,_S,FindPlantedSubgraphs(G,_S),get_nc());
-    //emp11(R,*this,TransferMap(atoms,R.atoms));
-    //}
-
-
-    /*
-    static void add_autobahn(Ptensors1& R, const Ptensors1& x, 
-      const cnine::Rtensor2_view& E, const vector<int> blocks, const cnine::Rtensor3_view& W){
-      int N=R.getn();
-      int K=E.n0;
-      int nc=R.get_nc();
-      int xnc=x.get_nc();
-      int nblocks=blocks.size();
-
-      PTENS_ASSRT(x.getn()==N);
-      PTENS_ASSRT(R.tail==N*K*nc);
-      PTENS_ASSRT(x.tail==N*K*xnc);
-      PTENS_ASSRT(W.n0==nblocks);
-      PTENS_ASSRT(W.n1==xnc);
-      PTENS_ASSRT(W.n2==nc);
-      PTENS_ASSRT(E.n1==K);
-
-      auto A=cnine::Tensor<float>::zero({N,K,xnc},x.dev);
-      A.view3().add_mprod(E.transp(),x.view3(K));
-
-      auto B=cnine::Tensor<float>::zero({N,K,nc},x.dev);
-      int offs=0;
-      for(int b=0; b<nblocks; b++){
-	for(int i=offs; i<offs+blocks[b]; i++)
-	  B.view3().slice1(i).add_matmul_AA(A.view3().slice1(i),W.slice0(b));
-	offs+=blocks[b];
-      }
-
-      R.view3(K).add_mprod(E,B.view3());
-    }
-
-
-    static void add_autobahn(Ptensors1& R, const Ptensors1& x, const cnine::Rtensor2_view& E, 
-      const vector<int> blocks, const cnine::Rtensor3_view& W, const cnine::Rtensor2_view& B){
-      int N=R.getn();
-      int K=E.n0;
-      int nc=R.get_nc();
-      int xnc=x.get_nc();
-      int nblocks=blocks.size();
-
-      PTENS_ASSRT(x.getn()==N);
-      PTENS_ASSRT(R.tail==N*K*nc);
-      PTENS_ASSRT(x.tail==N*K*xnc);
-      PTENS_ASSRT(W.n0==nblocks);
-      PTENS_ASSRT(W.n1==xnc);
-      PTENS_ASSRT(W.n2==nc);
-      PTENS_ASSRT(E.n1==K);
-      PTENS_ASSRT(B.n0==nblocks);
-      PTENS_ASSRT(W.n1==nc);
-
-      auto A=cnine::Tensor<float>::zero({N,K,xnc},x.dev);
-      A.view3().add_mprod(E.transp(),x.view3(K));
-
-      auto B=cnine::Tensor<float>::zero({N,K,nc},x.dev);
-      int offs=0;
-      for(int b=0; b<nblocks; b++){
-	for(int i=offs; i<offs+blocks[b]; i++){
-	  B.view3().slice1(i).add_matmul_AA(A.view3().slice1(i),W.slice0(b));
-	  B.view3().slice1(i).add_broadcast0(B.slice0(b));	
-	}
-	offs+=blocks[b];
-      }
-
-      R.view3(K).add_mprod(E,B.view3());
-    }
-    */
-    /*
-    void add_autobahn_back2_to(const cnine::TensorView<float>& B, const SubgraphLayer1<TLAYER>& r){
-      S.make_eigenbasis();
-      PTENS_ASSRT(B.dims.size()==2);
-      PTENS_ASSRT(B.dims[0]==S.obj->eblocks.size());
-      PTENS_ASSRT(B.dims[1]==r.get_nc());
-
-      for_each_eigenslice(view3(),r.get_grad().view3(),[&]
-	(Rtensor2_view xslice, Rtensor2_view rslice, const int b){
-	  W.view3().slice0(b)
-	    rslice.sum0_into(B.slice0(b)); 
-	});
-    }
-    */
-

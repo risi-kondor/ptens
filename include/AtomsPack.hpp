@@ -90,6 +90,10 @@ namespace ptens{
       return obj->size();
     }
 
+    int constk() const{
+      return obj->constk;
+    }
+
     int size_of(const int i) const{
       return obj->size_of(i);
     }

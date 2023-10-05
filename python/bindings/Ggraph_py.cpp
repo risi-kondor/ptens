@@ -3,7 +3,7 @@ pybind11::class_<ptens::Ggraph>(m,"ggraph")
   .def(pybind11::init<const at::Tensor&>())
 
   .def_static("edge_index",[](const at::Tensor& x, const int n=-1){
-      return Ggraph::edges(n,cnine::RtensorA(x));})
+      return Ggraph::from_edges(n,cnine::RtensorA(x));})
 
   .def_static("random",static_cast<Ggraph(*)(const int, const float)>(&ptens::Ggraph::random))
 

@@ -15,10 +15,10 @@
 #ifndef _ptens_EMPlayers2
 #define _ptens_EMPlayers2
 
-#include "Ptensors0.hpp"
-#include "Ptensors1.hpp"
-#include "Ptensors2.hpp"
-#include "Hgraph.hpp"
+//#include "Ptensors0.hpp"
+//#include "Ptensors1.hpp"
+//#include "Ptensors2.hpp"
+//#include "Hgraph.hpp"
 #include "flog.hpp"
 
 
@@ -139,9 +139,9 @@ namespace ptens{
   }
 
 
-    //auto [map0,map1]=map.intersects(x.atoms,r.atoms);
-
-
 }
 
 #endif 
+
+
+//auto [map0,map1]=map.intersects(x.atoms,r.atoms);
