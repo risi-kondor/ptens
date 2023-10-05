@@ -48,11 +48,11 @@ namespace ptens{
       cnine::plist_indexed_object_bank<AtomsPackObj,shared_ptr<AtomsPackObj>>([this](const vector<AtomsPackObj*>& v)
 	{return shared_ptr<AtomsPackObj>(new AtomsPackObj(cat_with(v)));});
 
-    cnine::once<BASE> gpack=cnine::once<BASE>([&](){
-	BASE R(*this,1);
-	R.dir.move_to_device(1);
-	return R;
-      });
+    //cnine::once<BASE> gpack=cnine::once<BASE>([&](){
+    //BASE R(*this,1);
+    //R.dir.move_to_device(1);
+    //return R;
+    //});
 
 
     int constk=0;
@@ -289,8 +289,8 @@ namespace ptens{
   public: // ---- to_nodes_map -------------------------------------------------------------------------------
 
 
-    cnine::once<shared_ptr<cnine::GatherMap> > to_nodes_map=
-      cnine::once<shared_ptr<cnine::GatherMap> >([&](){
+    cnine::oncep<cnine::GatherMap> gather_to_nodes_map=
+      cnine::oncep<cnine::GatherMap>([&](){
 
 	cnine::map_of_lists2<int,int> lists;
 	for(int i=0; i<size(); i++)
@@ -318,7 +318,9 @@ namespace ptens{
 	  i++;
 	  tail+=2*n;
 	}
-	return shared_ptr<cnine::GatherMap>(R);
+
+	R->to_device(1);
+	return R;
       });
 
 

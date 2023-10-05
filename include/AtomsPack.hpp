@@ -146,6 +146,14 @@ namespace ptens{
       return obj->dims1(nc);
     }
 
+    pair<int*,int*> gpu_arrs(const int dev){
+      return obj->gpu_arrs(dev);
+    }
+
+    int* gather_to_nodes_map(const int dev){
+      return obj->gather_to_nodes_map()->arrg;
+    }
+
 
   public: // ---- Concatenation ------------------------------------------------------------------------------
 
