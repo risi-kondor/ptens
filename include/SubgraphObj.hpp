@@ -130,7 +130,6 @@ namespace ptens{
       PTENS_ASSRT(evals.dims.size()==1);
       PTENS_ASSRT(getn()==evals.dims[0]);
       eblocks.clear();
-      int j=0;
       for(int i=0; i<evals.dims[0];){
 	float t=evals(i);
 	int start=i;

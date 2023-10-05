@@ -119,6 +119,7 @@ def main():
             '../cuda/Ptensors0.cu',
             '../cuda/Ptensors1.cu',
             '../cuda/Ptensors2.cu',
+            '../cuda/NodeLayer.cu',
             'bindings/ptens_py.cpp'
         ],
             include_dirs=_include_dirs,

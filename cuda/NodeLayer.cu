@@ -18,8 +18,16 @@ must be accompanied by a verbatim copy of the license.
 #include <cuda_runtime.h>
 #include <thrust/complex.h>
 #include <thrust/tuple.h>
+#include "Cnine_base.hpp"
+#include "CnineLog.hpp"
 
+extern cnine::CnineLog cnine::cnine_log;
+
+#include "Ptensors0.hpp"
+#include "Ptensors1.hpp"
+#include "Ptensors2.hpp"
 #include "NodeLayer.hpp"
+
 
 
 __global__ void NodeLayer_to_Ptensors0_kernel(float* rarr, const int* rdir, const float* xarr, 
@@ -27,14 +35,15 @@ __global__ void NodeLayer_to_Ptensors0_kernel(float* rarr, const int* rdir, cons
 
   const int b=blockIdx.x;
   const int c=threadIdx.x;
+  const int nc=blockDim.x;
 
-  int* atoms=atomsarr+atomsdir[2*b];
+  const int* atoms=atomsarr+atomsdir[2*b];
   int natoms=atomsdir[2*b+1];
   
   float t=0;
   for(int a=0; a<natoms; a++)
     t+=xarr[atoms[a]*nc+c];
-  rarr[rdir[2*i]+c]+=t;
+  rarr[rdir[2*b]+c]+=t;
 }
 
 
@@ -45,36 +54,36 @@ __global__ void NodeLayer_to_Ptensors1_kernel(float* rarr, const int* rdir, cons
   const int c=threadIdx.x;
   const int nc=blockDim.x;
 
-  int* atoms=atomsarr+atomsdir[2*b];
+  const int* atoms=atomsarr+atomsdir[2*b];
   int natoms=atomsdir[2*b+1];
   
   float t=0;
   for(int i=0; i<natoms; i++)
     t+=xarr[atoms[i]*nc+c];
   for(int i=0; i<natoms; i++)
-    rarr[rdir[2*i]+2*i*nc+c]+=t;
+    rarr[rdir[2*b]+2*i*nc+c]+=t;
 
   for(int i=0; i<natoms; i++)
-    rarr[rdir[2*i]+2*i*nc+nc+c]+=xarr[atoms[i]*nc+c];
+    rarr[rdir[2*b]+2*i*nc+nc+c]+=xarr[atoms[i]*nc+c];
 }
 
 
 // shrinking version, nc is half the number of channels in x
-__global__ void NodeLayer_to_Ptensors1_kernelB(float* rarr, const int* rdir, const float* xarr, 
+__global__ void NodeLayer_to_Ptensors1B_kernel(float* rarr, const int* rdir, const float* xarr, 
   const int* atomsarr, const int* atomsdir){
 
   const int b=blockIdx.x;
   const int c=threadIdx.x;
   const int nc=blockDim.x;
 
-  int* atoms=atomsarr+atomsdir[2*b];
+  const int* atoms=atomsarr+atomsdir[2*b];
   int natoms=atomsdir[2*b+1];
   
   float t=0;
   for(int i=0; i<natoms; i++)
     t+=xarr[atoms[i]*2*nc+c];
   for(int i=0; i<natoms; i++)
-    rarr[rdir[2*i]+i*nc+c]+=t+
+    rarr[rdir[2*b]+i*nc+c]+=t+
       xarr[atoms[i]*2*nc+nc+c];
 }
 
@@ -84,6 +93,7 @@ __global__ void NodeLayer_from_Ptensors0_kernel(float* rarr, const float* xarr, 
 
   const int b=blockIdx.x;
   const int c=threadIdx.x;
+  const int nc=blockDim.x;
 
   const int offs=bmap[3*b];
   const int n=bmap[3*b+1];
@@ -101,6 +111,7 @@ __global__ void NodeLayer_from_Ptensors1_kernel(float* rarr, const float* xarr, 
 
   const int b=blockIdx.x;
   const int c=threadIdx.x;
+  const int nc=blockDim.x;
 
   const int offs=bmap[3*b];
   const int n=bmap[3*b+1];
@@ -116,7 +127,7 @@ __global__ void NodeLayer_from_Ptensors1_kernel(float* rarr, const float* xarr, 
     for(int j=0; j<k; i++){
       tsum+=xarr[offs+nc*j+c];
       if(atomsarr[aoffs+j]==target)
-	rarr[target*2*nc+nc+c]+=xarr[offs+nc*j+c]
+	rarr[target*2*nc+nc+c]+=xarr[offs+nc*j+c];
     }
   }
   rarr[target*2*nc+c]+=tsum;
@@ -129,6 +140,7 @@ __global__ void NodeLayer_from_Ptensors1B_kernel(float* rarr, const float* xarr,
 
   const int b=blockIdx.x;
   const int c=threadIdx.x;
+  const int nc=blockDim.x;
 
   const int offs=bmap[3*b];
   const int n=bmap[3*b+1];
@@ -144,7 +156,7 @@ __global__ void NodeLayer_from_Ptensors1B_kernel(float* rarr, const float* xarr,
     for(int j=0; j<k; i++){
       tsum+=xarr[offs+2*nc*j+c];
       if(atomsarr[aoffs+j]==target)
-	rarr[target*nc+c]+=xarr[offs+2*nc*j+nc+c]
+	rarr[target*nc+c]+=xarr[offs+2*nc*j+nc+c];
     }
   }
   rarr[target*nc+c]+=tsum;
@@ -161,56 +173,56 @@ namespace ptens{
   void NodeLayer_to_Ptensors0_cu(Ptensors0& r, const NodeLayer& x,  const cudaStream_t& stream){
     int dev=x.dev;
     PTENS_ASSRT(r.dev==dev);
-    auto atoms=r.atoms.obj->gpack;
+    auto atoms=r.atoms.obj->gpack();
 
     NodeLayer_to_Ptensors0_kernel<<<r.size(),x.nc,0,stream>>>
-      (r.arrg,r.dir.garr(dev),x.arr,atoms.arrg,atoms.dir.arrg);
+      (r.arrg,r.dir.garr(dev),x.mem(),atoms.arrg,atoms.dir.arrg);
   }
 
   void NodeLayer_to_Ptensors1_cu(Ptensors1& r, const NodeLayer& x,  const cudaStream_t& stream){
     int dev=x.dev;
     PTENS_ASSRT(r.dev==dev);
-    auto atoms=r.atoms.obj->gpack;
+    auto atoms=r.atoms.obj->gpack();
 
     NodeLayer_to_Ptensors1_kernel<<<r.size(),x.nc,0,stream>>>
-      (r.arrg,r.dir.garr(dev),x.arr,atoms.arrg,atoms.dir.arrg);
+      (r.arrg,r.dir.garr(dev),x.mem(),atoms.arrg,atoms.dir.arrg);
   }
 
   void NodeLayer_to_Ptensors1B_cu(Ptensors1& r, const NodeLayer& x,  const cudaStream_t& stream){
     int dev=x.dev;
     PTENS_ASSRT(r.dev==dev);
-    auto atoms=r.atoms.obj->gpack;
+    auto atoms=r.atoms.obj->gpack();
 
-    NodeLayer_to_Ptensors1B_kernelB<<<r.size(),x.nc/2,0,stream>>>
-      (r.arrg,r.dir.garr(dev),x.arr,atoms.arrg,atoms.dir.arrg);
+    NodeLayer_to_Ptensors1B_kernel<<<r.size(),x.nc/2,0,stream>>>
+      (r.arrg,r.dir.garr(dev),x.mem(),atoms.arrg,atoms.dir.arrg);
   }
 
 
   void NodeLayer_from_Ptensors0_cu(NodeLayer& r, const Ptensors0& x,  const cudaStream_t& stream){
     int dev=x.dev;
     PTENS_ASSRT(r.dev==dev);
-    auto atoms=x.atoms.obj->gpack;
+    auto atoms=x.atoms.obj->gpack();
 
-    NodeLayer_from_Ptensors0_kernel<<<r.size(),x.nc,0,stream>>>
-      (r.arr,x.arrg,x.dir.garr(dev),x.atoms.obj->to_nodes_map->get_barr(1));
+    NodeLayer_from_Ptensors0_kernel<<<r.getn(),x.nc,0,stream>>>
+      (r.mem(),x.arrg,x.dir.garr(dev),x.atoms.obj->to_nodes_map()->get_barr(1));
   }
 
   void NodeLayer_from_Ptensors1_cu(NodeLayer& r, const Ptensors1& x,  const cudaStream_t& stream){
     int dev=x.dev;
     PTENS_ASSRT(r.dev==dev);
-    auto atoms=x.atoms.obj->gpack;
+    auto atoms=x.atoms.obj->gpack();
 
-    NodeLayer_from_Ptensors1_kernel<<<r.size(),x.nc,0,stream>>>
-      (r.arr, x.arrg, x.dir.garr(dev), atoms.arrg, atoms.dir.arrg, x.atoms.obj->to_nodes_map->get_barr(1));
+    NodeLayer_from_Ptensors1_kernel<<<r.getn(),x.nc,0,stream>>>
+      (r.mem(), x.arrg, x.dir.garr(dev), atoms.arrg, atoms.dir.arrg, x.atoms.obj->to_nodes_map()->get_barr(1));
   }
 
   void NodeLayer_from_Ptensors1B_cu(NodeLayer& r, const Ptensors1& x,  const cudaStream_t& stream){
     int dev=x.dev;
     PTENS_ASSRT(r.dev==dev);
-    auto atoms=x.atoms.obj->gpack;
+    auto atoms=x.atoms.obj->gpack();
 
-    NodeLayer_from_Ptensors1B_kernel<<<r.size(),x.nc,0,stream>>>
-      (r.arr, x.arrg, x.dir.garr(dev), atoms.arrg, atoms.dir.arrg, x.atoms.obj->to_nodes_map->get_barr(1));
+    NodeLayer_from_Ptensors1B_kernel<<<r.getn(),x.nc,0,stream>>>
+      (r.mem(), x.arrg, x.dir.garr(dev), atoms.arrg, atoms.dir.arrg, x.atoms.obj->to_nodes_map()->get_barr(1));
   }
 
 

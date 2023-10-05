@@ -22,11 +22,13 @@
 
 namespace ptens{
 
+  class NodeLayer;
+
 #ifdef _WITH_CUDA
   extern void NodeLayer_to_Ptensors0_cu(Ptensors0& r, const NodeLayer& x,  const cudaStream_t& stream);
   extern void NodeLayer_to_Ptensors1_cu(Ptensors1& r, const NodeLayer& x,  const cudaStream_t& stream);
   extern void NodeLayer_to_Ptensors1B_cu(Ptensors1& r, const NodeLayer& x,  const cudaStream_t& stream);
-  extern void NodeLayer_from_Ptensors0_cu(NodeLayer& x, const Ptensors1& r, const cudaStream_t& stream);
+  extern void NodeLayer_from_Ptensors0_cu(NodeLayer& x, const Ptensors0& r, const cudaStream_t& stream);
   extern void NodeLayer_from_Ptensors1_cu(NodeLayer& x, const Ptensors1& r, const cudaStream_t& stream);
   extern void NodeLayer_from_Ptensors1B_cu(NodeLayer& x, const Ptensors1& r, const cudaStream_t& stream);
 #endif 
