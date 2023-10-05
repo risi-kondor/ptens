@@ -63,12 +63,12 @@ class nodelayer(torch.Tensor):
         return R
 
     @classmethod
-    def gather(self,x,S):
-        return Nodelayer_GatherFn.apply(x,S)
+    def gather(self,x):
+        return Nodelayer_GatherFn.apply(x)
 
     @classmethod
-    def gather_from_ptensors(self,x,G,S):
-        return Nodelayer_GatherFromPtensorsFn.apply(x,G,S)
+    def gather_from_ptensors(self,x,G):
+        return Nodelayer_GatherFromPtensorsFn.apply(x,G)
 
 
     # ----- Access -------------------------------------------------------------------------------------------
@@ -368,7 +368,7 @@ class Nodelayer_normalize_channels(torch.autograd.Function):
 
 
 
-class Nodelayer0_GatherFn(torch.autograd.Function):
+class Nodelayer_GatherFn(torch.autograd.Function):
     @staticmethod
     def forward(ctx,x):
         r=ptens.nodelayer(1)
@@ -382,11 +382,11 @@ class Nodelayer0_GatherFn(torch.autograd.Function):
         return nodelayer.dummy(), None
 
 
-class Nodelayer0_GatherFromPtensorsFn(torch.autograd.Function):
+class Nodelayer_GatherFromPtensorsFn(torch.autograd.Function):
     @staticmethod
     def forward(ctx,x,G):
         r=ptens.nodelayer(1)
-        r.obj=_nodelayer(x.obj,G.obj)
+        r.obj=_nodelayer(G.obj,x.obj)
         ctx.x=x.obj
         ctx.r=r.obj
         return r

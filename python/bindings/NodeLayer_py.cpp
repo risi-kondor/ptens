@@ -60,10 +60,10 @@ pybind11::class_<NodeLayer>(m,"nodelayer")
   .def("gather_back",[](NodeLayer& r, SGlayer1& x){r.gather_back(x);})
 
 
-  .def(pybind11::init<const Ptensors0&, const Ggraph&>())
+  .def(pybind11::init<const Ggraph&, const Ptensors0&>())
   .def("gather_back",[](NodeLayer& r, Ptensors0& x){r.gather_back(x);})
 
-  .def(pybind11::init<const Ptensors1&, const Ggraph&>())
+  .def(pybind11::init<const Ggraph&, const Ptensors1&>())
   .def("gather_back",[](NodeLayer& r, Ptensors1& x){r.gather_back(x);})
 
 
@@ -138,5 +138,5 @@ pybind11::class_<NodeLayer>(m,"nodelayer")
 
   .def("str",&NodeLayer::str,py::arg("indent")="")
   .def("__str__",&NodeLayer::str,py::arg("indent")="")
-  .def("__repr__",&NodeLayer::repr);
+  .def("__repr__",&NodeLayer::str,py::arg("indent")="");
 

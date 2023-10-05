@@ -1,3 +1,6 @@
+WTH_CUDA=t
+CUDA_HOME=/usr/local/cuda
+
 ROOTDIR=..
 include $(ROOTDIR)/common.txt
 
