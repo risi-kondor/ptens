@@ -39,6 +39,7 @@ from ptens.ptensors2 import ptensors2 as ptensors2
 from ptens.ggraph import ggraph as ggraph
 from ptens.subgraph import subgraph as subgraph
 
+from ptens.nodelayer import nodelayer as nodelayer
 from ptens.subgraphlayer0 import subgraphlayer0 as subgraphlayer0
 from ptens.subgraphlayer1 import subgraphlayer1 as subgraphlayer1
 from ptens.subgraphlayer2 import subgraphlayer2 as subgraphlayer2
