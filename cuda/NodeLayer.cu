@@ -240,7 +240,7 @@ namespace ptens{
     int dev=x.dev;
     PTENS_ASSRT(x.dev==1);
     PTENS_ASSRT(r.dev==1);
-    cout<<"llll"<<r.nc<<" "<<x.nc<<endl;
+    //cout<<"llll"<<r.nc<<" "<<x.nc<<endl;
     PTENS_ASSRT(r.nc==2*x.nc);
     auto atoms=x.atoms.gpu_arrs(1);
     auto gatherMap=x.atoms.gather_to_nodes_map(1);
