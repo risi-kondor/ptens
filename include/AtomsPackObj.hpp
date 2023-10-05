@@ -313,12 +313,12 @@ namespace ptens{
 	  R->arr[3*i+2]=p.first;
 
 	  for(int j=0; j<n; j++){
-	    R->arr[tail+2*j]=list[j];
-	    *reinterpret_cast<float*>(R->arr+tail+2*j+1)=1.0;
+	    R->arr[_tail+2*j]=list[j];
+	    *reinterpret_cast<float*>(R->arr+_tail+2*j+1)=1.0;
 	  }
 
 	  i++;
-	  tail+=2*n;
+	  _tail+=2*n;
 	}
 
 	R->to_device(1);
