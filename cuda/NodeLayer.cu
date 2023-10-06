@@ -163,16 +163,17 @@ __global__ void NodeLayer_from_Ptensors1B_kernel(float* rarr, const float* xarr,
     int offs=xdir[3*src];
     int aoffs=atomsdir[2*src];
     int k=atomsdir[2*src+1];
-    assert(xdir[3*src+1]==k);
-    assert(xdir[3*src+2]==2*nc);
+    //assert(xdir[3*src+1]==k);
+    //assert(xdir[3*src+2]==2*nc);
 
     for(int j=0; j<k; j++){
-      tsum+=xarr[offs+2*nc*j+c];
-      if(atomsarr[aoffs+j]==target)
-	rarr[target*nc+c]+=xarr[offs+2*nc*j+nc+c];
+      tsum+=xarr[offs]; //+2*nc*j+c];
+      //if(atomsarr[aoffs+j]==target)
+      //rarr[target*nc+c]+=xarr[offs+2*nc*j+nc+c];
     }
   }
-  rarr[target*nc+c]+=tsum;
+  if(c==0)printf("%d %f\n",b,tsum);
+  //rarr[target*nc+c]+=tsum;
 }
 
 

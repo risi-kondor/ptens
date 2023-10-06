@@ -388,7 +388,7 @@ namespace ptens{
 	}
       }
 
-      //GPUCODE(CUDA_STREAM(NodeLayer_from_Ptensors1B_cu(*this,x,stream)));
+      GPUCODE(CUDA_STREAM(NodeLayer_from_Ptensors1B_cu(*this,x,stream)));
     }
 
 
