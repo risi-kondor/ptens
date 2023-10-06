@@ -93,7 +93,7 @@ namespace ptens{
       auto it=subgraphpack_cache.find(H);
       if(it!=subgraphpack_cache.end()) return it->second;
       else{
-	cout<<"Not in subgraph cache"<<endl;
+	//cout<<"Not in subgraph cache"<<endl;
 	cnine::flog timer("GgraphObj::finding subgraphs");
 	subgraphpack_cache[H]=AtomsPack(new AtomsPackObj
 	  (cnine::Tensor<int>(cnine::FindPlantedSubgraphs<float>(*this,H))));
