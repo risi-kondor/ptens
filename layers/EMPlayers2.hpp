@@ -27,18 +27,21 @@ namespace ptens{
   template<typename SRC, typename DEST>
   void emp00(DEST& r, const SRC& x, const TransferMap& map){
     if(map.is_empty()) return;
+    cnine::flog timer("ptens::emp00");
     r.broadcast0(x.reduce0(map.in()),map.out(),0);
   }
 
   template<typename SRC, typename DEST>
   void emp01(DEST& r, const SRC& x, const TransferMap& map){
     if(map.is_empty()) return;
+    cnine::flog timer("ptens::emp01");
     r.broadcast0(x.reduce0(map.in()),map.out(),0);
   }
 
   template<typename SRC, typename DEST>
   void emp10(DEST& r, const SRC& x, const TransferMap& map){
     if(map.is_empty()) return;
+    cnine::flog timer("ptens::emp10");
     r.broadcast0(x.reduce0(map.in()),map.out(),0);
   }
 

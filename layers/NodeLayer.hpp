@@ -208,8 +208,9 @@ namespace ptens{
       auto& xatoms=*x.atoms.obj;
       int N=x.size();
       int constk=x.constk;
+      cnine::flog timer("ptens::NodeLayer::emp_to(Ptensors0&)");
 
-      if(dev>0){
+      if(dev==0){
 	if(constk>0){
 	  for(int i=0; i<N; i++){
 	    auto u=x.constk_view_of(i);
@@ -233,8 +234,9 @@ namespace ptens{
       auto& xatoms=*x.atoms.obj;
       int N=x.size();
       int constk=x.constk;
+      cnine::flog timer("ptens::NodeLayer::emp_to(Ptensors1&)");
 
-      if(dev>0){
+      if(dev==0){
 	if(constk>0){
 	  for(int i=0; i<N; i++){
 	    auto u=x.constk_view_of(i,0,nc);
@@ -266,6 +268,7 @@ namespace ptens{
       auto& xatoms=*x.atoms.obj;
       int N=x.size();
       int constk=x.constk;
+      cnine::flog timer("ptens::NodeLayer::emp_toB(Ptensors1&)");
 
       if(dev==0){
 	if(constk>0){
@@ -297,6 +300,7 @@ namespace ptens{
       auto& xatoms=*x.atoms.obj;
       int N=x.size();
       int constk=x.constk;
+      cnine::flog timer("ptens::NodeLayer::emp_from(Ptensors0&)");
 
       if(dev==0){
 	if(constk>0){
@@ -323,6 +327,7 @@ namespace ptens{
       auto& xatoms=*x.atoms.obj;
       int N=x.size();
       int constk=x.constk;
+      cnine::flog timer("ptens::NodeLayer::emp_from(Ptensors1&)");
 
       if(dev==0){
 	if(constk>0){
@@ -360,6 +365,7 @@ namespace ptens{
       auto& xatoms=*x.atoms.obj;
       int N=x.size();
       int constk=x.constk;
+      cnine::flog timer("ptens::NodeLayer::emp_fromB(Ptensors1&)");
 
       if(dev==0){
 	if(constk>0){
