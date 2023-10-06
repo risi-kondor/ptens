@@ -163,17 +163,17 @@ __global__ void NodeLayer_from_Ptensors1B_kernel(float* rarr, const float* xarr,
     int offs=xdir[3*src];
     int aoffs=atomsdir[2*src];
     int k=atomsdir[2*src+1];
-    //assert(xdir[3*src+1]==k);
-    //assert(xdir[3*src+2]==2*nc);
+    assert(xdir[3*src+1]==k);
+    assert(xdir[3*src+2]==2*nc);
 
     for(int j=0; j<k; j++){
-      tsum+=xarr[offs]; //+2*nc*j+c];
-      //if(atomsarr[aoffs+j]==target)
-      //rarr[target*nc+c]+=xarr[offs+2*nc*j+nc+c];
+      tsum+=xarr[offs+2*nc*j+c];
+      if(atomsarr[aoffs+j]==target)
+	rarr[target*nc+c]+=xarr[offs+2*nc*j+nc+c];
     }
   }
-  if(c==0)printf("%d %f\n",b,tsum);
-  //rarr[target*nc+c]+=tsum;
+  //if(c==0)printf("%d %f\n",b,tsum);
+  rarr[target*nc+c]+=tsum;
 }
 
 
@@ -230,9 +230,11 @@ namespace ptens{
     PTENS_ASSRT(r.dev==1);
     PTENS_ASSRT(r.nc==x.nc);
     //auto atoms=x.atoms.obj->gpack();
+    int N=x.atoms.gather_to_nodes_map_size(1);
     auto gatherMap=x.atoms.gather_to_nodes_map(1);
+    if(N==0) return;
 
-    NodeLayer_from_Ptensors0_kernel<<<r.getn(),x.nc,0,stream>>>
+    NodeLayer_from_Ptensors0_kernel<<<N,x.nc,0,stream>>>
       (r.mem(),x.arrg,x.dir.garr(dev),gatherMap);
     //(r.mem(),x.arrg,x.dir.garr(dev),x.atoms.obj->to_nodes_map()->get_barr(1));
   }
@@ -242,10 +244,12 @@ namespace ptens{
     PTENS_ASSRT(x.dev==1);
     PTENS_ASSRT(r.dev==1);
     PTENS_ASSRT(r.nc==2*x.nc);
+    int N=x.atoms.gather_to_nodes_map_size(1);
     auto atoms=x.atoms.gpu_arrs(1);
     auto gatherMap=x.atoms.gather_to_nodes_map(1);
-    
-    NodeLayer_from_Ptensors1_kernel<<<r.getn(),x.nc,0,stream>>>
+    if(N==0) return;
+
+    NodeLayer_from_Ptensors1_kernel<<<N,x.nc,0,stream>>>
       (r.mem(), x.arrg, x.dir.garr(dev), atoms.first, atoms.second, gatherMap);
     //(r.mem(), x.arrg, x.dir.garr(dev), atoms.arrg, atoms.dir.arrg, x.atoms.obj->to_nodes_map()->get_barr(1));
 
@@ -256,10 +260,12 @@ namespace ptens{
     PTENS_ASSRT(x.dev==1);
     PTENS_ASSRT(r.dev==1);
     PTENS_ASSRT(r.nc==x.nc/2);
+    int N=x.atoms.gather_to_nodes_map_size(1);
     auto atoms=x.atoms.gpu_arrs(1);
     auto gatherMap=x.atoms.gather_to_nodes_map(1);
+    if(N==0) return;
 
-    NodeLayer_from_Ptensors1B_kernel<<<r.getn(),x.nc/2,0,stream>>>
+    NodeLayer_from_Ptensors1B_kernel<<<N,x.nc/2,0,stream>>>
       (r.mem(), x.arrg, x.dir.garr(dev), atoms.first, atoms.second ,gatherMap);
     //(r.mem(), x.arrg, x.dir.garr(dev), atoms.arrg, atoms.dir.arrg, x.atoms.obj->to_nodes_map()->get_barr(1));
   }

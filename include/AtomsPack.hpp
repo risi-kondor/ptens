@@ -154,6 +154,10 @@ namespace ptens{
       return obj->gather_to_nodes_map()->arrg;
     }
 
+    int gather_to_nodes_map_size(const int dev) const{
+      return obj->gather_to_nodes_map()->n;
+    }
+
 
   public: // ---- Concatenation ------------------------------------------------------------------------------
 
