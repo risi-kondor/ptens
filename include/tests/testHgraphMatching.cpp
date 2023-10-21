@@ -15,7 +15,7 @@
 #include "Cnine_base.cpp"
 #include "CnineSession.hpp"
 #include "Hgraph.hpp"
-#include "PtensFindPlantedSubgraphs.hpp"
+#include "FindPlantedSubgraphs.hpp"
 
 using namespace ptens;
 using namespace cnine;

@@ -19,6 +19,7 @@
 #include "Rtensor2_view.hpp"
 #include "Ptensors.hpp"
 #include "Ptensor1.hpp"
+#include "PtensLoggedTimer.hpp"
 
 
 namespace ptens{

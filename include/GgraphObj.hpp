@@ -17,6 +17,7 @@
 #include "once.hpp"
 #include "sparse_graph.hpp"
 #include "FindPlantedSubgraphs.hpp"
+#include "FindPlantedSubgraphs2.hpp"
 #include "SubgraphObj.hpp"
 #include "RtensorA.hpp"
 #include "AtomsPack.hpp"
