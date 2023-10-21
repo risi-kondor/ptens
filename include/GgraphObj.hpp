@@ -96,6 +96,20 @@ namespace ptens{
       else{
 	//cout<<"Not in subgraph cache"<<endl;
 	cnine::flog timer("GgraphObj::finding subgraphs");
+
+	if(H.getn()==1 && H.labeled==false && H.nedges()==0){
+	  subgraphpack_cache[H]=AtomsPack(getn());
+	  return subgraphpack_cache[H];
+	}
+
+	if(H.getn()==2 && H.labeled==false && H.nedges()==1){
+	  AtomsPack r;
+	  for_each_edge([&](const int i, const int j, const float v){
+	      if(i<j) r.push_back({i,j});});
+	  subgraphpack_cache[H]=r;
+	  return r;
+	}
+
 	subgraphpack_cache[H]=AtomsPack(new AtomsPackObj
 	  (cnine::Tensor<int>(cnine::FindPlantedSubgraphs<float>(*this,H))));
 	return subgraphpack_cache[H];
