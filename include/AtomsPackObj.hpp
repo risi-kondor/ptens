@@ -222,6 +222,21 @@ namespace ptens{
       return Atoms(cnine::array_pool<int>::operator()(i));
     }
 
+    int n_intersects(const AtomsPackObj& y, const int i, const int j) const{
+      int k=0;
+      int ni=size_of(i);
+      int nj=y.size_of(j);
+      for(int a=0; a<ni; a++){
+	int ix=(*this)(i,a);
+	for(int b=0; b<nj; b++)
+	  if(y(j,b)==ix){
+	    k++;
+	    break;
+	  }
+      }
+      return k;
+    }
+
     int tsize0() const{
       return size();
     }

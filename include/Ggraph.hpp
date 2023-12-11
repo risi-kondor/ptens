@@ -68,6 +68,14 @@ namespace ptens{
       return obj->getn();
     }
 
+    int nedges() const{
+      return obj->nedges();
+    }
+
+    AtomsPack edges() const{
+      return obj->edges();
+    }
+
     cnine::RtensorA dense() const{
       return obj->dense().rtensor();
     }

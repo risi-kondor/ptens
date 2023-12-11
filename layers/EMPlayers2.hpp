@@ -47,11 +47,20 @@ namespace ptens{
 
   template<typename SRC, typename DEST>
   void emp11(DEST& r, const SRC& x, const TransferMap& map){
-    if(map.is_empty()) return;
     int nc=x.get_nc();
-    cnine::flog timer("ptens::emp11");
-    r.broadcast0(x.reduce0(map.in()),map.out(),0);
-    r.broadcast1(x.reduce1(map.in()),map.out(),nc);
+    if(!map.is_graded()){
+      if(map.is_empty()) return;
+      cnine::flog timer("ptens::emp11");
+      r.broadcast0(x.reduce0(map.in()),map.out(),0);
+      r.broadcast1(x.reduce1(map.in()),map.out(),nc);
+    }else{
+      cnine::flog timer("ptens::emp11G");
+      for(auto& p:map.obj->graded_maps){
+	auto& map=*p.second;
+	r.broadcast0(x.reduce0(map.in),map.out,*map.bmap,0);
+	r.broadcast1(x.reduce1(map.in),map.out,*map.bmap,nc);
+      }
+    }
   }
 
   template<typename SRC, typename DEST>

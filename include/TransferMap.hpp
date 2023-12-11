@@ -16,10 +16,12 @@
 #define _ptens_TransferMap
 
 #include "TransferMapObj.hpp"
+//#include "AtomsPack.hpp"
 
 
 namespace ptens{
 
+  //class AtomsPack;
   class AtomsPackObj;
 
   class TransferMap{
@@ -36,8 +38,8 @@ namespace ptens{
     TransferMap(TransferMapObj<AtomsPackObj>* x):
       obj(x){}
 
-    //TransferMap(const ATOMSPACK& _in_atoms, const ATOMSPACK& _out_atoms):
-    //obj(new TransferMapObj(_in_atoms,_out_atoms){}
+    //TransferMap(const AtomsPack& _in_atoms, const AtomsPack& _out_atoms):
+    //obj(new TransferMapObj(*_in_atoms.obj,*_out_atoms.obj)){}
 
 
   public: // ---- Access -------------------------------------------------------------------------------------
@@ -45,6 +47,10 @@ namespace ptens{
 
     bool is_empty() const{
       return obj->is_empty();
+    }
+
+    bool is_graded() const{
+      return obj->is_graded();
     }
 
     const AindexPack& in() const{

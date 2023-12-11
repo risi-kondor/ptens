@@ -34,6 +34,7 @@ namespace ptens{
     mutable unordered_map<SubgraphObj,AtomsPack> subgraphpack_cache;
 
     using BASE::BASE;
+    using BASE::nedges;
 
 
     GgraphObj(const initializer_list<pair<int,int> >& list, const int n): 
@@ -128,7 +129,21 @@ namespace ptens{
 	    }
 	return AtomsPack(R);
       });
-    
+
+    /*
+    cnine::once<Tensor<int> > edges=cnine::once<Tensor<int> >([&](){
+	auto R=new Tensor<int>(cnine::Gdims(nedges(),2));
+	int i=0;
+	for(auto& p:data)
+	  for(auto& q:p.second)
+	    if(p.first<q.first){
+	      R->set(i,0,p.first);
+	      R->set(i,1,q.first);
+	      i++;
+	    }
+	return R;
+      });
+    */
 
   public: // ---- I/O -----------------------------------------------------------------------------------------
 

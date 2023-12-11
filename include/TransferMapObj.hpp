@@ -20,6 +20,7 @@
 #include "array_pool.hpp"
 #include "AindexPack.hpp"
 #include "GatherMap.hpp"
+#include "TransferMapGradedObj.hpp"
 #include "flog.hpp"
 
 
@@ -44,20 +45,24 @@ namespace ptens{
 
     mutable shared_ptr<cnine::GatherMap> bmap;
 
+    unordered_map<int,unique_ptr<TransferMapGradedObj<ATOMSPACK> > > graded_maps;
+
 
     ~TransferMapObj(){
       //cout<<"Destroying a TransferMapObj"<<endl;
     }
 
-    TransferMapObj(const ATOMSPACK& _in_atoms, const ATOMSPACK& _out_atoms):
+    TransferMapObj(const ATOMSPACK& _in_atoms, const ATOMSPACK& _out_atoms, const bool graded=false):
       SparseRmatrix(_out_atoms.size(),_in_atoms.size()),
-      //in_atoms(&_in_atoms), 
-      //out_atoms(&_in_atoms),
       in(new AindexPack()),
       out(new AindexPack()){
       //cout<<"Creating new TransferMapObj...";//<<endl;
-      make_overlaps(_in_atoms,_out_atoms);
-      make_intersects(_in_atoms,_out_atoms);
+      if(graded){
+	make_graded(_in_atoms,_out_atoms);
+      }else{
+	make_overlaps(_in_atoms,_out_atoms);
+	make_intersects(_in_atoms,_out_atoms);
+      }
       //cout<<"done."<<endl;
     }
 
@@ -71,6 +76,10 @@ namespace ptens{
 	  return false;
       }
       return true;
+    }
+
+    bool is_graded() const{
+      return graded_maps.size()>0;
     }
 
     void for_each_edge(std::function<void(const int, const int, const float)> lambda, const bool self=0) const{
@@ -118,6 +127,8 @@ namespace ptens{
 	}
       }
     }
+
+
 
 
   public: // ---- Intersects --------------------------------------------------------------------------------------------
@@ -181,6 +192,45 @@ namespace ptens{
       return bmap;
     }
 
+
+  public: // ---- Graded --------------------------------------------------------------------------------------------
+
+
+    void make_graded(const ATOMSPACK& in_atoms, const ATOMSPACK& out_atoms){
+      cnine::flog timer("TransferMapObj::make_graded");
+
+      unordered_map<int,vector<int> > map;
+      for(int j=0; j<in_atoms.size(); j++){
+	auto w=(in_atoms)(j);             
+	for(auto p:w){
+	  auto it=map.find(p);
+	  if(it==map.end()) map[p]=vector<int>({j});
+	  else it->second.push_back(j);
+	}
+      }          
+
+      for(int i=0; i<out_atoms.size(); i++){
+	auto v=(out_atoms)(i);
+	for(auto p:v){
+	  auto it=map.find(p);
+	  if(it!=map.end()){
+	    for(auto j:it->second){
+	      int k=out_atoms.n_intersects(in_atoms,i,j);
+	      auto it=graded_maps.find(k);
+	      if(it==graded_maps.end())
+		it=graded_maps.emplace(k,unique_ptr<TransferMapGradedObj<ATOMSPACK> >
+		  (new TransferMapGradedObj<ATOMSPACK>(k,out_atoms.size(),in_atoms.size()))).first;
+	      it->second->set(i,j,1.0);
+	    }
+	  }
+	}
+      }
+
+      for(auto& p:graded_maps){
+	p.second->make_intersects(in_atoms,out_atoms);
+      }
+    }
+
     
   };
 
@@ -189,77 +239,6 @@ namespace ptens{
 #endif 
 
 
-    /*
-    TransferMap(const cnine::Tensor<int>& y, const cnine::Tensor<int>& x):
-      TransferMap(x.dim(1),y.dim(1)){
-      cnine::flog timer("TransferMap::TransferMap(const Tensor<int>&, const Tensor<int>&)");
-      CNINE_ASSRT(x.ndims()==2);
-      CNINE_ASSRT(y.ndims()==2);
-      const int kx=x.dims[1];
-      const int ky=y.dims[1];
-
-      for(int i=0; i<x.dims[0]; i++){
-	for(int j=0; j<y.dims[0]; j++){
-
-	  bool found=false;
-	  for(int a=0; !found && a<kx; a++){
-	    int t=x(i,a);
-	    for(int b=0; !found && b<ky; b++)
-	      if(y(j,b)==t) found=true;
-	  }
-	  if(found) set(i,j,1);
-
-	}
-      }
-    }
-    */
-
-    /*
-    TransferMap(const cnine::Tensor<int>& y, const cnine::array_pool<int>& x):
-      TransferMap(x.size(),y.dims[0]){
-      cnine::flog timer("TransferMap::TransferMap(const Tensor<int>&, const AtomsPack&)");
-      CNINE_ASSRT(y.ndims()==2);
-      const int ky=y.dims[1];
-
-      for(int i=0; i<x.size(); i++){
-	auto v=x(i);
-	for(int j=0; j<y.dims[0]; j++){
-	  
-	  bool found=false;
-	  for(int a=0; !found && a<v.size(); a++){
-	    int t=v[a];
-	    for(int b=0; !found && b<ky; b++)
-	      if(y(j,b)==t) found=true;
-	  }
-	  if(found) set(i,j,1);
-	  
-	}
-      }
-    }
-    */
-      
-    /*
-    TransferMap(const cnine::array_pool<int>& y, const cnine::Tensor<int>& x):
-      TransferMap(x.dims[0],y.size()){
-      cnine::flog timer("TransferMap::TransferMap(const AtomsPack&, const Tensor<int>&)");
-      CNINE_ASSRT(x.ndims()==2);
-      const int kx=x.dims[1];
-
-	for(int i=0; i<x.dims[0]; i++){
-	  for(int j=0; j<y.size(); j++){
-	    auto v=y(j);
-	    
-	    bool found=false;
-	    for(int a=0; !found && a<kx; a++){
-	      int t=x(i,a);
-	      for(int b=0; !found && b<v.size(); b++)
-		if(v[b]==t) found=true;
-	    }
-	    if(found) set(i,j,1);
-	  }
-	}
-	}
-    */
     // for future use 
     /*  
     pair<IntMatrix,IntMatrix> intersects(const IntMatrix& inputs, const IntMatrix& outputs, const bool self=0) const{
