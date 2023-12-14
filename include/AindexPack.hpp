@@ -98,7 +98,7 @@ namespace ptens{
       int addr=dir(i,0);
       int len=dir(i,1);
       assert(len>=0);
-      return arr[addr+j];
+      return arr[addr+j+1]; // changed!!
     }
 
     int nix(const int i) const{

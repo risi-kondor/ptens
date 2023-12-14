@@ -82,6 +82,10 @@ namespace ptens{
       return graded_maps.size()>0;
     }
 
+    int ntotal() const{
+      return BASE::size();
+    }
+
     void for_each_edge(std::function<void(const int, const int, const float)> lambda, const bool self=0) const{
       for(auto& p: lists){
 	int i=p.first;
