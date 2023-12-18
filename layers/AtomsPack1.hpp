@@ -16,16 +16,16 @@
 #define _ptens_AtomsPack0
 
 #include "AtomsPack.hpp"
-#include "AtomsPack0obj.hpp"
+#include "AtomsPack1obj.hpp"
 #include "CompoundTransferMap.hpp"
 
 namespace ptens{
 
-  class AtomsPack0{
+  class AtomsPack1{
   public:
 
 
-    shared_ptr<AtomsPack0obj<int> > obj;
+    shared_ptr<AtomsPack1obj<int> > obj;
 
 
   public: // ---- Maps ---------------------------------------------------------------------------------------

@@ -9,27 +9,26 @@
  * use is prohibited. All redistributed versions of this file (in 
  * original or modified form) must retain this copyright notice and 
  * must be accompanied by a verbatim copy of the license. 
+ *
  */
+#include "Cnine_base.cpp"
+#include "CnineSession.hpp"
+#include "Hgraph.hpp"
+#include "AtomsPack0.hpp"
 
-#ifndef _ptens_CompundTransferMap
-#define _ptens_CompundTransferMap
+#include "Cnine_base.cpp"
 
-#include "AtomsPackObj.hpp"
-#include "CompoundTransferMapObj.hpp"
+using namespace ptens;
+using namespace cnine;
+
+//PtensSession ptens::ptens_session;
 
 
-namespace ptens{
+int main(int argc, char** argv){
 
-  class CompoundTransferMap{
-  public:
+  //cnine_session session;
 
-    shared_ptr<CompoundTransferMapObj > obj;
-
-    CompoundTransferMap(const int in_dim, const int out_dim, const cnine::GatherMapB& g):
-      obj(new CompoundTransferMapObj(in_dim,out_dim,g)){}
-
-  };
+  AtomsPack x({{0,1},{1,2,3},{5}});
+  AtomsPack y({{0},{1,2,3},{4,5},{6}});
 
 }
-
-#endif 

@@ -16,7 +16,7 @@
 
 #include <map>
 
-#include "array_pool.hpp"
+#include "hlists.hpp"
 #include "Atoms.hpp"
 #include "GatherMap.hpp"
 
@@ -24,8 +24,10 @@
 namespace ptens{
 
 
-  class AindexPack: public cnine::array_pool<int>{
+  class AindexPack: public cnine::hlists<int>{
   public:
+
+    typedef cnine::hlists<int> BASE;
 
     int _max_nix=0;
     int count1=0;
@@ -44,7 +46,7 @@ namespace ptens{
 
 
     AindexPack(const AindexPack& x):
-      array_pool<int>(x){
+      BASE(x){
       bmap=x.bmap;
       _max_nix=x._max_nix;
       count1=x.count1;
@@ -52,8 +54,8 @@ namespace ptens{
     }
 
     AindexPack(AindexPack&& x):
-      array_pool<int>(std::move(x)){
-      bmap=x.bmap; //x.bmap=nullptr;
+      BASE(std::move(x)){
+      bmap=x.bmap; 
       _max_nix=x._max_nix;
       count1=x.count1;
       count2=x.count2;
@@ -71,39 +73,44 @@ namespace ptens{
 
     int tix(const int i) const{
       assert(i<size());
+      return head(i);
       //return arr[lookup[i].first];
-      return arr[dir(i,0)];
+      //return get_arr()[dir(i,0)];
     }
 
     int tens(const int i) const{
       assert(i<size());
-      return arr[dir(i,0)];
+      return head(i);
+      //return get_arr()[dir(i,0)];
       //return arr[lookup[i].first];
     }
 
     vector<int> ix(const int i) const{
-      assert(i<size());
-      int addr=dir(i,0);
-      int len=dir(i,1)-1;
-      PTENS_ASSRT(len>=0);
-      vector<int> R(len);
-      for(int i=0; i<len; i++){
-	R[i]=arr[addr+i+1];
-      }
-      return R;
+      return BASE::operator()(i); 
+      //assert(i<size());
+      //int addr=dir(i,0);
+      //int len=dir(i,1)-1;
+      //PTENS_ASSRT(len>=0);
+      //vector<int> R(len);
+      //for(int i=0; i<len; i++){
+      //R[i]=get_arr()[addr+i+1];
+      //}
+      //return R;
     }
 
     int ix(const int i, const int j) const{
-      assert(i<size());
-      int addr=dir(i,0);
-      int len=dir(i,1);
-      assert(len>=0);
-      return arr[addr+j+1]; // changed!!
+      return BASE::operator()(i,j);
+      //assert(i<size());
+      //int addr=dir(i,0);
+      //int len=dir(i,1);
+      //assert(len>=0);
+      //return get_arr()[addr+j+1]; // changed!!
     }
 
     int nix(const int i) const{
-      assert(i<size());
-      return dir(i,1)-1;
+      return BASE::size_of(i);
+      //assert(i<size());
+      //return dir(i,1)-1;
     }
 
     /*
@@ -128,16 +135,17 @@ namespace ptens{
     }
 
     void push_back(const int tix, vector<int> indices){
-      int len=indices.size()+1;
-      if(tail+len>memsize)
-	reserve(std::max(2*memsize,tail+len));
-      arr[tail]=tix;
-      for(int i=0; i<len-1; i++)
-	arr[tail+1+i]=indices[i];
-      dir.push_back(tail,len);
+      BASE::push_back(tix,indices);
+      //int len=indices.size()+1;
+      //if(tail+len>memsize)
+      //reserve(std::max(2*memsize,tail+len));
+      //arr[tail]=tix;
+      //for(int i=0; i<len-1; i++)
+      //get_arr()[tail+1+i]=indices[i];
+      //dir.push_back(tail,len);
       //lookup.push_back(pair<int,int>(tail,len));
-      tail+=len;
-      _max_nix=std::max(_max_nix,len-1);
+      //tail+=len;
+      _max_nix=std::max(_max_nix,(int)indices.size());
     }
 
     
@@ -145,18 +153,6 @@ namespace ptens{
 
   public: // ---- I/O ----------------------------------------------------------------------------------------
 
-
-    /*
-    string str(const string indent="") const{
-      ostringstream oss;
-      oss<<"(";
-      for(int i=0; i<size()-1; i++)
-	oss<<(*this)[i]<<",";
-      if(size()>0) oss<<(*this)[size()-1];
-      oss<<")";
-      return oss.str();
-    }
-    */
 
     string repr() const{
       return "<AindexPack[N="+to_string(size())+"]>";
@@ -184,6 +180,18 @@ namespace ptens{
       for(int i=0; i<len; i++)
 	R[i]=arr[addr+i];
       return R;
+    }
+    */
+
+    /*
+    string str(const string indent="") const{
+      ostringstream oss;
+      oss<<"(";
+      for(int i=0; i<size()-1; i++)
+	oss<<(*this)[i]<<",";
+      if(size()>0) oss<<(*this)[size()-1];
+      oss<<")";
+      return oss.str();
     }
     */
 

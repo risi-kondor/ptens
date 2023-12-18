@@ -48,13 +48,6 @@ namespace ptens{
       cnine::plist_indexed_object_bank<AtomsPackObj,shared_ptr<AtomsPackObj>>([this](const vector<AtomsPackObj*>& v)
 	{return shared_ptr<AtomsPackObj>(new AtomsPackObj(cat_with(v)));});
 
-    //cnine::once<BASE> gpack=cnine::once<BASE>([&](){
-    //BASE R(*this,1);
-    //R.dir.move_to_device(1);
-    //return R;
-    //});
-
-
     int constk=0;
 
 
@@ -62,14 +55,7 @@ namespace ptens{
 
 
     AtomsPackObj():
-      observable(this)
-      //overlap_maps([this](const AtomsPackObj& x)
-      //{return TransferMap(new TransferMapObj<AtomsPackObj>(x,*this));}),
-      //cat_maps([this](const vector<AtomsPackObj*>& v)
-      //{return shared_ptr<AtomsPackObj>(new AtomsPackObj(cat_with(v)));})
-    {
-      //cout<<"Make AtomsPackObj 0"<<endl;
-    }
+      observable(this){}
 
 
   public: // ---- Constructors ------------------------------------------------------------------------------
@@ -80,11 +66,6 @@ namespace ptens{
       observable(this){
       constk=k;
     }
-    //overlap_maps([this](const AtomsPackObj& x)
-    //{return TransferMap(new TransferMapObj<AtomsPackObj>(x,*this));}),
-    //cat_maps([this](const vector<AtomsPackObj*>& v)
-    //{return shared_ptr<AtomsPackObj>(new AtomsPackObj(cat_with(v)));})
-
 
     // eliminate?
     AtomsPackObj(const int N):
@@ -108,12 +89,13 @@ namespace ptens{
     }
 
     // eliminate?
-    AtomsPackObj(const vector<vector<int> >& x):
-      AtomsPackObj(){
-      for(auto& p:x)
-	push_back(p);
-      //cout<<"Make AtomsPackObj 3"<<endl;
-    }
+    //[[deprecated]]
+    //AtomsPackObj(const vector<vector<int> >& x):
+    //AtomsPackObj(){
+    //for(auto& p:x)
+    //push_back(p);
+    //cout<<"Make AtomsPackObj 3"<<endl;
+    //}
 
     AtomsPackObj(const initializer_list<initializer_list<int> >& x):
       AtomsPackObj(){
@@ -154,12 +136,7 @@ namespace ptens{
 
     AtomsPackObj(const AtomsPackObj& x):
       array_pool(x),
-      observable(this)
-		//overlap_maps([this](const AtomsPackObj& x)
-		//{return TransferMap(new TransferMapObj<AtomsPackObj>(x,*this));}),
-		//cat_maps([this](const vector<AtomsPackObj*>& v)
-		//{return shared_ptr<AtomsPackObj>(new AtomsPackObj(cat_with(v)));})
-    {
+      observable(this){
       //cout<<"AtomsPackCopied!"<<endl;
       PTENS_COPY_WARNING();
       constk=x.constk;
@@ -167,12 +144,7 @@ namespace ptens{
 
     AtomsPackObj(AtomsPackObj&& x):
       array_pool(std::move(x)),
-      observable(this)
-		//overlap_maps([this](const AtomsPackObj& x)
-		//{return TransferMap(new TransferMapObj<AtomsPackObj>(x,*this));}),
-		//cat_maps([this](const vector<AtomsPackObj*>& v)
-		//{return shared_ptr<AtomsPackObj>(new AtomsPackObj(cat_with(v)));})
-    {
+      observable(this){
       PTENS_MOVE_WARNING();
       //cout<<"AtomsPackMoved!"<<endl;
       constk=x.constk;
@@ -193,10 +165,6 @@ namespace ptens{
     AtomsPackObj(cnine::array_pool<int>&& x):
       cnine::array_pool<int>(std::move(x)),
       observable(this)
-		//overlap_maps([this](const AtomsPackObj& x)
-		//{return TransferMap(new TransferMapObj<AtomsPackObj>(x,*this));}),
-		//cat_maps([this](const vector<AtomsPackObj*>& v)
-		//{return shared_ptr<AtomsPackObj>(new AtomsPackObj(cat_with(v)));})
     {}
 
     AtomsPackObj(const cnine::Tensor<int>& M):
@@ -208,11 +176,6 @@ namespace ptens{
 
   public: // ---- Views --------------------------------------------------------------------------------------
 
-
-    //AtomsPackObj view(){
-      //return AtomsPackObj(cnine::array_pool<int>::view(),-1); // hack
-      //return AtomsPackObj(cnine::array_pool<int>::view());
-    //}
 
 
   public: // ---- Access -------------------------------------------------------------------------------------
@@ -272,14 +235,6 @@ namespace ptens{
 
   public: // ---- Concatenation ------------------------------------------------------------------------------
 
-    /*
-    static AtomsPackObj cat(const vector<reference_wrapper<AtomsPackObj> >& list){
-      return AtomsPackObj(cnine::array_pool<int>::cat
-	(cnine::mapcar<reference_wrapper<AtomsPackObj>,reference_wrapper<array_pool<int> > >
-	  (list,[](const reference_wrapper<AtomsPackObj>& x){
-	    return reference_wrapper<array_pool<int> >(x.get());})));
-    }
-    */
 
     static shared_ptr<AtomsPackObj> cat(const vector<reference_wrapper<AtomsPackObj> >& list){
       PTENS_ASSRT(list.size()>0);
@@ -292,7 +247,6 @@ namespace ptens{
     }
 
     AtomsPackObj cat_with(const vector<AtomsPackObj*> list){
-      //cout<<"AtomPackObj concatenation"<<endl;
       vector<reference_wrapper<cnine::array_pool<int> > > v;
       v.push_back(*this);
       for(auto p:list)
@@ -313,7 +267,7 @@ namespace ptens{
 	    lists[(*this)(i,j)].push_back(i);
 	int n_dest=lists.size();
 
-	cnine::GatherMap* R=new cnine::GatherMap(n_dest,tail,cnine::fill_raw());
+	cnine::GatherMap* R=new cnine::GatherMap(n_dest,get_tail(),cnine::fill_raw());
 
 	int i=0;
 	int _tail=3*n_dest;
@@ -343,13 +297,16 @@ namespace ptens{
 
 
     AtomsPackObj permute(const cnine::permutation& pi){
-      PTENS_ASSRT(dev==0);
+      PTENS_ASSRT(get_dev()==0);
       array_pool<int> A;
-      A.dir=dir;
-      A.reserve(tail);
-      A.tail=tail;
-      for(int i=0; i<tail; i++)
-	A.arr[i]=pi(arr[i]);
+      for(int i=0; i<size(); i++){
+	vector<int> v=(*this)(i);
+	int len=v.size();
+	vector<int> w(len);
+	for(int j=0; j<len; j++)
+	  w[j]=pi(v[j]);
+	A.push_back(w);
+      }
       return A;
     }
 
@@ -376,3 +333,29 @@ namespace ptens{
 
 
 #endif 
+    //overlap_maps([this](const AtomsPackObj& x)
+    //{return TransferMap(new TransferMapObj<AtomsPackObj>(x,*this));}),
+    //cat_maps([this](const vector<AtomsPackObj*>& v)
+    //{return shared_ptr<AtomsPackObj>(new AtomsPackObj(cat_with(v)));})
+		//overlap_maps([this](const AtomsPackObj& x)
+		//{return TransferMap(new TransferMapObj<AtomsPackObj>(x,*this));}),
+		//cat_maps([this](const vector<AtomsPackObj*>& v)
+		//{return shared_ptr<AtomsPackObj>(new AtomsPackObj(cat_with(v)));})
+		//overlap_maps([this](const AtomsPackObj& x)
+		//{return TransferMap(new TransferMapObj<AtomsPackObj>(x,*this));}),
+		//cat_maps([this](const vector<AtomsPackObj*>& v)
+		//{return shared_ptr<AtomsPackObj>(new AtomsPackObj(cat_with(v)));})
+    //cnine::once<BASE> gpack=cnine::once<BASE>([&](){
+    //BASE R(*this,1);
+    //R.dir.move_to_device(1);
+    //return R;
+    //});
+
+
+    //cnine::once<BASE> gpack=cnine::once<BASE>([&](){
+    //BASE R(*this,1);
+    //R.dir.move_to_device(1);
+    //return R;
+    //});
+
+

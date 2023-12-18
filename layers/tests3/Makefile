@@ -2,7 +2,6 @@ ROOTDIR=../..
 include $(ROOTDIR)/common.txt
 
 INCLUDE= $(CNINE_INCLUDES) $(PTENS_INCLUDES) 
-#-I$(INCLUDEDIR) -I$(TENSORSDIR) -I$(LAYERSDIR)  
 
 TESTS=$(patsubst %.cpp,%,$(wildcard *.cpp))
 

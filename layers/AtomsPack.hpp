@@ -43,8 +43,9 @@ namespace ptens{
     AtomsPack(const int N, const int k):
       obj(new AtomsPackObj(N,k)){}
 
-    AtomsPack(const vector<vector<int> >& x):
-      obj(new AtomsPackObj(x)){}
+    //[[deprecated]]
+    //AtomsPack(const vector<vector<int> >& x):
+    //obj(new AtomsPackObj(x)){}
 
     AtomsPack(const initializer_list<initializer_list<int> >& x):
       obj(new AtomsPackObj(x)){}

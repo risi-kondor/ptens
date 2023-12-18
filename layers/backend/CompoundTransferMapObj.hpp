@@ -11,14 +11,37 @@
  * must be accompanied by a verbatim copy of the license. 
  */
 
-#ifndef _ptens_CompundTransferMapObj
-#define _ptens_CompundTransferMapOBj
+#ifndef _ptens_CompoundTransferMapObj
+#define _ptens_CompoundTransferMapObj
 
 #include "AtomsPackObj.hpp"
+#include "GatherMapProgram.hpp"
 
 
 namespace ptens{
 
+
+
+  class CompoundTransferMapObj{
+  public:
+
+    cnine::GatherMapProgram prog;
+
+    CompoundTransferMapObj(const int in_dim, const int out_dim, const int column_multiplier=1):
+      prog(cnine::dims(in_dim,1),cnine::dims(out_dim,column_multiplier)){}
+
+    CompoundTransferMapObj(const int in_dim, const int out_dim, const cnine::GatherMapB& g):
+      prog(cnine::dims(in_dim,1),cnine::dims(out_dim,1),g){}
+
+    ~CompoundTransferMapObj(){
+    }
+
+  };
+
+}
+
+#endif 
+  /*
   class CTMnode{
   public:
 
@@ -29,40 +52,4 @@ namespace ptens{
     }
 
   };
-
-
-
-  class CompoundTransferMapObj{
-  public:
-
-    vector<CTMnode*> nodes;
-    vector<LTensor<float>*> vars;
-
-    ~CompoundTransferMapObj(){
-      for(auto p:nodes)
-	delete p;
-      for(auto p:vars)
-	delete p;
-    }
-
-    CompoundTransferMapObj(const AtomsPackObj& in_atoms, const AtomsPackObj& out_atoms, const TransferMapProgram& prog){
-      
-    }
-
-
-    typename<TYPE>
-    void operator()(Ltensor<TYPE>& r, const Ltensor<TYPE>& x){
-      int nc=r.dim(1);
-      
-      
-      for(auto p:nodes){
-	CTMnode& node=*p;
-	gather_rows(varsp.out,p.arg
-      }
-    }
-    
-  };
-
-}
-
-#endif 
+  */

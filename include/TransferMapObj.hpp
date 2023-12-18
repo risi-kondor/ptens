@@ -32,6 +32,7 @@ namespace ptens{
   public:
     
     typedef cnine::SparseRmatrix SparseRmatrix;
+    typedef cnine::SparseRmatrix BASE;
     typedef cnine::Tensor<int> IntMatrix;
 
     using SparseRmatrix::SparseRmatrix;
@@ -86,6 +87,15 @@ namespace ptens{
       return BASE::size();
     }
 
+    void for_each_row(std::function<void(const int, const vector<int>)> lambda) const{
+      for(auto& p: lists){
+	vector<int> v;
+	p.second->forall_nonzero([&](const int j, const float a){
+	    v.push_back(j);});
+	lambda(p.first,v);
+      }
+    }
+
     void for_each_edge(std::function<void(const int, const int, const float)> lambda, const bool self=0) const{
       for(auto& p: lists){
 	int i=p.first;
@@ -95,6 +105,7 @@ namespace ptens{
       }
     }
 
+    
 
   public: // ---- Overlaps -----------------------------------------------------------------------------------
 
@@ -130,7 +141,7 @@ namespace ptens{
 	  }
 	}
       }
-    }
+k    }
 
 
 
