@@ -37,10 +37,6 @@ namespace ptens{
 
     using SparseRmatrix::SparseRmatrix;
 
-
-    //shared_ptr<const ATOMSPACK> in_atoms;
-    //shared_ptr<const ATOMSPACK> out_atoms;
-
     shared_ptr<AindexPack> in;
     shared_ptr<AindexPack> out;
 
@@ -141,7 +137,7 @@ namespace ptens{
 	  }
 	}
       }
-k    }
+    }
 
 
 

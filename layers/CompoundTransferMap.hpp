@@ -15,7 +15,7 @@
 #define _ptens_CompundTransferMap
 
 #include "AtomsPackObj.hpp"
-#include "CompoundTransferMapObj.hpp"
+#include "GatherMapProgram.hpp"
 
 
 namespace ptens{
@@ -23,7 +23,7 @@ namespace ptens{
   class CompoundTransferMap{
   public:
 
-    shared_ptr<CompoundTransferMapObj > obj;
+    shared_ptr<GatherMapProgram> obj;
 
     CompoundTransferMap(const int in_dim, const int out_dim, const cnine::GatherMapB& g):
       obj(new CompoundTransferMapObj(in_dim,out_dim,g)){}

@@ -28,6 +28,7 @@
 
 #include "Atoms.hpp"
 #include "TransferMap.hpp"
+#include "MessageList.hpp"
 
 
 namespace ptens{
@@ -43,6 +44,10 @@ namespace ptens{
     cnine::ptr_indexed_object_bank<AtomsPackObj,TransferMap> overlap_maps=
       cnine::ptr_indexed_object_bank<AtomsPackObj,TransferMap>([this](const AtomsPackObj& x)
 	{return TransferMap(new TransferMapObj<AtomsPackObj>(x,*this));});
+
+    cnine::ptr_indexed_object_bank<AtomsPackObj,MessageList> overlaps_mlist=
+      cnine::ptr_indexed_object_bank<AtomsPackObj,MessageList>([this](const AtomsPackObj& x)
+	{return MessageList::overlaps(x,*this);});
 
     cnine::plist_indexed_object_bank<AtomsPackObj,shared_ptr<AtomsPackObj>> cat_maps=
       cnine::plist_indexed_object_bank<AtomsPackObj,shared_ptr<AtomsPackObj>>([this](const vector<AtomsPackObj*>& v)
@@ -84,8 +89,6 @@ namespace ptens{
       for(int i=0; i<N; i++){
 	push_back(v);
       }
-      //cout<<"Make AtomsPackObj 2"<<endl;
-
     }
 
     // eliminate?
@@ -333,6 +336,8 @@ namespace ptens{
 
 
 #endif 
+
+
     //overlap_maps([this](const AtomsPackObj& x)
     //{return TransferMap(new TransferMapObj<AtomsPackObj>(x,*this));}),
     //cat_maps([this](const vector<AtomsPackObj*>& v)

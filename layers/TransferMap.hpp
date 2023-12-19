@@ -21,8 +21,8 @@
 
 namespace ptens{
 
-  //class AtomsPack;
   class AtomsPackObj;
+
 
   class TransferMap{
   public:

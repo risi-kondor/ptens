@@ -32,7 +32,7 @@ namespace ptens{
     
     
     template<typename SOURCE>
-    CompoundTransferMap overlaps_transfer_map(const SOURCE& x){
+    GatherMapProgram overlaps_transfer_map(const SOURCE& x){
       return CompoundTransferMap(obj->overlaps_transfer_map(*x.obj));
     }
 

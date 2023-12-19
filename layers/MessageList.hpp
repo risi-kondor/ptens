@@ -12,28 +12,26 @@
  *
  */
 
-#ifndef _ptens_AtomsPack0
-#define _ptens_AtomsPack0
+#ifndef _ptens_MessageList
+#define _ptens_MessageList
 
-#include "AtomsPack.hpp"
-#include "AtomsPack0obj.hpp"
-#include "MessageMap.hpp"
+#include "AtomsPackObj.hpp"
+#include "MessageListObj.hpp"
+
 
 namespace ptens{
 
-  class AtomsPack0{
+  class MessageList{
   public:
 
+    shared_ptr<MessageListObj> obj;
 
-    shared_ptr<AtomsPack0obj<int> > obj;
 
+    static MessageList overlap(const AtomsPackObj& x, const AtomsPackObj& y):
+      obj(new MessageListObj(x,y)){}
 
-  public: // ---- Maps ---------------------------------------------------------------------------------------
-    
-    
-    template<typename SOURCE>
-    CompoundTransferMap overlaps_tmap(const SOURCE& x){
-      return MessageMap(obj->overlaps_map(*x.obj));
+    pair<const cnine::hlists<int>&, const cnine::hlists<int>&> lists() const{
+      return pair<const cnine::hlists<int>&, const cnine::hlists<int>&>(obj->in,obj->out);
     }
 
 
