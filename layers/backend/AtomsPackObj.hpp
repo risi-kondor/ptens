@@ -104,7 +104,6 @@ namespace ptens{
       AtomsPackObj(){
       for(auto& p:x)
 	push_back(p);
-      cout<<"Make AtomsPackObj 4"<<endl;
 
     }
 
@@ -113,7 +112,6 @@ namespace ptens{
       for(auto p:forest)
 	p->for_each_maximal_path([&](const vector<int>& x){
 	    push_back(x);});
-      cout<<"Make AtomsPackObj 5"<<endl;
     }
 
 
@@ -264,7 +262,7 @@ namespace ptens{
     cnine::oncep<cnine::GatherMap> gather_to_nodes_map=
       cnine::oncep<cnine::GatherMap>([&](){
 
-	cnine::map_of_lists2<int,int> lists;
+	cnine::map_of_lists<int,int> lists;
 	for(int i=0; i<size(); i++)
 	  for(int j=0; j<size_of(i); j++)
 	    lists[(*this)(i,j)].push_back(i);

@@ -21,19 +21,52 @@
 
 namespace ptens{
 
+  template<typename DUMMY> class AtomsPack0obj;
+  template<typename DUMMY> class AtomsPack1obj;
+  template<typename DUMMY> class AtomsPack2obj;
+
   class MessageList{
   public:
 
-    shared_ptr<MessageListObj> obj;
+    shared_ptr<const MessageListObj> obj;
+
+    shared_ptr<AtomsPack0obj<int> > source0;
+    shared_ptr<AtomsPack1obj<int> > source1;
+    shared_ptr<AtomsPack2obj<int> > source2;
 
 
-    static MessageList overlap(const AtomsPackObj& x, const AtomsPackObj& y):
-      obj(new MessageListObj(x,y)){}
+    MessageList(const MessageListObj* _obj):
+      obj(_obj){}
+
+
+  public: // ---- Named constructors ------------------------------------------------------------------------
+
+
+    static MessageList overlaps(const cnine::array_pool<int>& x, const cnine::array_pool<int>& y){
+      return MessageList(new MessageListObj(x,y));
+    }
 
     pair<const cnine::hlists<int>&, const cnine::hlists<int>&> lists() const{
       return pair<const cnine::hlists<int>&, const cnine::hlists<int>&>(obj->in,obj->out);
     }
 
+
+  public: // ---- I/O ----------------------------------------------------------------------------------------
+
+    string classname() const{
+      return "MessageList";
+    }
+
+    string repr() const{
+      return "MessageList";
+    }
+
+    string str(const string indent="") const{
+      return obj->str();
+    }
+
+    friend ostream& operator<<(ostream& stream, const MessageList& v){
+      stream<<v.str(); return stream;}
 
   };
 

@@ -22,13 +22,12 @@
 
 namespace ptens{
 
+  template<typename DUMMY>
   class AtomsPack1obj{
   public:
 
-    typedef cnine::ptr_indexed_object_bank<AtomsPack0obj<DUMMY>,GatherMapProgram> TBANK0;
-    typedef cnine::ptr_indexed_object_bank<AtomsPack1obj<DUMMY>,GatherMapProgram> TBANK1;
-    typedef cnine::ptr_indexed_object_bank<AtomsPack2obj<DUMMY>,GatherMapProgram> TBANK2;
-
+    typedef cnine::Gdims Gdims;
+    typedef cnine::ptr_indexed_object_bank<MessageList,MessageMap> MMBank;
 
     shared_ptr<AtomsPackObj> atoms;
 
@@ -36,8 +35,11 @@ namespace ptens{
   public: // ---- Constructors ------------------------------------------------------------------------------
 
 
-    AtomsPackOb1(const shared_ptr<AtomsPackObj>& _atoms):
+    AtomsPack1obj(const shared_ptr<AtomsPackObj>& _atoms):
       atoms(_atoms){}
+
+    AtomsPack1obj(const initializer_list<initializer_list<int> >& x):
+      AtomsPack1obj(cnine::to_share(new AtomsPackObj(x))){}
 
 
   public: // ---- Access ------------------------------------------------------------------------------------
@@ -47,48 +49,48 @@ namespace ptens{
       return atoms->size();
     }
 
-    int offset(const int i){
+    int offset(const int i) const{
       return atoms->offset(i);
     }
 
-    int index_of(const int i, const int j0){
-      return atoms->offset(i)+j;
+    int index_of(const int i, const int j0) const{
+      return atoms->offset(i)+j0;
     }
 
 
   public: // ---- Transfer maps -----------------------------------------------------------------------------
 
 
-    GatherMapProgram overlaps_map(const AtomsPack0obj<DUMMY>& x){
-      return overlaps_map0(x);}
-
-    GatherMapProgram overlaps_map(const AtomsPack1obj<DUMMY>& x){
-      return overlaps_map1(x);}
-
-    GatherMapProgram overlaps_map(const AtomsPack2obj<DUMMY>& x){
-      return overlap_map2(x);}
+    MMBank message_map=MMBank([&](const MessageList& x){
+	if(x.source0) return mmap(x,*x.source0);
+	if(x.source1) return mmap(x,*x.source1);
+	if(x.source2) return mmap(x,*x.source2);
+      });
 
 
     // 1 <- 0
-    TBANK0 overlaps_map0=TBANK0([&](const AtomsPack0obj<DUMMY>& y){
-	auto[in_lists,out_lists]=atoms->overlaps_mlist(*y.atoms).lists();
-
-	map_of_lists<int,int> direct;
-	for(int m=0; m<in_lists.size(); m++){
-	  int in_tensor=in_lists.head(m);
-	  int out_tensor=out_lists.head(m);
-	  direct.push_back(index_of(out_tensor,out_lists(m,0)),y.index_of(in_tensor));
-	}
-    
-	return GatherMapProgram(new GatherMapB(direct));
-      });
+    //TBANK0 overlaps_map0=TBANK0([&](const AtomsPack0obj<DUMMY>& y){
+    //auto[in_lists,out_lists]=atoms->overlaps_mlist(*y.atoms).lists();
+    MessageMap mmap(const MessageList& lists, const AtomsPack0obj<DUMMY>& y){
+      auto[in_lists,out_lists]=lists.lists();
+      cnine::map_of_lists<int,int> direct;
+      for(int m=0; m<in_lists.size(); m++){
+	int in_tensor=in_lists.head(m);
+	int out_tensor=out_lists.head(m);
+	direct.push_back(index_of(out_tensor,out_lists(m,0)),y.index_of(in_tensor));
+      }
+      
+      return cnine::GatherMapProgram(new cnine::GatherMapB(direct));
+    }
   
 
     // 1 <- 1
-    TBANK1 overlaps_map1=TBANK1([&](const AtomsPack0obj<DUMMY>& y){
-      auto[in_lists,out_lists]=atoms->overlaps_mlist(*y.atoms).lists();
+    //TBANK1 overlaps_map1=TBANK1([&](const AtomsPack0obj<DUMMY>& y){
+    //auto[in_lists,out_lists]=atoms->overlaps_mlist(*y.atoms).lists();
+    MessageMap mmap(const MessageList& lists, const AtomsPack1obj<DUMMY>& y){
+      auto[in_lists,out_lists]=lists.lists();
 
-      map_of_lists<int,int> direct;
+      cnine::map_of_lists<int,int> direct;
       for(int m=0; m<in_lists.size(); m++){
 	int in_tensor=in_lists.head(m);
 	int out_tensor=out_lists.head(m);
@@ -97,59 +99,61 @@ namespace ptens{
 	  direct.push_back(2*index_of(out_tensor,out_lists(m,j))+1,y.index_of(in_tensor,in_lists(m,j)));
       }
 
-      GatherMapProgram R;
+      cnine::GatherMapProgram R;
       R.add_var(Gdims(in_lists.size(),1));
       R.add_map(y.reduce0(in_lists),2,0);
       R.add_map(broadcast0(out_lists,2),1,2);
-      R.add_map(new GatherMapB(direct,2));
+      R.add_map(new cnine::GatherMapB(direct,2));
       return R;
-      });
+    }
 
 
     // 1 <- 2
-    TBANK2 overlaps_map2=TBANK2([&](const AtomsPack0obj<DUMMY>& y){
-	auto[in_lists,out_lists]=atoms->overlaps_mlist(*y.atoms).lists();
+    //TBANK2 overlaps_map2=TBANK2([&](const AtomsPack0obj<DUMMY>& y){
+    //auto[in_lists,out_lists]=atoms->overlaps_mlist(*y.atoms).lists();
+    MessageMap mmap(const MessageList& lists, const AtomsPack2obj<DUMMY>& y){
+      auto[in_lists,out_lists]=lists.lists();
 
-	map_of_lists<int,int> direct;
-	for(int m=0; m<in_lists.size(); m++){
-	  int in_tensor=in_lists.head(m);
-	  int out_tensor=out_lists.head(m);
-	  vector<int> in=in_lists(m);
-	  vector<int> out=out_lists(m);
-	  for(int i0=0; i0<in.size_of(m); i0++)
-	    direct.push_back(5*index_of(out_tensor,out[i0])+2,y.index_of(in_tensor,in[i0],in[i0]));
-	  for(int i0=0; i0<in.size_of(m); i0++){
-	    for(int i1=0; i1<in.size_of(m); i1++){
-	      direct.push_back(5*index_of(out_tensor,out[i0])+3,y.index_of(in_tensor,in[i0],in[i1]));
-	      direct.push_back(5*index_of(out_tensor,out[i0])+4,y.index_of(in_tensor,in[i1],in[i0]));
-	    }
+      cnine::map_of_lists<int,int> direct;
+      for(int m=0; m<in_lists.size(); m++){
+	int in_tensor=in_lists.head(m);
+	int out_tensor=out_lists.head(m);
+	vector<int> in=in_lists(m);
+	vector<int> out=out_lists(m);
+	for(int i0=0; i0<in.size(); i0++)
+	  direct.push_back(5*index_of(out_tensor,out[i0])+2,y.index_of(in_tensor,in[i0],in[i0]));
+	for(int i0=0; i0<in.size(); i0++){
+	  for(int i1=0; i1<in.size(); i1++){
+	    direct.push_back(5*index_of(out_tensor,out[i0])+3,y.index_of(in_tensor,in[i0],in[i1]));
+	    direct.push_back(5*index_of(out_tensor,out[i0])+4,y.index_of(in_tensor,in[i1],in[i0]));
 	  }
 	}
+      }
 	
-	GatherMapProgram R;
-	R.add_var(Gdims(in_lists.size(),2));
-	R.add_map(y.reduce0(in_lists,2),2,0);
-	R.add_map(broadcast0(out_lists,5),1,2);
-	R.add_map(new GatherMapB(direct,5));
-	return R;
-      });
+      cnine::GatherMapProgram R;
+      R.add_var(Gdims(in_lists.size(),2));
+      R.add_map(y.reduce0(in_lists,2),2,0);
+      R.add_map(broadcast0(out_lists,5),1,2);
+      R.add_map(new cnine::GatherMapB(direct,5));
+      return R;
+    }
 
 
   public: // ---- Broadcasting and reduction ----------------------------------------------------------------
 
 
-    GatherMapB reduce0(const hlists<int>& in_lists, const int stride=1, const int coffs=0){
-      map_of_lists<int,int> R;
+    cnine::GatherMapB reduce0(const cnine::hlists<int>& in_lists, const int stride=1, const int coffs=0){
+      cnine::map_of_lists<int,int> R;
       for(int m=0; m<in_lists.size(); m++){
 	int in_tensor=in_lists.head(m);
 	in_lists.for_each_of(m,[&](const int x){
 	    R.push_back(m,stride*index_of(in_tensor,x)+coffs);});
       }
-      return GatherMapB(R,stride);
+      return cnine::GatherMapB(R,stride);
     }
 
-    GatherMapB broadcast0(const hlists<int>& out_lists, const int stride=1, const int coffs=0){
-      map_of_lists<int,int> R;
+    cnine::GatherMapB broadcast0(const cnine::hlists<int>& out_lists, const int stride=1, const int coffs=0){
+      cnine::map_of_lists<int,int> R;
       PTENS_ASSRT(stride>=1);
       PTENS_ASSRT(coffs<=stride-1);
       for(int m=0; m<out_lists.size(); m++){
@@ -157,8 +161,27 @@ namespace ptens{
 	out_lists.for_each_of(m,[&](const int x){
 	    R.push_back(stride*index_of(out_tensor,x)+coffs,m);});
       }
-      return GatherMapB(R,stride);
+      return cnine::GatherMapB(R,stride);
     }
+
+
+  public: // ---- I/O ----------------------------------------------------------------------------------------
+
+
+    string classname() const{
+      return "AtomsPack1obj";
+    }
+
+    string repr() const{
+      return "AtomsPack1obj";
+    }
+
+    string str(const string indent="") const{
+      return atoms->str(indent);
+    }
+
+    friend ostream& operator<<(ostream& stream, const AtomsPack1obj& v){
+      stream<<v.str(); return stream;}
 
 
 
@@ -167,3 +190,14 @@ namespace ptens{
 }
 
 #endif 
+    //GatherMapProgram overlaps_map(const AtomsPack0obj<DUMMY>& x){
+    //return overlaps_map0(x);}
+
+    //GatherMapProgram overlaps_map(const AtomsPack1obj<DUMMY>& x){
+    //return overlaps_map1(x);}
+
+    //GatherMapProgram overlaps_map(const AtomsPack2obj<DUMMY>& x){
+    //return overlap_map2(x);}
+    //typedef cnine::ptr_indexed_object_bank<AtomsPack0obj<DUMMY>,GatherMapProgram> TBANK0;
+    //typedef cnine::ptr_indexed_object_bank<AtomsPack1obj<DUMMY>,GatherMapProgram> TBANK1;
+    //typedef cnine::ptr_indexed_object_bank<AtomsPack2obj<DUMMY>,GatherMapProgram> TBANK2;

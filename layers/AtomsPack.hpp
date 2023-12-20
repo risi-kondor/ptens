@@ -183,6 +183,11 @@ namespace ptens{
       return obj->overlaps(*y.obj);
     }
 
+    // create map for messages from y
+    MessageList overlaps_mlist(const AtomsPack& y){
+      return obj->overlaps_mlist(*y.obj);
+    }
+
 
   public: // ---- I/O ----------------------------------------------------------------------------------------
 

@@ -51,7 +51,7 @@ namespace ptens{
 
 
     // overlaps 
-    MessageListObj(const cnine::array_pool<int>& x, const cnine::array_pool<int>& y){
+    MessageListObj(const cnine::array_pool<int>& y, const cnine::array_pool<int>& x){
 
       if(x.size()<10){
 	for(int i=0; i<y.size(); i++){
@@ -59,7 +59,7 @@ namespace ptens{
 	  for(int j=0; j<x.size(); j++){
 	    auto w=x(j);
 	    if([&](){for(auto p:v) if(std::find(w.begin(),w.end(),p)!=w.end()) return true; return false;}())
-	      append_intersection(i,j,x.view_of(i),y.view_of(j));
+	      append_intersection(i,j,y.view_of(i),x.view_of(j));
 	  }
 	}
 	return;
@@ -87,14 +87,46 @@ namespace ptens{
 	for(int j=0; j<y.n0; j++)
 	  if(y(j)==t){
 	    v_in.push_back(i); 
-	    v_out.push_back(i); 
+	    v_out.push_back(j); 
 	    break;
 	  }
       }
       in.push_back(xi,v_in);
-      out.push_back(xi,v_out);
+      out.push_back(yi,v_out);
     }
 
+
+  public: // ---- I/O ----------------------------------------------------------------------------------------
+
+
+    string classname() const{
+      return "MessageListObj";
+    }
+
+    string repr() const{
+      return "MessageListObj";
+    }
+
+    string str(const string indent="") const{
+      ostringstream oss;
+      PTENS_ASSRT(in.size()==out.size());
+      for(int m=0; m<in.size(); m++){
+	oss<<indent<<out.head(m)<<":(";
+	for(int i=0; i<out.size_of(m); i++)
+	  oss<<out(m,i)<<",";
+	if(out.size_of(m)>0) oss<<"\b";
+	oss<<") <- ";
+	oss<<indent<<in.head(m)<<":(";
+	for(int i=0; i<in.size_of(m); i++)
+	  oss<<in(m,i)<<",";
+	if(in.size_of(m)>0) oss<<"\b";
+	oss<<")"<<endl;
+      }
+      return oss.str();
+    }
+
+    friend ostream& operator<<(ostream& stream, const MessageListObj& v){
+      stream<<v.str(); return stream;}
 
   };
 

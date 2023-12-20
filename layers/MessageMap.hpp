@@ -9,26 +9,31 @@
  * use is prohibited. All redistributed versions of this file (in 
  * original or modified form) must retain this copyright notice and 
  * must be accompanied by a verbatim copy of the license. 
- *
  */
-#include "Cnine_base.cpp"
-#include "CnineSession.hpp"
-#include "Hgraph.hpp"
-#include "AtomsPack0.hpp"
 
-#include "Cnine_base.cpp"
+#ifndef _ptens_MessageMap
+#define _ptens_MessageMap
 
-using namespace ptens;
-using namespace cnine;
-
-//PtensSession ptens::ptens_session;
+#include "AtomsPackObj.hpp"
+#include "GatherMapProgram.hpp"
 
 
-int main(int argc, char** argv){
+namespace ptens{
 
-  //cnine_session session;
 
-  AtomsPack x({{0,1},{1,2,3},{5}});
-  AtomsPack y({{0},{1,2,3},{4,5},{6}});
+  class MessageMap{
+  public:
+
+    shared_ptr<cnine::GatherMapProgram> obj;
+
+    MessageMap(const cnine::GatherMapProgram&& _obj):
+      obj(new cnine::GatherMapProgram(_obj)){}
+
+    //MessageMap(const int in_dim, const int out_dim, const cnine::GatherMapB& g):
+    //obj(new cnine::GatherMapB(g,in_dim,out_dim)){}
+
+  };
 
 }
+
+#endif 

@@ -17,6 +17,8 @@
 
 #include "AtomsPack.hpp"
 #include "AtomsPack0obj.hpp"
+#include "AtomsPack1obj.hpp"
+#include "AtomsPack2obj.hpp"
 #include "MessageMap.hpp"
 
 namespace ptens{
@@ -28,13 +30,45 @@ namespace ptens{
     shared_ptr<AtomsPack0obj<int> > obj;
 
 
+  public: // ---- Constructors ------------------------------------------------------------------------------
+
+
+    AtomsPack0(const initializer_list<initializer_list<int> >& x):
+      obj(new AtomsPack0obj<int>(x)){}
+
+
   public: // ---- Maps ---------------------------------------------------------------------------------------
     
     
     template<typename SOURCE>
-    CompoundTransferMap overlaps_tmap(const SOURCE& x){
-      return MessageMap(obj->overlaps_map(*x.obj));
+    MessageList overlaps_mlist(const SOURCE& x){
+      return obj->atoms->overlaps_mlist(x.obj->atoms);
     }
+
+    template<typename SOURCE>
+    MessageMap overlaps_tmap(const SOURCE& x){
+      return obj->mmap(obj->atoms->overlaps_mlist(x.obj->atoms));
+    }
+
+
+  public: // ---- I/O ----------------------------------------------------------------------------------------
+
+
+    string classname() const{
+      return "AtomsPack0";
+    }
+
+    string repr() const{
+      return "AtomsPack0";
+    }
+
+    string str(const string indent="") const{
+      return obj->str(indent);
+    }
+
+    friend ostream& operator<<(ostream& stream, const AtomsPack0& v){
+      stream<<v.str(); return stream;}
+
 
 
   };
@@ -42,3 +76,6 @@ namespace ptens{
 }
 
 #endif 
+
+
+// AtomsPackObj <- MessageList <- MessageListObj

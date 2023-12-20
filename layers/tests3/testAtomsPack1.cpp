@@ -9,27 +9,30 @@
  * use is prohibited. All redistributed versions of this file (in 
  * original or modified form) must retain this copyright notice and 
  * must be accompanied by a verbatim copy of the license. 
+ *
  */
 
-#ifndef _ptens_CompundTransferMap
-#define _ptens_CompundTransferMap
+#include "Cnine_base.cpp"
+#include "PtensSession.hpp"
+#include "AtomsPack0.hpp"
 
-#include "AtomsPackObj.hpp"
-#include "GatherMapProgram.hpp"
+using namespace ptens;
+using namespace cnine;
+
+PtensSession ptens_session;
 
 
-namespace ptens{
+int main(int argc, char** argv){
 
-  class CompoundTransferMap{
-  public:
+  //cnine_session session;
 
-    shared_ptr<GatherMapProgram> obj;
+  AtomsPack x({{0,1},{1,2,3},{5}});
+  AtomsPack y({{0},{1,2,3},{4,5},{6}});
+  cout<<x<<endl;
+  cout<<y<<endl;
 
-    CompoundTransferMap(const int in_dim, const int out_dim, const cnine::GatherMapB& g):
-      obj(new CompoundTransferMapObj(in_dim,out_dim,g)){}
-
-  };
+  MessageList overlaps=x.overlaps_mlist(y);
+  cout<<overlaps<<endl;
+  
 
 }
-
-#endif 

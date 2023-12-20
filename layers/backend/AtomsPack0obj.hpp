@@ -18,17 +18,23 @@
 #include "map_of_lists.hpp"
 #include "AtomsPackObj.hpp"
 #include "GatherMapProgram.hpp"
+#include "MessageMap.hpp"
 
 
 namespace ptens{
 
   template<typename DUMMY>
+  class AtomsPack1obj;
+
+  template<typename DUMMY>
+  class AtomsPack2obj;
+
+
+  template<typename DUMMY>
   class AtomsPack0obj{
   public:
 
-    typedef cnine::ptr_indexed_object_bank<AtomsPack0obj<DUMMY>,GatherMapProgram> TBANK0;
-    typedef cnine::ptr_indexed_object_bank<AtomsPack1obj<DUMMY>,GatherMapProgram> TBANK1;
-    typedef cnine::ptr_indexed_object_bank<AtomsPack2obj<DUMMY>,GatherMapProgram> TBANK2;
+    typedef cnine::ptr_indexed_object_bank<MessageList,MessageMap> MMBank;
 
 
     shared_ptr<AtomsPackObj> atoms;
@@ -37,8 +43,11 @@ namespace ptens{
   public: // ---- Constructors ------------------------------------------------------------------------------
 
 
-    AtomsPackOb1(const shared_ptr<AtomsPackObj>& _atoms):
+    AtomsPack0obj(const shared_ptr<AtomsPackObj>& _atoms):
       atoms(_atoms){}
+
+    AtomsPack0obj(const initializer_list<initializer_list<int> >& x):
+      AtomsPack0obj(cnine::to_share(new AtomsPackObj(x))){}
 
 
   public: // ---- Access ------------------------------------------------------------------------------------
@@ -48,7 +57,7 @@ namespace ptens{
       return atoms->size();
     }
 
-    int index_of(const int i){
+    int index_of(const int i) const{
       return i;
     }
 
@@ -56,59 +65,75 @@ namespace ptens{
   public: // ---- Transfer maps -----------------------------------------------------------------------------
 
 
-    GatherMapProgram overlaps_map(const AtomsPack0obj<DUMMY>& x){
-      return overlaps_map0(x);}
-
-    GatherMapProgram overlaps_map(const AtomsPack1obj<DUMMY>& x){
-      return overlaps_map1(x);}
-
-    GatherMapProgram overlaps_map(const AtomsPack2obj<DUMMY>& x){
-      return overlaps_map2(x);}
-
+    MMBank message_map=MMBank([&](const MessageList& x){
+	if(x.source0) return mmap(x,*x.source0);
+	if(x.source1) return mmap(x,*x.source1);
+	if(x.source2) return mmap(x,*x.source2);
+	return mmap(x,*x.source2);
+      });
     
     // 0 <- 0
-    TBANK0 overlaps_map0=TBANK0([&](const AtomsPack0obj<DUMMY>& y){
-	auto[in,out]=atoms->overlaps_mlist(*y.atoms).lists();
-
-	map_of_lists2<int,int> direct;
-	for(int m=0; m<in.size(); m++){
-	  int in_tensor=in.head(m);
-	  int out_tensor=out.head(m);
-	  direct.push_back(index_of(out_tensor),y.index_of(in_tensor);});
-      
-	return GatherMapProgram(new GatherMapB(direct));
-      });
+    //TBANK0 overlaps_map0=TBANK0([&](const AtomsPack0obj<DUMMY>& y){
+    //auto[in,out]=atoms->overlaps_mlist(*y.atoms).lists();
+    MessageMap mmap(const MessageList& lists, const AtomsPack0obj<DUMMY>& y){
+      auto[in,out]=lists.lists();
+      cnine::map_of_lists<int,int> direct;
+      for(int m=0; m<in.size(); m++){
+	int in_tensor=in.head(m);
+	int out_tensor=out.head(m);
+	direct.push_back(index_of(out_tensor),y.index_of(in_tensor));
+      }
+      return cnine::GatherMapProgram(new cnine::GatherMapB(direct));
+    };
   
 
     // 0 <- 1
-    TBANK1 overlaps_map1=TBANK1([&](const AtomsPack0obj<DUMMY>& y){
-      auto[in_lists,out_lists]=atoms->overlaps_mlist(*y.atoms).lists();
-
-      map_of_lists2<int,int> direct;
-      for(int m=0; m<in_list.size(); m++){
+    //TBANK1 overlaps_map1=TBANK1([&](const AtomsPack0obj<DUMMY>& y){
+    //auto[in_lists,out_lists]=atoms->overlaps_mlist(*y.atoms).lists();
+    MessageMap mmap(const MessageList& lists, const AtomsPack1obj<DUMMY>& y){
+      auto[in_lists,out_lists]=lists.lists();
+      cnine::map_of_lists<int,int> direct;
+      for(int m=0; m<in_lists.size(); m++){
 	int in_tensor=in_lists.head(m);
 	int out_tensor=out_lists.head(m);
 	direct.push_back(index_of(out_tensor),y.index_of(in_tensor,in_lists(m,0)));
       }
-
-      return GatherMapProgram(new GatherMapB(direct));
-    });
+      return cnine::GatherMapProgram(new cnine::GatherMapB(direct));
+    }
 
 
     // 0 <- 2
-    TBANK2 overlaps_map2=TBANK2([&](const AtomsPack0obj<DUMMY>& y){
-	auto[in_lists,out_lists]=atoms->overlaps_mlist(*y.atoms).lists();
+    //TBANK2 overlaps_map2=TBANK2([&](const AtomsPack0obj<DUMMY>& y){
+    //auto[in_lists,out_lists]=atoms->overlaps_mlist(*y.atoms).lists();
+    MessageMap mmap(const MessageList& lists, const AtomsPack2obj<DUMMY>& y){
+      auto[in_lists,out_lists]=lists.lists();
+      cnine::map_of_lists<int,int> direct;
+      for(int m=0; m<in_lists.size(); m++){
+	int in_tensor=in_lists.head(m);
+	int out_tensor=out_lists.head(m);
+	direct.push_back(index_of(out_tensor),y.index_of(in_tensor,in_lists(m,0),in_lists(m,0)));
+      }
+      return cnine::GatherMapProgram(new cnine::GatherMapB(direct));
+    }
 
-	map_of_lists2<int,int> direct;
-	for(int m=0; m<in_lists.size(); m++){
-	  int in_tensor=in_lists.head(m);
-	  int out_tensor=out_lists.head(m);
-	  direct.push_back(index_of(out_tensor),y.index_of(in_tensor,in_lists(m,0),in_lists(m,0)));
-	}
 
-	return GatherMapProgram(new GatherMapB(direct));
-      });
+  public: // ---- I/O ----------------------------------------------------------------------------------------
 
+
+    string classname() const{
+      return "AtomsPack0Obj";
+    }
+
+    string repr() const{
+      return "AtomsPack0Obj";
+    }
+
+    string str(const string indent="") const{
+      return atoms->str(indent);
+    }
+
+    friend ostream& operator<<(ostream& stream, const AtomsPack0obj& v){
+      stream<<v.str(); return stream;}
 
 
   };
@@ -116,3 +141,14 @@ namespace ptens{
 }
 
 #endif 
+    //GatherMapProgram overlaps_map(const AtomsPack0obj<DUMMY>& x){
+    //return overlaps_map0(x);}
+
+    //GatherMapProgram overlaps_map(const AtomsPack1obj<DUMMY>& x){
+    //return overlaps_map1(x);}
+
+    //GatherMapProgram overlaps_map(const AtomsPack2obj<DUMMY>& x){
+    //return overlaps_map2(x);}
+    //typedef cnine::ptr_indexed_object_bank<AtomsPack0obj<DUMMY>,GatherMapProgram> TBANK0;
+    //typedef cnine::ptr_indexed_object_bank<AtomsPack1obj<DUMMY>,GatherMapProgram> TBANK1;
+    //typedef cnine::ptr_indexed_object_bank<AtomsPack2obj<DUMMY>,GatherMapProgram> TBANK2;
