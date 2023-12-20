@@ -59,9 +59,9 @@ namespace ptens{
       return atoms->size();
     }
 
-    int offset1(const int i) const{
-      return atoms->offset(i);
-    }
+    //int offset1(const int i) const{
+    //return atoms->offset(i);
+    //}
 
     int offset(const int i) const{
       return offsets[i];
@@ -203,10 +203,10 @@ namespace ptens{
 	vector<int> ix=in_lists(m);
 	int k=ix.size();
 	
-	int in_offs=atoms->offset(in_tensor);
+	int offs=atoms->offset(in_tensor);
 	int n=size_of(in_tensor);
 
-	int out_offs=in_lists.offset1(in_tensor);
+	int out_offs=in_lists.offset(in_tensor);
 	
 	for(int i0=0; i0<k; i0++){
 	  int target=3*(out_offs+i0);
@@ -237,7 +237,7 @@ namespace ptens{
 	
 	for(int i0=0; i0<k; i0++)
 	  R.push_back(ncols*(offs+(n+1)*ix[i0])+coffs,m);
-	for(int i=0; i0<k; i0++)
+	for(int i0=0; i0<k; i0++)
 	  for(int i1=0; i1<k; i1++)
 	    R.push_back(ncols*(offs+ix[i0]*n+ix[i1])+coffs+cstride,m);
 
@@ -246,7 +246,7 @@ namespace ptens{
     }
 
 
-    cnine::GatherMapB broadcast1(const cnine::hlists<int>& out_lists, const int ncols=3, const int coffs=0){
+    cnine::GatherMapB broadcast1(const cnine::hlists<int>& out_lists, const int ncols=3, const int coffs=0, const int cstride=1){
       cnine::map_of_lists<int,int> R;
       PTENS_ASSRT(ncols>=3);
       PTENS_ASSRT(coffs<=ncols-3);
@@ -260,14 +260,14 @@ namespace ptens{
 	int offs=offset(out_tensor);
 	int n=size_of(out_tensor);
 	
-	int in_offs=out_lists.offset1(in_tensor);
+	int in_offs=out_lists.offset(m);
 
 	for(int i0=0; i0<k; i0++){
 	  int source=in_offs+i0;
 	  R.push_back(ncols*(offs+(n+1)*ix[i0])+coffs,source);
 	  for(int i1=0; i1<k; i1++){
 	    R.push_back(ncols*(offs+ix[i0]*n+ix[i1])+coffs+cstride,source);
-	    R.push_back(ncols*(offs+ix[i1]*n+ix[i0])+coffs+cstride,source);
+	    R.push_back(ncols*(offs+ix[i1]*n+ix[i0])+coffs+2*cstride,source);
 	  }
 	}
       }

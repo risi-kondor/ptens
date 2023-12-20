@@ -40,7 +40,7 @@ namespace ptens{
     
     template<typename SOURCE>
     MessageList overlaps_mlist(const SOURCE& x){
-      return obj->atoms->overlaps_mlist(x.obj->atoms);
+      return obj->atoms->overlaps_mlist(*x.obj->atoms);
     }
 
     template<typename SOURCE>

@@ -17,7 +17,7 @@
 
 #include "AtomsPackObj.hpp"
 #include "MessageListObj.hpp"
-
+#include "observable.hpp"
 
 namespace ptens{
 
@@ -25,7 +25,8 @@ namespace ptens{
   template<typename DUMMY> class AtomsPack1obj;
   template<typename DUMMY> class AtomsPack2obj;
 
-  class MessageList{
+
+  class MessageList: public cnine::observable<MessageList>{
   public:
 
     shared_ptr<const MessageListObj> obj;
@@ -36,6 +37,7 @@ namespace ptens{
 
 
     MessageList(const MessageListObj* _obj):
+      observable(this), 
       obj(_obj){}
 
 
@@ -51,7 +53,19 @@ namespace ptens{
     }
 
 
+  public: // ---- Copying ------------------------------------------------------------------------------------
+
+
+    MessageList(const MessageList& x):
+      observable(this),
+      obj(x.obj),
+      source0(x.source0),
+      source1(x.source1),
+      source2(x.source2){}
+
+
   public: // ---- I/O ----------------------------------------------------------------------------------------
+
 
     string classname() const{
       return "MessageList";
