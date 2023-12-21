@@ -31,7 +31,7 @@ namespace ptens{
   public: // ---- Constructors ------------------------------------------------------------------------------
 
 
-    AtomsPack0(const initializer_list<initializer_list<int> >& x):
+    AtomsPack2(const initializer_list<initializer_list<int> >& x):
       obj(new AtomsPack2obj<int>(x)){}
 
 
@@ -40,12 +40,14 @@ namespace ptens{
     
     template<typename SOURCE>
     MessageList overlaps_mlist(const SOURCE& x){
-      return obj->atoms->overlaps_mlist(*x.obj->atoms);
+      return MessageList(obj->atoms->overlaps_mlist(*x.obj->atoms),x.obj);
+      //return obj->atoms->overlaps_mlist(*x.obj->atoms);
     }
 
     template<typename SOURCE>
-    MessageMap overlaps_tmap(const SOURCE& x){
-      return obj->mmap(obj->atoms->overlaps_mlist(x.obj->atoms));
+    MessageMap overlaps_mmap(const SOURCE& x){
+      return obj->message_map(overlaps_mlist(x));
+      //return obj->message_map(obj->atoms->overlaps_mlist(*x.obj->atoms));
     }
 
 

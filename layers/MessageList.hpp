@@ -63,6 +63,19 @@ namespace ptens{
       source1(x.source1),
       source2(x.source2){}
 
+    MessageList(const MessageList& x, const shared_ptr<AtomsPack0obj<int> > s):
+      MessageList(x){
+      source0=s;}
+
+    MessageList(const MessageList& x, const shared_ptr<AtomsPack1obj<int> > s):
+      MessageList(x){
+      source1=s;}
+
+    MessageList(const MessageList& x, const shared_ptr<AtomsPack2obj<int> > s):
+      MessageList(x){
+      source2=s;}
+
+
 
   public: // ---- I/O ----------------------------------------------------------------------------------------
 

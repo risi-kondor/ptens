@@ -65,10 +65,17 @@ namespace ptens{
   public: // ---- Transfer maps -----------------------------------------------------------------------------
 
 
+    //template<typename SOURCE>
+    //MessageList overlaps_mlist(const SOURCE& x){
+    //return MessageList(atoms->overlaps_mlist(x.atoms),x);
+    //}
+
+
     MMBank message_map=MMBank([&](const MessageList& x){
 	if(x.source0) return mmap(x,*x.source0);
 	if(x.source1) return mmap(x,*x.source1);
 	if(x.source2) return mmap(x,*x.source2);
+	CNINE_UNIMPL();
 	return mmap(x,*x.source2);
       });
     

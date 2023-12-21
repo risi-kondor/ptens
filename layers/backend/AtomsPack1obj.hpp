@@ -17,10 +17,20 @@
 
 #include "map_of_lists.hpp"
 #include "AtomsPackObj.hpp"
+#include "AtomsPack0obj.hpp"
+#include "AtomsPack2obj.hpp"
 #include "GatherMapProgram.hpp"
+#include "MessageMap.hpp"
 
 
 namespace ptens{
+
+  template<typename DUMMY>
+  class AtomsPack0obj;
+
+  template<typename DUMMY>
+  class AtomsPack2obj;
+
 
   template<typename DUMMY>
   class AtomsPack1obj{
@@ -65,6 +75,8 @@ namespace ptens{
 	if(x.source0) return mmap(x,*x.source0);
 	if(x.source1) return mmap(x,*x.source1);
 	if(x.source2) return mmap(x,*x.source2);
+	CNINE_UNIMPL();
+	return mmap(x,*x.source2);
       });
 
 
@@ -142,7 +154,7 @@ namespace ptens{
   public: // ---- Broadcasting and reduction ----------------------------------------------------------------
 
 
-    cnine::GatherMapB reduce0(const cnine::hlists<int>& in_lists, const int stride=1, const int coffs=0){
+    cnine::GatherMapB reduce0(const cnine::hlists<int>& in_lists, const int stride=1, const int coffs=0) const{
       cnine::map_of_lists<int,int> R;
       for(int m=0; m<in_lists.size(); m++){
 	int in_tensor=in_lists.head(m);
@@ -152,7 +164,7 @@ namespace ptens{
       return cnine::GatherMapB(R,stride);
     }
 
-    cnine::GatherMapB broadcast0(const cnine::hlists<int>& out_lists, const int stride=1, const int coffs=0){
+    cnine::GatherMapB broadcast0(const cnine::hlists<int>& out_lists, const int stride=1, const int coffs=0) const{
       cnine::map_of_lists<int,int> R;
       PTENS_ASSRT(stride>=1);
       PTENS_ASSRT(coffs<=stride-1);

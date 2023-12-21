@@ -29,8 +29,35 @@ namespace ptens{
     MessageMap(const cnine::GatherMapProgram&& _obj):
       obj(new cnine::GatherMapProgram(_obj)){}
 
-    //MessageMap(const int in_dim, const int out_dim, const cnine::GatherMapB& g):
-    //obj(new cnine::GatherMapB(g,in_dim,out_dim)){}
+
+    MessageMap inv() const{
+      return MessageMap(obj->inv());
+    }
+
+    template<typename TYPE>
+    void operator()(cnine::Ltensor<TYPE>& r, const cnine::Ltensor<TYPE>& x){
+      (*obj)(r,x);
+    }
+
+
+  public: // ---- I/O ----------------------------------------------------------------------------------------
+
+
+    string classname() const{
+      return "MessageMap";
+    }
+
+    string repr() const{
+      return "MessageMap";
+    }
+
+    string str(const string indent="") const{
+      return obj->str(indent);
+    }
+
+    friend ostream& operator<<(ostream& stream, const MessageMap& v){
+      stream<<v.str(); return stream;}
+
 
   };
 

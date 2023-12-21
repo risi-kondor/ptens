@@ -32,5 +32,8 @@ int main(int argc, char** argv){
   MessageList overlaps=x.overlaps_mlist(y);
   cout<<overlaps<<endl;
   
+  MessageMap overlaps_tmap=x.overlaps_mmap(y);
+  cout<<overlaps_tmap<<endl;
+
 
 }

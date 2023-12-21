@@ -14,7 +14,7 @@
 
 #include "Cnine_base.cpp"
 #include "PtensSession.hpp"
-#include "AtomsPack1.hpp"
+#include "AtomsPack2.hpp"
 
 using namespace ptens;
 using namespace cnine;
@@ -24,11 +24,9 @@ PtensSession ptens_session;
 
 int main(int argc, char** argv){
 
-  Ltensor<float> Y(Gdims(7,5),filltype=4);
-  Ltensor<float> X(Gdims(6,10));
 
-  AtomsPack1 x({{0,1},{1,2,3},{5}});
-  AtomsPack1 y({{0},{1,2,3},{4,5},{6}});
+  AtomsPack2 x({{0,1},{1,2,3},{5}});
+  AtomsPack2 y({{0},{1,2,3},{4,5},{6}});
   cout<<x<<endl;
   cout<<y<<endl;
 
@@ -38,10 +36,5 @@ int main(int argc, char** argv){
   MessageMap overlaps_tmap=x.overlaps_mmap(y);
   cout<<overlaps_tmap<<endl;
 
-  cout<<overlaps_tmap.inv()<<endl;
-
-  overlaps_tmap(X,Y);
-
-  cout<<X<<endl;
 
 }

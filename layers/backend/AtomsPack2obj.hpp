@@ -17,10 +17,19 @@
 
 #include "map_of_lists.hpp"
 #include "AtomsPackObj.hpp"
+#include "AtomsPack0obj.hpp"
+#include "AtomsPack1obj.hpp"
 #include "GatherMapProgram.hpp"
+#include "MessageMap.hpp"
 
 
 namespace ptens{
+
+  template<typename DUMMY>
+  class AtomsPack0obj;
+
+  template<typename DUMMY>
+  class AtomsPack1obj;
 
 
   template<typename DUMMY>
@@ -83,6 +92,8 @@ namespace ptens{
 	if(x.source0) return mmap(x,*x.source0);
 	if(x.source1) return mmap(x,*x.source1);
 	if(x.source2) return mmap(x,*x.source2);
+	CNINE_UNIMPL();
+	return mmap(x,*x.source2);
       });
 
 
@@ -169,7 +180,7 @@ namespace ptens{
   public: // ---- Broadcasting and reduction ----------------------------------------------------------------
 
 
-    cnine::GatherMapB reduce0(const cnine::hlists<int>& in_lists, const int stride=1, const int coffs=0){
+    cnine::GatherMapB reduce0(const cnine::hlists<int>& in_lists, const int stride=1, const int coffs=0) const{
       cnine::map_of_lists<int,int> R;
       PTENS_ASSRT(coffs<=stride-1);
 
@@ -193,7 +204,7 @@ namespace ptens{
     }
 
 
-    cnine::GatherMapB reduce1(const cnine::hlists<int>& in_lists, const int stride=1, const int coffs=0){
+    cnine::GatherMapB reduce1(const cnine::hlists<int>& in_lists, const int stride=1, const int coffs=0) const{
       cnine::map_of_lists<int,int> R;
       PTENS_ASSRT(coffs<=stride-1);
 
@@ -221,7 +232,7 @@ namespace ptens{
     }
 
 
-    cnine::GatherMapB broadcast0(const cnine::hlists<int>& out_lists, const int ncols=2, const int coffs=0, const int cstride=1){
+    cnine::GatherMapB broadcast0(const cnine::hlists<int>& out_lists, const int ncols=2, const int coffs=0, const int cstride=1) const{
       cnine::map_of_lists<int,int> R;
       PTENS_ASSRT(ncols>=2);
       PTENS_ASSRT(coffs<=ncols-2);
@@ -246,7 +257,7 @@ namespace ptens{
     }
 
 
-    cnine::GatherMapB broadcast1(const cnine::hlists<int>& out_lists, const int ncols=3, const int coffs=0, const int cstride=1){
+    cnine::GatherMapB broadcast1(const cnine::hlists<int>& out_lists, const int ncols=3, const int coffs=0, const int cstride=1) const{
       cnine::map_of_lists<int,int> R;
       PTENS_ASSRT(ncols>=3);
       PTENS_ASSRT(coffs<=ncols-3);
