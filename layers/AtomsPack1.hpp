@@ -12,8 +12,8 @@
  *
  */
 
-#ifndef _ptens_AtomsPack0
-#define _ptens_AtomsPack0
+#ifndef _ptens_AtomsPack1
+#define _ptens_AtomsPack1
 
 #include "AtomsPack.hpp"
 #include "AtomsPack1obj.hpp"
@@ -30,6 +30,9 @@ namespace ptens{
 
   public: // ---- Constructors ------------------------------------------------------------------------------
 
+
+    AtomsPack1(const AtomsPack& _atoms):
+      obj(new AtomsPack1obj<int>(_atoms)){}
 
     AtomsPack1(const initializer_list<initializer_list<int> >& x):
       obj(new AtomsPack1obj<int>(x)){}
@@ -48,6 +51,34 @@ namespace ptens{
     MessageMap overlaps_mmap(const SOURCE& x){
       return obj->message_map(overlaps_mlist(x));
       //return obj->message_map(obj->atoms->overlaps_mlist(*x.obj->atoms));
+    }
+
+
+  public: // ---- Access ------------------------------------------------------------------------------------
+
+
+    int size() const{
+      return obj->size();
+    }
+
+    int size1() const{
+      return obj->size1();
+    }
+
+    int size_of(const int i) const{
+      return obj->size_of(i);
+    }
+
+    int offset(const int i) const{
+      return obj->offset(i);
+    }
+
+    int index_of(const int i, const int j0) const{
+      return obj->index_of(i,j0);
+    }
+
+    Atoms operator()(const int i) const{
+      return (*obj->atoms)(i);
     }
 
 

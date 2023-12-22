@@ -12,8 +12,8 @@
  *
  */
 
-#ifndef _ptens_AtomsPack0
-#define _ptens_AtomsPack0
+#ifndef _ptens_AtomsPack2
+#define _ptens_AtomsPack2
 
 #include "AtomsPack.hpp"
 #include "AtomsPack2obj.hpp"
@@ -31,6 +31,9 @@ namespace ptens{
   public: // ---- Constructors ------------------------------------------------------------------------------
 
 
+    AtomsPack2(const AtomsPack& _atoms):
+      obj(new AtomsPack2obj<int>(_atoms)){}
+
     AtomsPack2(const initializer_list<initializer_list<int> >& x):
       obj(new AtomsPack2obj<int>(x)){}
 
@@ -41,13 +44,43 @@ namespace ptens{
     template<typename SOURCE>
     MessageList overlaps_mlist(const SOURCE& x){
       return MessageList(obj->atoms->overlaps_mlist(*x.obj->atoms),x.obj);
-      //return obj->atoms->overlaps_mlist(*x.obj->atoms);
     }
 
     template<typename SOURCE>
     MessageMap overlaps_mmap(const SOURCE& x){
       return obj->message_map(overlaps_mlist(x));
-      //return obj->message_map(obj->atoms->overlaps_mlist(*x.obj->atoms));
+    }
+
+
+  public: // ---- Access ------------------------------------------------------------------------------------
+
+
+    int size() const{
+      return obj->size();
+    }
+
+    int size1() const{
+      return obj->size1();
+    }
+
+    int size2() const{
+      return obj->size2();
+    }
+
+    int size_of(const int i) const{
+      return obj->size_of(i);
+    }
+
+    int offset(const int i) const{
+      return obj->offset(i);
+    }
+
+    int index_of(const int i, const int j0, const int j1) const{
+      return obj->index_of(i,j0,j1);
+    }
+
+    Atoms operator()(const int i) const{
+      return (*obj->atoms)(i);
     }
 
 

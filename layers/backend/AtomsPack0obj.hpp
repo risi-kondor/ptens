@@ -43,6 +43,12 @@ namespace ptens{
   public: // ---- Constructors ------------------------------------------------------------------------------
 
 
+    AtomsPack0obj(const int n):
+      atoms(new AtomsPackObj(n)){}
+
+    AtomsPack0obj(const AtomsPack& _atoms):
+      atoms(_atoms.obj){}
+
     AtomsPack0obj(const shared_ptr<AtomsPackObj>& _atoms):
       atoms(_atoms){}
 
@@ -55,6 +61,10 @@ namespace ptens{
 
     int size() const{
       return atoms->size();
+    }
+
+    int offset(const int i) const{
+      return i;
     }
 
     int index_of(const int i) const{
@@ -80,8 +90,6 @@ namespace ptens{
       });
     
     // 0 <- 0
-    //TBANK0 overlaps_map0=TBANK0([&](const AtomsPack0obj<DUMMY>& y){
-    //auto[in,out]=atoms->overlaps_mlist(*y.atoms).lists();
     MessageMap mmap(const MessageList& lists, const AtomsPack0obj<DUMMY>& y){
       auto[in,out]=lists.lists();
       cnine::map_of_lists<int,int> direct;
@@ -95,8 +103,6 @@ namespace ptens{
   
 
     // 0 <- 1
-    //TBANK1 overlaps_map1=TBANK1([&](const AtomsPack0obj<DUMMY>& y){
-    //auto[in_lists,out_lists]=atoms->overlaps_mlist(*y.atoms).lists();
     MessageMap mmap(const MessageList& lists, const AtomsPack1obj<DUMMY>& y){
       auto[in_lists,out_lists]=lists.lists();
       cnine::map_of_lists<int,int> direct;
@@ -110,8 +116,6 @@ namespace ptens{
 
 
     // 0 <- 2
-    //TBANK2 overlaps_map2=TBANK2([&](const AtomsPack0obj<DUMMY>& y){
-    //auto[in_lists,out_lists]=atoms->overlaps_mlist(*y.atoms).lists();
     MessageMap mmap(const MessageList& lists, const AtomsPack2obj<DUMMY>& y){
       auto[in_lists,out_lists]=lists.lists();
       cnine::map_of_lists<int,int> direct;
@@ -159,3 +163,9 @@ namespace ptens{
     //typedef cnine::ptr_indexed_object_bank<AtomsPack0obj<DUMMY>,GatherMapProgram> TBANK0;
     //typedef cnine::ptr_indexed_object_bank<AtomsPack1obj<DUMMY>,GatherMapProgram> TBANK1;
     //typedef cnine::ptr_indexed_object_bank<AtomsPack2obj<DUMMY>,GatherMapProgram> TBANK2;
+    //TBANK0 overlaps_map0=TBANK0([&](const AtomsPack0obj<DUMMY>& y){
+    //auto[in,out]=atoms->overlaps_mlist(*y.atoms).lists();
+    //TBANK1 overlaps_map1=TBANK1([&](const AtomsPack0obj<DUMMY>& y){
+    //auto[in_lists,out_lists]=atoms->overlaps_mlist(*y.atoms).lists();
+    //TBANK2 overlaps_map2=TBANK2([&](const AtomsPack0obj<DUMMY>& y){
+    //auto[in_lists,out_lists]=atoms->overlaps_mlist(*y.atoms).lists();

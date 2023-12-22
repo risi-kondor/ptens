@@ -33,6 +33,12 @@ namespace ptens{
   public: // ---- Constructors ------------------------------------------------------------------------------
 
 
+    AtomsPack0(const int n):
+      obj(new AtomsPack0obj<int>(n)){}
+
+    AtomsPack0(const AtomsPack& _atoms):
+      obj(new AtomsPack0obj<int>(_atoms)){}
+
     AtomsPack0(const initializer_list<initializer_list<int> >& x):
       obj(new AtomsPack0obj<int>(x)){}
 
@@ -52,6 +58,22 @@ namespace ptens{
       //return obj->message_map(obj->atoms->overlaps_mlist(*x.obj->atoms));
     }
 
+
+  public: // ---- Access ------------------------------------------------------------------------------------
+
+
+    int size() const{
+      return obj->size();
+    }
+
+    int offset(const int i) const{
+      return obj->offset(i);
+    }
+
+    Atoms operator()(const int i) const{
+      return (*obj->atoms)(i);
+    }
+    
 
   public: // ---- I/O ----------------------------------------------------------------------------------------
 

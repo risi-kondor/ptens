@@ -14,7 +14,9 @@
 #include "Cnine_base.cpp"
 #include "CnineSession.hpp"
 
-#include "Ptensors1.hpp"
+#include "Ptensors0b.hpp"
+#include "Ptensors1b.hpp"
+#include "Ptensors2b.hpp"
 
 using namespace ptens;
 using namespace cnine;
@@ -24,11 +26,23 @@ PtensSession ptens_session;
 
 int main(int argc, char** argv){
 
-  Ptensors0 A=Ptensors0::sequential(2,3);
-  cout<<A<<endl;
+  typedef Ptensors0b<float> Ptens0;
+  typedef Ptensors1b<float> Ptens1;
+  typedef Ptensors2b<float> Ptens2;
 
-  Ptensors0b<float> Ab(A);
-  cout<<Ab<<endl;
+  AtomsPack xatoms=AtomsPack::random(8,0.5);
+  Ptens0 X0=Ptens0(xatoms,channels=3,filltype=4);
+  Ptens1 X1=Ptens1(xatoms,channels=3,filltype=4);
+  Ptens2 X2=Ptens2(xatoms,channels=3,filltype=4);
+
+  AtomsPack yatoms=AtomsPack::random(8,0.5);
+  cout<<Ptens2::gather(X0,yatoms)<<endl;
+  cout<<Ptens2::gather(X1,yatoms)<<endl;
+  cout<<Ptens2::gather(X2,yatoms)<<endl;
+
+
+  //Ptensors1b<float> Ab(A);
+  //cout<<Ab<<endl;
 
 }
 
