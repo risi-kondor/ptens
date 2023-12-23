@@ -61,6 +61,10 @@ namespace ptens{
       return AtomsPack(new AtomsPackObj(AtomsPackObj::random(n,p)));
     }
 
+    static AtomsPack random0(const int n){
+      return AtomsPack(new AtomsPackObj(AtomsPackObj::random0(n)));
+    }
+
 
   public: // ---- Copying ------------------------------------------------------------------------------------
 

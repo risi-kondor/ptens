@@ -131,6 +131,19 @@ namespace ptens{
       return R;
     }
 
+   static AtomsPackObj random0(const int n){
+      AtomsPackObj R;
+      uniform_int_distribution<> distr(0,n-1);
+      for(int i=0; i<n; i++){
+	//vector<int> v;
+	//for(int j=0; j<n; j++)
+	//if(distr(rndGen)<p)
+	//v.push_back(j);
+	R.push_back({distr(rndGen)});
+      }
+      return R;
+    }
+
 
   public: // ---- Copying ------------------------------------------------------------------------------------
 

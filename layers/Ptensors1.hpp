@@ -90,6 +90,7 @@ namespace ptens{
 
 
     template<typename FILLTYPE, typename = typename std::enable_if<std::is_base_of<cnine::fill_pattern, FILLTYPE>::value, FILLTYPE>::type>
+    [[deprecated]]
     Ptensors1(const AtomsPack& _atoms, const int _nc, const FILLTYPE& dummy, const int _dev=0):
       Ptensors(_atoms, cnine::Gdims({_nc}), dummy, _dev){}
 

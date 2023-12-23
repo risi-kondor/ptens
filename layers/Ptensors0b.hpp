@@ -93,7 +93,7 @@ namespace ptens{
 
     Ptensors0b(const Ptensors0& x):
       BASE(cnine::Gdims({x.tail/x.nc,x.nc})),
-      atoms(x.tail/x.nc){
+      atoms(x.atoms){
       BASE::view2().set(x.view_as_matrix().view2());
     }
 
