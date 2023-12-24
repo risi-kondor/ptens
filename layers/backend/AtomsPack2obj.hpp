@@ -115,9 +115,15 @@ namespace ptens{
       for(int m=0; m<in_lists.size(); m++){
 	int in_tensor=in_lists.head(m);
 	int out_tensor=out_lists.head(m);
-	direct.push_back(index_of(out_tensor,out_lists(m,0),out_lists(m,0)),y.index_of(in_tensor));
+	vector<int> in=in_lists(m);
+	vector<int> out=out_lists(m);
+	for(int i0=0; i0<out.size(); i0++)
+	  direct.push_back(2*index_of(out_tensor,out[i0],out[0])+1,y.index_of(in_tensor));
+	for(int i0=0; i0<out.size(); i0++)
+	  for(int i1=0; i1<out.size(); i1++)
+	    direct.push_back(2*index_of(out_tensor,out[i0],out[i1]),y.index_of(in_tensor));
       }
-      return cnine::GatherMapProgram(new cnine::GatherMapB(direct));
+      return cnine::GatherMapProgram(new cnine::GatherMapB(direct,2));
     }
   
       
@@ -133,10 +139,10 @@ namespace ptens{
 	vector<int> out=out_lists(m);
 	for(int i0=0; i0<out.size(); i0++){
 	  int source=y.index_of(in_tensor,in[i0]);
-	  direct.push_back(5*index_of(out_tensor,out[i0],out[i0])+2,source);
+	  direct.push_back(5*index_of(out_tensor,out[i0],out[i0])+4,source);
 	  for(int i1=0; i1<out.size(); i1++){
 	    direct.push_back(5*index_of(out_tensor,out[i0],out[i1])+3,source);
-	    direct.push_back(5*index_of(out_tensor,out[i1],out[i0])+4,source);
+	    direct.push_back(5*index_of(out_tensor,out[i1],out[i0])+2,source);
 	  }
 	}
       }
@@ -199,10 +205,10 @@ namespace ptens{
 	int n=size_of(in_tensor);
 	
 	for(int i0=0; i0<k; i0++)
-	  R.push_back(2*m,in_columns*(offs+(n+1)*ix[i0])+coffs);
+	  R.push_back(2*m+1,in_columns*(offs+(n+1)*ix[i0])+coffs);
 	for(int i0=0; i0<k; i0++)
 	  for(int i1=0; i1<k; i1++)
-	    R.push_back(2*m+1,in_columns*(offs+ix[i0]*n+ix[i1])+coffs);
+	    R.push_back(2*m,in_columns*(offs+ix[i0]*n+ix[i1])+coffs);
 
       }
       return cnine::GatherMapB(R,2,in_columns);
@@ -219,17 +225,17 @@ namespace ptens{
 	vector<int> ix=in_lists(m);
 	int k=ix.size();
 	
-	int offs=atoms->offset(in_tensor);
+	int offs=/*atoms->*/offset(in_tensor);
 	int n=size_of(in_tensor);
 
 	int out_offs=in_lists.offset(m)-m; 
 	
 	for(int i0=0; i0<k; i0++){
 	  int target=3*(out_offs+i0);
-	  R.push_back(target,in_columns*(offs+(n+1)*ix[i0])+coffs);
+	  R.push_back(target+2,in_columns*(offs+(n+1)*ix[i0])+coffs);
 	  for(int i1=0; i1<k; i1++){
 	    R.push_back(target+1,in_columns*(offs+ix[i0]*n+ix[i1])+coffs);
-	    R.push_back(target+2,in_columns*(offs+ix[i1]*n+ix[i0])+coffs);
+	    R.push_back(target,in_columns*(offs+ix[i1]*n+ix[i0])+coffs);
 	  }
 	}
       }
@@ -252,10 +258,10 @@ namespace ptens{
 	int n=size_of(out_tensor);
 	
 	for(int i0=0; i0<k; i0++)
-	  R.push_back(ncols*(offs+(n+1)*ix[i0])+coffs,m);
+	  R.push_back(ncols*(offs+(n+1)*ix[i0])+coffs+cstride,m);
 	for(int i0=0; i0<k; i0++)
 	  for(int i1=0; i1<k; i1++)
-	    R.push_back(ncols*(offs+ix[i0]*n+ix[i1])+coffs+cstride,m);
+	    R.push_back(ncols*(offs+ix[i0]*n+ix[i1])+coffs,m);
 
       }
       return cnine::GatherMapB(R,ncols);
@@ -280,10 +286,10 @@ namespace ptens{
 
 	for(int i0=0; i0<k; i0++){
 	  int source=in_offs+i0;
-	  R.push_back(ncols*(offs+(n+1)*ix[i0])+coffs,source);
+	  R.push_back(ncols*(offs+(n+1)*ix[i0])+coffs+2*cstride,source);
 	  for(int i1=0; i1<k; i1++){
 	    R.push_back(ncols*(offs+ix[i0]*n+ix[i1])+coffs+cstride,source);
-	    R.push_back(ncols*(offs+ix[i1]*n+ix[i0])+coffs+2*cstride,source);
+	    R.push_back(ncols*(offs+ix[i1]*n+ix[i0])+coffs,source);
 	  }
 	}
       }

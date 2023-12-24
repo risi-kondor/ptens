@@ -91,7 +91,7 @@ namespace ptens{
   void emp12(DEST& r, const SRC& x, const TransferMap& map){
     if(map.is_empty()) return;
     int nc=x.get_nc();
-    r.broadcast0(x.reduce0(map.in()),map.out());
+    r.broadcast0(x.reduce0(map.in()),map.out(),0);
     r.broadcast1(x.reduce1(map.in()),map.out(),2*nc);
   }
 
@@ -107,7 +107,7 @@ namespace ptens{
   void emp22(DEST& r, const SRC& x, const TransferMap& map){
     if(map.is_empty()) return;
     int nc=x.get_nc();
-    r.broadcast0(x.reduce0(map.in()),map.out());
+    r.broadcast0(x.reduce0(map.in()),map.out(),0);
     r.broadcast1(x.reduce1(map.in()),map.out(),4*nc);
     r.broadcast2(x.reduce2(map.in()),map.out(),13*nc);
   }
@@ -124,7 +124,7 @@ namespace ptens{
   template<typename SRC, typename DEST>
   void emp20(DEST& r, const SRC& x, const TransferMap& map){
     if(map.is_empty()) return;
-    r.broadcast0(x.reduce0(map.in()),map.out());
+    r.broadcast0(x.reduce0(map.in()),map.out(),0);
   }
 
   template<typename SRC, typename DEST>
@@ -138,7 +138,7 @@ namespace ptens{
   void emp21(DEST& r, const SRC& x, const TransferMap& map){
     if(map.is_empty()) return;
     int nc=x.get_nc();
-    r.broadcast0(x.reduce0(map.in()),map.out());
+    r.broadcast0(x.reduce0(map.in()),map.out(),0); // added 0 
     r.broadcast1(x.reduce1(map.in()),map.out(),2*nc);
   }
 

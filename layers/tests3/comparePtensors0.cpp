@@ -11,6 +11,7 @@
  * must be accompanied by a verbatim copy of the license. 
  *
  */
+
 #include "Cnine_base.cpp"
 #include "CnineSession.hpp"
 
@@ -42,35 +43,31 @@ int main(int argc, char** argv){
   Ptens1 X1(x1);
   Ptens2 X2(x2);
 
-  //cout<<x0<<endl;
-  //cout<<X0<<endl;
-  //cout<<X1<<endl;
-  //cout<<X2<<endl;
-
-  AtomsPack yatoms=AtomsPack::random(5,0.5);
+  AtomsPack yatoms=AtomsPack::random0(5);
   TransferMap tmap0=yatoms.overlaps(xatoms0);
   TransferMap tmap=yatoms.overlaps(xatoms);
 
-  Ptensors1 y0=Ptensors1::zero(yatoms,nc);
-  emp10(y0,x0,tmap0);
-  Ptens1 Y0=Ptens1::gather(x0,yatoms);
+  Ptensors0 y0=Ptensors0::zero(yatoms,nc);
+  emp00(y0,x0,tmap0);
+  Ptens0 Y0=Ptens0::gather(x0,yatoms);
   //cout<<y0<<endl;
   //cout<<Y0<<endl;
-  cout<<"1 <- 0 error: "<<Y0.diff2(Ptens1(y0))<<endl;
+  cout<<"0 <- 0 error: "<<Y0.diff2(Ptens0(y0))<<endl;
 
 
-  Ptensors1 y1=Ptensors1::zero(yatoms,2*nc);
-  emp11(y1,x1,tmap);
-  Ptens1 Y1=Ptens1::gather(x1,yatoms);
+  Ptensors0 y1=Ptensors0::zero(yatoms,nc);
+  emp01(y1,x1,tmap);
+  Ptens0 Y1=Ptens0::gather(x1,yatoms);
   //cout<<y1<<endl;
   //cout<<Y1<<endl;
-  cout<<"1 <- 1 error: "<<Y1.diff2(Ptens1(y1))<<endl;
+  cout<<"0 <- 1 error: "<<Y1.diff2(Ptens0(y1))<<endl;
 
-  Ptensors1 y2=Ptensors1::zero(yatoms,5*nc);
-  //cout<<y2<<"------------"<<endl;
-  emp21(y2,x2,tmap);
-  Ptens1 Y2=Ptens1::gather(x2,yatoms);
-  cout<<"1 <- 2 error: "<<Y2.diff2(Ptens1(y2))<<endl;
+  Ptensors0 y2=Ptensors0::zero(yatoms,2*nc);
+  emp02(y2,x2,tmap);
+  Ptens0 Y2=Ptens0::gather(x2,yatoms);
+  //cout<<y2<<endl;
+  //cout<<Y2<<endl;
+  cout<<"0 <- 2 error: "<<Y2.diff2(Ptens0(y2))<<endl;
 
   
 

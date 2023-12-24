@@ -135,11 +135,11 @@ namespace ptens{
 	vector<int> in=in_lists(m);
 	vector<int> out=out_lists(m);
 	for(int i0=0; i0<in.size(); i0++)
-	  direct.push_back(5*index_of(out_tensor,out[i0])+2,y.index_of(in_tensor,in[i0],in[i0]));
+	  direct.push_back(5*index_of(out_tensor,out[i0])+4,y.index_of(in_tensor,in[i0],in[i0]));
 	for(int i0=0; i0<in.size(); i0++){
 	  for(int i1=0; i1<in.size(); i1++){
 	    direct.push_back(5*index_of(out_tensor,out[i0])+3,y.index_of(in_tensor,in[i0],in[i1]));
-	    direct.push_back(5*index_of(out_tensor,out[i0])+4,y.index_of(in_tensor,in[i1],in[i0]));
+	    direct.push_back(5*index_of(out_tensor,out[i0])+2,y.index_of(in_tensor,in[i1],in[i0]));
 	  }
 	}
       }

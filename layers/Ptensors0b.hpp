@@ -159,7 +159,7 @@ namespace ptens{
     }
 
     static Ptensors0b<TYPE> gather(const Ptensors2b<TYPE>& x, const AtomsPack& a){
-      Ptensors0b<TYPE> R(a,x.nchannels());
+      Ptensors0b<TYPE> R(a,2*x.nchannels());
       R.gather(x);
       return R;
     }

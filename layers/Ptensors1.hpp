@@ -584,6 +584,7 @@ namespace ptens{
     }
 
     // deprecated 
+    [[deprecated]]
     RtensorPackB reduce0(const AindexPack& list, const int offs, const int n) const{
       TimedFn T("Ptensors1","reduce0",*this,list,list.count1*n);
       int N=list.size();
@@ -599,6 +600,7 @@ namespace ptens{
     }
 
     // deprecated 
+    [[deprecated]]
     RtensorPackB reduce1(const AindexPack& list, const int offs, const int n) const{
       TimedFn T("Ptensors1","reduce1",*this,list,list.count1*n);
       int N=list.size();
@@ -683,6 +685,7 @@ namespace ptens{
 	const int n=x.nc;
 	for(int i=0; i<N; i++){
 	  view_of(list.tens(i),list.ix(i),offs,n)+=repeat0(x.view1_of(i),list.nix(i));
+	  //cout<<"qqq"<<view_of(list.tens(i))<<endl;
 	}
       }
       GPUCODE(CUDA_STREAM(Ptensors1_broadcast0_cu(*this,x,list,offs,stream)));
@@ -727,7 +730,13 @@ namespace ptens{
 	const int n=x.nc;
 	for(int i=0; i<N; i++){
 	  if(x.dim_of(i,0)==0) continue;
+	  //cout<<"<-"<<i<<" "<<list.tens(i)<<" "<<offs<<" "<<n<<" :";
+	  //auto v=list.ix(i);
+	  //for(auto p:v) cout<<p;
+	  //cout<<endl;
+	  //if(list.tens(i)==1) cout<<"***"<<view_of(1)<<endl;
 	  view_of(list.tens(i),list.ix(i),offs,n)+=x.view2_of(i);
+	  //if(list.tens(i)==1) cout<<view_of(1)<<endl;
 	}
       }
       GPUCODE(CUDA_STREAM(Ptensors1_broadcast1_cu(*this,x,list,offs,stream)));
@@ -781,6 +790,7 @@ namespace ptens{
     }
 
     // deprecated 
+    [[deprecated]]
     void broadcast0(const RtensorPackB& x, const AindexPack& list){
       TimedFn T("Ptensors1","brcast0",*this,x,list,list.count1*x.nc);
       if(dev==0){
@@ -792,6 +802,7 @@ namespace ptens{
     }
 
     // deprecated 
+    [[deprecated]]
     void broadcast1(const RtensorPackB& x, const AindexPack& list){
       TimedFn T("Ptensors1","brcast1",*this,x,list,list.count1*x.nc);
       if(dev==0){

@@ -536,10 +536,15 @@ namespace ptens{
       RtensorPackB R(dims,cnine::fill_zero(),dev);
       if(dev==0){
 	for(int i=0; i<N; i++){
+	  //cout<<i<<" "<<list.nix(i)<<" "<<list.tens(i)<<" ";
+	  //auto v=list.ix(i);
+	  //for(auto p:v) cout<<p<<",";
+	  //cout<<endl;
 	  if(list.nix(i)==0) continue;
 	  view_of(list.tens(i),list.ix(i)).sum0_into(R.view2_of(i).block(0,0,-1,nc));
 	  view_of(list.tens(i),list.ix(i)).sum1_into(R.view2_of(i).block(0,nc,-1,nc));
-	  R.view2_of(i).block(0,2*nc,-1,nc)+=view_of(list.tens(i),list.ix(i)).diag01();
+	  R.view2_of(i).block(0,2*nc,-1,nc)+=view_of(list.tens(i),list.ix(i)).diag01(); // is this a problem?
+	  //cout<<R.view2_of(i)<<endl<<endl;
 	}
       }
       GPUCODE(CUDA_STREAM(Ptensors2_reduce1_cu(R,*this,list,0,nc,stream)));
@@ -611,6 +616,7 @@ namespace ptens{
 
 
     // deprecated: now called broadcast0_back
+    [[deprecated]]
     RtensorPackB reduce0(const AindexPack& list, const int offs, const int n) const{
       TimedFn T("Ptensors2","reduce0",*this,list,(list.count2+list.count1)*n);
       int N=list.size();
@@ -627,6 +633,7 @@ namespace ptens{
     }
 
     // deprecated: now called broadcast1_back
+    [[deprecated]]
     RtensorPackB reduce1(const AindexPack& list, const int offs, const int n) const{
       TimedFn T("Ptensors2","reduce1",*this,list,(list.count1+2*list.count2)*n);
       int N=list.size();
@@ -647,6 +654,7 @@ namespace ptens{
     }
 
     // deprecated now called broadcast2_back
+    [[deprecated]]
     RtensorPackB reduce2(const AindexPack& list, const int offs, const int n) const{
       TimedFn T("Ptensors2","reduce2",*this,list,(2*list.count2)*n);
       int N=list.size();
@@ -904,6 +912,7 @@ namespace ptens{
     // ---- deprecated
 
     // deprecated: now called reduce0_back
+    [[deprecated]]
     void broadcast0(const RtensorPackB& x, const AindexPack& list){
       TimedFn T("Ptensors2","brcast0",*this,x,list,(list.count1+list.count2)*x.nc);
       int N=list.size();
@@ -919,6 +928,7 @@ namespace ptens{
     }
 
     // deprecated: now called reduce1_back
+    [[deprecated]]
     void broadcast1(const RtensorPackB& x, const AindexPack& list){
       TimedFn T("Ptensors2","brcast1",*this,x,list,(list.count1+2*list.count2)*x.nc);
       int N=list.size();
@@ -935,6 +945,7 @@ namespace ptens{
     }
 
     // deprecated: now called reduce2_back
+    [[deprecated]]
     void broadcast2(const RtensorPackB& x, const AindexPack& list){
       TimedFn T("Ptensors2","brcast2",*this,x,list,(list.count2)*x.nc);
       int N=list.size();

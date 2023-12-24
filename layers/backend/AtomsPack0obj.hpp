@@ -122,9 +122,15 @@ namespace ptens{
       for(int m=0; m<in_lists.size(); m++){
 	int in_tensor=in_lists.head(m);
 	int out_tensor=out_lists.head(m);
-	direct.push_back(index_of(out_tensor),y.index_of(in_tensor,in_lists(m,0),in_lists(m,0)));
+	vector<int> in=in_lists(m);
+	vector<int> out=out_lists(m);
+	for(int i0=0; i0<in.size(); i0++)
+	  direct.push_back(2*index_of(out_tensor)+1,y.index_of(in_tensor,in[i0],in[i0]));
+	for(int i0=0; i0<in.size(); i0++)
+	  for(int i1=0; i1<in.size(); i1++)
+	    direct.push_back(2*index_of(out_tensor),y.index_of(in_tensor,in[i0],in[i1]));
       }
-      return cnine::GatherMapProgram(new cnine::GatherMapB(direct));
+      return cnine::GatherMapProgram(new cnine::GatherMapB(direct,2));
     }
 
 
