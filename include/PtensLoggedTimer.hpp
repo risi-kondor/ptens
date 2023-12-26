@@ -31,7 +31,7 @@ namespace ptens{
   public:
 
     string task;
-    int n_ops=0;
+    long long n_ops=0;
     chrono::time_point<chrono::system_clock> t0;
 
     ~LoggedTimer(){
@@ -104,7 +104,7 @@ namespace ptens{
 
 
 
-    LoggedTimer(string _task, const int _ops):
+    LoggedTimer(string _task, const long long _ops):
       task(_task){
       t0=chrono::system_clock::now();
       n_ops=_ops;
@@ -132,14 +132,27 @@ namespace ptens{
 
     template<typename OBJ0>
     TimedFn(string cl, string fn, const OBJ0& obj0, const int count):
-      LoggedTimer(cl+"::"+fn+"("+obj0.repr()+")"+" [n="+to_string(count)+"]",count){}
+      LoggedTimer(cl+"::"+fn+"("+obj0.repr()+")"+" [n="+to_string(count)+"]",(long long) count){}
 
     template<typename OBJ0, typename OBJ1>
     TimedFn(string cl, string fn, const OBJ0& obj0, const OBJ1& obj1, const int count):
-      LoggedTimer(cl+"::"+fn+"("+obj0.repr()+","+obj1.repr()+")"+" [n="+to_string(count)+"]",count){}
+      LoggedTimer(cl+"::"+fn+"("+obj0.repr()+","+obj1.repr()+")"+" [n="+to_string(count)+"]",(long long) count){}
 
     template<typename OBJ0, typename OBJ1, typename OBJ2>
     TimedFn(string cl, string fn, const OBJ0& obj0, const OBJ1& obj1, const OBJ2& obj2, const int count):
+      LoggedTimer(cl+"::"+fn+"("+obj0.repr()+","+obj1.repr()+","+obj2.repr()+")"+" [n="+to_string(count)+"]",(long long) count){}
+
+
+    template<typename OBJ0>
+    TimedFn(string cl, string fn, const OBJ0& obj0, const long long count):
+      LoggedTimer(cl+"::"+fn+"("+obj0.repr()+")"+" [n="+to_string(count)+"]",count){}
+
+    template<typename OBJ0, typename OBJ1>
+    TimedFn(string cl, string fn, const OBJ0& obj0, const OBJ1& obj1, const long long count):
+      LoggedTimer(cl+"::"+fn+"("+obj0.repr()+","+obj1.repr()+")"+" [n="+to_string(count)+"]",count){}
+
+    template<typename OBJ0, typename OBJ1, typename OBJ2>
+    TimedFn(string cl, string fn, const OBJ0& obj0, const OBJ1& obj1, const OBJ2& obj2, const long long count):
       LoggedTimer(cl+"::"+fn+"("+obj0.repr()+","+obj1.repr()+","+obj2.repr()+")"+" [n="+to_string(count)+"]",count){}
 
 

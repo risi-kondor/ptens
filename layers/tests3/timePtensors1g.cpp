@@ -33,13 +33,13 @@ int main(int argc, char** argv){
   cudaDeviceReset(); // why do we need this?
 
   int nc=128;
-  int niter=5;
+  int niter=1;
 
   typedef Ptensors0b<float> Ptens0;
   typedef Ptensors1b<float> Ptens1;
   typedef Ptensors2b<float> Ptens2;
 
-  AtomsPack xatoms=AtomsPack::random(300,0.2);
+  AtomsPack xatoms=AtomsPack::random(200,0.5);
   //Ptens0 X0=Ptens0(xatoms,channels=nc,filltype=3);
   Ptens1 X1=Ptens1(xatoms,channels=nc,filltype=3);
   //Ptens2 X2=Ptens2(xatoms,channels=nc,filltype=3);
@@ -48,7 +48,7 @@ int main(int argc, char** argv){
   Ptens1 X1g(X1,1); 
   //Ptens2 X2g(X2,1); 
 
-  AtomsPack yatoms=AtomsPack::random(300,0.2);
+  AtomsPack yatoms=AtomsPack::random(200,0.5);
   //Ptens1 Y0=Ptens1::gather(X0,yatoms);
   Ptens1 Y1=Ptens1::gather(X1,yatoms);
   //Ptens1 Y2=Ptens1::gather(X1,yatoms);
@@ -57,17 +57,15 @@ int main(int argc, char** argv){
   Ptens1 Y1g=Ptens1::gather(X1g,yatoms);
   //Ptens1 Y2g=Ptens1::gather(X1g,yatoms);
 
-  {
+  if(false){
     TimedFn timer("Ptensors1b","Gather 1<-1",Y1,X1);
     for(int i=0; i<niter; i++)
-      //Ptens1 Y1=Ptens1::gather(X1,yatoms);
       Y1.gather(X1);
   }
 
   {
     TimedFn timer("Ptensors1b","GGather 1<-1",Y1g,X1g);
     for(int i=0; i<niter; i++)
-      //Ptens1 Y1g=Ptens1::gather(X1g,yatoms);
       Y1g.gather(X1g);
   }
 
