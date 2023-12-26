@@ -34,7 +34,7 @@ namespace ptens{
   class AtomsPack0obj{
   public:
 
-    typedef cnine::ptr_indexed_object_bank<MessageList,MessageMap> MMBank;
+    typedef cnine::ptr_indexed_object_bank<MessageListObj,MessageMap> MMBank;
 
 
     shared_ptr<AtomsPackObj> atoms;
@@ -82,9 +82,9 @@ namespace ptens{
 
 
     MMBank message_map=MMBank([&](const MessageList& x){
-	if(x.source0) return mmap(x,*x.source0);
-	if(x.source1) return mmap(x,*x.source1);
-	if(x.source2) return mmap(x,*x.source2);
+	if(x.source0) return mmap(x.obj,*x.source0);
+	if(x.source1) return mmap(x.obj,*x.source1);
+	if(x.source2) return mmap(x.obj,*x.source2);
 	CNINE_UNIMPL();
 	return mmap(x,*x.source2);
       });
