@@ -51,8 +51,8 @@ namespace ptens{
   public: // ----- Constructors ------------------------------------------------------------------------------
 
 
-    Ptensors2b(const AtomsPack& _atoms, const int nc):
-      BASE(cnine::Gdims(_atoms.tsize2(),nc)),
+    Ptensors2b(const AtomsPack& _atoms, const int nc, const int _dev=0):
+      BASE(cnine::Gdims(_atoms.tsize2(),nc),0,_dev),
       atoms(_atoms){}
 
 
@@ -148,19 +148,19 @@ namespace ptens{
 
 
     static Ptensors2b<TYPE> gather(const Ptensors0b<TYPE>& x, const AtomsPack& a){
-      Ptensors2b<TYPE> R(a,2*x.nchannels());
+      Ptensors2b<TYPE> R(a,2*x.nchannels(),x.get_dev());
       R.gather(x);
       return R;
     }
 
     static Ptensors2b<TYPE> gather(const Ptensors1b<TYPE>& x, const AtomsPack& a){
-      Ptensors2b<TYPE> R(a,5*x.nchannels());
+      Ptensors2b<TYPE> R(a,5*x.nchannels(),x.get_dev());
       R.gather(x);
       return R;
     }
 
     static Ptensors2b<TYPE> gather(const Ptensors2b<TYPE>& x, const AtomsPack& a){
-      Ptensors2b<TYPE> R(a,15*x.nchannels());
+      Ptensors2b<TYPE> R(a,15*x.nchannels(),x.get_dev());
       R.gather(x);
       return R;
     }

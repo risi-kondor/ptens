@@ -32,7 +32,7 @@ PTENS_INCLUDES+=-I$(TENSORSDIR)
 PTENS_INCLUDES+=-I$(LAYERSDIR)
 PTENS_INCLUDES+=-I$(LAYERSBACKENDDIR)
 
-CFLAGS= -std=c++17 -O3 -ferror-limit=1  
+CFLAGS= -std=c++17 -O3 #-ferror-limit=1  
 INCLUDE= -I $(ROOTDIR)/include 
 LIBS= -lstdc++ -lm -lpthread 
 

@@ -26,6 +26,12 @@ PtensSession ptens_session;
 
 int main(int argc, char** argv){
 
+  cnine_session session;
+
+  //cudaSetDevice(0);
+  //cudaDeviceSynchronize();
+  cudaDeviceReset(); // why do we need this?
+
   typedef Ptensors0b<float> Ptens0;
   typedef Ptensors1b<float> Ptens1;
   typedef Ptensors2b<float> Ptens2;
@@ -40,7 +46,6 @@ int main(int argc, char** argv){
   Ptens2 X2g(X2,1); 
 
   AtomsPack yatoms=AtomsPack::random(4,0.5);
-  cout<<X0<<endl;
   Ptens1 Y0=Ptens1::gather(X0,yatoms);
   Ptens1 Y1=Ptens1::gather(X1,yatoms);
   Ptens1 Y2=Ptens1::gather(X1,yatoms);
@@ -49,12 +54,19 @@ int main(int argc, char** argv){
   Ptens1 Y1g=Ptens1::gather(X1g,yatoms);
   Ptens1 Y2g=Ptens1::gather(X1g,yatoms);
 
-  cout<<Y0<<endl;
-  cout<<Y0g<<endl;
-  cout<<Y1<<endl;
-  cout<<Y1g<<endl;
-  cout<<Y2<<endl;
-  cout<<Y2g<<endl;
+  //cout<<Y0<<endl;
+  //cout<<Y0g<<endl;
+  //cout<<Y1<<endl;
+  //cout<<Y1g<<endl;
+  //cout<<Y2<<endl;
+  //cout<<Y2g<<endl;
+
+  cout<<Y0.diff2(Y0g)<<endl;
+  cout<<Y1.diff2(Y1g)<<endl;
+  cout<<Y2.diff2(Y2g)<<endl;
+
+  //cudaDeviceSynchronize();
+  //cudaDeviceReset();
 
 }
 
