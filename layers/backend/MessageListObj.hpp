@@ -36,7 +36,8 @@ namespace ptens{
     cnine::hlists<int> out;
 
 
-    MessageListObj(){}
+    MessageListObj():
+      observable(this){}
 
 
   public: // ---- Access -------------------------------------------------------------------------------------
@@ -51,7 +52,8 @@ namespace ptens{
 
 
     // overlaps 
-    MessageListObj(const cnine::array_pool<int>& y, const cnine::array_pool<int>& x){
+    MessageListObj(const cnine::array_pool<int>& y, const cnine::array_pool<int>& x):
+      observable(this){
       cout<<"overlaps"<<endl;
       cnine::flog timer("MessageListObj::[overlaps]");
 

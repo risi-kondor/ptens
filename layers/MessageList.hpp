@@ -37,7 +37,7 @@ namespace ptens{
 
 
     MessageList(const MessageListObj* _obj):
-      observable(this), 
+      //observable(this), 
       obj(_obj){}
 
 
@@ -57,7 +57,7 @@ namespace ptens{
 
 
     MessageList(const MessageList& x):
-      observable(this),
+      //observable(this),
       obj(x.obj),
       source0(x.source0),
       source1(x.source1),
