@@ -40,22 +40,22 @@ int main(int argc, char** argv){
   typedef Ptensors2b<float> Ptens2;
 
   AtomsPack xatoms=AtomsPack::random(300,0.2);
-  Ptens0 X0=Ptens0(xatoms,channels=nc,filltype=3);
+  //Ptens0 X0=Ptens0(xatoms,channels=nc,filltype=3);
   Ptens1 X1=Ptens1(xatoms,channels=nc,filltype=3);
-  Ptens2 X2=Ptens2(xatoms,channels=nc,filltype=3);
+  //Ptens2 X2=Ptens2(xatoms,channels=nc,filltype=3);
 
-  Ptens0 X0g(X0,1); 
+  //Ptens0 X0g(X0,1); 
   Ptens1 X1g(X1,1); 
-  Ptens2 X2g(X2,1); 
+  //Ptens2 X2g(X2,1); 
 
   AtomsPack yatoms=AtomsPack::random(300,0.2);
-  Ptens1 Y0=Ptens1::gather(X0,yatoms);
+  //Ptens1 Y0=Ptens1::gather(X0,yatoms);
   Ptens1 Y1=Ptens1::gather(X1,yatoms);
-  Ptens1 Y2=Ptens1::gather(X1,yatoms);
+  //Ptens1 Y2=Ptens1::gather(X1,yatoms);
 
-  Ptens1 Y0g=Ptens1::gather(X0g,yatoms);
+  //Ptens1 Y0g=Ptens1::gather(X0g,yatoms);
   Ptens1 Y1g=Ptens1::gather(X1g,yatoms);
-  Ptens1 Y2g=Ptens1::gather(X1g,yatoms);
+  //Ptens1 Y2g=Ptens1::gather(X1g,yatoms);
 
   {
     TimedFn timer("Ptensors1b","Gather 1<-1",Y1,X1);

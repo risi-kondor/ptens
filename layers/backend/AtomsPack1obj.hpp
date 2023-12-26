@@ -105,6 +105,7 @@ namespace ptens{
     // 1 <- 1
     MessageMap mmap(const MessageList& lists, const AtomsPack1obj<DUMMY>& y){
       auto[in_lists,out_lists]=lists.lists();
+      cnine::flog timer("AtomsPack1obj::[1<-1]");
 
       cnine::map_of_lists<int,int> direct;
       for(int m=0; m<in_lists.size(); m++){

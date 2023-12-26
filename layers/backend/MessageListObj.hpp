@@ -52,6 +52,8 @@ namespace ptens{
 
     // overlaps 
     MessageListObj(const cnine::array_pool<int>& y, const cnine::array_pool<int>& x){
+      cout<<"overlaps"<<endl;
+      cnine::flog timer("MessageListObj::[overlaps]");
 
       if(x.size()<10){
 	for(int i=0; i<y.size(); i++){
