@@ -48,7 +48,7 @@ namespace ptens{
 
     template<typename SOURCE>
     MessageMap overlaps_mmap(const SOURCE& x){
-      return obj->message_map(overlaps_mlist(x));
+      return obj->message_map(*overlaps_mlist(x).obj);
     }
 
 
