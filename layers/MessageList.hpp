@@ -66,15 +66,15 @@ namespace ptens{
 
     MessageList(const MessageList& x, const shared_ptr<AtomsPack0obj<int> > s):
       MessageList(x){
-      obj.source0=s;}
+      obj->source0=s;}
 
     MessageList(const MessageList& x, const shared_ptr<AtomsPack1obj<int> > s):
       MessageList(x){
-      obj.source1=s;}
+      obj->source1=s;}
 
     MessageList(const MessageList& x, const shared_ptr<AtomsPack2obj<int> > s):
       MessageList(x){
-      obj.source2=s;}
+      obj->source2=s;}
 
 
 
