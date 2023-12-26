@@ -23,6 +23,7 @@
 #include "TransferMapGradedObj.hpp"
 #include "flog.hpp"
 #include "map_of_lists.hpp"
+#include "map_of_maps.hpp"
 #include "hlists.hpp"
 
 
@@ -82,11 +83,15 @@ namespace ptens{
       for(int i=0; i<nx; i++)
 	x.for_each_of(i,[&](const int j){in_lists.push_back(j,i);});
 
+      cnine::map_of_maps<int,int,bool> done;
       int ny=y.size();
       for(int i=0; i<ny; i++)
 	y.for_each_of(i,[&](const int j){
 	    for(auto p:in_lists[j])
-	      append_intersection(p,i,x.view_of(p),y.view_of(i));
+	      if(!done.is_filled(p,i)){
+		append_intersection(p,i,x.view_of(p),y.view_of(i));
+		done.set(p,i,true);
+	      }
 	  });
     }
 

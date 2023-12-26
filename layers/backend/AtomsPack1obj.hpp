@@ -115,6 +115,8 @@ namespace ptens{
 	for(int j=0; j<k; j++)
 	  direct.push_back(2*index_of(out_tensor,out_lists(m,j))+1,y.index_of(in_tensor,in_lists(m,j)));
       }
+      cout<<in_lists.size()<<endl;
+      cout<<direct.total()<<endl;
 
       cnine::GatherMapProgram R;
       R.add_var(Gdims(in_lists.size(),1));

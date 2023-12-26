@@ -32,14 +32,15 @@ int main(int argc, char** argv){
   //cudaDeviceSynchronize();
   cudaDeviceReset(); // why do we need this?
 
-  int nc=128;
+  int N=200;
+  int nc=256;
   int niter=1;
 
   typedef Ptensors0b<float> Ptens0;
   typedef Ptensors1b<float> Ptens1;
   typedef Ptensors2b<float> Ptens2;
 
-  AtomsPack xatoms=AtomsPack::random(200,0.5);
+  AtomsPack xatoms=AtomsPack::random(N,0.5);
   //Ptens0 X0=Ptens0(xatoms,channels=nc,filltype=3);
   Ptens1 X1=Ptens1(xatoms,channels=nc,filltype=3);
   //Ptens2 X2=Ptens2(xatoms,channels=nc,filltype=3);
@@ -48,9 +49,9 @@ int main(int argc, char** argv){
   Ptens1 X1g(X1,1); 
   //Ptens2 X2g(X2,1); 
 
-  AtomsPack yatoms=AtomsPack::random(200,0.5);
+  AtomsPack yatoms=AtomsPack::random(N,0.5);
   //Ptens1 Y0=Ptens1::gather(X0,yatoms);
-  Ptens1 Y1=Ptens1::gather(X1,yatoms);
+  Ptens1 Y1=Ptens1::gather(X1,yatoms); 
   //Ptens1 Y2=Ptens1::gather(X1,yatoms);
 
   //Ptens1 Y0g=Ptens1::gather(X0g,yatoms);
