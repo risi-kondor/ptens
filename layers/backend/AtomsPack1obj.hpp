@@ -34,7 +34,7 @@ namespace ptens{
   public:
 
     typedef cnine::Gdims Gdims;
-    typedef cnine::ptr_indexed_object_bank<MessageList,MessageMap> MMBank;
+    typedef cnine::ptr_indexed_object_bank<MessageListObj,MessageMap> MMBank;
 
     shared_ptr<AtomsPackObj> atoms;
 
