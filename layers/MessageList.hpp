@@ -31,9 +31,9 @@ namespace ptens{
 
     shared_ptr<const MessageListObj> obj;
 
-    shared_ptr<AtomsPack0obj<int> > source0;
-    shared_ptr<AtomsPack1obj<int> > source1;
-    shared_ptr<AtomsPack2obj<int> > source2;
+    //shared_ptr<AtomsPack0obj<int> > source0;
+    //shared_ptr<AtomsPack1obj<int> > source1;
+    //shared_ptr<AtomsPack2obj<int> > source2;
 
 
     MessageList(const MessageListObj* _obj):
@@ -58,22 +58,23 @@ namespace ptens{
 
     MessageList(const MessageList& x):
       //observable(this),
-      obj(x.obj),
-      source0(x.source0),
-      source1(x.source1),
-      source2(x.source2){}
+      obj(x.obj){}
+    //obj(x.obj),
+    //source0(x.source0),
+    //source1(x.source1),
+    //source2(x.source2){}
 
     MessageList(const MessageList& x, const shared_ptr<AtomsPack0obj<int> > s):
       MessageList(x){
-      source0=s;}
+      obj.source0=s;}
 
     MessageList(const MessageList& x, const shared_ptr<AtomsPack1obj<int> > s):
       MessageList(x){
-      source1=s;}
+      obj.source1=s;}
 
     MessageList(const MessageList& x, const shared_ptr<AtomsPack2obj<int> > s):
       MessageList(x){
-      source2=s;}
+      obj.source2=s;}
 
 
 

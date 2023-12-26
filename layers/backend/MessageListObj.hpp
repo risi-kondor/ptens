@@ -28,6 +28,11 @@
 
 namespace ptens{
 
+  template<typename DUMMY> class AtomsPack0obj;
+  template<typename DUMMY> class AtomsPack1obj;
+  template<typename DUMMY> class AtomsPack2obj;
+
+
   class MessageListObj: public cnine::observable<MessageListObj>{
   public:
 
@@ -35,6 +40,9 @@ namespace ptens{
     cnine::hlists<int> in;
     cnine::hlists<int> out;
 
+    shared_ptr<AtomsPack0obj<int> > source0;
+    shared_ptr<AtomsPack1obj<int> > source1;
+    shared_ptr<AtomsPack2obj<int> > source2;
 
     MessageListObj():
       observable(this){}
