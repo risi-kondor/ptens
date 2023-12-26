@@ -40,9 +40,9 @@ namespace ptens{
     cnine::hlists<int> in;
     cnine::hlists<int> out;
 
-    shared_ptr<AtomsPack0obj<int> > source0;
-    shared_ptr<AtomsPack1obj<int> > source1;
-    shared_ptr<AtomsPack2obj<int> > source2;
+    mutable shared_ptr<AtomsPack0obj<int> > source0;
+    mutable shared_ptr<AtomsPack1obj<int> > source1;
+    mutable shared_ptr<AtomsPack2obj<int> > source2;
 
     MessageListObj():
       observable(this){}
