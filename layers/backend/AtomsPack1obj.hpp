@@ -84,7 +84,7 @@ namespace ptens{
 	if(x.source1) return mmap(x,*x.source1);
 	if(x.source2) return mmap(x,*x.source2);
 	CNINE_UNIMPL();
-	return mmap(*x.obj,*x.source2);
+	return mmap(x,*x.source2);
       });
 
 
