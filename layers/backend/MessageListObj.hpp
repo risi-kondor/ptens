@@ -28,7 +28,7 @@
 
 namespace ptens{
 
-  class MessageListObj{
+  class MessageListObj: public cnine::observable<MessageListObj>{
   public:
 
 

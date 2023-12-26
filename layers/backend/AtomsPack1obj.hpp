@@ -89,7 +89,7 @@ namespace ptens{
 
 
     // 1 <- 0
-    MessageMap mmap(const MessageList& lists, const AtomsPack0obj<DUMMY>& y){
+    MessageMap mmap(const MessageListObj& lists, const AtomsPack0obj<DUMMY>& y){
       auto[in_lists,out_lists]=lists.lists();
       cnine::map_of_lists<int,int> direct;
       for(int m=0; m<in_lists.size(); m++){
@@ -103,7 +103,7 @@ namespace ptens{
   
 
     // 1 <- 1
-    MessageMap mmap(const MessageList& lists, const AtomsPack1obj<DUMMY>& y){
+    MessageMap mmap(const MessageListObj& lists, const AtomsPack1obj<DUMMY>& y){
       auto[in_lists,out_lists]=lists.lists();
       cnine::flog timer("AtomsPack1obj::[1<-1]");
 
@@ -126,7 +126,7 @@ namespace ptens{
 
 
     // 1 <- 2
-    MessageMap mmap(const MessageList& lists, const AtomsPack2obj<DUMMY>& y){
+    MessageMap mmap(const MessageListObj& lists, const AtomsPack2obj<DUMMY>& y){
       auto[in_lists,out_lists]=lists.lists();
 
       cnine::map_of_lists<int,int> direct;

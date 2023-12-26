@@ -26,7 +26,7 @@ namespace ptens{
   template<typename DUMMY> class AtomsPack2obj;
 
 
-  class MessageList: public cnine::observable<MessageList>{
+  class MessageList{ //: public cnine::observable<MessageList>{
   public:
 
     shared_ptr<const MessageListObj> obj;
