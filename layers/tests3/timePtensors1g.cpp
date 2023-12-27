@@ -11,6 +11,7 @@
  * must be accompanied by a verbatim copy of the license. 
  *
  */
+
 #include "Cnine_base.cpp"
 #include "CnineSession.hpp"
 
@@ -28,9 +29,9 @@ int main(int argc, char** argv){
 
   cnine_session session;
 
-  //cudaSetDevice(0);
-  //cudaDeviceSynchronize();
+#ifdef _WITH_CUDA
   cudaDeviceReset(); // why do we need this?
+#endif 
 
   int N=200;
   int nc=256;
@@ -41,34 +42,49 @@ int main(int argc, char** argv){
   typedef Ptensors2b<float> Ptens2;
 
   AtomsPack xatoms=AtomsPack::random(N,0.5);
-  //Ptens0 X0=Ptens0(xatoms,channels=nc,filltype=3);
-  Ptens1 X1=Ptens1(xatoms,channels=nc,filltype=3);
-  //Ptens2 X2=Ptens2(xatoms,channels=nc,filltype=3);
-
-  //Ptens0 X0g(X0,1); 
-  Ptens1 X1g(X1,1); 
-  //Ptens2 X2g(X2,1); 
-
   AtomsPack yatoms=AtomsPack::random(N,0.5);
-  //Ptens1 Y0=Ptens1::gather(X0,yatoms);
+
+  Ptens0 X0=Ptens0(xatoms,channels=nc,filltype=3);
+  Ptens1 X1=Ptens1(xatoms,channels=nc,filltype=3);
+  Ptens2 X2=Ptens2(xatoms,channels=nc,filltype=3);
+#ifdef _WITH_CUDA
+  Ptens0 X0g(X0,1); 
+  Ptens1 X1g(X1,1); 
+  Ptens2 X2g(X2,1); 
+#endif 
+
+
+  Ptens1 Y0=Ptens1::gather(X0,yatoms); 
+  timed_block("Gather 1<-0 (CPU)",[&](){
+    for(int i=0; i<niter; i++) Y0.gather(X0);});
+
+#ifdef _WITH_CUDA
+  Ptens1 Y0g=Ptens1::gather(X0g,yatoms);
+  timed_block("Gather 1<-0 (GPU)",[&](){
+      for(int i=0; i<niter; i++) Y0g.gather(X0g);});
+#endif 
+
+
   Ptens1 Y1=Ptens1::gather(X1,yatoms); 
-  //Ptens1 Y2=Ptens1::gather(X1,yatoms);
+  timed_block("Gather 1<-1 (CPU)",[&](){
+      for(int i=0; i<niter; i++) Y1.gather(X1);});
 
-  //Ptens1 Y0g=Ptens1::gather(X0g,yatoms);
+#ifdef _WITH_CUDA
   Ptens1 Y1g=Ptens1::gather(X1g,yatoms);
-  //Ptens1 Y2g=Ptens1::gather(X1g,yatoms);
+  timed_block("Gather 1<-1 (GPU)",[&](){
+      for(int i=0; i<niter; i++) Y1g.gather(X1g);});
+#endif 
 
-  if(false){
-    TimedFn timer("Ptensors1b","Gather 1<-1",Y1,X1);
-    for(int i=0; i<niter; i++)
-      Y1.gather(X1);
-  }
 
-  {
-    TimedFn timer("Ptensors1b","GGather 1<-1",Y1g,X1g);
-    for(int i=0; i<niter; i++)
-      Y1g.gather(X1g);
-  }
+  Ptens1 Y2=Ptens1::gather(X2,yatoms); 
+  timed_block("Gather 1<-2 (CPU)",[&](){
+    for(int i=0; i<niter; i++) Y2.gather(X2);});
+
+#ifdef _WITH_CUDA
+  Ptens1 Y2g=Ptens1::gather(X2g,yatoms);
+  timed_block("Gather 1<-2 (GPU)",[&](){
+      for(int i=0; i<niter; i++) Y2g.gather(X2g);});
+#endif 
 
 
 }

@@ -159,6 +159,16 @@ namespace ptens{
   };
 
 
+  class TimedBlock: public LoggedTimer{
+  public:
+
+    TimedBlock(string _name, std::function<void()> lambda):
+      LoggedTimer(_name){
+      lambda();
+    }
+
+  };
+
 }
 
 #endif 

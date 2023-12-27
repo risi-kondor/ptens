@@ -21,7 +21,7 @@
 #include "AindexPack.hpp"
 #include "GatherMap.hpp"
 #include "TransferMapGradedObj.hpp"
-#include "flog.hpp"
+#include "fnlog.hpp"
 #include "map_of_lists.hpp"
 #include "map_of_maps.hpp"
 #include "hlists.hpp"
@@ -63,8 +63,7 @@ namespace ptens{
     // overlaps 
     MessageListObj(const cnine::array_pool<int>& y, const cnine::array_pool<int>& x):
       observable(this){
-      cout<<"overlaps"<<endl;
-      cnine::flog timer("MessageListObj::[overlaps]");
+      cnine::fnlog timer("MessageListObj::[overlaps]");
 
       if(x.size()<10){
 	for(int i=0; i<y.size(); i++){
