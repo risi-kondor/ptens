@@ -31,6 +31,8 @@ namespace ptens{
   public: // ---- Constructors ------------------------------------------------------------------------------
 
 
+    AtomsPack1(){}
+
     AtomsPack1(const AtomsPack& _atoms):
       obj(new AtomsPack1obj<int>(_atoms)){}
 

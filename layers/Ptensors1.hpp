@@ -584,7 +584,7 @@ namespace ptens{
     }
 
     // deprecated 
-    [[deprecated]]
+    //[[deprecated]]
     RtensorPackB reduce0(const AindexPack& list, const int offs, const int n) const{
       TimedFn T("Ptensors1","reduce0",*this,list,list.count1*n);
       int N=list.size();
@@ -600,7 +600,7 @@ namespace ptens{
     }
 
     // deprecated 
-    [[deprecated]]
+    //[[deprecated]]
     RtensorPackB reduce1(const AindexPack& list, const int offs, const int n) const{
       TimedFn T("Ptensors1","reduce1",*this,list,list.count1*n);
       int N=list.size();
@@ -790,7 +790,7 @@ namespace ptens{
     }
 
     // deprecated 
-    [[deprecated]]
+    //[[deprecated]]
     void broadcast0(const RtensorPackB& x, const AindexPack& list){
       TimedFn T("Ptensors1","brcast0",*this,x,list,list.count1*x.nc);
       if(dev==0){
@@ -802,7 +802,7 @@ namespace ptens{
     }
 
     // deprecated 
-    [[deprecated]]
+    //[[deprecated]]
     void broadcast1(const RtensorPackB& x, const AindexPack& list){
       TimedFn T("Ptensors1","brcast1",*this,x,list,list.count1*x.nc);
       if(dev==0){

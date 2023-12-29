@@ -33,6 +33,8 @@ namespace ptens{
   public: // ---- Constructors ------------------------------------------------------------------------------
 
 
+    AtomsPack0(){}
+
     AtomsPack0(const int n):
       obj(new AtomsPack0obj<int>(n)){}
 
@@ -73,6 +75,11 @@ namespace ptens{
     Atoms operator()(const int i) const{
       return (*obj->atoms)(i);
     }
+
+    vector<vector<int> > as_vecs() const{
+      return obj->atoms->as_vecs();
+    }
+
     
 
   public: // ---- I/O ----------------------------------------------------------------------------------------

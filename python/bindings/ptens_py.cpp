@@ -15,6 +15,7 @@
 #include "Ptensors0.hpp"
 #include "Ptensors1.hpp"
 #include "Ptensors2.hpp"
+#include "Tensor.hpp"
 
 #include "LinmapFunctions.hpp"
 #include "MsgFunctions.hpp"
@@ -29,6 +30,10 @@
 #include "SubgraphLayer0.hpp"
 #include "SubgraphLayer1.hpp"
 #include "SubgraphLayer2.hpp"
+
+#include "Ptensors0b.hpp"
+#include "Ptensors1b.hpp"
+#include "Ptensors2b.hpp"
 
 
 namespace ptens{ 
@@ -52,17 +57,22 @@ PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
   #include "Ptensor1_py.cpp"
   #include "Ptensor2_py.cpp"
 
-  #include "Ptensors0_py.cpp"
-  #include "Ptensors1_py.cpp"
-  #include "Ptensors2_py.cpp"
+  #include "Ptensors0b_py.cpp"
 
-  #include "LinmapFunctions_py.cpp"
-  #include "MsgFunctions_py.cpp"
-  #include "OuterFunctions_py.cpp"
 
-  #include "NodeLayer_py.cpp"
-  #include "SubgraphLayer0_py.cpp"
-  #include "SubgraphLayer1_py.cpp"
-  #include "SubgraphLayer2_py.cpp"
+
+  //#include "Ptensors0_py.cpp"
+  //#include "Ptensors1_py.cpp"
+  //#include "Ptensors2_py.cpp"
+
+  //#include "LinmapFunctions_py.cpp"
+  //#include "MsgFunctions_py.cpp"
+  //#include "OuterFunctions_py.cpp"
+
+  //#include "NodeLayer_py.cpp"
+  //#include "SubgraphLayer0_py.cpp"
+  //#include "SubgraphLayer1_py.cpp"
+  //#include "SubgraphLayer2_py.cpp"
+
 
 }

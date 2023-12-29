@@ -91,14 +91,11 @@ namespace ptens{
       }
     }
 
-    // eliminate?
-    //[[deprecated]]
-    //AtomsPackObj(const vector<vector<int> >& x):
-    //AtomsPackObj(){
-    //for(auto& p:x)
-    //push_back(p);
-    //cout<<"Make AtomsPackObj 3"<<endl;
-    //}
+    AtomsPackObj(const vector<vector<int> >& x):
+      AtomsPackObj(){
+      for(auto& p:x)
+	push_back(p);
+    }
 
     AtomsPackObj(const initializer_list<initializer_list<int> >& x):
       AtomsPackObj(){

@@ -20,6 +20,7 @@
 #include "Ptensors0.hpp"
 #include "PtensLoggedTimer.hpp"
 #include "Ltensor.hpp"
+#include "Ptensorsb.hpp"
 
 
 namespace ptens{
@@ -29,22 +30,30 @@ namespace ptens{
 
 
   template<typename TYPE>
-  class Ptensors0b:  public cnine::Ltensor<TYPE>, public cnine::diff_class<Ptensors0b<TYPE> >{
+  class Ptensors0b:  //public cnine::Ltensor<TYPE>,
+    public Ptensorsb<TYPE, Ptensors0b<TYPE> >{
+    //public cnine::diff_class<Ptensors0b<TYPE> >{
+
   public:
 
-    using cnine::diff_class<Ptensors0b<TYPE> >::grad;
+    //using cnine::diff_class<Ptensors0b<TYPE> >::grad;
+    using cnine::diff_class<Ptensors0b<TYPE> >::get_grad;
 
-    typedef cnine::Ltensor<TYPE> BASE;
-    using BASE::get_dev;
+    typedef Ptensorsb<TYPE, Ptensors0b<TYPE> > BASE;
+    typedef cnine::Ltensor<TYPE> TENSOR;
+    using TENSOR::get_dev;
+    using TENSOR::dim;
+    using TENSOR::move_to_device;
+    using TENSOR::add;
 
 
     AtomsPack0 atoms;
 
 
     ~Ptensors0b(){
-#ifdef WITH_FAKE_GRAD
-      if(grad) delete grad;
-#endif 
+      //#ifdef WITH_FAKE_GRAD
+      //if(grad) delete grad;
+      //#endif 
     }
 
 
@@ -54,6 +63,10 @@ namespace ptens{
     Ptensors0b(const AtomsPack& _atoms, const int nc, const int _dev=0):
       BASE(cnine::Gdims(_atoms.size(),nc),0,_dev),
       atoms(_atoms){}
+
+    Ptensors0b(const int n, const int nc, const int fcode=0, const int _dev=0):
+      BASE(cnine::Gdims(n,nc),fcode,_dev),
+      atoms(n){}
 
 
   public: // ---- Named parameter constructors ---------------------------------------------------------------
@@ -70,7 +83,7 @@ namespace ptens{
       atoms(_atoms){
       vparams v;
       unroller(v,args...);
-      BASE::reset(BASE({atoms.size(),v.nc},v.fcode,v.dev));
+      TENSOR::reset(TENSOR({atoms.size(),v.nc},v.fcode,v.dev));
     }
 
     template<typename... Args>
@@ -88,19 +101,47 @@ namespace ptens{
     void unroller(vparams& v){}
 
 
+  public: // ----- Spawning ----------------------------------------------------------------------------------
+
+
+    Ptensors0b copy() const{
+      return Ptensors0b(TENSOR::copy(),atoms);
+    }
+
+    Ptensors0b zeros_like() const{
+      return Ptensors0b(TENSOR::zeros_like(),atoms);
+    }
+
+    static Ptensors0b* new_zeros_like(const Ptensors0b& x){
+      return new Ptensors0b(x.TENSOR::zeros_like(),x.atoms);
+    }
+    
+
   public: // ----- Conversions -------------------------------------------------------------------------------
 
 
+    Ptensors0b(const TENSOR& x, const AtomsPack0& _atoms):
+      BASE(x),
+      atoms(_atoms){}
+
     Ptensors0b(const Ptensors0& x):
-      BASE(cnine::Gdims({x.tail/x.nc,x.nc})),
+      TENSOR(cnine::Gdims({x.tail/x.nc,x.nc})),
       atoms(x.atoms){
-      BASE::view2().set(x.view_as_matrix().view2());
+      TENSOR::view2().set(x.view_as_matrix().view2());
     }
 
-    #ifdef _WITH_ATEN
+#ifdef _WITH_ATEN
     Ptensors0b(const at::Tensor& T):
-      BASE(T){}
-    #endif 
+      BASE(T){
+      atoms=AtomsPack0(dim(0));
+    }
+
+    Ptensors0b(const at::Tensor& T, const AtomsPack& _atoms):
+      BASE(T), atoms(_atoms){}
+
+    Ptensors0b(const at::Tensor& T, const vector<vector<int> >& v):
+      BASE(T), atoms(v){}
+#endif 
 
 
   public: // ---- Transport ----------------------------------------------------------------------------------
@@ -118,8 +159,12 @@ namespace ptens{
       return atoms.size();
     }
 
+    int get_nc() const{
+      return TENSOR::dim(1);
+    }
+
     int nchannels() const{
-      return BASE::dim(1);
+      return TENSOR::dim(1);
     }
 
     int offset(const int i) const{
@@ -134,13 +179,25 @@ namespace ptens{
       return atoms(i);
     }
     
-    BASE tensor_of(const int i) const{
-      return BASE::row(offset(i));
+    TENSOR tensor_of(const int i) const{
+      return TENSOR::row(offset(i));
     }
 
     Ptensor0 operator()(const int i) const{
       return Ptensor0(cnine::RtensorA(tensor_of(i).view1()),atoms_of(i));
     }
+
+
+  public: // ---- Operations ---------------------------------------------------------------------------------
+
+
+    //Ptensors0b mprod(const TENSOR& y){
+    //return Ptensors0b(BASE::mprod(y),atoms);
+    //}
+
+    //Ptensors0b scale_channels(const TENSOR& s){
+    //return Ptensors0b(BASE::scale_channels(s),atoms);
+    //}
 
 
   public: // ---- Message passing ----------------------------------------------------------------------------
@@ -167,6 +224,16 @@ namespace ptens{
     template<typename SOURCE>
     void gather(const SOURCE& x){
       (atoms.overlaps_mmap(x.atoms))(*this,x);
+    }
+
+    template<typename OUTPUT>
+    void gather_back(const OUTPUT& x){
+      x.atoms.overlaps_mmap(atoms).inv()(*this,x);
+    }
+
+    template<typename OUTPUT>
+    void gather_backprop(const OUTPUT& x){
+      x.atoms.overlaps_mmap(atoms).inv()(get_grad(),x.get_grad());
     }
 
 

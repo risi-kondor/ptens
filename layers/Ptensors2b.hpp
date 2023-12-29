@@ -33,6 +33,7 @@ namespace ptens{
   public:
 
     using cnine::diff_class<Ptensors2b<TYPE> >::grad;
+    using cnine::diff_class<Ptensors2b<TYPE> >::get_grad;
 
     typedef cnine::Ltensor<TYPE> BASE;
     using BASE::get_dev;
@@ -88,8 +89,20 @@ namespace ptens{
     void unroller(vparams& v){}
 
 
+  public: // ----- Spawning ----------------------------------------------------------------------------------
+
+
+    static Ptensors2b* new_zeros_like(const Ptensors2b& x){
+      return new Ptensors2b(x.BASE::zeros_like(),x.atoms);
+    }
+    
+
   public: // ----- Conversions -------------------------------------------------------------------------------
 
+
+    Ptensors2b(BASE& x, const AtomsPack2& _atoms):
+      BASE(x),
+      atoms(_atoms){}
 
     Ptensors2b(const Ptensors2& x):
       BASE(cnine::Gdims({x.tail/x.nc,x.nc})),
@@ -168,6 +181,16 @@ namespace ptens{
     template<typename SOURCE>
     void gather(const SOURCE& x){
       (atoms.overlaps_mmap(x.atoms))(*this,x);
+    }
+
+    template<typename OUTPUT>
+    void gather_back(const OUTPUT& x){
+      x.atoms.overlaps_mmap(atoms).inv()(*this,x);
+    }
+
+    template<typename OUTPUT>
+    void gather_backprop(const OUTPUT& x){
+      get_grad().gather_back(x.get_grad());
     }
 
 
