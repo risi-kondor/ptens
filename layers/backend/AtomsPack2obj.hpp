@@ -21,26 +21,22 @@
 #include "AtomsPack1obj.hpp"
 #include "GatherMapProgram.hpp"
 #include "MessageMap.hpp"
+#include "AtomsPackObjBase.hpp"
 
 
 namespace ptens{
 
-  template<typename DUMMY>
-  class AtomsPack0obj;
-
-  template<typename DUMMY>
-  class AtomsPack1obj;
+  template<typename DUMMY> class AtomsPack0obj;
+  template<typename DUMMY> class AtomsPack1obj;
+  template<typename DUMMY> class AtomsPack2obj;
 
 
   template<typename DUMMY>
-  class AtomsPack2obj{
+  class AtomsPack2obj: public AtomsPackObjBase{
   public:
 
     typedef cnine::Gdims Gdims;
-    typedef cnine::ptr_indexed_object_bank<MessageListObj,MessageMap> MMBank;
 
-
-    shared_ptr<AtomsPackObj> atoms;
     vector<int> offsets;
 
 
@@ -48,7 +44,7 @@ namespace ptens{
 
 
     AtomsPack2obj(const shared_ptr<AtomsPackObj>& _atoms):
-      atoms(_atoms),
+      AtomsPackObjBase(_atoms),
       offsets(_atoms->size()){
       int t=0;
       for(int i=0; i<atoms->size(); i++){
@@ -66,10 +62,6 @@ namespace ptens{
 
   public: // ---- Access ------------------------------------------------------------------------------------
 
-
-    int size() const{
-      return atoms->size();
-    }
 
     int size1() const{
       return atoms->tsize1();
@@ -99,13 +91,16 @@ namespace ptens{
   public: // ---- Transfer maps -----------------------------------------------------------------------------
 
 
-    MMBank message_map=MMBank([&](const MessageListObj& x){
-	if(x.source0) return mmap(x,*x.source0);
-	if(x.source1) return mmap(x,*x.source1);
-	if(x.source2) return mmap(x,*x.source2);
-	CNINE_UNIMPL();
-	return mmap(x,*x.source2);
-      });
+    MessageMap mmap(const MessageListObj& lists, const AtomsPackObjBase& y){
+      if(dynamic_cast<const AtomsPack0obj<DUMMY>*>(&y)) 
+	return mmap(lists, dynamic_cast<const AtomsPack0obj<DUMMY>&>(y));
+      if(dynamic_cast<const AtomsPack1obj<DUMMY>*>(&y)) 
+	return mmap(lists, dynamic_cast<const AtomsPack1obj<DUMMY>&>(y));
+      if(dynamic_cast<const AtomsPack2obj<DUMMY>*>(&y)) 
+	return mmap(lists, dynamic_cast<const AtomsPack2obj<DUMMY>&>(y));
+      CNINE_UNIMPL();
+      return mmap(lists, dynamic_cast<const AtomsPack0obj<DUMMY>&>(y));
+    }
 
 
     // 2 <- 0 

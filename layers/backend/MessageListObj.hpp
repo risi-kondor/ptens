@@ -14,7 +14,6 @@
 
 #ifndef _ptens_MessageListObj
 #define _ptens_MessageListObj
-#define _ptens_TransferMapObj
 
 #include "Tensor.hpp"
 #include "array_pool.hpp"
@@ -41,9 +40,9 @@ namespace ptens{
     cnine::hlists<int> in;
     cnine::hlists<int> out;
 
-    mutable shared_ptr<AtomsPack0obj<int> > source0;
-    mutable shared_ptr<AtomsPack1obj<int> > source1;
-    mutable shared_ptr<AtomsPack2obj<int> > source2;
+    mutable shared_ptr<AtomsPack0obj<int> > source0=nullptr;
+    mutable shared_ptr<AtomsPack1obj<int> > source1=nullptr;
+    mutable shared_ptr<AtomsPack2obj<int> > source2=nullptr;
 
     MessageListObj():
       observable(this){}

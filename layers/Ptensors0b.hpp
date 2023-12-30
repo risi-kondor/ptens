@@ -108,6 +108,10 @@ namespace ptens{
       return Ptensors0b(TENSOR::copy(),atoms);
     }
 
+    Ptensors0b copy(const int _dev) const{
+      return Ptensors0b(TENSOR::copy(_dev),atoms);
+    }
+
     Ptensors0b zeros_like() const{
       return Ptensors0b(TENSOR::zeros_like(),atoms);
     }
@@ -125,7 +129,7 @@ namespace ptens{
       atoms(_atoms){}
 
     Ptensors0b(const Ptensors0& x):
-      TENSOR(cnine::Gdims({x.tail/x.nc,x.nc})),
+      BASE(cnine::Gdims({x.tail/x.nc,x.nc})),
       atoms(x.atoms){
       TENSOR::view2().set(x.view_as_matrix().view2());
     }
@@ -154,6 +158,10 @@ namespace ptens{
 
   public: // ----- Access ------------------------------------------------------------------------------------
 
+
+    static int getk(){
+      return 0;
+    }
 
     int size() const{
       return atoms.size();

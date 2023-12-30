@@ -76,6 +76,10 @@ namespace ptens{
       MessageList(x){
       obj->source2=s;}
 
+    //MessageList(const MessageList& x, const shared_ptr<AtomsPackObjBase> s):
+    //MessageList(x){
+    //obj->source2=s;}
+
 
 
   public: // ---- I/O ----------------------------------------------------------------------------------------

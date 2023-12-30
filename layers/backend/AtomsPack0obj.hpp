@@ -19,38 +19,32 @@
 #include "AtomsPackObj.hpp"
 #include "GatherMapProgram.hpp"
 #include "MessageMap.hpp"
+#include "AtomsPackObjBase.hpp"
 
 
 namespace ptens{
 
-  template<typename DUMMY>
-  class AtomsPack1obj;
+  template<typename DUMMY> class AtomsPack0obj;
+  template<typename DUMMY> class AtomsPack1obj;
+  template<typename DUMMY> class AtomsPack2obj;
+
+  template<>
+  class AtomsPack1obj<int>;
+
 
   template<typename DUMMY>
-  class AtomsPack2obj;
-
-
-  template<typename DUMMY>
-  class AtomsPack0obj{
+  class AtomsPack0obj: public AtomsPackObjBase{
   public:
-
-    typedef cnine::ptr_indexed_object_bank<MessageListObj,MessageMap> MMBank;
-
-
-    shared_ptr<AtomsPackObj> atoms;
-
-
-  public: // ---- Constructors ------------------------------------------------------------------------------
 
 
     AtomsPack0obj(const int n):
-      atoms(new AtomsPackObj(n)){}
+      AtomsPackObjBase(cnine::to_share(new AtomsPackObj(n))){}
 
     AtomsPack0obj(const AtomsPack& _atoms):
-      atoms(_atoms.obj){}
+      AtomsPackObjBase(_atoms.obj){}
 
     AtomsPack0obj(const shared_ptr<AtomsPackObj>& _atoms):
-      atoms(_atoms){}
+      AtomsPackObjBase(_atoms){}
 
     AtomsPack0obj(const initializer_list<initializer_list<int> >& x):
       AtomsPack0obj(cnine::to_share(new AtomsPackObj(x))){}
@@ -59,12 +53,12 @@ namespace ptens{
   public: // ---- Access ------------------------------------------------------------------------------------
 
 
-    int size() const{
-      return atoms->size();
-    }
-
     int offset(const int i) const{
       return i;
+    }
+
+    int size_of(const int i) const{
+      return atoms->size_of(i);
     }
 
     int index_of(const int i) const{
@@ -75,20 +69,17 @@ namespace ptens{
   public: // ---- Transfer maps -----------------------------------------------------------------------------
 
 
-    //template<typename SOURCE>
-    //MessageList overlaps_mlist(const SOURCE& x){
-    //return MessageList(atoms->overlaps_mlist(x.atoms),x);
-    //}
+    MessageMap mmap(const MessageListObj& lists, const AtomsPackObjBase& y){
+      if(dynamic_cast<const AtomsPack0obj<DUMMY>*>(&y)) 
+	return mmap(lists, dynamic_cast<const AtomsPack0obj<DUMMY>&>(y));
+      if(dynamic_cast<const AtomsPack1obj<DUMMY>*>(&y)) 
+	return mmap(lists, dynamic_cast<const AtomsPack1obj<DUMMY>&>(y));
+      if(dynamic_cast<const AtomsPack2obj<DUMMY>*>(&y)) 
+	return mmap(lists, dynamic_cast<const AtomsPack2obj<DUMMY>&>(y));
+      CNINE_UNIMPL();
+      return mmap(lists, dynamic_cast<const AtomsPack0obj<DUMMY>&>(y));
+    }
 
-
-    MMBank message_map=MMBank([&](const MessageListObj& x){
-	if(x.source0) return mmap(x,*x.source0);
-	if(x.source1) return mmap(x,*x.source1);
-	if(x.source2) return mmap(x,*x.source2);
-	CNINE_UNIMPL();
-	return mmap(x,*x.source2);
-      });
-    
     // 0 <- 0
     MessageMap mmap(const MessageListObj& lists, const AtomsPack0obj<DUMMY>& y){
       auto[in,out]=lists.lists();
@@ -175,3 +166,8 @@ namespace ptens{
     //auto[in_lists,out_lists]=atoms->overlaps_mlist(*y.atoms).lists();
     //TBANK2 overlaps_map2=TBANK2([&](const AtomsPack0obj<DUMMY>& y){
     //auto[in_lists,out_lists]=atoms->overlaps_mlist(*y.atoms).lists();
+    //typedef cnine::ptr_indexed_object_bank<MessageListObj,MessageMap> MMBank;
+
+
+    //shared_ptr<AtomsPackObj> atoms;
+
