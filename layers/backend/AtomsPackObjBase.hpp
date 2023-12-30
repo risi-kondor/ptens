@@ -31,6 +31,8 @@ namespace ptens{
 
     shared_ptr<AtomsPackObj> atoms;
 
+    virtual ~AtomsPackObjBase(){}
+
 
   public: // ---- Constructors ------------------------------------------------------------------------------
 

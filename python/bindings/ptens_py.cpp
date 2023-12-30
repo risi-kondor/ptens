@@ -16,6 +16,7 @@
 #include "Ptensors1.hpp"
 #include "Ptensors2.hpp"
 #include "Tensor.hpp"
+#include "ATview.hpp"
 
 #include "LinmapFunctions.hpp"
 #include "MsgFunctions.hpp"
@@ -31,10 +32,10 @@
 #include "SubgraphLayer1.hpp"
 #include "SubgraphLayer2.hpp"
 
-#include "Ptensors0b.hpp"
-#include "Ptensors1b.hpp"
-#include "Ptensors2b.hpp"
-
+//#include "Ptensors0b.hpp"
+//#include "Ptensors1b.hpp"
+//#include "Ptensors2b.hpp"
+#include "PtensorLayer.hpp"
 
 namespace ptens{ 
   PtensSession ptens_session;
@@ -57,7 +58,8 @@ PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
   #include "Ptensor1_py.cpp"
   #include "Ptensor2_py.cpp"
 
-  #include "Ptensors0b_py.cpp"
+  //#include "Ptensors0b_py.cpp"
+  #include "PtensorLayer_py.cpp"
 
 
 

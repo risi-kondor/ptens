@@ -48,4 +48,5 @@ from ptens.ptensor2 import ptensor2 as ptensor2
 
 #from ptens.functions import *
 
-from ptens.ptensors0b import ptensors0b as ptensors0b
+#from ptens.ptensors0b import ptensors0b as ptensors0b
+from ptens.ptensorlayer import ptensorlayer as ptensorlayer 

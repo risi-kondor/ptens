@@ -24,23 +24,6 @@
 
 namespace ptens{
 
-#ifdef _WITH_ATEN
-  template<typename TYPE>
-  class ATview: public cnine::Ltensor<TYPE>{
-  public:
-    
-    typedef cnine::Ltensor<TYPE> BASE;
-
-    ATview(at::Tensor& x):
-      BASE(BASE::view(x)){}
-
-    ~ATview(){
-      BASE::arr.blob->arr=nullptr;
-    }
-
-  };
-#endif 
-
 
   template<typename TYPE, typename OBJ>
   class Ptensorsb: public cnine::Ltensor<TYPE>, public cnine::diff_class<OBJ>{
