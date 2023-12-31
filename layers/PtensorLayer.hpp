@@ -36,6 +36,7 @@ namespace ptens{
     using cnine::diff_class<PtensorLayer<TYPE> >::get_grad;
 
     typedef cnine::Ltensor<TYPE> BASE;
+    using BASE::torch;
     using BASE::get_dev;
     using BASE::dim;
     using BASE::move_to_device;
@@ -43,6 +44,7 @@ namespace ptens{
     //using BASE::mprod;
     using BASE::inp;
     using BASE::diff2;
+    //using BASE::block;
 
     AtomsPackN atoms;
 
@@ -57,6 +59,14 @@ namespace ptens{
   public: // ----- Constructors ------------------------------------------------------------------------------
 
 
+    PtensorLayer(const int k, const BASE& M):
+      BASE(M.copy()),
+      atoms(k,AtomsPack(M.dim(0))){}
+
+    PtensorLayer(const int k, const AtomsPack& _atoms, const BASE& M):
+      BASE(M.copy()),
+      atoms(k,_atoms){}
+
     PtensorLayer(const int k, const AtomsPack& _atoms, const int nc, const int _dev=0):
       atoms(k,_atoms){
       BASE::reset(BASE({atoms.nrows(),nc},0,_dev));
@@ -66,6 +76,9 @@ namespace ptens{
       atoms(k,_atoms){
       BASE::reset(BASE({atoms.nrows(),nc},fcode,_dev));
     }
+
+    PtensorLayer(const BASE& x, const AtomsPackN& _atoms):
+      BASE(x), atoms(_atoms){}
 
 
   public: // ---- Named parameter constructors ---------------------------------------------------------------
@@ -111,6 +124,14 @@ namespace ptens{
       return PtensorLayer(BASE::copy(_dev),atoms);
     }
 
+    PtensorLayer zeros_like() const{
+      return PtensorLayer(BASE::zeros_like(),atoms);
+    }
+
+    PtensorLayer gaussian_like() const{
+      return PtensorLayer(BASE::gaussian_like(),atoms);
+    }
+
     static PtensorLayer* new_zeros_like(const PtensorLayer& x){
       return new PtensorLayer(x.BASE::zeros_like(),x.atoms);
     }
@@ -118,9 +139,6 @@ namespace ptens{
 
   public: // ----- Conversions -------------------------------------------------------------------------------
 
-
-    PtensorLayer(const BASE& x, const AtomsPackN& _atoms):
-      BASE(x), atoms(_atoms){}
 
     PtensorLayer(const Ptensors0& x):
       BASE(cnine::Gdims({x.tail/x.nc,x.nc})),
@@ -236,9 +254,30 @@ namespace ptens{
   public: // ---- Operations ---------------------------------------------------------------------------------
 
 
-    //PtensorLayer add(const PtensorLayer& y){
-    //return PtensorLayer(BASE::add(y),atoms);
-    //}
+    static PtensorLayer cat(const vector<reference_wrapper<PtensorLayer> >& list){
+      vector<shared_ptr<AtomsPackObjBase> > v; 
+      for(auto p:list)
+	v.push_back(p.get().atoms.obj);
+      return PtensorLayer(BASE::stack(0,list),AtomsPackObjBase::cat(v));
+    }
+
+    /*
+    static PtensorLayer cat(const vector<PtensorLayer*>& list){
+      vector<shared_ptr<AtomsPackObjBase> > v; 
+      for(auto p:list)
+	v.push_back(p->atoms->obj);
+      return PtensorLayer(BASE::stack(0,list),AtomsPackObjBase::cat(v));
+    }
+    */
+
+    PtensorLayer cat_channels(const PtensorLayer& y) const{
+      PTENS_ASSRT(atoms==y.atoms);
+      PTENS_ASSRT(dim(0)==y.dim(0));
+      BASE R({dim(0),dim(1)+y.dim(1)},0,get_dev());
+      R.block(0,0,dim(0),dim(1))+=*this;
+      R.block(0,dim(1),dim(0),y.dim(1))+=y;
+      return PtensorLayer(R,atoms);
+    }
 
     PtensorLayer mult_channels(const cnine::Ltensor<TYPE>& s) const{
       return PtensorLayer(BASE::scale_columns(s),atoms);
@@ -254,25 +293,32 @@ namespace ptens{
       return R;
     }
 
+    PtensorLayer ReLU(TYPE alpha) const{
+      return PtensorLayer(BASE::ReLU(alpha),atoms);
+    }
 
-    PtensorLayer ReLU(const PtensorLayer& x, TYPE alpha){
-      return PtensorLayer(ReLU(alpha),atoms);
+    void cat_channels_back0(const PtensorLayer& g){
+      get_grad()+=g.get_grad().block(0,0,dim(0),dim(1));
+    }
+
+    void cat_channels_back1(const PtensorLayer& g){
+      get_grad()+=g.get_grad().block(0,g.dim(1)-dim(1),dim(0),dim(1));
     }
 
     void add_mult_channels_back(const PtensorLayer& g, const BASE& s){
-      get_grad().add_scale_columns(g.get_grad(),s);
+      get_grad().BASE::add_scale_columns(g.get_grad(),s);
     }
 
     void add_mprod_back0(const PtensorLayer& g, const BASE& M){
-      get_grad().add_mprod(g.get_grad(),M.transp());
+      get_grad().BASE::add_mprod(g.get_grad(),M.transp());
     }
 
     void add_linear_back0(const PtensorLayer& g, const BASE& M){
-      get_grad().add_mprod(g.get_grad(),M.transp());
+      get_grad().BASE::add_mprod(g.get_grad(),M.transp());
     }
 
     void add_ReLU_back(const PtensorLayer& g, const PtensorLayer& x, const float alpha){
-      get_grad().add_ReLU_back(g.get_grad(),x,alpha);
+      get_grad().BASE::add_ReLU_back(g.get_grad(),x,alpha);
     }
 
 
@@ -294,7 +340,7 @@ namespace ptens{
       }
       ostringstream oss;
       for(int i=0; i<size(); i++){
-	oss<<indent<<"Ptensor"<<getk()<<atoms_of(i)<<":"<<endl;
+	oss<<indent<<"Ptensor"<<getk()<<"("<<atoms_of(i)<<"):"<<endl;
 	oss<<tensor_of(i).to_string(indent+"  ")<<endl;
       }
       return oss.str();

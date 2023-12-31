@@ -56,6 +56,24 @@ namespace ptens{
     virtual int offset(const int i) const=0;
 
 
+  public: // ---- Concatenation ------------------------------------------------------------------------------
+
+
+    static shared_ptr<AtomsPackObjBase> cat(const vector<shared_ptr<AtomsPackObjBase> >& list){
+      CNINE_ASSRT(list.size()>0); 
+      cnine::plist<AtomsPackObjBase*> v;
+      for(int i=1; i<list.size(); i++)
+	v.push_back(list[i].get());
+      return list[0]->cat_maps(v);
+    }
+
+    typedef cnine::plist_indexed_object_bank<AtomsPackObjBase,shared_ptr<AtomsPackObjBase> > CAT_MAPS; 
+    CAT_MAPS cat_maps=CAT_MAPS([this](const vector<AtomsPackObjBase*>& v)
+      {return shared_ptr<AtomsPackObjBase>(cat_with(v));});
+
+    virtual AtomsPackObjBase* cat_with(const vector<AtomsPackObjBase*>& list){CNINE_UNIMPL(); return nullptr;};
+
+
   public: // ---- Transfer maps -----------------------------------------------------------------------------
 
 

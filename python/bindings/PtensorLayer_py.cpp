@@ -1,4 +1,5 @@
 typedef cnine::ATview<float> TVIEW;
+typedef PtensorLayer<float> TLAYER;
 
 
 pybind11::class_<PtensorLayer<float> >(m,"ptensorlayer")
@@ -6,6 +7,13 @@ pybind11::class_<PtensorLayer<float> >(m,"ptensorlayer")
 //.def(pybind11::init<const at::Tensor&>())
 //.def(pybind11::init<const at::Tensor&, const AtomsPack&>())
 //.def(pybind11::init<const at::Tensor&, const vector<vector<int> >& >())
+
+  .def(py::init([](const int k, at::Tensor& M){
+	return TLAYER(k,Ltensor<float>(TVIEW(M)));}))
+  .def(py::init([](const int k, const AtomsPack& atoms, at::Tensor& M){
+	return TLAYER(k,atoms,Ltensor<float>(TVIEW(M)));}))
+  .def(py::init([](const int k, const vector<vector<int> >& atoms, at::Tensor& M){
+	return TLAYER(k,AtomsPack(atoms),Ltensor<float>(TVIEW(M)));}))
 
   .def_static("create",[](const int k, const int n, const int _nc, const int fcode, const int _dev){
       return PtensorLayer<float>(k,AtomsPack(n),_nc,fcode,_dev);}, 
@@ -21,6 +29,10 @@ pybind11::class_<PtensorLayer<float> >(m,"ptensorlayer")
 
   .def("copy",[](const PtensorLayer<float>& x){return x.copy();})
   .def("copy",[](const PtensorLayer<float>& x, const int _dev){return x.copy(_dev);})
+  .def("zeros_like",&TLAYER::zeros_like)
+  .def("randn_like",&TLAYER::gaussian_like)
+
+  .def("torch",[](const TLAYER& x){return x.torch();})
 
 
 // ---- Conversions, transport, etc. ------------------------------------------------------------------------
@@ -30,11 +42,7 @@ pybind11::class_<PtensorLayer<float> >(m,"ptensorlayer")
       x.add_to_grad(y);})
   .def("add_to_grad",[](PtensorLayer<float>& x, const PtensorLayer<float>& y, const float c){
       x.add_to_grad(y,c);})
-
-//.def("add_to_grad",[](PtensorLayer<float>& x, const cnine::loose_ptr<PtensorLayer<float>>& y){x.add_to_grad(y);})
-//  .def("add_to_gradp",[](PtensorLayer<float>& x, const cnine::loose_ptr<PtensorLayer<float>>& y){x.add_to_grad(y);})
-//.def("add_to_grad",&PtensorLayer<float>::add_to_grad)
-//.def("get_grad",&PtensorLayer<float>::get_grad)
+  .def("get_grad",[](const PtensorLayer<float>& x){return x.get_grad();})
 //.def("get_gradp",&PtensorLayer<float>::get_gradp)
 //.def("gradp",&PtensorLayer<float>::get_gradp)
 
@@ -53,7 +61,8 @@ pybind11::class_<PtensorLayer<float> >(m,"ptensorlayer")
 
   .def("get_dev",&PtensorLayer<float>::get_dev)
   .def("get_nc",&PtensorLayer<float>::get_nc)
-//.def("get_atoms",[](const PtensorLayer<float>& x){return x.atoms;})
+  .def("get_atoms",[](const PtensorLayer<float>& x){return *x.atoms.obj->atoms;})
+  .def("dim",&TLAYER::dim)
 //.def("view_of_atoms",[](const PtensorLayer<float>& x){return x.atoms;})
 //.def("view_of_atoms",&PtensorLayer<float>::view_of_atoms)
 
@@ -70,9 +79,20 @@ pybind11::class_<PtensorLayer<float> >(m,"ptensorlayer")
 // ---- Operations -------------------------------------------------------------------------------------------
 
   
-//.def("add",&PtensorLayer<float>::add)
   .def("add",[](PtensorLayer<float>& r, const PtensorLayer<float>& x){r.add(x);})
   .def("add_back",[](PtensorLayer<float>& x, const PtensorLayer<float>& g){x.add_to_grad(g.get_grad());})
+
+  .def("cat_channels",&TLAYER::cat_channels)
+  .def("cat_channels_back0",&TLAYER::cat_channels_back0)
+  .def("cat_channels_back1",&TLAYER::cat_channels_back1)
+
+  .def_static("cat",&TLAYER::cat)
+  .def("add_cat_back",[](TLAYER& x, TLAYER& r, const int offs){
+      x.get_grad()+=r.slices(0,offs,x.dim(0));})
+
+//.def("outer",&TLAYER::outer)
+//.def("outer_back0",&TLAYER::outer_back0)
+//.def("outer_back1",&TLAYER::outer_back1)
 
   .def("mprod",[](const PtensorLayer<float>& x, at::Tensor& M){
       return x.mprod(TVIEW(M));})
@@ -95,14 +115,11 @@ pybind11::class_<PtensorLayer<float> >(m,"ptensorlayer")
   .def("linear_back2",[](const PtensorLayer<float>& x, PtensorLayer<float>& g){
       return g.get_grad().sum(0).torch();})
 
-  .def("ReLU",&PtensorLayer<float>::add_ReLU) 
-//[](const PtensorLayer<float>& x, const float alpha){return x.ReLU(alpha);})
-  .def("add_ReLU_back",&PtensorLayer<float>::add_ReLU_back)
+  .def("ReLU",&TLAYER::ReLU)
+  .def("add_ReLU_back",&TLAYER::add_ReLU_back)
 
-  .def("inp",&PtensorLayer<float>::inp)
-  .def("diff2",&PtensorLayer<float>::diff2)
-//.def("inp",[](const PtensorLayer<float>& x, const PtensorLayer<float>& y){return x.inp(y);})
-//.def("diff2",[](const PtensorLayer<float>& x, const PtensorLayer<float>& y){return x.diff2(y);})
+  .def("inp",[](const TLAYER& x, const TLAYER& y){return x.inp(y);})
+  .def("diff2",[](const TLAYER& x, const TLAYER& y){return x.diff2(y);})
 
 // ---- I/O --------------------------------------------------------------------------------------------------
 
@@ -110,3 +127,7 @@ pybind11::class_<PtensorLayer<float> >(m,"ptensorlayer")
   .def("__str__",&PtensorLayer<float>::str,py::arg("indent")="")
   .def("__repr__",&PtensorLayer<float>::repr);
 
+
+
+
+//.def("ReLU",[](const TLAYER& x, const float alpha){return x.ReLU(alpha);})

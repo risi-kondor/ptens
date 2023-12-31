@@ -38,6 +38,9 @@ namespace ptens{
 
     AtomsPackN(){}
 
+    AtomsPackN(shared_ptr<AtomsPackObjBase> _obj):
+      obj(_obj){}
+
     AtomsPackN(const int n):
       obj(new AtomsPack0obj<int>(n)){}
 
@@ -52,6 +55,14 @@ namespace ptens{
       if(k==1) obj.reset(new AtomsPack1obj<int>(x));
       if(k==2) obj.reset(new AtomsPack2obj<int>(x));
     }
+
+    //AtomsPackN(AtomsPackObjBase* _obj):
+    //obj(_obj){}
+
+
+    static AtomsPackN cat(const vector<reference_wrapper<AtomsPackN> >& list){
+      return AtomsPackObjBase::cat(cnine::mapcar<reference_wrapper<AtomsPackN>,shared_ptr<AtomsPackObjBase> >
+	(list,[](const reference_wrapper<AtomsPackN>& x){return x.get().obj;}));}
 
 
   public: // ---- Conversions --------------------------------------------------------------------------------
@@ -128,7 +139,10 @@ namespace ptens{
       return obj->atoms->as_vecs();
     }
 
-    
+    bool operator==(const AtomsPackN& y) const{
+      return true;
+    }
+
 
   public: // ---- I/O ----------------------------------------------------------------------------------------
 

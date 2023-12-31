@@ -66,6 +66,16 @@ namespace ptens{
     }
 
 
+  public: // ---- Concatenation -----------------------------------------------------------------------------
+
+
+    AtomsPackObjBase* cat_with(const vector<AtomsPackObjBase*>& list){
+      cnine::plist<AtomsPackObj*> v;
+      for(auto p:list) v.push_back(p->atoms.get());
+      return new AtomsPack0obj(atoms->cat_maps(v));
+    }
+
+
   public: // ---- Transfer maps -----------------------------------------------------------------------------
 
 

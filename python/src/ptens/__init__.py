@@ -35,9 +35,9 @@ from ptens.ptensor2 import ptensor2 as ptensor2
 #from ptens.ptensors1 import ptensors1 as ptensors1
 #from ptens.ptensors2 import ptensors2 as ptensors2
 
-##from ptens.graph import graph as graph
-#from ptens.ggraph import ggraph as ggraph
-#from ptens.subgraph import subgraph as subgraph
+#from ptens.graph import graph as graph
+from ptens.ggraph import ggraph as ggraph
+from ptens.subgraph import subgraph as subgraph
 
 #from ptens.nodelayer import nodelayer as nodelayer
 #from ptens.subgraphlayer0 import subgraphlayer0 as subgraphlayer0
@@ -46,7 +46,7 @@ from ptens.ptensor2 import ptensor2 as ptensor2
 
 ##import ptens.modules as modules
 
-#from ptens.functions import *
+from ptens.functions import *
 
 #from ptens.ptensors0b import ptensors0b as ptensors0b
-from ptens.ptensorlayer import ptensorlayer as ptensorlayer 
+from ptens.tlayer import tlayer as tlayer 
