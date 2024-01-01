@@ -52,6 +52,10 @@ namespace ptens{
       return atoms->size();
     }
 
+    int offset1(const int i) const{
+      return atoms->offset(i);
+    }
+
     virtual int size_of(const int i) const=0;
     virtual int offset(const int i) const=0;
 

@@ -682,7 +682,7 @@ namespace ptens{
       //const int n=x.nc;
       if(dev==0){
 	for(int i=0; i<size(); i++){
-	  view_of(i).add(repeat0(repeat0(x.view1_of(i).block(0,nc),k_of(i)),k_of(i)));
+	  view_of(i).add(repeat0(repeat0(x.view1_of(i).block(0,nc),k_of(i)),k_of(i))); // are these correct??
 	  view_of(i).diag01().add(repeat0(x.view1_of(i).block(nc,nc),k_of(i)));
 	}
       }

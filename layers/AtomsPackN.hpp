@@ -120,6 +120,10 @@ namespace ptens{
       return obj->offset(i);
     }
 
+    int offset1(const int i) const{
+      return obj->offset1(i);
+    }
+
     Atoms operator()(const int i) const{
       return (*obj->atoms)(i);
     }

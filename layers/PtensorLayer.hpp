@@ -35,6 +35,10 @@ namespace ptens{
     using cnine::diff_class<PtensorLayer<TYPE> >::grad;
     using cnine::diff_class<PtensorLayer<TYPE> >::get_grad;
 
+    using cnine::Rtensor1_view Rtensor1_view;
+    using cnine::Rtensor2_view Rtensor2_view;
+    using cnine::Rtensor3_view Rtensor3_view;
+
     typedef cnine::Ltensor<TYPE> BASE;
     using BASE::torch;
     using BASE::get_dev;
@@ -47,6 +51,7 @@ namespace ptens{
     //using BASE::block;
 
     AtomsPackN atoms;
+    int nc=0;
 
 
     ~PtensorLayer(){
@@ -61,24 +66,31 @@ namespace ptens{
 
     PtensorLayer(const int k, const BASE& M):
       BASE(M.copy()),
-      atoms(k,AtomsPack(M.dim(0))){}
+      atoms(k,AtomsPack(M.dim(0))),
+      nc(M.dim(1)){}
 
     PtensorLayer(const int k, const AtomsPack& _atoms, const BASE& M):
       BASE(M.copy()),
-      atoms(k,_atoms){}
+      atoms(k,_atoms),
+      nc(M.dim(1)){}
 
-    PtensorLayer(const int k, const AtomsPack& _atoms, const int nc, const int _dev=0):
-      atoms(k,_atoms){
+    PtensorLayer(const int k, const AtomsPack& _atoms, const int _nc, const int _dev=0):
+      atoms(k,_atoms), nc(_nc){
       BASE::reset(BASE({atoms.nrows(),nc},0,_dev));
     }
 
-    PtensorLayer(const int k, const AtomsPack& _atoms, const int nc, const int fcode, const int _dev):
-      atoms(k,_atoms){
+    PtensorLayer(const int k, const AtomsPack& _atoms, const int _nc, const int fcode, const int _dev):
+      atoms(k,_atoms), nc(_nc){
       BASE::reset(BASE({atoms.nrows(),nc},fcode,_dev));
     }
 
-    PtensorLayer(const BASE& x, const AtomsPackN& _atoms):
-      BASE(x), atoms(_atoms){}
+    //PtensorLayer(const BASE& x, const AtomsPackN& _atoms):
+    //BASE(x), atoms(_atoms){}
+
+    PtensorLayer(const AtomsPackN& _atoms, const int _nc, const int _dev=0):
+      BASE({atoms.nrows(),_nc},0,_dev),
+      atoms(_atoms),
+      nc(_nc){}
 
 
   public: // ---- Named parameter constructors ---------------------------------------------------------------
@@ -142,26 +154,26 @@ namespace ptens{
 
     PtensorLayer(const Ptensors0& x):
       BASE(cnine::Gdims({x.tail/x.nc,x.nc})),
-      atoms(0,x.atoms){
+      atoms(0,x.atoms), nc(x.nc){
       BASE::view2().set(x.view_as_matrix().view2());
     }
 
     PtensorLayer(const Ptensors1& x):
       BASE(cnine::Gdims({x.tail/x.nc,x.nc})),
-      atoms(1,x.atoms){
+      atoms(1,x.atoms), nc(x.nc){
       BASE::view2().set(x.view_as_matrix().view2());
     }
 
     PtensorLayer(const Ptensors2& x):
       BASE(cnine::Gdims({x.tail/x.nc,x.nc})),
-      atoms(2,x.atoms){
+      atoms(2,x.atoms), nc(x.nc){
       BASE::view2().set(x.view_as_matrix().view2());
     }
 
 #ifdef _WITH_ATEN // needed for grad
     PtensorLayer(const at::Tensor& T):
       BASE(T){}
-    #endif 
+#endif 
 
 
   public: // ---- Transport ----------------------------------------------------------------------------------
@@ -169,7 +181,7 @@ namespace ptens{
 
     PtensorLayer(const PtensorLayer& x, const int _dev):
       BASE(x.copy(_dev)), 
-      atoms(x.atoms){}
+      atoms(x.atoms), nc(x.nc){}
 
 
   public: // ----- Access ------------------------------------------------------------------------------------
@@ -193,7 +205,8 @@ namespace ptens{
     }
 
     int get_nc() const{
-      return BASE::dim(1);
+      return nc;
+      //      return BASE::dim(1);
     }
 
     int nchannels() const{
@@ -208,6 +221,10 @@ namespace ptens{
       return atoms.offset(i);
     }
 
+    int offset(const int i) const{
+      return atoms.offset1(i);
+    }
+
     Atoms atoms_of(const int i) const{
       return atoms(i);
     }
@@ -215,12 +232,41 @@ namespace ptens{
     BASE tensor_of(const int i) const{
       int k=getk();
       if(k==1) return BASE::slices(0,offset(i),size_of(i));
-      if(k==2) {int n=size_of(i); return BASE::slices(0,offset(i),n*n).reshape({n,n,nchannels()});}
+      if(k==2) {int n=size_of(i); return BASE::slices(0,offset(i),n*n).reshape({n,n,get_nc()});}
       return BASE::slice(0,offset(i));
     }
 
     BASE operator()(const int i) const{
       return tensor_of(i);
+    }
+
+    Rtensor1_view view1_of(const int i) const{
+      return Rtensor1_view(get_arr(),nc,strides[1],dev);
+    }
+
+    Rtensor1_view view1_of(const int i, const int offs, const int m) const{
+      return Rtensor1_view(get_arr()+offs*strides[1],
+	m,strides[1],dev);
+    }
+
+    Rtensor2_view view2_of(const int i) const{
+      return Rtensor2_view(get_arr()+offset(i)*strides[0],size_of(i),nc,strides[0],strides[1],dev);
+    }
+
+    Rtensor2_view view2_of(const int i, const int offs, const int m) const{
+      return Rtensor2_view(get_arr()+offset(i)*strides[0]+offs*strides[1],
+	size_of(i),m,strides[0],strides[1],dev);
+    }
+
+    Rtensor2_view view3_of(const int i) const{
+      int n=size_of(i);
+      return Rtensor3_view(get_arr()+offset(i)*strides[0],n,n,nc,strides[0]*n,strides[0],strides[1],dev);
+    }
+
+    Rtensor2_view view3_of(const int i, const int offs, const int m) const{
+      int n=size_of(i);
+      return Rtensor3_view(get_arr()+offset(i)*strides[0]+offs*strides[1],
+	n,n,m,strides[0]*n,strides[0],strides[1],dev);
     }
 
 
@@ -229,8 +275,8 @@ namespace ptens{
 
     template<typename SOURCE>
     static PtensorLayer<TYPE> gather(const int k, const AtomsPack& a, const SOURCE& x){
-      int nc=vector<int>({1,1,2,5,15})[x.getk()+k];
-      PtensorLayer<TYPE> R(k,a,nc*x.nchannels(),x.get_dev());
+      int m=vector<int>({1,1,2,5,15})[x.getk()+k];
+      PtensorLayer<TYPE> R(k,a,m*x.get_nc(),x.get_dev());
       R.gather(x);
       return R;
     }
@@ -251,6 +297,358 @@ namespace ptens{
     }
 
 
+    static PtensorLayer linmaps(const int k, const SOURCE& x){
+      int xk=x.getk();
+      int nc=x.get_nc();
+      int nc_out=vector<int>({1,1,2,5,15})[k+xk]*nc;
+      PtensorLayer<TYPE> r(k,x.atoms,out_nc,x.get_dev());
+      if(k==0){
+	if(xk==0) r+=x;
+	if(xk==1) r+=x.reduce0();
+	if(xk==2) r+=x.reduce0();
+      }
+      if(k==1){
+	if(xk==0) 
+	  r.broadcast0(x);
+	if(xk==1){
+	  r.broadcast0(x.reduce0());
+	  r.cols(nc,nc)+=x;}
+	if(xk==2){
+	  r.broadcast0(x.reduce0());
+	  r.cols(2*nc,3*nc)+=x.reduce1();}
+      }
+      if(k==2){
+	if(xk==0) 
+	  r.broadcast0(x);
+	if(xk==1){
+	  r.broadcast0(x.reduce0());
+	  r.broadcast1(x,2*nc);}
+	if(xk==2){
+	  r.broadcast0(x.reduce0());
+	  r.broadcast1(x.reduce1(),4*nc);
+	  r.broadcast2(x,13*nc);
+	}
+      }
+      return R;
+    }
+
+
+    void linmaps_back(const PtensorLayer& r){
+      int k=r.getk();
+      int xk=getk();
+      int nc=get_nc();
+      int nc_out=vector<int>({1,1,2,5,15})[k+xk]*nc;
+      PTENS_ASSRT(r.dim(1)==nc_out);
+      if(k==0){
+	if(xk==0) add(r);
+	if(xk==1) broadcast0(r);
+	if(xk==2) broadcast0_shrink(r);
+      }
+      if(k==1){
+	if(xk==0) 
+	  add(r.reduce0());
+	if(xk==1){
+	  broadcast0(r.reduce0(0,nc));
+	  add(r.cols(nc,nc));}
+	if(xk==2){
+	  broadcast0_shrink(r.reduce0(0,2*nc));
+	  broadcast0_shrink(r.cols(2*nc,3*nc));}
+      }
+      if(k==2){
+	if(xk==0) 
+	  add(r.reduce0_shrink(0,nc));
+	if(xk==1){
+	  broadcast0(r.reduce0_shrink(0,nc));
+	  add(r.reduce1_shrink(2*nc,nc));}
+	if(xk==2){
+	  broadcast0_shrink(r.reduce0_shrink(0,2*nc));
+	  broadcast1_shrink(r.reduce1_shrink(4*nc,3*nc));
+	  add(r.reduce2_shrink(13*nc,nc));}
+      }
+      return R;
+    }
+
+    
+  public: // ---- Reductions ---------------------------------------------------------------------------------
+
+
+    BASE reduce0() const{
+      TimedFn T("PtensorLayer"+to_string(getk()),"reduce0",*this);
+      int N=size();
+      int dev=get_dev();
+      
+      if(getk()==0) return *this;
+      
+    if(getk()==1){
+      BASE R({N,nc},0,dev);
+      Rtensor2_view r=R.view2();
+      if(dev==0){
+	for(int i=0; i<N; i++)
+	  view2_of(i).sum0_into(r.slice0(i));
+      }
+      return R;
+    }
+
+    if(getk()==2){
+      BASE R({N,3*nc},0,dev);
+      Rtensor2_view r=R.view2();
+      if(dev==0){
+	Rtensor2_view r0=R.block(0,0,N,nc);
+	Rtensor2_view r1=R.block(0,nc,N,nc);
+	for(int i=0; i<N; i++){
+	  view3_of(i).sum01_into(r0.slice0(i));
+	  view3_of(i).diag01().sum0_into(r1.slice0(i));
+	}
+      }
+      return R;
+    }
+
+    CNINE_UNIMPL();
+    return BASE();
+    }
+
+
+    BASE reduce0_shrink(const int offs, const int nc) const{
+      TimedFn T("PtensorLayer"+to_string(getk()),"reduce0_shrink",*this);
+      int N=size();
+      int dev=get_dev();
+      
+      if(getk()==2){
+	BASE R({N,nc},0,dev);
+	Rtensor2_view r=R.view2();
+	if(dev==0){
+	  for(int i=0; i<N; i++){
+	    view3_of(i,offs,nc).sum01_into(r.slice0(i));
+	    view3_of(i,offs+nc,nc).diag01().sum0_into(r.slice0(i));
+	  }
+	}
+	return R;
+      }
+
+      CNINE_UNIMPL();
+      return BASE();
+    }
+
+
+    BASE reduce1() const{
+      TimedFn T("PtensorLayer"+to_string(getk()),"reduce1",*this);
+      int N=size();
+      int dev=get_dev();
+      
+      if(getk()==1) return *this;
+      
+      if(getk()==2){
+	BASE R({size1(),3*nc},0,dev);
+	Rtensor2_view r=R.view2();
+	if(dev==0){
+	  for(int i=0; i<N; i++){
+	    int roffs=offset1(i);
+	    int n=size_of(i);
+	    view3_of(i).sum0_into(r.block(roffs,0,n,nc));
+	    view3_of(i).sum1_into(r.block(roffs,nc,n,nc));
+	    r.block(roffs,2*nc,n,nc)+=view3_of(i).diag01();
+	  }
+	}
+	return R;
+      }
+      
+      CNINE_UNIMPL();
+      return BASE();
+    }
+
+    
+    BASE reduce1_shrink(const int offs, const int nc) const{
+      TimedFn T("PtensorLayer"+to_string(getk()),"reduce1_shrink",*this);
+      int N=size();
+      int dev=get_dev();
+
+      if(getk()==2){
+	BASE R({dim(0),nc},0,dev);
+	Rtensor2_view r=R.view2();
+	if(dev==0){
+	  for(int i=0; i<N; i++){
+	    int roffs=offset1(i);
+	    int n=size_of(i);
+	    view3_of(i,offs,nc).sum0_into(r.block(roffs,0,n,nc));
+	    view3_of(i,offs+nc,nc).sum1_into(r.block(roffs,0,n,nc));
+	    r.block(roffs,0,n,nc)+=view3_of(i,offs+2*nc,nc).diag01();
+	  }
+	}
+	return R;
+      }
+      
+      CNINE_UNIMPL();
+      return BASE();
+    }
+
+
+    BASE reduce2_shrink(const int offs, const int nc) const{
+      TimedFn T("PtensorLayer"+to_string(getk()),"reduce2_shrink",*this);
+      int N=size();
+      int dev=get_dev();
+      
+      if(getk()==2){
+	BASE R({dim(0),nc},0,dev);
+	Rtensor2_view r=R.view2();
+	if(dev==0){
+	  for(int i=0; i<N; i++){
+	    int roffs=offset(i);
+	    int n=size_of(i);
+	    r.block(roffs,0,n*n,nc)+=view3_of(i,offs,nc);
+	    r.block(roffs,0,n*n,nc)+=view3_of(i,offs+nc,nc).transp01();
+	  }
+	}
+	return R;
+      }
+      
+      CNINE_UNIMPL();
+      return BASE();
+    }
+
+
+
+  public: // ---- Broadcasting -------------------------------------------------------------------------------
+
+
+    broadcast0(const BASE& X, const int offs=0){
+    TimedFn T("PtensorLayer"+to_string(getk()),"broadcast0",*this);
+    int N=size();
+    int dev=get_dev();
+    int nc=X.dim(1);
+    PTENS_ASSRT(X.dim(0)==N);
+    Rtensor2_view x=X.view2();
+
+    if(getk()==0){
+      view2().block(0,offs,N,nc)+=x;
+      return;
+    }
+
+    if(getk()==1){
+      if(dev==0){
+	for(int i=0; i<N; i++)
+	  view2_of(i,offs,nc)+=cnine::repeat0(x.slice0(i),size_of(i));
+      }
+      return; 
+    }
+
+    if(getk()==2){
+      if(dev==0){
+	for(int i=0; i<N; i++){
+	  view3_of(i,offs,nc)+=repeat0(repeat0(x.slice0(i)));
+	  view3_of(i,offs+nc,nc).diag01()+=repeat0(x.slice0(i));
+	}
+      }
+      return; 
+    }
+
+    CNINE_UNIMPL();
+  }
+
+  broadcast0_shrink(const BASE& X){
+    TimedFn T("PtensorLayer"+to_string(getk()),"broadcast0_shrink",*this);
+    int N=size();
+    int dev=get_dev();
+    int nc=dim(1);
+    PTENS_ASSRT(X.dim(0)==N);
+    PTENS_ASSRT(X.dim(1)==2*nc);
+    Rtensor2_view x=X.view2();
+    Rtensor2_view x0=x.block(0,0,N,nc);
+    Rtensor2_view x1=x.block(0,nc,N,nc);
+
+    if(getk()==2){
+      if(dev==0){
+	for(int i=0; i<N; i++){
+	  view3_of(i)+=repeat0(repeat0(x0.slice0(i)));
+	  view3_of(i).diag01()+=repeat0(x1.slice0(i));
+	}
+      }
+      return; 
+    }
+
+    CNINE_UNIMPL();
+  }
+
+
+  broadcast1(const BASE& X, const int offs=0){
+    TimedFn T("PtensorLayer"+to_string(getk()),"broadcast0",*this);
+    int N=size();
+    int dev=get_dev();
+    int nc=X.dim(1);
+    Rtensor2_view x=X.view2();
+
+    if(getk()==1){
+	view2().block(0,offs,dim(0),nc)+=x;
+      return; 
+    }
+
+    if(getk()==2){
+      if(dev==0){
+	for(int i=0; i<N; i++){
+	  int roffs=offset1(i);
+	  int n=size_of(i);
+	  view3_of(i,offs,nc)+=repeat0(x.block(roffs,0,n,nc));
+	  view3_of(i,offs+nc,nc)+=repeat1(x.block(roffs,0,n,nc));
+	  view3_of(i,offs+2*nc,nc).diag01()+=x.block(roffs,0,n,nc);
+	}
+      }
+      return; 
+    }
+
+    CNINE_UNIMPL();
+  }
+
+  broadcast1_shrink(const BASE& X){
+    TimedFn T("PtensorLayer"+to_string(getk()),"broadcast0_shrink",*this);
+    int N=size();
+    int dev=get_dev();
+    int nc=X.dim(1);
+    PTENS_ASSRT(X.dim(1)==3*nc);
+    Rtensor2_view x=X.view2();
+    Rtensor2_view x0=x.block(0,0,X.dim(0),nc);
+    Rtensor2_view x1=x.block(0,nc,X.dim(0),nc);
+    Rtensor2_view x2=x.block(0,2*nc,X.dim(0),nc);
+
+
+   if(getk()==2){
+      if(dev==0){
+	for(int i=0; i<N; i++){
+	  int roffs=offset1(i);
+	  int n=size_of(i);
+	  view3_of(i)+=repeat0(x.block(roffs,0,n,nc));
+	  view3_of(i)+=repeat1(x.block(roffs,nc,n,nc));
+	  view3_of(i).diag01()+=x.block(roffs,2*nc,n,nc);
+	}
+      }
+      return; 
+    }
+
+    CNINE_UNIMPL();
+  }
+
+
+  broadcast2(const BASE& X, const int offs=0){
+    TimedFn T("PtensorLayer"+to_string(getk()),"broadcast2",*this);
+    int N=size();
+    int dev=get_dev();
+    int nc=X.dim(1);
+    Rtensor2_view x=X.view2();
+
+    if(getk()==2){
+      if(dev==0){
+	for(int i=0; i<N; i++){
+	  int roffs=offset(i);
+	  int n=size_of(i);
+	  view3_of(i,offs,nc)+=x.block(roffs,0,n*n,nc);
+	  view3_of(i,offs+nc,nc)+=x.block(roffs,0,n*n,nc).transp01();
+	}
+      }
+      return; 
+    }
+
+    CNINE_UNIMPL();
+  }
+
+
   public: // ---- Operations ---------------------------------------------------------------------------------
 
 
@@ -260,15 +658,6 @@ namespace ptens{
 	v.push_back(p.get().atoms.obj);
       return PtensorLayer(BASE::stack(0,list),AtomsPackObjBase::cat(v));
     }
-
-    /*
-    static PtensorLayer cat(const vector<PtensorLayer*>& list){
-      vector<shared_ptr<AtomsPackObjBase> > v; 
-      for(auto p:list)
-	v.push_back(p->atoms->obj);
-      return PtensorLayer(BASE::stack(0,list),AtomsPackObjBase::cat(v));
-    }
-    */
 
     PtensorLayer cat_channels(const PtensorLayer& y) const{
       PTENS_ASSRT(atoms==y.atoms);
@@ -296,6 +685,7 @@ namespace ptens{
     PtensorLayer ReLU(TYPE alpha) const{
       return PtensorLayer(BASE::ReLU(alpha),atoms);
     }
+
 
     void cat_channels_back0(const PtensorLayer& g){
       get_grad()+=g.get_grad().block(0,0,dim(0),dim(1));
@@ -379,6 +769,15 @@ namespace ptens{
       PtensorLayer<TYPE> R(k,a,nc*x.nchannels(),x.get_dev());
       R.gather(x);
       return R;
+    }
+    */
+
+    /*
+    static PtensorLayer cat(const vector<PtensorLayer*>& list){
+      vector<shared_ptr<AtomsPackObjBase> > v; 
+      for(auto p:list)
+	v.push_back(p->atoms->obj);
+      return PtensorLayer(BASE::stack(0,list),AtomsPackObjBase::cat(v));
     }
     */
 
