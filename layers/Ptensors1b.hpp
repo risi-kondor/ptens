@@ -20,6 +20,7 @@
 #include "Ptensors1.hpp"
 #include "PtensLoggedTimer.hpp"
 #include "Ltensor.hpp"
+#include "Ptensorsb.hpp"
 
 
 namespace ptens{
@@ -29,13 +30,14 @@ namespace ptens{
 
 
   template<typename TYPE>
-  class Ptensors1b: public cnine::Ltensor<TYPE>, public cnine::diff_class<Ptensors1b<TYPE> >{
+  class Ptensors1b: public Ptensorsb<TYPE, Ptensors1b<TYPE> >, public cnine::diff_class<Ptensors1b<TYPE> >{
   public:
 
     using cnine::diff_class<Ptensors1b<TYPE> >::grad;
     using cnine::diff_class<Ptensors1b<TYPE> >::get_grad;
 
-    typedef cnine::Ltensor<TYPE> BASE;
+    typedef Ptensorsb<TYPE, Ptensors1b<TYPE> > BASE;
+    typedef cnine::Ltensor<TYPE> TENSOR;
     using BASE::get_dev;
 
 
@@ -91,6 +93,10 @@ namespace ptens{
 
   public: // ----- Spawning ----------------------------------------------------------------------------------
 
+    
+    //Ptensors1b like(const TENSOR& x) const{
+    //return Ptensors1b(x,atoms);
+    //}
 
     static Ptensors1b* new_zeros_like(const Ptensors1b& x){
       return new Ptensors1b(x.BASE::zeros_like(),x.atoms);
@@ -100,7 +106,7 @@ namespace ptens{
   public: // ----- Conversions -------------------------------------------------------------------------------
 
 
-    Ptensors1b(BASE& x, const AtomsPack1& _atoms):
+    Ptensors1b(const TENSOR& x, const AtomsPack1& _atoms):
       BASE(x),
       atoms(_atoms){}
 
@@ -122,6 +128,18 @@ namespace ptens{
     Ptensors1b(const Ptensors1b& x, const int _dev):
       BASE(x.copy(_dev)), 
       atoms(x.atoms){}
+
+
+  public: // ----- Virtual functions --------------------------------------------------------------------------
+
+
+    Ptensors1b& get_grad(){
+      return cnine::diff_class<Ptensors1b<TYPE> >::get_grad();
+    }
+
+    Ptensors1b& get_grad() const{
+      return cnine::diff_class<Ptensors1b<TYPE> >::get_grad();
+    }
 
 
   public: // ----- Access ------------------------------------------------------------------------------------
@@ -151,8 +169,8 @@ namespace ptens{
       return atoms(i);
     }
     
-    BASE tensor_of(const int i) const{
-      return BASE::rows(offset(i),offset(i)+size_of(i));
+    TENSOR tensor_of(const int i) const{
+      return TENSOR::rows(offset(i),size_of(i));
     }
 
     Ptensor1 operator()(const int i) const{

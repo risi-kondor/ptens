@@ -72,6 +72,8 @@ int main(int argc, char** argv){
   Ptens1 Y2=Ptens1::gather(x2,yatoms);
   cout<<"1 <- 2 error: "<<Y2.diff2(Ptens1(y2))<<endl;
 
-  
+  Ltensor<float> M({2*nc,2*nc},4); 
+  //cout<<Y1<<endl;
+  //cout<<mprod(Y1,M)<<endl;
 
 }

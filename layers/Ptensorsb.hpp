@@ -26,28 +26,40 @@ namespace ptens{
 
 
   template<typename TYPE, typename OBJ>
-  class Ptensorsb: public cnine::Ltensor<TYPE>, public cnine::diff_class<OBJ>{
+  class Ptensorsb: public cnine::Ltensor<TYPE>{ //, public cnine::diff_class<OBJ>{
   public:
 
     typedef cnine::Ltensor<TYPE> BASE;
     typedef cnine::Ltensor<TYPE> TENSOR;
     using BASE::BASE;
     using BASE::zeros_like;
+    using BASE::dim;
 
-    using cnine::diff_class<OBJ>::grad;
-    using cnine::diff_class<OBJ>::get_grad;
+    virtual ~Ptensorsb(){}
 
-    ~Ptensorsb(){
-#ifdef WITH_FAKE_GRAD
-      if(grad) delete grad;
-#endif 
-    }
+    virtual Ptensorsb& get_grad()=0;
+    virtual const Ptensorsb& get_grad() const=0;
 
 
   public: // ---- Operations ---------------------------------------------------------------------------------
 
 
-    void add_mprod_back0(const OBJ& g, const TENSOR& M){
+    //static OBJ cat(const vector<reference_wrapper<OBJ> >& list){
+    //vector<shared_ptr<AtomsPackObjBase> > v; 
+    //for(auto p:list)
+    //v.push_back(p.get().atoms.obj);
+    //return OBJ(BASE::stack(0,list),AtomsPackObjBase::cat(v));
+    //}
+
+    void cat_channels_back0(const OBJ& g){
+      get_grad()+=g.get_grad().block(0,0,dim(0),dim(1));
+    }
+
+    void cat_channels_back1(const OBJ& g){
+      get_grad()+=g.get_grad().block(0,g.dim(1)-dim(1),dim(0),dim(1));
+    }
+
+     void add_mprod_back0(const OBJ& g, const TENSOR& M){
       get_grad().add_mprod(g.get_grad(),M.transp());
     }
 
@@ -66,15 +78,24 @@ namespace ptens{
   };
 
 
-
-  template<typename OBJ, typename TYPE>
-  OBJ mprod(const OBJ& x, const cnine::Ltensor<TYPE>& y){
-    return OBJ(x*y,x.atoms);
+  template<typename OBJ>
+  OBJ cat_channels(const OBJ& x, const OBJ& y){
+    //PTENS_ASSRT(x.atoms==y.atoms);
+    PTENS_ASSRT(x.dim(0)==y.dim(0));
+    OBJ R({x.dim(0),x.dim(1)+y.dim(1)},0,x.get_dev());
+    R.block(0,0,x.dim(0),x.dim(1))+=x;
+    R.block(0,x.dim(1),x.dim(0),y.dim(1))+=y;
+    return R;
   }
 
   template<typename OBJ, typename TYPE>
   OBJ scale_channels(const OBJ& x, const cnine::Ltensor<TYPE>& s){
     return OBJ(x.scale_columns(s),x.atoms);
+  }
+
+  template<typename OBJ, typename TYPE>
+  OBJ mprod(const OBJ& x, const cnine::Ltensor<TYPE>& y){
+    return OBJ(x*y,x.atoms);
   }
 
   template<typename OBJ, typename TYPE>

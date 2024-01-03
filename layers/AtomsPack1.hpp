@@ -43,16 +43,19 @@ namespace ptens{
   public: // ---- Maps ---------------------------------------------------------------------------------------
     
     
-    template<typename SOURCE>
+   template<typename SOURCE>
     MessageList overlaps_mlist(const SOURCE& x){
-      return MessageList(obj->atoms->overlaps_mlist(*x.obj->atoms),x.obj);
-      //return obj->atoms->overlaps_mlist(*x.obj->atoms);
+      return obj->atoms->overlaps_mlist(*x.obj->atoms);
+    }
+
+    template<typename SOURCE>
+    MessageMap message_map(const MessageList& list, const SOURCE& source){
+      return obj->message_map(*list.obj,*source.obj);
     }
 
     template<typename SOURCE>
     MessageMap overlaps_mmap(const SOURCE& x){
-      return obj->message_map(*overlaps_mlist(x).obj);
-      //return obj->message_map(obj->atoms->overlaps_mlist(*x.obj->atoms));
+      return message_map(overlaps_mlist(x),x);
     }
 
 

@@ -30,17 +30,14 @@ namespace ptens{
 
 
   template<typename TYPE>
-  class Ptensors0b:  //public cnine::Ltensor<TYPE>,
-    public Ptensorsb<TYPE, Ptensors0b<TYPE> >{
-    //public cnine::diff_class<Ptensors0b<TYPE> >{
+  class Ptensors0b: public Ptensorsb<TYPE, Ptensors0b<TYPE> >, public cnine::diff_class<Ptensors0b<TYPE> >{
 
   public:
 
-    //using cnine::diff_class<Ptensors0b<TYPE> >::grad;
-    using cnine::diff_class<Ptensors0b<TYPE> >::get_grad;
-
     typedef Ptensorsb<TYPE, Ptensors0b<TYPE> > BASE;
     typedef cnine::Ltensor<TYPE> TENSOR;
+
+    using cnine::diff_class<Ptensors0b<TYPE> >::grad;
     using TENSOR::get_dev;
     using TENSOR::dim;
     using TENSOR::move_to_device;
@@ -51,17 +48,29 @@ namespace ptens{
 
 
     ~Ptensors0b(){
-      //#ifdef WITH_FAKE_GRAD
-      //if(grad) delete grad;
-      //#endif 
+#ifdef WITH_FAKE_GRAD
+      if(grad) delete grad;
+#endif 
     }
 
 
   public: // ----- Constructors ------------------------------------------------------------------------------
 
 
+    Ptensors0b(const TENSOR& M):
+      BASE(M.copy()),
+      atoms(AtomsPack0(M.dim(0))){}
+
+    Ptensors0b(const AtomsPack& _atoms, const TENSOR& M):
+      BASE(M.copy()),
+      atoms(_atoms){}
+
     Ptensors0b(const AtomsPack& _atoms, const int nc, const int _dev=0):
       BASE(cnine::Gdims(_atoms.size(),nc),0,_dev),
+      atoms(_atoms){}
+
+    Ptensors0b(const AtomsPack& _atoms, const int nc, const int fcode, const int _dev):
+      BASE(cnine::Gdims(_atoms.size(),nc),fcode,_dev),
       atoms(_atoms){}
 
     Ptensors0b(const int n, const int nc, const int fcode=0, const int _dev=0):
@@ -135,6 +144,7 @@ namespace ptens{
     }
 
 #ifdef _WITH_ATEN
+    /*
     Ptensors0b(const at::Tensor& T):
       BASE(T){
       atoms=AtomsPack0(dim(0));
@@ -145,6 +155,7 @@ namespace ptens{
 
     Ptensors0b(const at::Tensor& T, const vector<vector<int> >& v):
       BASE(T), atoms(v){}
+    */
 #endif 
 
 
@@ -154,6 +165,18 @@ namespace ptens{
     Ptensors0b(const Ptensors0b& x, const int _dev):
       BASE(x.copy(_dev)), 
       atoms(x.atoms){}
+
+
+  public: // ----- Virtual functions --------------------------------------------------------------------------
+
+
+    Ptensors0b& get_grad(){
+      return cnine::diff_class<Ptensors0b<TYPE> >::get_grad();
+    }
+
+    const Ptensors0b& get_grad() const{
+      return cnine::diff_class<Ptensors0b<TYPE> >::get_grad();
+    }
 
 
   public: // ----- Access ------------------------------------------------------------------------------------

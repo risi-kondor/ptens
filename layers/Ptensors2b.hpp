@@ -20,6 +20,7 @@
 #include "Ptensors2.hpp"
 #include "PtensLoggedTimer.hpp"
 #include "Ltensor.hpp"
+#include "Ptensorsb.hpp"
 
 
 namespace ptens{
@@ -29,13 +30,14 @@ namespace ptens{
 
 
   template<typename TYPE>
-  class Ptensors2b: public cnine::Ltensor<TYPE>, public cnine::diff_class<Ptensors2b<TYPE> >{
+  class Ptensors2b: public Ptensorsb<TYPE, Ptensors2b<TYPE> >, public cnine::diff_class<Ptensors2b<TYPE> >{
   public:
 
     using cnine::diff_class<Ptensors2b<TYPE> >::grad;
     using cnine::diff_class<Ptensors2b<TYPE> >::get_grad;
 
-    typedef cnine::Ltensor<TYPE> BASE;
+    typedef Ptensorsb<TYPE, Ptensors2b<TYPE> > BASE;
+    typedef cnine::Ltensor<TYPE> TENSOR;
     using BASE::get_dev;
 
 
@@ -92,6 +94,10 @@ namespace ptens{
   public: // ----- Spawning ----------------------------------------------------------------------------------
 
 
+    //Ptensors2b like(const TENSOR& x) const{
+    //return Ptensors2b(x,atoms);
+    //}
+
     static Ptensors2b* new_zeros_like(const Ptensors2b& x){
       return new Ptensors2b(x.BASE::zeros_like(),x.atoms);
     }
@@ -100,7 +106,7 @@ namespace ptens{
   public: // ----- Conversions -------------------------------------------------------------------------------
 
 
-    Ptensors2b(BASE& x, const AtomsPack2& _atoms):
+    Ptensors2b(const TENSOR& x, const AtomsPack2& _atoms):
       BASE(x),
       atoms(_atoms){}
 
@@ -122,6 +128,18 @@ namespace ptens{
     Ptensors2b(const Ptensors2b& x, const int _dev):
       BASE(x.copy(_dev)), 
       atoms(x.atoms){}
+
+
+  public: // ----- Virtual functions --------------------------------------------------------------------------
+
+
+    Ptensors2b& get_grad(){
+      return cnine::diff_class<Ptensors2b<TYPE> >::get_grad();
+    }
+
+    Ptensors2b& get_grad() const{
+      return cnine::diff_class<Ptensors2b<TYPE> >::get_grad();
+    }
 
 
   public: // ----- Access ------------------------------------------------------------------------------------
@@ -151,9 +169,9 @@ namespace ptens{
       return atoms(i);
     }
     
-    BASE tensor_of(const int i) const{
+    TENSOR tensor_of(const int i) const{
       int k=size_of(i);
-      return BASE::rows(offset(i),offset(i)+k*k).reshape({k,k,nchannels()});
+      return TENSOR::rows(offset(i),k*k).reshape({k,k,nchannels()});
     }
 
     Ptensor2 operator()(const int i) const{
