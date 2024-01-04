@@ -216,10 +216,11 @@ namespace ptens{
     }
 
     int tsize1() const{
-      int t=0;
-      for(int i=0; i<size(); i++)
-	t+=size_of(i);
-      return t;
+      return get_tail(); 
+      //int t=0;
+      //for(int i=0; i<size(); i++)
+      //t+=size_of(i);
+      //return t;
     }
 
     int tsize2() const{

@@ -33,12 +33,14 @@ namespace ptens{
   class Ptensors2b: public Ptensorsb<TYPE, Ptensors2b<TYPE> >, public cnine::diff_class<Ptensors2b<TYPE> >{
   public:
 
-    using cnine::diff_class<Ptensors2b<TYPE> >::grad;
-    using cnine::diff_class<Ptensors2b<TYPE> >::get_grad;
-
     typedef Ptensorsb<TYPE, Ptensors2b<TYPE> > BASE;
     typedef cnine::Ltensor<TYPE> TENSOR;
+
+    using cnine::diff_class<Ptensors2b<TYPE> >::grad;
     using BASE::get_dev;
+    using TENSOR::dim;
+    using TENSOR::move_to_device;
+    using TENSOR::add;
 
 
     AtomsPack2 atoms;
@@ -54,8 +56,19 @@ namespace ptens{
   public: // ----- Constructors ------------------------------------------------------------------------------
 
 
+    Ptensors2b(const TENSOR& M):
+      BASE(M.copy()){} // for diff_class
+
+    Ptensors2b(const AtomsPack& _atoms, const TENSOR& M):
+      BASE(M.copy()),
+      atoms(_atoms){}
+
     Ptensors2b(const AtomsPack& _atoms, const int nc, const int _dev=0):
       BASE(cnine::Gdims(_atoms.tsize2(),nc),0,_dev),
+      atoms(_atoms){}
+
+    Ptensors2b(const AtomsPack& _atoms, const int nc, const int fcode, const int _dev):
+      BASE(cnine::Gdims(_atoms.tsize2(),nc),fcode,_dev),
       atoms(_atoms){}
 
 
@@ -94,9 +107,17 @@ namespace ptens{
   public: // ----- Spawning ----------------------------------------------------------------------------------
 
 
-    //Ptensors2b like(const TENSOR& x) const{
-    //return Ptensors2b(x,atoms);
-    //}
+    Ptensors2b copy() const{
+      return Ptensors2b(TENSOR::copy(),atoms);
+    }
+
+    Ptensors2b copy(const int _dev) const{
+      return Ptensors2b(TENSOR::copy(_dev),atoms);
+    }
+
+    Ptensors2b zeros_like() const{
+      return Ptensors2b(TENSOR::zeros_like(),atoms);
+    }
 
     static Ptensors2b* new_zeros_like(const Ptensors2b& x){
       return new Ptensors2b(x.BASE::zeros_like(),x.atoms);
@@ -116,11 +137,6 @@ namespace ptens{
       BASE::view2().set(x.view_as_matrix().view2());
     }
 
-    #ifdef _WITH_ATEN
-    Ptensors2b(const at::Tensor& T):
-      BASE(T){}
-    #endif 
-
 
   public: // ---- Transport ----------------------------------------------------------------------------------
 
@@ -137,7 +153,7 @@ namespace ptens{
       return cnine::diff_class<Ptensors2b<TYPE> >::get_grad();
     }
 
-    Ptensors2b& get_grad() const{
+    const Ptensors2b& get_grad() const{
       return cnine::diff_class<Ptensors2b<TYPE> >::get_grad();
     }
 
@@ -151,6 +167,10 @@ namespace ptens{
 
     int size() const{
       return atoms.size();
+    }
+
+    int get_nc() const{
+      return BASE::dim(1);
     }
 
     int nchannels() const{
@@ -182,20 +202,10 @@ namespace ptens{
   public: // ---- Message passing ----------------------------------------------------------------------------
 
 
-    static Ptensors2b<TYPE> gather(const Ptensors0b<TYPE>& x, const AtomsPack& a){
-      Ptensors2b<TYPE> R(a,2*x.nchannels(),x.get_dev());
-      R.gather(x);
-      return R;
-    }
-
-    static Ptensors2b<TYPE> gather(const Ptensors1b<TYPE>& x, const AtomsPack& a){
-      Ptensors2b<TYPE> R(a,5*x.nchannels(),x.get_dev());
-      R.gather(x);
-      return R;
-    }
-
-    static Ptensors2b<TYPE> gather(const Ptensors2b<TYPE>& x, const AtomsPack& a){
-      Ptensors2b<TYPE> R(a,15*x.nchannels(),x.get_dev());
+    template<typename SOURCE>
+    static Ptensors2b<TYPE> gather(const SOURCE& x, const AtomsPack& a){
+      int nc=x.get_nc()*vector<int>({2,5,15})[x.getk()];
+      Ptensors2b<TYPE> R(a,nc,x.get_dev());
       R.gather(x);
       return R;
     }
@@ -252,3 +262,22 @@ namespace ptens{
 
 #endif 
 
+    /*
+    static Ptensors2b<TYPE> gather(const Ptensors0b<TYPE>& x, const AtomsPack& a){
+      Ptensors2b<TYPE> R(a,2*x.nchannels(),x.get_dev());
+      R.gather(x);
+      return R;
+    }
+
+    static Ptensors2b<TYPE> gather(const Ptensors1b<TYPE>& x, const AtomsPack& a){
+      Ptensors2b<TYPE> R(a,5*x.nchannels(),x.get_dev());
+      R.gather(x);
+      return R;
+    }
+
+    static Ptensors2b<TYPE> gather(const Ptensors2b<TYPE>& x, const AtomsPack& a){
+      Ptensors2b<TYPE> R(a,15*x.nchannels(),x.get_dev());
+      R.gather(x);
+      return R;
+    }
+    */

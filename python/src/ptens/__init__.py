@@ -49,4 +49,5 @@ from ptens.subgraph import subgraph as subgraph
 from ptens.functions import *
 
 #from ptens.ptensors0b import ptensors0b as ptensors0b
-from ptens.tlayer import tlayer as tlayer 
+from ptens.ptensors1b import ptensors1b as ptensors1b
+#from ptens.tlayer import tlayer as tlayer 

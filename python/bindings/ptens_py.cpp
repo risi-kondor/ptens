@@ -49,17 +49,19 @@ PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
   namespace py=pybind11;
   
 
-  #include "AtomsPack_py.cpp"
+#include "AtomsPack_py.cpp"
   //  #include "Hgraph_py.cpp"
-  #include "Ggraph_py.cpp"
-  #include "Subgraph_py.cpp"
-
-  #include "Ptensor0_py.cpp"
-  #include "Ptensor1_py.cpp"
-  #include "Ptensor2_py.cpp"
-
-  #include "Ptensors0b_py.cpp"
-  #include "PtensorLayer_py.cpp"
+#include "Ggraph_py.cpp"
+#include "Subgraph_py.cpp"
+  
+#include "Ptensor0_py.cpp"
+#include "Ptensor1_py.cpp"
+#include "Ptensor2_py.cpp"
+  
+#include "Ptensors0b_py.cpp"
+#include "Ptensors1b_py.cpp"
+#include "Ptensors2b_py.cpp"
+  //#include "PtensorLayer_py.cpp" // on hold
 
 
 

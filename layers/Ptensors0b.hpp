@@ -143,21 +143,6 @@ namespace ptens{
       TENSOR::view2().set(x.view_as_matrix().view2());
     }
 
-#ifdef _WITH_ATEN
-    /*
-    Ptensors0b(const at::Tensor& T):
-      BASE(T){
-      atoms=AtomsPack0(dim(0));
-    }
-
-    Ptensors0b(const at::Tensor& T, const AtomsPack& _atoms):
-      BASE(T), atoms(_atoms){}
-
-    Ptensors0b(const at::Tensor& T, const vector<vector<int> >& v):
-      BASE(T), atoms(v){}
-    */
-#endif 
-
 
   public: // ---- Transport ----------------------------------------------------------------------------------
 
@@ -202,9 +187,9 @@ namespace ptens{
       return i;
     }
 
-    int nrows(const int i) const{
-      return 1;
-    }
+    //int nrows(const int i) const{
+    //return 1;
+    //}
 
     Atoms atoms_of(const int i) const{
       return atoms(i);
@@ -222,32 +207,13 @@ namespace ptens{
   public: // ---- Operations ---------------------------------------------------------------------------------
 
 
-    //Ptensors0b mprod(const TENSOR& y){
-    //return Ptensors0b(BASE::mprod(y),atoms);
-    //}
-
-    //Ptensors0b scale_channels(const TENSOR& s){
-    //return Ptensors0b(BASE::scale_channels(s),atoms);
-    //}
-
-
   public: // ---- Message passing ----------------------------------------------------------------------------
 
 
-    static Ptensors0b<TYPE> gather(const Ptensors0b<TYPE>& x, const AtomsPack& a){
-      Ptensors0b<TYPE> R(a,x.nchannels(),x.get_dev());
-      R.gather(x);
-      return R;
-    }
-
-    static Ptensors0b<TYPE> gather(const Ptensors1b<TYPE>& x, const AtomsPack& a){
-      Ptensors0b<TYPE> R(a,x.nchannels(),x.get_dev());
-      R.gather(x);
-      return R;
-    }
-
-    static Ptensors0b<TYPE> gather(const Ptensors2b<TYPE>& x, const AtomsPack& a){
-      Ptensors0b<TYPE> R(a,2*x.nchannels(),x.get_dev());
+    template<typename SOURCE>
+    static Ptensors0b<TYPE> gather(const SOURCE& x, const AtomsPack& a){
+      int nc=x.get_nc()*vector<int>({1,1,2})[x.getk()];
+      Ptensors0b<TYPE> R(a,nc,x.get_dev());
       R.gather(x);
       return R;
     }
@@ -303,27 +269,34 @@ namespace ptens{
 #endif 
 
 
-    //Ptensors0b(){}
+    /*
+    Ptensors0b(const at::Tensor& T):
+      BASE(T){
+      atoms=AtomsPack0(dim(0));
+    }
 
-    //Ptensors0b(const int _nc, const int _dev=0):
-    //Ptensors(1,_nc,_dev){}
+    Ptensors0b(const at::Tensor& T, const AtomsPack& _atoms):
+      BASE(T), atoms(_atoms){}
 
-    //template<typename FILLTYPE, typename = typename std::enable_if<std::is_base_of<cnine::fill_pattern, FILLTYPE>::value, FILLTYPE>::type>
-    //Ptensors0b(const AtomsPack& _atoms, const int _nc, const FILLTYPE& dummy, const int _dev=0):
-    //Ptensors(_atoms, cnine::Gdims({_nc}), dummy, _dev){
-    //if(atoms.constk()>0) constk=atoms.constk();
-    //}
+    Ptensors0b(const at::Tensor& T, const vector<vector<int> >& v):
+      BASE(T), atoms(v){}
+    */
+    /*
+    static Ptensors0b<TYPE> gather(const Ptensors0b<TYPE>& x, const AtomsPack& a){
+      Ptensors0b<TYPE> R(a,x.nchannels(),x.get_dev());
+      R.gather(x);
+      return R;
+    }
 
-    //template<typename FILLTYPE, typename = typename std::enable_if<std::is_base_of<cnine::fill_pattern, FILLTYPE>::value, FILLTYPE>::type>
-    //Ptensors0b(const cnine::Tensor<int>& M, const int _nc, const FILLTYPE& dummy, const int _dev=0):
-    //Ptensors(AtomsPack(M), cnine::Gdims({_nc}), dummy, _dev){
-    //if(atoms.constk()>0) constk=atoms.constk();
-    //}
+    static Ptensors0b<TYPE> gather(const Ptensors1b<TYPE>& x, const AtomsPack& a){
+      Ptensors0b<TYPE> R(a,x.nchannels(),x.get_dev());
+      R.gather(x);
+      return R;
+    }
 
-    //template<typename FILLTYPE, typename = typename std::enable_if<std::is_base_of<cnine::fill_pattern, FILLTYPE>::value, FILLTYPE>::type>
-    //Ptensors0b(const int _n, const int _nc, const FILLTYPE& dummy, const int _dev=0):
-    //Ptensors(AtomsPack(_n), cnine::Gdims({_nc}), dummy, _dev){
-    //constk=1;
-    //}
-
-
+    static Ptensors0b<TYPE> gather(const Ptensors2b<TYPE>& x, const AtomsPack& a){
+      Ptensors0b<TYPE> R(a,2*x.nchannels(),x.get_dev());
+      R.gather(x);
+      return R;
+    }
+    */

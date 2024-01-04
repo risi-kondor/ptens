@@ -37,8 +37,8 @@ namespace ptens{
 
     virtual ~Ptensorsb(){}
 
-    virtual Ptensorsb& get_grad()=0;
-    virtual const Ptensorsb& get_grad() const=0;
+    virtual Ptensorsb& get_grad(){return *this;} // dummy
+    virtual const Ptensorsb& get_grad() const {return *this;} // dummy
 
 
   public: // ---- Operations ---------------------------------------------------------------------------------
@@ -72,7 +72,7 @@ namespace ptens{
     }
 
     void add_ReLU_back(const OBJ& g, const OBJ& x, const float alpha){
-      get_grad().add_ReLU_back(g.get_grad(),x,alpha);
+      get_grad().BASE::add_ReLU_back(g.get_grad(),x,alpha);
     }
 
   };
