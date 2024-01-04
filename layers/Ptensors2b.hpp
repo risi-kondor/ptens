@@ -16,6 +16,10 @@
 #define _ptens_Ptensors2b
 
 #include "diff_class.hpp"
+#include "Rtensor1_view.hpp"
+#include "Rtensor2_view.hpp"
+#include "Rtensor3_view.hpp"
+
 #include "AtomsPack2.hpp"
 #include "Ptensors2.hpp"
 #include "PtensLoggedTimer.hpp"
@@ -30,16 +34,22 @@ namespace ptens{
 
 
   template<typename TYPE>
-  class Ptensors2b: public Ptensorsb<TYPE, Ptensors2b<TYPE> >, public cnine::diff_class<Ptensors2b<TYPE> >{
+  class Ptensors2b: public Ptensorsb<TYPE>, public cnine::diff_class<Ptensors2b<TYPE> >{
   public:
 
-    typedef Ptensorsb<TYPE, Ptensors2b<TYPE> > BASE;
+    typedef Ptensorsb<TYPE> BASE;
     typedef cnine::Ltensor<TYPE> TENSOR;
+    typedef cnine::Rtensor2_view Rtensor2_view;
+    typedef cnine::Rtensor3_view Rtensor3_view;
 
     using cnine::diff_class<Ptensors2b<TYPE> >::grad;
     using BASE::get_dev;
+    using TENSOR::dev;
+    using TENSOR::get_arr;
     using TENSOR::dim;
     using TENSOR::move_to_device;
+    using TENSOR::strides;
+    using TENSOR::cols;
     using TENSOR::add;
 
 
@@ -185,6 +195,10 @@ namespace ptens{
       return atoms.offset(i);
     }
 
+    int offset1(const int i) const{
+      return atoms.offset(i);
+    }
+
     Atoms atoms_of(const int i) const{
       return atoms(i);
     }
@@ -196,6 +210,17 @@ namespace ptens{
 
     Ptensor2 operator()(const int i) const{
       return Ptensor2(cnine::RtensorA(tensor_of(i).view3()),atoms_of(i));
+    }
+
+    Rtensor3_view view3_of(const int i) const{
+      int n=size_of(i);
+      return Rtensor3_view(get_arr()+offset(i)*strides[0],n,n,get_nc(),strides[0]*n,strides[0],strides[1],dev);
+    }
+
+    Rtensor3_view view3_of(const int i, const int offs, const int m) const{
+      int n=size_of(i);
+      return Rtensor3_view(get_arr()+offset(i)*strides[0]+offs*strides[1],
+	n,n,m,strides[0]*n,strides[0],strides[1],dev);
     }
 
 
@@ -210,6 +235,40 @@ namespace ptens{
       return R;
     }
 
+    void add_linmaps(const Ptensorsb<TYPE>& x){
+      int xk=x.getk();
+      int nc=x.get_nc();
+
+      if(xk==0) 
+	broadcast0(x);
+      if(xk==1){
+	broadcast0(x.reduce0());
+	broadcast1(x,2*nc);
+      }
+      if(xk==2){
+	broadcast0(x.reduce0());
+	broadcast1(x.reduce1(),4*nc);
+	broadcast2(x,13*nc);
+      }
+    }
+
+
+    void add_linmaps_back(const Ptensorsb<TYPE>& r){
+      int k=r.getk();
+      int xk=getk();
+      int nc=get_nc();
+      int nc_out=vector<int>({1,1,2,5,15})[k+xk]*nc;
+      PTENS_ASSRT(r.dim(1)==nc_out);
+      if(k==0) broadcast0(r);
+      if(k==1){
+	broadcast0(r.reduce0(0,nc));
+	add(r.cols(nc,nc));}
+      if(k==2){
+	broadcast0(r.reduce0_shrink(0,nc));
+	add(r.reduce1_shrink(2*nc,nc));}
+    }
+
+
     template<typename SOURCE>
     void gather(const SOURCE& x){
       (atoms.overlaps_mmap(x.atoms))(*this,x);
@@ -223,6 +282,203 @@ namespace ptens{
     template<typename OUTPUT>
     void gather_backprop(const OUTPUT& x){
       get_grad().gather_back(x.get_grad());
+    }
+
+
+  public: // ---- Reductions ---------------------------------------------------------------------------------
+
+
+    BASE reduce0() const{
+      TimedFn T("Ptensors2b","reduce0",*this);
+      int N=size();
+      int nc=get_nc();
+      int dev=get_dev();
+      
+      BASE R({N,3*nc},0,dev);
+      Rtensor2_view r=R.view2();
+      if(dev==0){
+	Rtensor2_view r0=R.block(0,0,N,nc);
+	Rtensor2_view r1=R.block(0,nc,N,nc);
+	for(int i=0; i<N; i++){
+	  view3_of(i).sum01_into(r0.slice0(i));
+	  view3_of(i).diag01().sum0_into(r1.slice0(i));
+	}
+      }
+    }
+
+
+    BASE reduce0_shrink(const int offs, const int nc) const{
+      TimedFn T("Ptensors2b","reduce0_shrink",*this);
+      int N=size();
+      int dev=get_dev();
+      
+      BASE R({N,nc},0,dev);
+      Rtensor2_view r=R.view2();
+      if(dev==0){
+	for(int i=0; i<N; i++){
+	  view3_of(i,offs,nc).sum01_into(r.slice0(i));
+	  view3_of(i,offs+nc,nc).diag01().sum0_into(r.slice0(i));
+	}
+      }
+    }
+
+
+    BASE reduce1() const{
+      TimedFn T("Ptensors2b","reduce1",*this);
+      int N=size();
+      int nc=get_nc();
+      int dev=get_dev();
+
+      BASE R({atoms.size1(),3*nc},0,dev);
+      Rtensor2_view r=R.view2();
+      if(dev==0){
+	for(int i=0; i<N; i++){
+	  int roffs=offset1(i);
+	  int n=size_of(i);
+	  view3_of(i).sum0_into(r.block(roffs,0,n,nc));
+	  view3_of(i).sum1_into(r.block(roffs,nc,n,nc));
+	  r.block(roffs,2*nc,n,nc)+=view3_of(i).diag01();
+	}
+      }
+    }
+
+    
+    BASE reduce1_shrink(const int offs, const int nc) const{
+      TimedFn T("Ptensors2b","reduce1_shrink",*this);
+      int N=size();
+      int dev=get_dev();
+
+      BASE R({dim(0),nc},0,dev);
+      Rtensor2_view r=R.view2();
+      if(dev==0){
+	for(int i=0; i<N; i++){
+	  int roffs=offset1(i);
+	  int n=size_of(i);
+	  view3_of(i,offs,nc).sum0_into(r.block(roffs,0,n,nc));
+	  view3_of(i,offs+nc,nc).sum1_into(r.block(roffs,0,n,nc));
+	  r.block(roffs,0,n,nc)+=view3_of(i,offs+2*nc,nc).diag01();
+	}
+      }
+    }
+
+
+    BASE reduce2_shrink(const int offs, const int nc) const{
+      TimedFn T("Ptensors2b","reduce2_shrink",*this);
+      int N=size();
+      int dev=get_dev();
+      
+      BASE R({dim(0),nc},0,dev);
+      Rtensor2_view r=R.view2();
+      if(dev==0){
+	for(int i=0; i<N; i++){
+	  int roffs=offset(i);
+	  int n=size_of(i);
+	  r.block(roffs,0,n*n,nc)+=view3_of(i,offs,nc);
+	  r.block(roffs,0,n*n,nc)+=view3_of(i,offs+nc,nc).transp01();
+	}
+      }
+    }
+
+
+  public: // ---- Broadcasting -------------------------------------------------------------------------------
+
+
+    void broadcast0(const BASE& X, const int offs=0){
+      TimedFn T("Ptensors2b","broadcast0",*this);
+      int N=size();
+      int dev=get_dev();
+      int nc=X.dim(1);
+      PTENS_ASSRT(X.dim(0)==N);
+      Rtensor2_view x=X.view2();
+      
+      if(dev==0){
+	for(int i=0; i<N; i++){
+	  int n=size_of(i);
+	  view3_of(i,offs,nc)+=repeat0(repeat0(x.slice0(i),n),n);
+	  view3_of(i,offs+nc,nc).diag01()+=repeat0(x.slice0(i),n);
+	}
+      }
+    }
+
+    void broadcast0_shrink(const BASE& X){
+      TimedFn T("Ptensors2b","broadcast0_shrink",*this);
+      int N=size();
+      int dev=get_dev();
+      int nc=dim(1);
+      PTENS_ASSRT(X.dim(0)==N);
+      PTENS_ASSRT(X.dim(1)==2*nc);
+      Rtensor2_view x=X.view2();
+      Rtensor2_view x0=x.block(0,0,N,nc);
+      Rtensor2_view x1=x.block(0,nc,N,nc);
+      
+      if(dev==0){
+	for(int i=0; i<N; i++){
+	  int n=size_of(i);
+	  view3_of(i)+=repeat0(repeat0(x0.slice0(i),n),n);
+	  view3_of(i).diag01()+=repeat0(x1.slice0(i),n);
+	}
+      }
+    }
+    
+
+    void broadcast1(const BASE& X, const int offs=0){
+      TimedFn T("Ptensors2b","broadcast1",*this);
+      int N=size();
+      int dev=get_dev();
+      int nc=X.dim(1);
+      Rtensor2_view x=X.view2();
+
+      if(dev==0){
+	for(int i=0; i<N; i++){
+	  int roffs=offset1(i);
+	  int n=size_of(i);
+	  view3_of(i,offs,nc)+=repeat0(x.block(roffs,0,n,nc),n);
+	  view3_of(i,offs+nc,nc)+=repeat1(x.block(roffs,0,n,nc),n);
+	  view3_of(i,offs+2*nc,nc).diag01()+=x.block(roffs,0,n,nc);
+	}
+      }
+    }
+
+
+    void broadcast1_shrink(const BASE& X){
+      TimedFn T("Ptensors2b","broadcast1_shrink",*this);
+      int N=size();
+      int dev=get_dev();
+      int nc=X.dim(1);
+      PTENS_ASSRT(X.dim(1)==3*nc);
+      Rtensor2_view x=X.view2();
+      Rtensor2_view x0=x.block(0,0,X.dim(0),nc);
+      Rtensor2_view x1=x.block(0,nc,X.dim(0),nc);
+      Rtensor2_view x2=x.block(0,2*nc,X.dim(0),nc);
+      
+
+      if(dev==0){
+	for(int i=0; i<N; i++){
+	  int roffs=offset1(i);
+	  int n=size_of(i);
+	  view3_of(i)+=repeat0(x.block(roffs,0,n,nc),n);
+	  view3_of(i)+=repeat1(x.block(roffs,nc,n,nc),n);
+	  view3_of(i).diag01()+=x.block(roffs,2*nc,n,nc);
+	}
+      }
+    }
+
+
+    void broadcast2(const BASE& X, const int offs=0){
+      TimedFn T("Ptensors2b","broadcast2",*this);
+      int N=size();
+      int dev=get_dev();
+      int nc=X.dim(1);
+      Rtensor2_view x=X.view2();
+      
+      if(dev==0){
+	for(int i=0; i<N; i++){
+	  int roffs=offset(i);
+	  int n=size_of(i);
+	  view3_of(i,offs,nc)+=x.block(roffs,0,n*n,nc);
+	  // view3_of(i,offs+nc,nc)+=x.block(roffs,0,n*n,nc).transp01(); // todo!
+	}
+      }
     }
 
 

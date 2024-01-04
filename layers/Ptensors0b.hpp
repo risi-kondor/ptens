@@ -16,6 +16,10 @@
 #define _ptens_Ptensors0b
 
 #include "diff_class.hpp"
+#include "Rtensor1_view.hpp"
+#include "Rtensor2_view.hpp"
+#include "Rtensor3_view.hpp"
+
 #include "AtomsPack0.hpp"
 #include "Ptensors0.hpp"
 #include "PtensLoggedTimer.hpp"
@@ -30,11 +34,11 @@ namespace ptens{
 
 
   template<typename TYPE>
-  class Ptensors0b: public Ptensorsb<TYPE, Ptensors0b<TYPE> >, public cnine::diff_class<Ptensors0b<TYPE> >{
+  class Ptensors0b: public Ptensorsb<TYPE>, public cnine::diff_class<Ptensors0b<TYPE> >{
 
   public:
 
-    typedef Ptensorsb<TYPE, Ptensors0b<TYPE> > BASE;
+    typedef Ptensorsb<TYPE> BASE;
     typedef cnine::Ltensor<TYPE> TENSOR;
 
     using cnine::diff_class<Ptensors0b<TYPE> >::grad;
@@ -218,6 +222,21 @@ namespace ptens{
       return R;
     }
 
+    void add_linmaps(const Ptensorsb<TYPE>& x){
+      int xk=x.getk();
+      if(xk==0) add(x);
+      if(xk==1) add(x.reduce0());
+      if(xk==2) add(x.reduce0());
+    }
+
+    void add_linmaps_back(const Ptensorsb<TYPE>& r){
+      int k=r.getk();
+      int nc=get_nc();
+      if(k==0) add(r);
+      if(k==1) add(r.reduce0());
+      if(k==2) add(r.reduce0_shrink(0,nc));
+    }
+
     template<typename SOURCE>
     void gather(const SOURCE& x){
       (atoms.overlaps_mmap(x.atoms))(*this,x);
@@ -231,6 +250,25 @@ namespace ptens{
     template<typename OUTPUT>
     void gather_backprop(const OUTPUT& x){
       x.atoms.overlaps_mmap(atoms).inv()(get_grad(),x.get_grad());
+    }
+
+
+  public: // ---- Reductions ---------------------------------------------------------------------------------
+
+
+    BASE reduce0() const{
+      //TimedFn T("Ptensors0b","reduce0",*this);
+      return *this;
+    }
+
+
+  public: // ---- Broadcasting -------------------------------------------------------------------------------
+
+
+    void broadcast0(const BASE& X, const int offs=0){
+      TimedFn T("Ptensors0b","broadcast0",*this);
+      int nc=X.dim(1);
+      BASE::view2().cols(offs,nc)+=X.view2();
     }
 
 

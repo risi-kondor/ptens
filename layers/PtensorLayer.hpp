@@ -587,7 +587,7 @@ namespace ptens{
 
 
   void broadcast1(const BASE& X, const int offs=0){
-    TimedFn T("PtensorLayer"+to_string(getk()),"broadcast0",*this);
+    TimedFn T("PtensorLayer"+to_string(getk()),"broadcast1",*this);
     int N=size();
     int dev=get_dev();
     int nc=X.dim(1);
@@ -615,7 +615,7 @@ namespace ptens{
   }
 
   void broadcast1_shrink(const BASE& X){
-    TimedFn T("PtensorLayer"+to_string(getk()),"broadcast0_shrink",*this);
+    TimedFn T("PtensorLayer"+to_string(getk()),"broadcast1_shrink",*this);
     int N=size();
     int dev=get_dev();
     int nc=X.dim(1);

@@ -25,7 +25,7 @@
 namespace ptens{
 
 
-  template<typename TYPE, typename OBJ>
+  template<typename TYPE>
   class Ptensorsb: public cnine::Ltensor<TYPE>{ //, public cnine::diff_class<OBJ>{
   public:
 
@@ -51,27 +51,27 @@ namespace ptens{
     //return OBJ(BASE::stack(0,list),AtomsPackObjBase::cat(v));
     //}
 
-    void cat_channels_back0(const OBJ& g){
+    void cat_channels_back0(const Ptensorsb& g){
       get_grad()+=g.get_grad().block(0,0,dim(0),dim(1));
     }
 
-    void cat_channels_back1(const OBJ& g){
+    void cat_channels_back1(const Ptensorsb& g){
       get_grad()+=g.get_grad().block(0,g.dim(1)-dim(1),dim(0),dim(1));
     }
 
-     void add_mprod_back0(const OBJ& g, const TENSOR& M){
+     void add_mprod_back0(const Ptensorsb& g, const TENSOR& M){
       get_grad().add_mprod(g.get_grad(),M.transp());
     }
 
-    void add_scale_channels_back(const OBJ& g, const TENSOR& s){
+    void add_scale_channels_back(const Ptensorsb& g, const TENSOR& s){
       get_grad().add_scale_columns(g.get_grad(),s);
     }
 
-    void add_linear_back0(const OBJ& g, const TENSOR& M){
+    void add_linear_back0(const Ptensorsb& g, const TENSOR& M){
       get_grad().add_mprod(g.get_grad(),M.transp());
     }
 
-    void add_ReLU_back(const OBJ& g, const OBJ& x, const float alpha){
+    void add_ReLU_back(const Ptensorsb& g, const Ptensorsb& x, const float alpha){
       get_grad().BASE::add_ReLU_back(g.get_grad(),x,alpha);
     }
 

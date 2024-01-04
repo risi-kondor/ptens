@@ -95,6 +95,11 @@ class ptensorsb(torch.Tensor):
         return self.obj.__str__()
 
 
+# ------------------------------------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------------------------------------
+
+
 
 # ----- Transport and conversions ----------------------------------------------------------------------------
 
@@ -112,7 +117,7 @@ class Ptensorsb_toMxFn(torch.autograd.Function):
         return ptensorsb.dummy()
 
 
-class Ptensors0b_toFn(torch.autograd.Function):
+class Ptensorsb_toFn(torch.autograd.Function):
 
     @staticmethod
     def forward(ctx,x,_dev):
@@ -147,9 +152,27 @@ class Ptensorsb_addFn(torch.autograd.Function):
 
     @staticmethod
     def backward(ctx,g):
-        ctx.x.add_to_grad(ctx.r.get_gradp())
-        ctx.y.add_to_grad(ctx.r.get_gradp())
-        return ptensors1(1),ptensors1(1)
+        ctx.x.add_back(ctx.r)
+        ctx.y.add_back(ctx.r)
+        return ptensorsb.dummy(),ptensorsb.dummy()
+
+
+class Ptensorsb_cat_channelsFn(torch.autograd.Function):
+    
+    @staticmethod
+    def forward(ctx,x,y):
+        r=x.dummy(1)
+        r.obj=x.obj.cat_channels(y.obj)
+        ctx.x=x.obj
+        ctx.y=y.obj
+        ctx.r=r.obj
+        return r
+
+    @staticmethod
+    def backward(ctx,g):
+        ctx.x.cat_channels_back0(ctx.r)
+        ctx.y.cat_channels_back1(ctx.r)
+        return ptensorsb.dummy(),ptensorsb.dummy()
 
 
 class Ptensorsb_mprodFn(torch.autograd.Function):
@@ -191,7 +214,7 @@ class Ptensorsb_scaleFn(torch.autograd.Function):
     @staticmethod
     def forward(ctx,x,y):
         r=x.dummy()
-        r.obj=scale(x.obj,y)
+        r.obj=x.obj.scale(y)
         ctx.x=x.obj
         ctx.y=y
         ctx.r=r.obj
@@ -208,7 +231,7 @@ class Ptensorsb_mult_channelsFn(torch.autograd.Function):
     @staticmethod
     def forward(ctx,x,y):
         r=x.dummy()
-        r.obj=x.obj.scale_channels(y)
+        r.obj=x.obj.mult_channels(y)
         ctx.x=x.obj
         ctx.y=y
         ctx.r=r.obj
@@ -216,7 +239,7 @@ class Ptensorsb_mult_channelsFn(torch.autograd.Function):
 
     @staticmethod
     def backward(ctx,g):
-        ctx.x.add_scale_channels_back0(ctx.r,ctx.y)
+        ctx.x.add_mult_channels_back0(ctx.r,ctx.y)
         return ptensorsb.dummy(), None
 
 
@@ -233,7 +256,7 @@ class Ptensorsb_ReLUFn(torch.autograd.Function):
 
     @staticmethod
     def backward(ctx,g):
-        ctx.x.add_ReLU_back(ctx.r,ctx.alpha)
+        ctx.x.add_ReLU_back(ctx.r,ctx.x,ctx.alpha)
         return ptensorsb.dummy(), None
 
 

@@ -48,17 +48,17 @@ int main(int argc, char** argv){
   //cout<<yatoms<<endl;
 
   Ptensors2 y0=Ptensors2::zero(yatoms,2*nc); emp20(y0,x0,tmap0);
-  Ptens2 Y0=Ptens2::gather(x0,yatoms);
+  Ptens2 Y0=Ptens2::gather(X0,yatoms);
   cout<<"2 <- 0 error: "<<Y0.diff2(Ptens2(y0))<<endl;
 
   Ptensors2 y1=Ptensors2::zero(yatoms,5*nc); emp21(y1,x1,tmap);
-  Ptens2 Y1=Ptens2::gather(x1,yatoms);
+  Ptens2 Y1=Ptens2::gather(X1,yatoms);
   cout<<"2 <- 1 error: "<<Y1.diff2(Ptens2(y1))<<endl;
   //cout<<y1(0)<<endl;
   //cout<<Y1(0)<<endl;
 
   Ptensors2 y2=Ptensors2::zero(yatoms,15*nc); emp22(y2,x2,tmap);
-  Ptens2 Y2=Ptens2::gather(x2,yatoms);
+  Ptens2 Y2=Ptens2::gather(X2,yatoms);
   cout<<"2 <- 2 error: "<<Y2.diff2(Ptens2(y2))<<endl;
   //cout<<y2(0)<<endl;
   //cout<<Y2(0)<<endl;

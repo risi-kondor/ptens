@@ -49,7 +49,7 @@ int main(int argc, char** argv){
 
   Ptensors0 y0=Ptensors0::zero(yatoms,nc);
   emp00(y0,x0,tmap0);
-  Ptens0 Y0=Ptens0::gather(x0,yatoms);
+  Ptens0 Y0=Ptens0::gather(X0,yatoms);
   //cout<<y0<<endl;
   //cout<<Y0<<endl;
   cout<<"0 <- 0 error: "<<Y0.diff2(Ptens0(y0))<<endl;
@@ -57,14 +57,14 @@ int main(int argc, char** argv){
 
   Ptensors0 y1=Ptensors0::zero(yatoms,nc);
   emp01(y1,x1,tmap);
-  Ptens0 Y1=Ptens0::gather(x1,yatoms);
+  Ptens0 Y1=Ptens0::gather(X1,yatoms);
   //cout<<y1<<endl;
   //cout<<Y1<<endl;
   cout<<"0 <- 1 error: "<<Y1.diff2(Ptens0(y1))<<endl;
 
   Ptensors0 y2=Ptensors0::zero(yatoms,2*nc);
   emp02(y2,x2,tmap);
-  Ptens0 Y2=Ptens0::gather(x2,yatoms);
+  Ptens0 Y2=Ptens0::gather(X2,yatoms);
   //cout<<y2<<endl;
   //cout<<Y2<<endl;
   cout<<"0 <- 2 error: "<<Y2.diff2(Ptens0(y2))<<endl;

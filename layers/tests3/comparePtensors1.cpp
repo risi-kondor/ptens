@@ -53,7 +53,7 @@ int main(int argc, char** argv){
 
   Ptensors1 y0=Ptensors1::zero(yatoms,nc);
   emp10(y0,x0,tmap0);
-  Ptens1 Y0=Ptens1::gather(x0,yatoms);
+  Ptens1 Y0=Ptens1::gather(X0,yatoms);
   //cout<<y0<<endl;
   //cout<<Y0<<endl;
   cout<<"1 <- 0 error: "<<Y0.diff2(Ptens1(y0))<<endl;
@@ -61,7 +61,7 @@ int main(int argc, char** argv){
 
   Ptensors1 y1=Ptensors1::zero(yatoms,2*nc);
   emp11(y1,x1,tmap);
-  Ptens1 Y1=Ptens1::gather(x1,yatoms);
+  Ptens1 Y1=Ptens1::gather(X1,yatoms);
   //cout<<y1<<endl;
   //cout<<Y1<<endl;
   cout<<"1 <- 1 error: "<<Y1.diff2(Ptens1(y1))<<endl;
@@ -69,7 +69,7 @@ int main(int argc, char** argv){
   Ptensors1 y2=Ptensors1::zero(yatoms,5*nc);
   //cout<<y2<<"------------"<<endl;
   emp21(y2,x2,tmap);
-  Ptens1 Y2=Ptens1::gather(x2,yatoms);
+  Ptens1 Y2=Ptens1::gather(X2,yatoms);
   cout<<"1 <- 2 error: "<<Y2.diff2(Ptens1(y2))<<endl;
 
   Ltensor<float> M({2*nc,2*nc},4); 
