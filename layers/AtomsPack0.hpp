@@ -49,17 +49,17 @@ namespace ptens{
     
     
     template<typename SOURCE>
-    MessageList overlaps_mlist(const SOURCE& x){
+    MessageList overlaps_mlist(const SOURCE& x) const{
       return obj->atoms->overlaps_mlist(*x.obj->atoms);
     }
 
     template<typename SOURCE>
-    MessageMap message_map(const MessageList& list, const SOURCE& source){
+    MessageMap message_map(const MessageList& list, const SOURCE& source) const{
       return obj->message_map(*list.obj,*source.obj);
     }
 
     template<typename SOURCE>
-    MessageMap overlaps_mmap(const SOURCE& x){
+    MessageMap overlaps_mmap(const SOURCE& x) const{
       return message_map(overlaps_mlist(x),x);
     }
 

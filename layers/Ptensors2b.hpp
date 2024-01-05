@@ -129,6 +129,10 @@ namespace ptens{
       return Ptensors2b(TENSOR::zeros_like(),atoms);
     }
 
+    Ptensors2b gaussian_like() const{
+      return Ptensors2b(BASE::gaussian_like(),atoms);
+    }
+
     static Ptensors2b* new_zeros_like(const Ptensors2b& x){
       return new Ptensors2b(x.BASE::zeros_like(),x.atoms);
     }
@@ -191,12 +195,16 @@ namespace ptens{
       return atoms.size_of(i);
     }
 
+    AtomsPack get_atoms() const{
+      return atoms.obj->atoms;
+    }
+
     int offset(const int i) const{
       return atoms.offset(i);
     }
 
     int offset1(const int i) const{
-      return atoms.offset(i);
+      return atoms.offset1(i);
     }
 
     Atoms atoms_of(const int i) const{
@@ -214,12 +222,12 @@ namespace ptens{
 
     Rtensor3_view view3_of(const int i) const{
       int n=size_of(i);
-      return Rtensor3_view(get_arr()+offset(i)*strides[0],n,n,get_nc(),strides[0]*n,strides[0],strides[1],dev);
+      return Rtensor3_view(const_cast<TYPE*>(get_arr())+offset(i)*strides[0],n,n,get_nc(),strides[0]*n,strides[0],strides[1],dev);
     }
 
     Rtensor3_view view3_of(const int i, const int offs, const int m) const{
       int n=size_of(i);
-      return Rtensor3_view(get_arr()+offset(i)*strides[0]+offs*strides[1],
+      return Rtensor3_view(const_cast<TYPE*>(get_arr())+offset(i)*strides[0]+offs*strides[1],
 	n,n,m,strides[0]*n,strides[0],strides[1],dev);
     }
 
@@ -235,47 +243,49 @@ namespace ptens{
       return R;
     }
 
-    void add_linmaps(const Ptensorsb<TYPE>& x){
-      int xk=x.getk();
-      int nc=x.get_nc();
+    void add_linmaps(const Ptensors0b<TYPE>& x){
+      broadcast0(x);
+    }
 
-      if(xk==0) 
-	broadcast0(x);
-      if(xk==1){
-	broadcast0(x.reduce0());
-	broadcast1(x,2*nc);
-      }
-      if(xk==2){
-	broadcast0(x.reduce0());
-	broadcast1(x.reduce1(),4*nc);
-	broadcast2(x,13*nc);
-      }
+    void add_linmaps(const Ptensors1b<TYPE>& x){
+      int nc=x.get_nc();
+      broadcast0(x.reduce0());
+      broadcast1(x,2*nc);
+    }
+
+    void add_linmaps(const Ptensors2b<TYPE>& x){
+      int nc=x.get_nc();
+      broadcast0(x.reduce0());
+      broadcast1(x.reduce1(),4*nc);
+      broadcast2(x,13*nc);
     }
 
 
-    void add_linmaps_back(const Ptensorsb<TYPE>& r){
-      int k=r.getk();
-      int xk=getk();
+    void add_linmaps_back(const Ptensors0b<TYPE>& r){
       int nc=get_nc();
-      int nc_out=vector<int>({1,1,2,5,15})[k+xk]*nc;
-      PTENS_ASSRT(r.dim(1)==nc_out);
-      if(k==0) broadcast0(r);
-      if(k==1){
-	broadcast0(r.reduce0(0,nc));
-	add(r.cols(nc,nc));}
-      if(k==2){
-	broadcast0(r.reduce0_shrink(0,nc));
-	add(r.reduce1_shrink(2*nc,nc));}
+      broadcast0(r);
+    }
+
+    void add_linmaps_back(const Ptensors1b<TYPE>& r){
+      int nc=get_nc();
+      broadcast0(r.reduce0(0,nc));
+      add(r.cols(nc,nc));
+    }
+
+    void add_linmaps_back(const Ptensors2b<TYPE>& r){
+      int nc=get_nc();
+      broadcast0(r.reduce0_shrink(0,nc));
+      add(r.reduce1_shrink(2*nc,nc));
     }
 
 
     template<typename SOURCE>
-    void gather(const SOURCE& x){
+    void add_gather(const SOURCE& x){
       (atoms.overlaps_mmap(x.atoms))(*this,x);
     }
 
     template<typename OUTPUT>
-    void gather_back(const OUTPUT& x){
+    void add_gather_back(const OUTPUT& x){
       x.atoms.overlaps_mmap(atoms).inv()(*this,x);
     }
 
@@ -294,7 +304,7 @@ namespace ptens{
       int nc=get_nc();
       int dev=get_dev();
       
-      BASE R({N,3*nc},0,dev);
+      BASE R({N,2*nc},0,dev);
       Rtensor2_view r=R.view2();
       if(dev==0){
 	Rtensor2_view r0=R.block(0,0,N,nc);
@@ -304,6 +314,7 @@ namespace ptens{
 	  view3_of(i).diag01().sum0_into(r1.slice0(i));
 	}
       }
+      return R;
     }
 
 
@@ -320,6 +331,7 @@ namespace ptens{
 	  view3_of(i,offs+nc,nc).diag01().sum0_into(r.slice0(i));
 	}
       }
+      return R;
     }
 
 
@@ -340,6 +352,7 @@ namespace ptens{
 	  r.block(roffs,2*nc,n,nc)+=view3_of(i).diag01();
 	}
       }
+      return R;
     }
 
     
@@ -359,6 +372,7 @@ namespace ptens{
 	  r.block(roffs,0,n,nc)+=view3_of(i,offs+2*nc,nc).diag01();
 	}
       }
+      return R;
     }
 
 
@@ -377,6 +391,7 @@ namespace ptens{
 	  r.block(roffs,0,n*n,nc)+=view3_of(i,offs+nc,nc).transp01();
 	}
       }
+      return R;
     }
 
 
@@ -475,8 +490,8 @@ namespace ptens{
 	for(int i=0; i<N; i++){
 	  int roffs=offset(i);
 	  int n=size_of(i);
-	  view3_of(i,offs,nc)+=x.block(roffs,0,n*n,nc);
-	  // view3_of(i,offs+nc,nc)+=x.block(roffs,0,n*n,nc).transp01(); // todo!
+	  view3_of(i,offs,nc)+=split0(x.block(roffs,0,n*n,nc),n,n);
+	  view3_of(i,offs+nc,nc)+=split0(x.block(roffs,0,n*n,nc),n,n).transp01();
 	}
       }
     }

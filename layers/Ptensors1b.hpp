@@ -129,6 +129,10 @@ namespace ptens{
       return Ptensors1b(TENSOR::zeros_like(),atoms);
     }
 
+    Ptensors1b gaussian_like() const{
+      return Ptensors1b(BASE::gaussian_like(),atoms);
+    }
+
     static Ptensors1b* new_zeros_like(const Ptensors1b& x){
       return new Ptensors1b(x.BASE::zeros_like(),x.atoms);
     }
@@ -187,6 +191,10 @@ namespace ptens{
       return BASE::dim(1);
     }
 
+    AtomsPack get_atoms() const{
+      return atoms.obj->atoms;
+    }
+
     int size_of(const int i) const{
       return atoms.size_of(i);
     }
@@ -200,11 +208,11 @@ namespace ptens{
     }
     
     Rtensor2_view view2_of(const int i) const{
-      return Rtensor2_view(get_arr()+offset(i)*strides[0],size_of(i),get_nc(),strides[0],strides[1],dev);
+      return Rtensor2_view(const_cast<TYPE*>(get_arr())+offset(i)*strides[0],size_of(i),get_nc(),strides[0],strides[1],dev);
     }
 
     Rtensor2_view view2_of(const int i, const int offs, const int m) const{
-      return Rtensor2_view(get_arr()+offset(i)*strides[0]+offs*strides[1],
+      return Rtensor2_view(const_cast<TYPE*>(get_arr())+offset(i)*strides[0]+offs*strides[1],
 	size_of(i),m,strides[0],strides[1],dev);
     }
 
@@ -231,41 +239,45 @@ namespace ptens{
       return R;
     }
 
-    void add_linmaps(const Ptensorsb<TYPE>& x){
-      int xk=x.getk();
-      int nc=get_nc();
-      if(xk==0) 
-	broadcast0(x);
-      if(xk==1){
-	broadcast0(x.reduce0());
-	cols(nc,nc)+=x;}
-      if(xk==2){
-	broadcast0(x.reduce0());
-	cols(2*nc,3*nc)+=x.reduce1();}
+    void add_linmaps(const Ptensors0b<TYPE>& x){
+      broadcast0(x);
     }
 
-    void add_linmaps_back(const Ptensorsb<TYPE>& r){
-      int k=r.getk();
-      int nc=get_nc();
-      int nc_out=vector<int>({1,2,5})[k]*nc;
-      PTENS_ASSRT(r.get_nc()==nc_out);
-      if(k==0) 
+    void add_linmaps(const Ptensors1b<TYPE>& x){
+      int nc=x.get_nc();
+      broadcast0(x.reduce0());
+      cols(nc,nc)+=x;
+    }
+
+    void add_linmaps(const Ptensors2b<TYPE>& x){
+      int nc=x.get_nc();
+      broadcast0(x.reduce0());
+      cols(2*nc,3*nc)+=x.reduce1();
+    }
+
+    void add_linmaps_back(const Ptensors0b<TYPE>& r){
 	broadcast0(r);
-      if(k==1){
-	broadcast0(r.reduce0(0,nc));
-	add(r.cols(nc,nc));}
-      if(k==2){
-	broadcast0(r.reduce0_shrink(0,nc));
-	add(r.reduce1_shrink(2*nc,nc));}
     }
 
+    void add_linmaps_back(const Ptensors1b<TYPE>& r){
+      int nc=get_nc();
+      broadcast0(r.reduce0(0,nc));
+      add(r.cols(nc,nc));
+    }
+
+    void add_linmaps_back(const Ptensors2b<TYPE>& r){
+      int nc=get_nc();
+      broadcast0(r.reduce0_shrink(0,nc));
+      add(r.reduce1_shrink(2*nc,nc));
+    }
+    
     template<typename SOURCE>
-    void gather(const SOURCE& x){
+    void add_gather(const SOURCE& x){
       (atoms.overlaps_mmap(x.atoms))(*this,x);
     }
 
     template<typename OUTPUT>
-    void gather_back(const OUTPUT& x){
+    void add_gather_back(const OUTPUT& x){
       x.atoms.overlaps_mmap(atoms).inv()(*this,x);
     }
 
@@ -288,6 +300,20 @@ namespace ptens{
 	for(int i=0; i<N; i++)
 	  view2_of(i).sum0_into(r.slice0(i));
       }
+      return R;
+    }
+
+    BASE reduce0(const int offs, const int nc) const{
+      TimedFn T("Ptensors1b","reduce0",*this);
+      int N=size();
+      int dev=get_dev();
+      BASE R({N,get_nc()},0,dev);
+      Rtensor2_view r=R.view2();
+      if(dev==0){
+	for(int i=0; i<N; i++)
+	  view2_of(i,offs,nc).sum0_into(r.slice0(i));
+      }
+      return R;
     }
 
     BASE reduce1() const{
@@ -301,18 +327,20 @@ namespace ptens{
     void broadcast0(const BASE& X, const int offs=0){
       TimedFn T("Ptensors1b","broadcast0",*this);
       int N=size();
+      int nc=X.dim(1);
       PTENS_ASSRT(X.dim(0)==N);
       Rtensor2_view x=X.view2();
       
       if(get_dev()==0){
 	for(int i=0; i<N; i++)
-	  view2_of(i,offs,get_nc())+=cnine::repeat0(x.slice0(i),size_of(i));
+	  view2_of(i,offs,nc)+=cnine::repeat0(x.slice0(i),size_of(i));
       }
     }
 
     void broadcast1(const BASE& X, const int offs=0){
       TimedFn T("Ptensors1b","broadcast1",*this);
-      BASE::view2().block(0,offs,dim(0),get_nc())+=X.view2();
+      int nc=X.dim(1);
+      BASE::view2().block(0,offs,dim(0),nc)+=X.view2();
     }
 
 

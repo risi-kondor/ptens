@@ -35,6 +35,7 @@
 #include "Ptensors0b.hpp"
 #include "Ptensors1b.hpp"
 #include "Ptensors2b.hpp"
+#include "Ptensorsb_functions.hpp"
 #include "PtensorLayer.hpp"
 
 namespace ptens{ 
@@ -61,8 +62,7 @@ PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
 #include "Ptensors0b_py.cpp"
 #include "Ptensors1b_py.cpp"
 #include "Ptensors2b_py.cpp"
-  //#include "PtensorLayer_py.cpp" // on hold
-
+//#include "PtensorLayer_py.cpp" // on hold
 
 
   //#include "Ptensors0_py.cpp"

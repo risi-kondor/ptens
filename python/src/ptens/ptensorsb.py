@@ -292,3 +292,102 @@ class Ptensorsb_diff2Fn(torch.autograd.Function):
         return ptensorsb.dummy(), ptensorsb.dummy()
 
 
+# ---- Message passing --------------------------------------------------------------------------------------
+
+
+class Ptensorsb_Linmaps0Fn(torch.autograd.Function):
+
+    @staticmethod
+    def forward(ctx,x):
+        r=x.dummy()
+        r.obj=x.obj.linmaps0()
+        ctx.x=x.obj
+        ctx.r=R.obj
+        return R
+        
+    @staticmethod
+    def backward(ctx,g):
+	ctx.x.add_linmaps_back(ctx.r)
+        return ptensorsb.dummy()
+
+
+class Ptensorsb_Linmaps1Fn(torch.autograd.Function):
+
+    @staticmethod
+    def forward(ctx,x):
+        r=x.dummy()
+        r.obj=x.obj.linmaps1()
+        ctx.x=x.obj
+        ctx.r=R.obj
+        return R
+        
+    @staticmethod
+    def backward(ctx,g):
+	ctx.x.add_linmaps_back(ctx.r)
+        return ptensorsb.dummy()
+
+
+class Ptensorsb_Linmaps2Fn(torch.autograd.Function):
+
+    @staticmethod
+    def forward(ctx,x):
+        r=x.dummy()
+        r.obj=x.obj.linmaps2()
+        ctx.x=x.obj
+        ctx.r=R.obj
+        return R
+        
+    @staticmethod
+    def backward(ctx,g):
+	ctx.x.add_linmaps_back(ctx.r)
+        return ptensorsb.dummy()
+
+
+class Ptensorsb_Gather0Fn(torch.autograd.Function):
+
+    @staticmethod
+    def forward(ctx,x,atoms):
+        r=x.dummy()
+        r.obj=x.obj.linmaps0(atoms)
+        ctx.x=x.obj
+        ctx.r=R.obj
+        return R
+        
+    @staticmethod
+    def backward(ctx,g):
+	ctx.x.add_linmaps_back(ctx.r)
+        return ptensorsb.dummy()
+
+
+class Ptensorsb_Gather1Fn(torch.autograd.Function):
+
+    @staticmethod
+    def forward(ctx,x,atoms):
+        r=x.dummy()
+        r.obj=x.obj.linmaps1(atoms)
+        ctx.x=x.obj
+        ctx.r=R.obj
+        return R
+        
+    @staticmethod
+    def backward(ctx,g):
+	ctx.x.add_linmaps_back(ctx.r)
+        return ptensorsb.dummy()
+
+
+class Ptensorsb_Gather2Fn(torch.autograd.Function):
+
+    @staticmethod
+    def forward(ctx,x,atoms):
+        r=x.dummy()
+        r.obj=x.obj.linmaps2(atoms)
+        ctx.x=x.obj
+        ctx.r=R.obj
+        return R
+        
+    @staticmethod
+    def backward(ctx,g):
+	ctx.x.add_linmaps_back(ctx.r)
+        return ptensorsb.dummy()
+
+

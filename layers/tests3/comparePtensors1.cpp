@@ -18,6 +18,9 @@
 #include "Ptensors1b.hpp"
 #include "Ptensors2b.hpp"
 #include "EMPlayers2.hpp"
+#include "Ptensorsb_functions.hpp"
+#include "LinmapLayers.hpp"
+
 
 using namespace ptens;
 using namespace cnine;
@@ -42,11 +45,6 @@ int main(int argc, char** argv){
   Ptens1 X1(x1);
   Ptens2 X2(x2);
 
-  //cout<<x0<<endl;
-  //cout<<X0<<endl;
-  //cout<<X1<<endl;
-  //cout<<X2<<endl;
-
   AtomsPack yatoms=AtomsPack::random(5,0.5);
   TransferMap tmap0=yatoms.overlaps(xatoms0);
   TransferMap tmap=yatoms.overlaps(xatoms);
@@ -54,16 +52,12 @@ int main(int argc, char** argv){
   Ptensors1 y0=Ptensors1::zero(yatoms,nc);
   emp10(y0,x0,tmap0);
   Ptens1 Y0=Ptens1::gather(X0,yatoms);
-  //cout<<y0<<endl;
-  //cout<<Y0<<endl;
   cout<<"1 <- 0 error: "<<Y0.diff2(Ptens1(y0))<<endl;
 
 
   Ptensors1 y1=Ptensors1::zero(yatoms,2*nc);
   emp11(y1,x1,tmap);
   Ptens1 Y1=Ptens1::gather(X1,yatoms);
-  //cout<<y1<<endl;
-  //cout<<Y1<<endl;
   cout<<"1 <- 1 error: "<<Y1.diff2(Ptens1(y1))<<endl;
 
   Ptensors1 y2=Ptensors1::zero(yatoms,5*nc);
@@ -72,8 +66,21 @@ int main(int argc, char** argv){
   Ptens1 Y2=Ptens1::gather(X2,yatoms);
   cout<<"1 <- 2 error: "<<Y2.diff2(Ptens1(y2))<<endl;
 
-  Ltensor<float> M({2*nc,2*nc},4); 
+  //Ltensor<float> M({2*nc,2*nc},4); 
   //cout<<Y1<<endl;
   //cout<<mprod(Y1,M)<<endl;
+
+  Ptensors1 z0=linmaps1(x0);
+  Ptens1 Z0=ptens::linmaps1(X0);
+  cout<<"linmaps(1 <- 0) error: "<<Z0.diff2(Ptens1(z0))<<endl;
+
+  Ptensors1 z1=linmaps1(x1);
+  Ptens1 Z1=ptens::linmaps1(X1);
+  cout<<"linmaps(1 <- 1) error: "<<Z0.diff2(Ptens1(z0))<<endl;
+
+  Ptensors1 z2=linmaps1(x2);
+  Ptens1 Z2=ptens::linmaps1(X2);
+  cout<<"linmaps(1 <- 2) error: "<<Z0.diff2(Ptens1(z0))<<endl;
+
 
 }

@@ -23,15 +23,15 @@ class TestLinear(object):
     @pytest.mark.parametrize('w', [torch.tensor([[1.0,0.0],[0.0,1.0],[0.0,0.0]])])
     @pytest.mark.parametrize('b', [torch.tensor([1.0,2.0,3.0])])
     def test_linear0(self, w, b):
-        self.backprop(p.ptensors0, p.linear, w, b, [[1,2,3],[3,5],[2]], 3)
+        self.backprop(p.ptensors0, p.linear, torch.randn([3,3]), b, [[1,2,3],[3,5],[2]], 3)
 
     @pytest.mark.parametrize('w', [torch.tensor([[1.0,0.0],[0.0,1.0],[0.0,0.0]])])
     @pytest.mark.parametrize('b', [torch.tensor([1.0,2.0,3.0])])
     def test_linear1(self, w, b):
-        self.backprop(p.ptensors1, p.linear, w, b, [[1,2,3],[3,5],[2]], 3)
+        self.backprop(p.ptensors1, p.linear, torch.randn([3,3]), b, [[1,2,3],[3,5],[2]], 3)
 
     @pytest.mark.parametrize('w', [torch.tensor([[1.0,0.0],[0.0,1.0],[0.0,0.0]])])
     @pytest.mark.parametrize('b', [torch.tensor([1.0,2.0,3.0])])
     def test_linear2(self, w, b):
-        self.backprop(p.ptensors2, p.linear, w, b, [[1,2,3],[3,5],[2]], 3)
+        self.backprop(p.ptensors2, p.linear, torch.randn([3,3]), b, [[1,2,3],[3,5],[2]], 3)
 

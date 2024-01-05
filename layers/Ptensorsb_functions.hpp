@@ -15,33 +15,84 @@
 #ifndef _ptens_Ptensorsb_functions
 #define _ptens_Ptensorsb_functions
 
-#include "Ptensorsb0.hpp"
-#include "Ptensorsb1.hpp"
-#include "Ptensorsb2.hpp"
+#include "Ptensors0b.hpp"
+#include "Ptensors1b.hpp"
+#include "Ptensors2b.hpp"
+
 
 namespace ptens{
 
-  template<typename TYPE>
-  inline linmaps0(const Ptensorsb<TYPE>& x){
-    Ptensorsb0<TYPE> R(x.atoms,x.get_nc()*vector<int>({1,1,2})[x.getk()],x.get_dev());
+  template<typename SOURCE>
+  inline Ptensors0b<float> linmaps0(const SOURCE& x){
+    Ptensors0b<float> R(x.get_atoms(),x.get_nc()*vector<int>({1,1,2})[x.getk()],x.get_dev());
     R.add_linmaps(x);
     return R;
   }
 
-  template<typename TYPE>
-  inline linmaps1(const Ptensorsb<TYPE>& x){
-    Ptensorsb1<float> R(x.atoms,x.get_nc()*vector<int>({1,2,5})[x.getk()],x.get_dev());
+  template<typename SOURCE>
+  inline Ptensors1b<float> linmaps1(const SOURCE& x){
+    Ptensors1b<float> R(x.get_atoms(),x.get_nc()*vector<int>({1,2,5})[x.getk()],x.get_dev());
     R.add_linmaps(x);
     return R;
   }
 
-  template<typename TYPE>
-  inline linmaps2(const Ptensorsb<TYPE>& x){
-    Ptensorsb2<float> R(x.atoms,x.get_nc()*vector<int>({2,5,15})[x.getk()],x.get_dev());
+  template<typename SOURCE>
+  inline Ptensors2b<float> linmaps2(const SOURCE& x){
+    Ptensors2b<float> R(x.get_atoms(),x.get_nc()*vector<int>({2,5,15})[x.getk()],x.get_dev());
     R.add_linmaps(x);
     return R;
   }
 
-};
+
+  template<typename SOURCE>
+  Ptensors0b<float> gather0(const SOURCE& x, const AtomsPack& a){
+    int nc=x.get_nc()*vector<int>({1,1,2})[x.getk()];
+    Ptensors0b<float> R(a,nc,x.get_dev());
+    R.add_gather(x);
+    return R;
+  }
+
+  template<typename SOURCE>
+  Ptensors1b<float> gather1(const SOURCE& x, const AtomsPack& a){
+    int nc=x.get_nc()*vector<int>({1,2,5})[x.getk()];
+    Ptensors0b<float> R(a,nc,x.get_dev());
+    R.add_gather(x);
+    return R;
+  }
+
+  template<typename SOURCE>
+  Ptensors2b<float> gather2(const SOURCE& x, const AtomsPack& a){
+    int nc=x.get_nc()*vector<int>({2,5,15})[x.getk()];
+    Ptensors2b<float> R(a,nc,x.get_dev());
+    R.add_gather(x);
+    return R;
+  }
+
+}
 
 #endif 
+
+
+  /* these do not work 
+  template<typename TYPE>
+  inline Ptensors0b<TYPE> linmaps0(const Ptensorsb<TYPE>& x){
+    Ptensors0b<TYPE> R(x.atoms,x.get_nc()*vector<int>({1,1,2})[x.getk()],x.get_dev());
+    R.add_linmaps(x);
+    return R;
+  }
+
+  template<typename TYPE>
+  inline Ptensors1b<TYPE> linmaps1(const Ptensorsb<TYPE>& x){
+    Ptensors1b<float> R(x.atoms,x.get_nc()*vector<int>({1,2,5})[x.getk()],x.get_dev());
+    R.add_linmaps(x);
+    return R;
+  }
+
+  template<typename TYPE>
+  inline Ptensors2b<TYPE> linmaps2(const Ptensorsb<TYPE>& x){
+    Ptensors2b<float> R(x.atoms,x.get_nc()*vector<int>({2,5,15})[x.getk()],x.get_dev());
+    R.add_linmaps(x);
+    return R;
+  }
+  */
+

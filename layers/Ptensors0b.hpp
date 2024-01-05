@@ -129,6 +129,10 @@ namespace ptens{
       return Ptensors0b(TENSOR::zeros_like(),atoms);
     }
 
+    Ptensors0b gaussian_like() const{
+      return Ptensors0b(BASE::gaussian_like(),atoms);
+    }
+
     static Ptensors0b* new_zeros_like(const Ptensors0b& x){
       return new Ptensors0b(x.TENSOR::zeros_like(),x.atoms);
     }
@@ -187,6 +191,10 @@ namespace ptens{
       return TENSOR::dim(1);
     }
 
+    AtomsPack get_atoms() const{
+      return atoms.obj->atoms;
+    }
+
     int offset(const int i) const{
       return i;
     }
@@ -222,28 +230,38 @@ namespace ptens{
       return R;
     }
 
-    void add_linmaps(const Ptensorsb<TYPE>& x){
-      int xk=x.getk();
-      if(xk==0) add(x);
-      if(xk==1) add(x.reduce0());
-      if(xk==2) add(x.reduce0());
+    void add_linmaps(const Ptensors0b<TYPE>& x){
+      add(x);
     }
 
-    void add_linmaps_back(const Ptensorsb<TYPE>& r){
-      int k=r.getk();
+    void add_linmaps(const Ptensors1b<TYPE>& x){
+      add(x.reduce0());
+    }
+
+    void add_linmaps(const Ptensors2b<TYPE>& x){
+      add(x.reduce0());
+    }
+
+    void add_linmaps_back(const Ptensors0b<TYPE>& r){
+      add(r);
+    }
+
+    void add_linmaps_back(const Ptensors1b<TYPE>& r){
+      add(r.reduce0());
+    }
+
+    void add_linmaps_back(const Ptensors2b<TYPE>& r){
       int nc=get_nc();
-      if(k==0) add(r);
-      if(k==1) add(r.reduce0());
-      if(k==2) add(r.reduce0_shrink(0,nc));
+      add(r.reduce0_shrink(0,nc));
     }
 
     template<typename SOURCE>
-    void gather(const SOURCE& x){
+    void add_gather(const SOURCE& x){
       (atoms.overlaps_mmap(x.atoms))(*this,x);
     }
 
     template<typename OUTPUT>
-    void gather_back(const OUTPUT& x){
+    void add_gather_back(const OUTPUT& x){
       x.atoms.overlaps_mmap(atoms).inv()(*this,x);
     }
 
@@ -257,7 +275,6 @@ namespace ptens{
 
 
     BASE reduce0() const{
-      //TimedFn T("Ptensors0b","reduce0",*this);
       return *this;
     }
 

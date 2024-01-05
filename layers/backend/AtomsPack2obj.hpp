@@ -71,9 +71,9 @@ namespace ptens{
       return atoms->tsize2();
     }
 
-    //int offset1(const int i) const{
-    //return atoms->offset(i);
-    //}
+    int offset1(const int i) const{
+      return atoms->offset(i);
+    }
 
     int size_of(const int i) const{
       return atoms->size_of(i);

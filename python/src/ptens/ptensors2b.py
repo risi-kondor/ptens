@@ -14,7 +14,7 @@
 import torch
 
 import ptens_base
-from ptens_base import ptensors1b as _ptensors1b
+from ptens_base import ptensors2b as _ptensors2b
 from ptens.utility import device_id as device_id
 from ptens.ptensorsb import * 
 
@@ -23,47 +23,47 @@ from ptens.ptensorsb import *
 #import ptens.ptensors2 
 
 
-class ptensors1b(torch.Tensor):
+class ptensors2b(torch.Tensor):
 
     @classmethod
     def dummy(self):
-        R=ptensors1b(1)
+        R=ptensors2b(1)
         return R
 
     @classmethod
     def init(self,obj):
-        R=ptensors1b(1)
+        R=ptensors2b(1)
         R.obj=obj
         return R
     
     @classmethod
     def from_matrix(self,M,atoms=None):
-        return Ptensors1b_fromMxFn.apply(M,atoms)
+        return Ptensors2b_fromMxFn.apply(M,atoms)
             
     @classmethod
     def zeros(self, _atoms, _nc, device='cpu'):
-        R=ptensors1b(1)
-        R.obj=_ptensors1b.create(_atoms,_nc,0,device_id(device))
+        R=ptensors2b(1)
+        R.obj=_ptensors2b.create(_atoms,_nc,0,device_id(device))
         return R
 
     @classmethod
     def randn(self, _atoms, _nc, device='cpu'):
-        R=ptensors1b(1)
-        R.obj=_ptensors1b.create(_atoms,_nc,4,device_id(device))
+        R=ptensors2b(1)
+        R.obj=_ptensors2b.create(_atoms,_nc,4,device_id(device))
         return R
 
     @classmethod
     def sequential(self, _atoms, _nc, device='cpu'):
-        R=ptensors1b(1)
-        R.obj=_ptensors1b.create(_atoms,_nc,3,device_id(device))
+        R=ptensors2b(1)
+        R.obj=_ptensors2b.create(_atoms,_nc,3,device_id(device))
         return R
 
     def randn_like(self):
-        return ptensors1b.init(self.obj.randn_like())
+        return ptensors2b.init(self.obj.randn_like())
     
     @classmethod
     def cat(self,*args):
-        return Ptensors1b_catFn.apply(self,*args)
+        return Ptensors2b_catFn.apply(self,*args)
 
 
     # ----- Access -------------------------------------------------------------------------------------------
@@ -73,7 +73,7 @@ class ptensors1b(torch.Tensor):
         return self.obj.get_grad()
 
     def get_grad(self):
-        R=ptensors1b(1)
+        R=ptensors2b(1)
         R.obj=self.obj.get_grad()
         return R
     
@@ -106,7 +106,7 @@ class ptensors1b(torch.Tensor):
         return Ptensorsb_cat_channelsFn.apply(self,y)
 
     def outer(self,y):
-         return Ptensors1b_outerFn.apply(self,y)
+         return Ptensors2b_outerFn.apply(self,y)
 
     def __mul__(self,y):
         return Ptensorsb_mprodFn.apply(self,y)
@@ -174,15 +174,15 @@ class ptensors1b(torch.Tensor):
 # ----- Transport and conversions ----------------------------------------------------------------------------
 
 
-class Ptensors1b_fromMxFn(torch.autograd.Function):
+class Ptensors2b_fromMxFn(torch.autograd.Function):
 
     @staticmethod
     def forward(ctx,x,atoms=None):
-        R=ptensors1b(1)
+        R=ptensors2b(1)
         if atoms is None:
-            R.obj=_ptensors1b(x)
+            R.obj=_ptensors2b(x)
         else:
-            R.obj=_ptensors1b(atoms,x)
+            R.obj=_ptensors2b(atoms,x)
         ctx.r=R.obj
         return R
 
@@ -192,13 +192,13 @@ class Ptensors1b_fromMxFn(torch.autograd.Function):
 
 
 
-class Ptensors1b_catFn(torch.autograd.Function):
+class Ptensors2b_catFn(torch.autograd.Function):
     
     @staticmethod
     def forward(ctx,dummy,*args):
-        r=ptensors1b.dummy()
+        r=ptensors2b.dummy()
         ctx.args=[x.obj for x in args]
-        r.obj=_ptensors1b.cat(ctx.args)
+        r.obj=_ptensors2b.cat(ctx.args)
         ctx.r=r.obj
         return r
 
@@ -209,15 +209,15 @@ class Ptensors1b_catFn(torch.autograd.Function):
         for x in ctx.args:
             x.add_cat_back(ctx.r,offs)
             offs=offs+x.dim(0)
-            dummies.append(ptensors1b.dummy())
-        return None, dummies #it was *dummies
+            dummies.append(ptensors2b.dummy())
+        return None, dummies # it was *dummies
 
 
-class Ptensors1b_outerFn(torch.autograd.Function):
+class Ptensors2b_outerFn(torch.autograd.Function):
 
     @staticmethod
     def forward(ctx,x,y):
-        r=ptensors1b.dummy()
+        r=ptensors2b.dummy()
         r.obj=x.obj.outer(y.obj)
         ctx.x=x.obj
         ctx.y=y.obj
@@ -227,6 +227,6 @@ class Ptensors1b_outerFn(torch.autograd.Function):
     @staticmethod
     def backward(ctx,g):
         ctx.x.outer_back0(ctx.r,ctx.y)
-        ctx.y.outer_back0(ctx.r,ctxxy)
-        return ptensors1b.dummy(), ptensors1b.dummy()
+        ctx.y.outer_back0(ctx.r,ctx.y)
+        return ptensors2b.dummy(), ptensors2b.dummy()
 

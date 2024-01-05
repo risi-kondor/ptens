@@ -19,6 +19,8 @@
 #include "Ptensors1b.hpp"
 #include "Ptensors2b.hpp"
 #include "EMPlayers2.hpp"
+#include "Ptensorsb_functions.hpp"
+#include "LinmapLayers.hpp"
 
 using namespace ptens;
 using namespace cnine;
@@ -69,6 +71,17 @@ int main(int argc, char** argv){
   //cout<<Y2<<endl;
   cout<<"0 <- 2 error: "<<Y2.diff2(Ptens0(y2))<<endl;
 
+  Ptensors0 z0=linmaps0(x0);
+  Ptens0 Z0=ptens::linmaps0(X0);
+  cout<<"linmaps(0 <- 0) error: "<<Z0.diff2(Ptens0(z0))<<endl;
+
+  Ptensors0 z1=linmaps0(x1);
+  Ptens0 Z1=ptens::linmaps0(X1);
+  cout<<"linmaps(0 <- 1) error: "<<Z0.diff2(Ptens0(z0))<<endl;
+
+  Ptensors0 z2=linmaps0(x2);
+  Ptens0 Z2=ptens::linmaps0(X2);
+  cout<<"linmaps(0 <- 2) error: "<<Z0.diff2(Ptens0(z0))<<endl;
   
 
 }

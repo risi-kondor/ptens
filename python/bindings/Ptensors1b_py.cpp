@@ -90,6 +90,30 @@ pybind11::class_<Ptensors1b<float> >(m,"ptensors1b")
   .def("diff2",[](const Ptensors1b<float>& x, const Ptensors1b<float>& y){return x.diff2(y);})
 
 
+// ---- Message passing --------------------------------------------------------------------------------------
+
+
+  .def("linmaps0",[](const Ptensors1b<float>& x){return linmaps0(x);})
+  .def("linmaps1",[](const Ptensors1b<float>& x){return linmaps1(x);})
+  .def("linmaps2",[](const Ptensors1b<float>& x){return linmaps2(x);})
+  .def("add_linmaps_back",[](Ptensors1b<float>& x, Ptensors0b<float>& g){
+      x.get_grad().add_linmaps_back(g.get_grad());})
+  .def("add_linmaps_back",[](Ptensors1b<float>& x, Ptensors1b<float>& g){
+      x.get_grad().add_linmaps_back(g.get_grad());})
+  .def("add_linmaps_back",[](Ptensors1b<float>& x, Ptensors2b<float>& g){
+      x.get_grad().add_linmaps_back(g.get_grad());})
+
+  .def("gather0",[](const Ptensors1b<float>& x, const AtomsPack& a){return gather0(x,a);})
+  .def("gather1",[](const Ptensors1b<float>& x, const AtomsPack& a){return gather1(x,a);})
+  .def("gather2",[](const Ptensors1b<float>& x, const AtomsPack& a){return gather2(x,a);})
+  .def("add_gather_back",[](Ptensors1b<float>& x, Ptensors0b<float>& g){
+      x.get_grad().add_gather_back(g.get_grad());})
+  .def("add_gather_back",[](Ptensors1b<float>& x, Ptensors1b<float>& g){
+      x.get_grad().add_gather_back(g.get_grad());})
+  .def("add_gather_back",[](Ptensors1b<float>& x, Ptensors2b<float>& g){
+      x.get_grad().add_gather_back(g.get_grad());})
+
+
 // ---- I/O --------------------------------------------------------------------------------------------------
 
 
