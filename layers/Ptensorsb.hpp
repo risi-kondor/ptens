@@ -110,39 +110,6 @@ namespace ptens{
     return OBJ(x.ReLU(alpha),x.atoms);
   }
 
-
-  //  cnine::Ltensor<TYPE> mprod_back1(const OBJ& g, const OBJ& x){
-  //return x.transp()*g.get_grad();
-  //}
-
-  //cnine::Ltensor<TYPE> linear_back1(const OBJ& g, const OBJ& x){
-  //return x.transp()*g.get_grad();
-  //}
-
-  //cnine::Ltensor<TYPE> linear_back2(const OBJ& g){
-  //return g.get_grad().sum(0);
-  //}
-
-
 }
 
 #endif 
-    //OBJ R=x.zeros_like();
-    //R.add_scale_columns(x,s);
-    //return R;
-    //OBJ R=x.zeros_like();
-    //R.add_ReLU(x,alpha);
-    //return R;
-    //    void _add_mprod(const OBJ& x, at::Tensor& M){
-    //BASE::add_mprod(x,ATview<TYPE>(M));
-    //}
-
-    //void add_mprod_back0(const OBJ& g, at::Tensor& M){
-    //get_grad().add_mprod(g.get_grad(),ATview<TYPE>(M).transp());
-    //}
-
-    //at::Tensor mprod_back1(const OBJ& x, const OBJ& r){
-    //BASE R({x.dim(1),r.dim(1)},r.get_dev());
-    //R.add_mprod(x.transp(),r.get_grad());
-    //return R.torch();
-    //}

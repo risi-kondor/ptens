@@ -27,16 +27,20 @@
 #include "OuterLayers.hpp"
 // //#include "ConcatLayers.hpp"
 
-#include "NodeLayer.hpp"
-#include "SubgraphLayer0.hpp"
-#include "SubgraphLayer1.hpp"
-#include "SubgraphLayer2.hpp"
+//#include "NodeLayer.hpp"
+//#include "SubgraphLayer0.hpp"
+//#include "SubgraphLayer1.hpp"
+//#include "SubgraphLayer2.hpp"
 
 #include "Ptensors0b.hpp"
 #include "Ptensors1b.hpp"
 #include "Ptensors2b.hpp"
-#include "Ptensorsb_functions.hpp"
-#include "PtensorLayer.hpp"
+
+//#include "NodeLayerb.hpp"
+#include "SubgraphLayer0b.hpp"
+#include "SubgraphLayer1b.hpp"
+#include "SubgraphLayer2b.hpp"
+
 
 namespace ptens{ 
   PtensSession ptens_session;
@@ -59,12 +63,6 @@ PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
 #include "Ptensor1_py.cpp"
 #include "Ptensor2_py.cpp"
   
-#include "Ptensors0b_py.cpp"
-#include "Ptensors1b_py.cpp"
-#include "Ptensors2b_py.cpp"
-//#include "PtensorLayer_py.cpp" // on hold
-
-
   //#include "Ptensors0_py.cpp"
   //#include "Ptensors1_py.cpp"
   //#include "Ptensors2_py.cpp"
@@ -77,6 +75,17 @@ PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
   //#include "SubgraphLayer0_py.cpp"
   //#include "SubgraphLayer1_py.cpp"
   //#include "SubgraphLayer2_py.cpp"
+
+#include "Ptensors0b_py.cpp"
+#include "Ptensors1b_py.cpp"
+#include "Ptensors2b_py.cpp"
+
+    //#include "NodeLayerb_py.cpp"
+#include "SubgraphLayer0b_py.cpp"
+#include "SubgraphLayer1b_py.cpp"
+#include "SubgraphLayer2b_py.cpp"
+
+
 
 
 }

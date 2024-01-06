@@ -528,6 +528,21 @@ namespace ptens{
   };
 
 
+  template<typename SOURCE>
+  inline Ptensors2b<float> linmaps2(const SOURCE& x){
+    Ptensors2b<float> R(x.get_atoms(),x.get_nc()*vector<int>({2,5,15})[x.getk()],x.get_dev());
+    R.add_linmaps(x);
+    return R;
+  }
+
+  template<typename SOURCE>
+  Ptensors2b<float> gather2(const SOURCE& x, const AtomsPack& a){
+    int nc=x.get_nc()*vector<int>({2,5,15})[x.getk()];
+    Ptensors2b<float> R(a,nc,x.get_dev());
+    R.add_gather(x);
+    return R;
+  }
+
 }
 
 

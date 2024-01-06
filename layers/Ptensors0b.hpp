@@ -146,7 +146,7 @@ namespace ptens{
     Ptensors0b(const TENSOR& x, const AtomsPack0& _atoms):
       BASE(x),
       atoms(_atoms){}
-
+    
     Ptensors0b(const Ptensors0& x):
       BASE(cnine::Gdims({x.tail/x.nc,x.nc})),
       atoms(x.atoms){
@@ -319,6 +319,24 @@ namespace ptens{
 
 
   };
+
+
+  template<typename SOURCE, typename = typename std::enable_if<std::is_base_of<Ptensorsb<float>, SOURCE>::value, SOURCE>::type>
+  inline Ptensors0b<float> linmaps0(const SOURCE& x){
+    Ptensors0b<float> R(x.get_atoms(),x.get_nc()*vector<int>({1,1,2})[x.getk()],x.get_dev());
+    R.add_linmaps(x);
+    return R;
+  }
+
+  template<typename SOURCE, typename = typename std::enable_if<std::is_base_of<Ptensorsb<float>, SOURCE>::value, SOURCE>::type>
+  Ptensors0b<float> gather0(const SOURCE& x, const AtomsPack& a){
+    int nc=x.get_nc()*vector<int>({1,1,2})[x.getk()];
+    Ptensors0b<float> R(a,nc,x.get_dev());
+    R.add_gather(x);
+    return R;
+  }
+
+
 
 }
 
