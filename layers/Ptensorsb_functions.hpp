@@ -18,9 +18,15 @@
 #include "Ptensors0b.hpp"
 #include "Ptensors1b.hpp"
 #include "Ptensors2b.hpp"
+#include "SubgraphLayer0b.hpp"
+#include "SubgraphLayer1b.hpp"
+#include "SubgraphLayer2b.hpp"
 
 
 namespace ptens{
+
+
+  // ---- Linmaps to new Ptensor layers ---------------------------------------------------------------------
 
   template<typename SOURCE>
   inline Ptensors0b<float> linmaps0(const SOURCE& x){
@@ -42,6 +48,34 @@ namespace ptens{
     R.add_linmaps(x);
     return R;
   }
+
+
+  // ---- Linmaps to new subgraph layers --------------------------------------------------------------------
+
+
+  template<typename SOURCE>
+  inline SubgraphLayer0b<float> linmaps0(const SOURCE& x){
+    SubgraphLayer0b<float> R(x.get_atoms(),x.get_nc()*vector<int>({1,1,2})[x.getk()],x.get_dev());
+    R.add_linmaps(x);
+    return R;
+  }
+
+  template<typename SOURCE>
+  inline SubgraphLayer1b<float> linmaps1(const SOURCE& x){
+    SubgraphLayer1b<float> R(x.get_atoms(),x.get_nc()*vector<int>({1,2,5})[x.getk()],x.get_dev());
+    R.add_linmaps(x);
+    return R;
+  }
+
+  template<typename SOURCE>
+  inline SubgraphLayer2b<float> linmaps2(const SOURCE& x){
+    SubgraphLayer2b<float> R(x.get_atoms(),x.get_nc()*vector<int>({2,5,15})[x.getk()],x.get_dev());
+    R.add_linmaps(x);
+    return R;
+  }
+
+
+  // ---- Gathering to new Ptensor layer --------------------------------------------------------------------
 
 
   template<typename SOURCE>
@@ -67,6 +101,8 @@ namespace ptens{
     R.add_gather(x);
     return R;
   }
+
+
 
 }
 

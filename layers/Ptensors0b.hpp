@@ -61,6 +61,8 @@ namespace ptens{
   public: // ----- Constructors ------------------------------------------------------------------------------
 
 
+    Ptensors0b(){}
+
     Ptensors0b(const TENSOR& M):
       BASE(M.copy()),
       atoms(AtomsPack0(M.dim(0))){}

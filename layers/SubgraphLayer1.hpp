@@ -15,9 +15,7 @@
 #ifndef _ptens_SubgraphLayer1
 #define _ptens_SubgraphLayer1
 
-#include "SubgraphLayer.hpp"
-#include "SubgraphLayer0.hpp"
-#include "EMPlayers2.hpp"
+#include "SubgraphLayer0b.hpp"
 
 
 namespace ptens{

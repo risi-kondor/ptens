@@ -66,6 +66,8 @@ namespace ptens{
   public: // ----- Constructors ------------------------------------------------------------------------------
 
 
+    Ptensors1b(){}
+
     Ptensors1b(const TENSOR& M):
       BASE(M.copy()){} // for diff_class
 
