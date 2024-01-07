@@ -3,7 +3,7 @@ typedef SubgraphLayer1b<float> SGlayer1b;
 typedef SubgraphLayer2b<float> SGlayer2b;
 
 
-pybind11::class_<SGlayer1b,Ptensors1b<float> >(m,"subgraph_layer1b")
+pybind11::class_<SGlayer1b,Ptensors1b<float> >(m,"subgraphlayer1b")
 
 //.def(pybind11::init<ptens::Ggraph&, const at::Tensor&>())
 
@@ -42,9 +42,9 @@ pybind11::class_<SGlayer1b,Ptensors1b<float> >(m,"subgraph_layer1b")
   .def("linmaps1",[](const SGlayer1b& x){return sglinmaps1(x);})
   .def("linmaps2",[](const SGlayer1b& x){return sglinmaps2(x);})
 
-  .def("gather",[](const SGlayer0b& x, const Subgraph& a){return SGlayer1b(x,a);})
-  .def("gather",[](const SGlayer1b& x, const Subgraph& a){return SGlayer1b(x,a);})
-  .def("gather",[](const SGlayer2b& x, const Subgraph& a){return SGlayer1b(x,a);});
+  .def("gather",[](const SGlayer0b& x, const Subgraph& a){return gather1(x,a);})
+  .def("gather",[](const SGlayer1b& x, const Subgraph& a){return gather1(x,a);})
+  .def("gather",[](const SGlayer2b& x, const Subgraph& a){return gather1(x,a);});
 
 
 // ---- I/O --------------------------------------------------------------------------------------------------

@@ -15,56 +15,48 @@
 import torch
 
 import ptens_base
-from ptens_base import subgraphlayer0b as _subgraphlayer0b
+from ptens_base import subgraphlayer2b as _subgraphlayer2b
 from ptens.utility import device_id as device_id
 from ptens.ptensorsb import * 
 
-#import ptens.ptensor0
-#import ptens.ptensors1
-#import ptens.ptensors2 
 
-
-class subgraphlayer0b(torch.Tensor):
+class subgraphlayer2b(torch.Tensor):
 
     @classmethod
     def dummy(self):
-        R=subgraphlayer0b(1)
+        R=subgraphlayer2b(1)
         return R
 
     @classmethod
     def init(self,obj):
-        R=subgraphlayer0b(1)
+        R=subgraphlayer2b(1)
         R.obj=obj
         return R
     
     @classmethod
-    def from_matrix(self,M,atoms=None):
-        return Subgraphlayer0b_fromMxFn.apply(M,atoms)
-            
-    @classmethod
     def zeros(self, _G, _nc, device='cpu'):
-        R=subgraphlayer0b(1)
-        R.obj=_subgraphlayer0b.create(_G,_nc,0,device_id(device))
+        R=subgraphlayer2b(1)
+        R.obj=_subgraphlayer2b.create(_G,_nc,0,device_id(device))
         return R
 
     @classmethod
     def randn(self, _G, _nc, device='cpu'):
-        R=subgraphlayer0b(1)
-        R.obj=_subgraphlayer0b.create(_G,_nc,4,device_id(device))
+        R=subgraphlayer2b(1)
+        R.obj=_subgraphlayer2b.create(_G,_nc,4,device_id(device))
         return R
 
     @classmethod
     def sequential(self, _G, _nc, device='cpu'):
-        R=subgraphlayer0b(1)
-        R.obj=_subgraphlayer0b.create(_G,_nc,3,device_id(device))
+        R=subgraphlayer2b(1)
+        R.obj=_subgraphlayer2b.create(_G,_nc,3,device_id(device))
         return R
 
     def randn_like(self):
-        return subgraphlayer0b.init(self.obj.randn_like())
+        return subgraphlayer2b.init(self.obj.randn_like())
     
     @classmethod
     def cat(self,*args):
-        return Subgraphlayer0b_catFn.apply(self,*args)
+        return Subgraphlayer2b_catFn.apply(self,*args)
 
 
     # ----- Access -------------------------------------------------------------------------------------------
@@ -74,7 +66,7 @@ class subgraphlayer0b(torch.Tensor):
         return self.obj.get_grad()
 
     def get_grad(self):
-        R=subgraphlayer0b(1)
+        R=subgraphlayer2b(1)
         R.obj=self.obj.get_grad()
         return R
     
@@ -107,7 +99,7 @@ class subgraphlayer0b(torch.Tensor):
         return Ptensorsb_cat_channelsFn.apply(self,y)
 
     def outer(self,y):
-         return Subgraphlayer0b_outerFn.apply(self,y)
+         return Subgraphlayer2b_outerFn.apply(self,y)
 
     def __mul__(self,y):
         return Ptensorsb_mprodFn.apply(self,y)
@@ -175,28 +167,13 @@ class subgraphlayer0b(torch.Tensor):
 # ----- Transport and conversions ----------------------------------------------------------------------------
 
 
-class Subgraphlayer0b_fromMxFn(torch.autograd.Function):
-
-    @staticmethod
-    def forward(ctx,G,x):
-        R=subgraphlayer0b(1)
-        R.obj=_subgraph_layerb0(G.obj,x)
-        ctx.r=R.obj
-        return R
-
-    @staticmethod
-    def backward(ctx,g):
-        return ctx.r.get_grad().torch(), None
-
-
-
-class Subgraphlayer0b_catFn(torch.autograd.Function):
+class Subgraphlayer2b_catFn(torch.autograd.Function):
     
     @staticmethod
     def forward(ctx,dummy,*args):
-        r=subgraphlayer0b.dummy()
+        r=subgraphlayer2b.dummy()
         ctx.args=[x.obj for x in args]
-        r.obj=_subgraphlayer0b.cat(ctx.args)
+        r.obj=_subgraphlayer2b.cat(ctx.args)
         ctx.r=r.obj
         return r
 
@@ -207,15 +184,15 @@ class Subgraphlayer0b_catFn(torch.autograd.Function):
         for x in ctx.args:
             x.add_cat_back(ctx.r,offs)
             offs=offs+x.dim(0)
-            dummies.append(subgraphlayer0b.dummy())
+            dummies.append(subgraphlayer2b.dummy())
         return None, dummies #it was *dummies
 
 
-class Subgraphlayer0b_outerFn(torch.autograd.Function):
+class Subgraphlayer2b_outerFn(torch.autograd.Function):
 
     @staticmethod
     def forward(ctx,x,y):
-        r=subgraphlayer0b.dummy()
+        r=subgraphlayer2b.dummy()
         r.obj=x.obj.outer(y.obj)
         ctx.x=x.obj
         ctx.y=y.obj
@@ -226,5 +203,5 @@ class Subgraphlayer0b_outerFn(torch.autograd.Function):
     def backward(ctx,g):
         ctx.x.outer_back0(ctx.r,ctx.y)
         ctx.y.outer_back0(ctx.r,ctxxy)
-        return subgraphlayer0b.dummy(), subgraphlayer0b.dummy()
+        return subgraphlayer2b.dummy(), subgraphlayer2b.dummy()
 
