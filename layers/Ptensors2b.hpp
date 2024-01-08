@@ -239,7 +239,7 @@ namespace ptens{
     static Ptensors2b<TYPE> gather(const SOURCE& x, const AtomsPack& a){
       int nc=x.get_nc()*vector<int>({2,5,15})[x.getk()];
       Ptensors2b<TYPE> R(a,nc,x.get_dev());
-      R.gather(x);
+      R.add_gather(x);
       return R;
     }
 

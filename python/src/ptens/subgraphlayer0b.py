@@ -44,19 +44,19 @@ class subgraphlayer0b(torch.Tensor):
     @classmethod
     def zeros(self, _G, _nc, device='cpu'):
         R=subgraphlayer0b(1)
-        R.obj=_subgraphlayer0b.create(_G,_nc,0,device_id(device))
+        R.obj=_subgraphlayer0b.create(_G.obj,_nc,0,device_id(device))
         return R
 
     @classmethod
     def randn(self, _G, _nc, device='cpu'):
         R=subgraphlayer0b(1)
-        R.obj=_subgraphlayer0b.create(_G,_nc,4,device_id(device))
+        R.obj=_subgraphlayer0b.create(_G.obj,_nc,4,device_id(device))
         return R
 
     @classmethod
     def sequential(self, _G, _nc, device='cpu'):
         R=subgraphlayer0b(1)
-        R.obj=_subgraphlayer0b.create(_G,_nc,3,device_id(device))
+        R.obj=_subgraphlayer0b.create(_G.obj,_nc,3,device_id(device))
         return R
 
     def randn_like(self):
@@ -180,7 +180,7 @@ class Subgraphlayer0b_fromMxFn(torch.autograd.Function):
     @staticmethod
     def forward(ctx,G,x):
         R=subgraphlayer0b(1)
-        R.obj=_subgraph_layerb0(G.obj,x)
+        R.obj=_subgraphlayer0b(G.obj,x)
         ctx.r=R.obj
         return R
 

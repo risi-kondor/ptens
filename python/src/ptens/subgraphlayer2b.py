@@ -34,21 +34,21 @@ class subgraphlayer2b(torch.Tensor):
         return R
     
     @classmethod
-    def zeros(self, _G, _nc, device='cpu'):
+    def zeros(self, _G, _S, _nc, device='cpu'):
         R=subgraphlayer2b(1)
-        R.obj=_subgraphlayer2b.create(_G,_nc,0,device_id(device))
+        R.obj=_subgraphlayer2b.create(_G.obj,_S.obj,_nc,0,device_id(device))
         return R
 
     @classmethod
-    def randn(self, _G, _nc, device='cpu'):
+    def randn(self, _G, _S, _nc, device='cpu'):
         R=subgraphlayer2b(1)
-        R.obj=_subgraphlayer2b.create(_G,_nc,4,device_id(device))
+        R.obj=_subgraphlayer2b.create(_G.obj,_S.obj,_nc,4,device_id(device))
         return R
 
     @classmethod
     def sequential(self, _G, _nc, device='cpu'):
         R=subgraphlayer2b(1)
-        R.obj=_subgraphlayer2b.create(_G,_nc,3,device_id(device))
+        R.obj=_subgraphlayer2b.create(_G.obj,_S.obj,_nc,3,device_id(device))
         return R
 
     def randn_like(self):

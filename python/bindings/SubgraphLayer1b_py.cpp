@@ -7,9 +7,9 @@ pybind11::class_<SGlayer1b,Ptensors1b<float> >(m,"subgraphlayer1b")
 
 //.def(pybind11::init<ptens::Ggraph&, const at::Tensor&>())
 
-//.def_static("create",[](const Ggraph& G, const int _nc, const int fcode, const int _dev){
-//    return SGlayer1b(G,_nc,fcode,_dev);}, 
-//  py::arg("graph"),py::arg("nc"),py::arg("fcode")=0,py::arg("device")=0)
+  .def_static("create",[](const Ggraph& G, const Subgraph& S, const int _nc, const int fcode, const int _dev){
+      return SGlayer1b(G,S,_nc,fcode,_dev);}, 
+    py::arg("graph"),py::arg("subgraph"),py::arg("nc"),py::arg("fcode")=0,py::arg("device")=0)
 
   .def("copy",[](const SGlayer1b& x){return x.copy();})
   .def("copy",[](const SGlayer1b& x, const int _dev){return x.copy(_dev);})
@@ -42,9 +42,9 @@ pybind11::class_<SGlayer1b,Ptensors1b<float> >(m,"subgraphlayer1b")
   .def("linmaps1",[](const SGlayer1b& x){return sglinmaps1(x);})
   .def("linmaps2",[](const SGlayer1b& x){return sglinmaps2(x);})
 
-  .def("gather",[](const SGlayer0b& x, const Subgraph& a){return gather1(x,a);})
-  .def("gather",[](const SGlayer1b& x, const Subgraph& a){return gather1(x,a);})
-  .def("gather",[](const SGlayer2b& x, const Subgraph& a){return gather1(x,a);});
+  .def_static("gather",[](const SGlayer0b& x, const Subgraph& a){return gather1(x,a);})
+  .def_static("gather",[](const SGlayer1b& x, const Subgraph& a){return gather1(x,a);})
+  .def_static("gather",[](const SGlayer2b& x, const Subgraph& a){return gather1(x,a);});
 
 
 // ---- I/O --------------------------------------------------------------------------------------------------

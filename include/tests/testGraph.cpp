@@ -26,10 +26,12 @@ PtensSession ptens::ptens_session;
 
 int main(int argc, char** argv){
 
-  Ggraph M=Ggraph::random(10,0.2);
+  Ggraph M=Ggraph::random(5,0.5);
   cout<<M<<endl;
 
-  Subgraph A=Subgraph::star(5);
+  Subgraph A=Subgraph::triangle();
   cout<<A<<endl;
 
+  auto U=M.subgraphs(A);
+  cout<<U<<endl;
 }

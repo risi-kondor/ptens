@@ -15,7 +15,7 @@
 import torch
 
 import ptens_base
-from ptens_base import subgraphlayer0b as _subgraphlayer0b
+from ptens_base import subgraphlayer1b as _subgraphlayer1b
 from ptens.utility import device_id as device_id
 from ptens.ptensorsb import * 
 
@@ -34,21 +34,21 @@ class subgraphlayer1b(torch.Tensor):
         return R
     
     @classmethod
-    def zeros(self, _G, _nc, device='cpu'):
+    def zeros(self, _G, _S, _nc, device='cpu'):
         R=subgraphlayer1b(1)
-        R.obj=_subgraphlayer1b.create(_G,_nc,0,device_id(device))
+        R.obj=_subgraphlayer1b.create(_G.obj,_S.obj,_nc,0,device_id(device))
         return R
 
     @classmethod
-    def randn(self, _G, _nc, device='cpu'):
+    def randn(self, _G, _S, _nc, device='cpu'):
         R=subgraphlayer1b(1)
-        R.obj=_subgraphlayer1b.create(_G,_nc,4,device_id(device))
+        R.obj=_subgraphlayer1b.create(_G.obj,_S.obj,_nc,4,device_id(device))
         return R
 
     @classmethod
-    def sequential(self, _G, _nc, device='cpu'):
+    def sequential(self, _G, _S, _nc, device='cpu'):
         R=subgraphlayer1b(1)
-        R.obj=_subgraphlayer1b.create(_G,_nc,3,device_id(device))
+        R.obj=_subgraphlayer1b.create(_G.obj,_S.obj,_nc,3,device_id(device))
         return R
 
     def randn_like(self):
@@ -57,6 +57,11 @@ class subgraphlayer1b(torch.Tensor):
     @classmethod
     def cat(self,*args):
         return Subgraphlayer1b_catFn.apply(self,*args)
+
+    @classmethod
+    def gather(self,x,S):
+        return SubgraphLayer1b_GatherFn.apply(x,S)
+
 
 
     # ----- Access -------------------------------------------------------------------------------------------
@@ -138,14 +143,14 @@ class subgraphlayer1b(torch.Tensor):
     def linmaps2(self,normalized=False):
         return Ptensorsb_Linmaps2Fn.apply(self);
 
-    def gather0(self,atoms):
-        return Ptensorsb_Gather0Fn.apply(self,atoms);
+    #def gather0(self,atoms):
+        #return Ptensorsb_Gather0Fn.apply(self,atoms);
 
-    def gather1(self,atoms):
-        return Ptensorsb_Gather1Fn.apply(self,atoms);
+    #def gather1(self,atoms):
+        #return Ptensorsb_Gather1Fn.apply(self,atoms);
 
-    def gather2(self,atoms):
-        return Ptensorsb_Gather2Fn.apply(self,atoms);
+    #def gather2(self,atoms):
+        #return Ptensorsb_Gather2Fn.apply(self,atoms);
 
 
     # ---- I/O ----------------------------------------------------------------------------------------------
@@ -204,4 +209,20 @@ class Subgraphlayer1b_outerFn(torch.autograd.Function):
         ctx.x.outer_back0(ctx.r,ctx.y)
         ctx.y.outer_back0(ctx.r,ctxxy)
         return subgraphlayer1b.dummy(), subgraphlayer1b.dummy()
+
+
+class SubgraphLayer1b_GatherFn(torch.autograd.Function):
+
+    @staticmethod
+    def forward(ctx,x,S):
+        r=x.dummy()
+        r.obj=_subgraphlayer1b.gather(x.obj,S.obj)
+        ctx.x=x.obj
+        ctx.r=r.obj
+        return r
+
+    @staticmethod
+    def backward(ctx,g):
+        ctx.x.add_gather_back(ctx.r)
+        return ptensorsb.dummy()
 

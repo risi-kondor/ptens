@@ -58,6 +58,9 @@ namespace ptens{
     SubgraphLayer1b(const Ggraph& _G, const Subgraph& _S, const BASE& x):
       BASE(x), G(_G), S(_S){}
 
+    SubgraphLayer1b(const Ggraph& _G, const Subgraph& _S, const int nc, const int fcode, const int _dev=0):
+      G(_G), S(_S), BASE(_G.subgraphs(_S),nc,fcode,_dev){}
+
     SubgraphLayer1b(const Ggraph& _G, const Subgraph& _S, const AtomsPack& _atoms, const int nc, const int fcode, const int _dev=0):
       G(_G), S(_S), BASE(_atoms,nc,fcode,_dev){}
 

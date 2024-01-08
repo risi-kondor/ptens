@@ -7,9 +7,9 @@ pybind11::class_<SGlayer2b,Ptensors2b<float> >(m,"subgraphlayer2b")
 
 //.def(pybind11::init<ptens::Ggraph&, const at::Tensor&>())
 
-//.def_static("create",[](const Ggraph& G, const int _nc, const int fcode, const int _dev){
-//    return SGlayer2b(G,_nc,fcode,_dev);}, 
-//  py::arg("graph"),py::arg("nc"),py::arg("fcode")=0,py::arg("device")=0)
+  .def_static("create",[](const Ggraph& G, const Subgraph& S, const int _nc, const int fcode, const int _dev){
+      return SGlayer2b(G,S,_nc,fcode,_dev);}, 
+    py::arg("graph"),py::arg("subgraph"),py::arg("nc"),py::arg("fcode")=0,py::arg("device")=0)
 
   .def("copy",[](const SGlayer2b& x){return x.copy();})
   .def("copy",[](const SGlayer2b& x, const int _dev){return x.copy(_dev);})

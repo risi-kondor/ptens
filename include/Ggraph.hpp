@@ -42,6 +42,9 @@ namespace ptens{
     Ggraph(const cnine::RtensorA& M):
       obj(new BASE(cnine::Tensor<float>(M))){}
 
+    //Ggraph(const Ggraph& x):
+    //obj(x.obj){}
+
 
   public: //  ---- Named constructors -------------------------------------------------------------------------
 

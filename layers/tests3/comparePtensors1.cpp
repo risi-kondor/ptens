@@ -18,7 +18,6 @@
 #include "Ptensors1b.hpp"
 #include "Ptensors2b.hpp"
 #include "EMPlayers2.hpp"
-#include "Ptensorsb_functions.hpp"
 #include "LinmapLayers.hpp"
 
 
