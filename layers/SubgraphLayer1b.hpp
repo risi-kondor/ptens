@@ -34,6 +34,7 @@ namespace ptens{
   public:
 
     typedef Ptensors1b<TYPE> BASE;
+    typedef cnine::Ltensor<TYPE> TENSOR;
 
     using BASE::BASE;
     using BASE::atoms;
@@ -57,6 +58,9 @@ namespace ptens{
 
     SubgraphLayer1b(const Ggraph& _G, const Subgraph& _S, const BASE& x):
       BASE(x), G(_G), S(_S){}
+
+    SubgraphLayer1b(const Ggraph& _G, const Subgraph& _S, const AtomsPack1& atoms, const TENSOR& x):
+      BASE(atoms,x), G(_G), S(_S){}
 
     SubgraphLayer1b(const Ggraph& _G, const Subgraph& _S, const int nc, const int fcode, const int _dev=0):
       G(_G), S(_S), BASE(_G.subgraphs(_S),nc,fcode,_dev){}
@@ -93,6 +97,10 @@ namespace ptens{
       return SubgraphLayer1b(G,S,BASE::gaussian_like());
     }
 
+    //static SubgraphLayer1b like(const SubgraphLayer1b& x, const cnine::Ltensor<TYPE>& M){
+    //return SubgraphLayer1(x.G,x.S);
+    //}
+
     static SubgraphLayer1b* new_zeros_like(const SubgraphLayer1b& x){
       return new SubgraphLayer1b(x.zeros_like());
       //return new SubgraphLayer1b(x.G,x.S,x.TENSOR::zeros_like());
@@ -101,6 +109,21 @@ namespace ptens{
 
   public: // ---- Message passing between subgraph layers -----------------------------------------------------
 
+
+    SubgraphLayer1b(const Ptensors0b<TYPE>& x, const Ggraph& g, const Subgraph& s):
+      SubgraphLayer1b(g,s,g.subgraphs(s),x.get_nc(),0,x.dev){
+      add_gather(x);
+    }
+
+    SubgraphLayer1b(const Ptensors1b<TYPE>& x, const Ggraph& g, const Subgraph& s):
+      SubgraphLayer1b(g,s,g.subgraphs(s),2*x.get_nc(),0,x.dev){
+      //add_gather(x);
+    }
+
+    SubgraphLayer1b(const Ptensors2b<TYPE>& x, const Ggraph& g, const Subgraph& s):
+      SubgraphLayer1b(g,s,g.subgraphs(s),5*x.get_nc(),0,x.dev){
+      add_gather(x);
+    }
 
     //SubgraphLayer1b(const NodeLayerb<TYPE>& x, const Subgraph& _S):
     //SubgraphLayer1b(x.G,_S,x.G.subgraphs(_S),2*x.get_nc(),x.get_dev()){

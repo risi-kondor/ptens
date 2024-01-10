@@ -26,7 +26,7 @@ namespace ptens{
     OBJ cat_channels_sg(const OBJ& x, const OBJ& y){
     //PTENS_ASSRT(x.atoms==y.atoms);
     PTENS_ASSRT(x.dim(0)==y.dim(0));
-    OBJ R(x.G,x.S,cnine::Ltensor<float>({x.dim(0),x.dim(1)+y.dim(1)},0,x.get_dev()));
+    OBJ R(x.G,x.S,x.atoms,cnine::Ltensor<float>({x.dim(0),x.dim(1)+y.dim(1)},0,x.get_dev()));
     R.block(0,0,x.dim(0),x.dim(1))+=x;
     R.block(0,x.dim(1),x.dim(0),y.dim(1))+=y;
     return R;
@@ -34,24 +34,24 @@ namespace ptens{
 
   template<typename OBJ, typename TYPE>
   OBJ scale_channels_sg(const OBJ& x, const cnine::Ltensor<TYPE>& s){
-    return OBJ(x.G,x.S,x.scale_columns(s));
+    return OBJ(x.G,x.S,x.atoms,x.scale_columns(s));
   }
 
   template<typename OBJ, typename TYPE>
   OBJ mprod_sg(const OBJ& x, const cnine::Ltensor<TYPE>& y){
-    return OBJ(x.G,x.S,x*y);
+    return OBJ(x.G,x.S,x.atoms,x*y);
   }
 
   template<typename OBJ, typename TYPE>
   OBJ linear_sg(const OBJ& x, const cnine::Ltensor<TYPE>& w, const cnine::Ltensor<TYPE>& b){
-    OBJ R(x.G,x.S,x*w);
+    OBJ R(x.G,x.S,x.atoms,x*w);
     R.add_broadcast(0,b);
     return R;
   }
 
   template<typename OBJ, typename TYPE>
   OBJ ReLU_sg(const OBJ& x, TYPE alpha){
-    return OBJ(x.G,x.S,x.ReLU(alpha));
+    return OBJ(x.G,x.S,x.atoms,x.ReLU(alpha));
   }
 
 

@@ -15,6 +15,8 @@ pybind11::class_<Ptensors1b<float> >(m,"ptensors1b")
       return Ptensors1b<float>(_atoms,cnine::channels=_nc,cnine::filltype=fcode,cnine::device=_dev);}, 
     py::arg("atoms"),py::arg("nc"),py::arg("fcode")=0,py::arg("device")=0)
 
+  .def("like",[](const Ptensors1b<float>& x, at::Tensor& M){
+      return Ptensors1b(x.atoms,ATview<float>(M));})
   .def("copy",[](const Ptensors1b<float>& x){return x.copy();})
   .def("copy",[](const Ptensors1b<float>& x, const int _dev){return x.copy(_dev);})
   .def("zeros_like",&Ptensors1b<float>::zeros_like)

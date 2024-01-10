@@ -42,6 +42,10 @@ class subgraphlayer0b(torch.Tensor):
         return Subgraphlayer0b_fromMxFn.apply(M,atoms)
             
     @classmethod
+    def like(self,x,M):
+        return SubgraphLayer0b_likeFn.apply(x,M)
+
+    @classmethod
     def zeros(self, _G, _nc, device='cpu'):
         R=subgraphlayer0b(1)
         R.obj=_subgraphlayer0b.create(_G.obj,_nc,0,device_id(device))
@@ -146,14 +150,22 @@ class subgraphlayer0b(torch.Tensor):
     def linmaps2(self,normalized=False):
         return Ptensorsb_Linmaps2Fn.apply(self);
 
-    def gather0(self,atoms):
-        return Ptensorsb_Gather0Fn.apply(self,atoms);
+    #def gather0(self,atoms):
+        #return Ptensorsb_Gather0Fn.apply(self,atoms);
 
-    def gather1(self,atoms):
-        return Ptensorsb_Gather1Fn.apply(self,atoms);
+    #def gather1(self,atoms):
+        #return Ptensorsb_Gather1Fn.apply(self,atoms);
 
-    def gather2(self,atoms):
-        return Ptensorsb_Gather2Fn.apply(self,atoms);
+    #def gather2(self,atoms):
+    #return Ptensorsb_Gather2Fn.apply(self,atoms);
+
+    @classmethod
+    def gather(self,x,S):
+        return Ptensorsb_Gather0Fn.apply(x,S)
+
+    @classmethod
+    def gather_from_ptensors(self,x,G,S):
+        return SubgraphLayer0b_GatherFromPtensorsbFn.apply(x,G,S)
 
 
     # ---- I/O ----------------------------------------------------------------------------------------------
@@ -188,6 +200,19 @@ class Subgraphlayer0b_fromMxFn(torch.autograd.Function):
     def backward(ctx,g):
         return ctx.r.get_grad().torch(), None
 
+
+class Subgraphlayer0b_likeFn(torch.autograd.Function):
+
+    @staticmethod
+    def forward(ctx,x,M):
+        r=subgraphlayer0b(1)
+        r.obj=_subgraph_layer0b.like(x.obj,M)
+        ctx.r=r.obj
+        return r
+
+    @staticmethod
+    def backward(ctx,g):
+        return ctx.r.get_grad().torch(), None
 
 
 class Subgraphlayer0b_catFn(torch.autograd.Function):
@@ -227,4 +252,21 @@ class Subgraphlayer0b_outerFn(torch.autograd.Function):
         ctx.x.outer_back0(ctx.r,ctx.y)
         ctx.y.outer_back0(ctx.r,ctxxy)
         return subgraphlayer0b.dummy(), subgraphlayer0b.dummy()
+
+
+class SubgraphLayer0b_GatherFromPtensorsbFn(torch.autograd.Function):
+
+    @staticmethod
+    def forward(ctx,x,G,S):
+        r=x.dummy()
+        r.obj=_subgraphlayer0b(x.obj,G.obj,S.obj)
+        ctx.x=x.obj
+        ctx.r=R.obj
+        return R
+
+    @staticmethod
+    def backward(ctx,g):
+        ctx.x.add_linmaps_back(ctx.r)
+        return ptensorsb.dummy()
+
 

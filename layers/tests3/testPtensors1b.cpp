@@ -38,19 +38,13 @@ int main(int argc, char** argv){
   AtomsPack yatoms=AtomsPack::random(4,0.5);
   cout<<X0<<endl;
   cout<<Ptens1::gather(X0,yatoms)<<endl;
-
-  cout<<X2<<endl;
-  Ptens2 C=Ptens2::cat({X2,X2});
-  cout<<Ltensor<float>(C)<<endl;
-  cout<<C<<endl;
-
-
-  exit(0);
-
   cout<<Ptens1::gather(X1,yatoms)<<endl;
   cout<<Ptens1::gather(X2,yatoms)<<endl;
 
 
+  //exit(0);
+  Ptens1 C=Ptens1::cat({X1,X1,X1});
+  cout<<C<<endl;
 
   //Ptensors1b<float> Ab(A);
   //cout<<Ab<<endl;

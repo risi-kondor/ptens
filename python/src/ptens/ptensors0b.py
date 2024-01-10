@@ -42,6 +42,10 @@ class ptensors0b(torch.Tensor):
         return Ptensors0b_fromMxFn.apply(M,atoms)
             
     @classmethod
+    def like(self,x,M):
+        return Ptensorsb_likeFn.apply(x,M)
+
+    @classmethod
     def zeros(self, _atoms, _nc, device='cpu'):
         R=ptensors0b(1)
         R.obj=_ptensors0b.create(_atoms,_nc,0,device_id(device))

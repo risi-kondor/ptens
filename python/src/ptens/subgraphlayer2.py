@@ -379,9 +379,6 @@ class Subgraph_layer2_mult_channelsFn(torch.autograd.Function):
 
 
 
-
-
-
 class SubgraphLayer2_GatherFn(torch.autograd.Function):
     @staticmethod
     def forward(ctx,x,S):

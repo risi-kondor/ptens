@@ -34,6 +34,10 @@ class subgraphlayer1b(torch.Tensor):
         return R
     
     @classmethod
+    def like(self,x,M):
+        return SubgraphLayer1b_likeFn.apply(x,M)
+
+    @classmethod
     def zeros(self, _G, _S, _nc, device='cpu'):
         R=subgraphlayer1b(1)
         R.obj=_subgraphlayer1b.create(_G.obj,_S.obj,_nc,0,device_id(device))
@@ -60,7 +64,7 @@ class subgraphlayer1b(torch.Tensor):
 
     @classmethod
     def gather(self,x,S):
-        return SubgraphLayer1b_GatherFn.apply(x,S)
+        return Ptensorsb_GatherFn.apply(x,S)
 
 
 
@@ -152,6 +156,14 @@ class subgraphlayer1b(torch.Tensor):
     #def gather2(self,atoms):
         #return Ptensorsb_Gather2Fn.apply(self,atoms);
 
+    @classmethod
+    def gather(self,x,S):
+        return Ptensorsb_Gather1Fn.apply(x,S)
+
+    @classmethod
+    def gather_from_ptensors(self,x,G,S):
+        return SubgraphLayer1b_GatherFromPtensorsbFn.apply(x,G,S)
+
 
     # ---- I/O ----------------------------------------------------------------------------------------------
 
@@ -170,6 +182,20 @@ class subgraphlayer1b(torch.Tensor):
 
 
 # ----- Transport and conversions ----------------------------------------------------------------------------
+
+
+class Subgraphlayer1b_likeFn(torch.autograd.Function):
+
+    @staticmethod
+    def forward(ctx,x,M):
+        r=subgraphlayer1b(1)
+        r.obj=_subgraph_layer1b.like(x.obj,M)
+        ctx.r=r.obj
+        return r
+
+    @staticmethod
+    def backward(ctx,g):
+        return ctx.r.get_grad().torch(), None
 
 
 class Subgraphlayer1b_catFn(torch.autograd.Function):
@@ -225,4 +251,21 @@ class SubgraphLayer1b_GatherFn(torch.autograd.Function):
     def backward(ctx,g):
         ctx.x.add_gather_back(ctx.r)
         return ptensorsb.dummy()
+
+
+class SubgraphLayer1b_GatherFromPtensorsbFn(torch.autograd.Function):
+
+    @staticmethod
+    def forward(ctx,x,G,S):
+        r=x.dummy()
+        r.obj=_subgraphlayer1b(x.obj,G.obj,S.obj)
+        ctx.x=x.obj
+        ctx.r=r.obj
+        return r
+
+    @staticmethod
+    def backward(ctx,g):
+        ctx.x.add_linmaps_back(ctx.r)
+        return ptensorsb.dummy()
+
 

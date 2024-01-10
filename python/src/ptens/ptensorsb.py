@@ -104,6 +104,18 @@ class ptensorsb(torch.Tensor):
 # ----- Transport and conversions ----------------------------------------------------------------------------
 
 
+class Ptensorsb_likeFn(torch.autograd.Function):
+    @staticmethod
+    def forward(ctx,x,M):
+        r=ptensorsb(1)
+        r.obj=x.obj.like(M)
+        ctx.r=r.obj
+        return r
+    @staticmethod
+    def backward(ctx,g):
+        return None, ctx.r.get_grad().torch()
+
+
 class Ptensorsb_toMxFn(torch.autograd.Function):
 
     @staticmethod
@@ -323,8 +335,8 @@ class Ptensorsb_Linmaps0Fn(torch.autograd.Function):
         r=x.dummy()
         r.obj=x.obj.linmaps0()
         ctx.x=x.obj
-        ctx.r=R.obj
-        return R
+        ctx.r=r.obj
+        return r
         
     @staticmethod
     def backward(ctx,g):
@@ -339,8 +351,8 @@ class Ptensorsb_Linmaps1Fn(torch.autograd.Function):
         r=x.dummy()
         r.obj=x.obj.linmaps1()
         ctx.x=x.obj
-        ctx.r=R.obj
-        return R
+        ctx.r=r.obj
+        return r
 
     @staticmethod
     def backward(ctx,g):
@@ -355,8 +367,8 @@ class Ptensorsb_Linmaps2Fn(torch.autograd.Function):
         r=x.dummy()
         r.obj=x.obj.linmaps2()
         ctx.x=x.obj
-        ctx.r=R.obj
-        return R
+        ctx.r=r.obj
+        return r
 
     @staticmethod
     def backward(ctx,g):
@@ -369,10 +381,10 @@ class Ptensorsb_Gather0Fn(torch.autograd.Function):
     @staticmethod
     def forward(ctx,x,atoms):
         r=x.dummy()
-        r.obj=x.obj.linmaps0(atoms)
+        r.obj=x.obj.gather0(atoms)
         ctx.x=x.obj
-        ctx.r=R.obj
-        return R
+        ctx.r=r.obj
+        return r
 
     @staticmethod
     def backward(ctx,g):
@@ -385,10 +397,10 @@ class Ptensorsb_Gather1Fn(torch.autograd.Function):
     @staticmethod
     def forward(ctx,x,atoms):
         r=x.dummy()
-        r.obj=x.obj.linmaps1(atoms)
+        r.obj=x.obj.gather1(atoms)
         ctx.x=x.obj
-        ctx.r=R.obj
-        return R
+        ctx.r=r.obj
+        return r
 
     @staticmethod
     def backward(ctx,g):
@@ -401,10 +413,10 @@ class Ptensorsb_Gather2Fn(torch.autograd.Function):
     @staticmethod
     def forward(ctx,x,atoms):
         r=x.dummy()
-        r.obj=x.obj.linmaps2(atoms)
+        r.obj=x.obj.gather2(atoms)
         ctx.x=x.obj
-        ctx.r=R.obj
-        return R
+        ctx.r=r.obj
+        return r
 
     @staticmethod
     def backward(ctx,g):

@@ -38,7 +38,13 @@ int main(int argc, char** argv){
   SubgraphLayer0b<float> f0(G,5,4);
   cout<<f0<<endl;
 
-  SubgraphLayer1b<float> f1(f0,edge);
-  cout<<f1<<endl;
+  SubgraphLayer1b<float> f1=gather1(f0,edge);
+  cout<<f1.str()<<endl;
 
+  Ltensor<float> W({5,5},filltype=4);
+  Ltensor<float> b({5},filltype=4);
+
+  auto f2=linear_sg(f1,W,b);
+  cout<<f2.str()<<endl;
+  
 }

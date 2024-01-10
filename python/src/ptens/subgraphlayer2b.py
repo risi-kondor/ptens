@@ -34,6 +34,10 @@ class subgraphlayer2b(torch.Tensor):
         return R
     
     @classmethod
+    def like(self,x,M):
+        return SubgraphLayer2b_likeFn.apply(x,M)
+
+    @classmethod
     def zeros(self, _G, _S, _nc, device='cpu'):
         R=subgraphlayer2b(1)
         R.obj=_subgraphlayer2b.create(_G.obj,_S.obj,_nc,0,device_id(device))
@@ -148,6 +152,15 @@ class subgraphlayer2b(torch.Tensor):
         return Ptensorsb_Gather2Fn.apply(self,atoms);
 
 
+    @classmethod
+    def gather(self,x,S):
+        return Ptensorsb_Gather2Fn.apply(x,S)
+
+    @classmethod
+    def gather_from_ptensors(self,x,G,S):
+        return SubgraphLayer2b_GatherFromPtensorsbFn.apply(x,G,S)
+
+
     # ---- I/O ----------------------------------------------------------------------------------------------
 
 
@@ -165,6 +178,20 @@ class subgraphlayer2b(torch.Tensor):
 
 
 # ----- Transport and conversions ----------------------------------------------------------------------------
+
+
+class Subgraphlayer2b_likeFn(torch.autograd.Function):
+
+    @staticmethod
+    def forward(ctx,x,M):
+        r=subgraphlayer2b(1)
+        r.obj=_subgraph_layer2b.like(x.obj,M)
+        ctx.r=r.obj
+        return r
+
+    @staticmethod
+    def backward(ctx,g):
+        return ctx.r.get_grad().torch(), None
 
 
 class Subgraphlayer2b_catFn(torch.autograd.Function):
@@ -204,4 +231,21 @@ class Subgraphlayer2b_outerFn(torch.autograd.Function):
         ctx.x.outer_back0(ctx.r,ctx.y)
         ctx.y.outer_back0(ctx.r,ctxxy)
         return subgraphlayer2b.dummy(), subgraphlayer2b.dummy()
+
+
+class SubgraphLayer2b_GatherFromPtensorsbFn(torch.autograd.Function):
+
+    @staticmethod
+    def forward(ctx,x,G,S):
+        r=x.dummy()
+        r.obj=_subgraphlayer2b(x.obj,G.obj,S.obj)
+        ctx.x=x.obj
+        ctx.r=R.obj
+        return R
+
+    @staticmethod
+    def backward(ctx,g):
+        ctx.x.add_linmaps_back(ctx.r)
+        return ptensorsb.dummy()
+
 

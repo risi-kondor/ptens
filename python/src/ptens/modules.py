@@ -125,7 +125,7 @@ class Linear(torch.nn.Module):
     # TODO: figure out why multiplication is broken.
     return linear(x,self.w,torch.zeros(self.w.size(1),device=self.w.device) if self.b is None else self.b)
 
-jclass LazyLinear(torch.nn.Module):
+class LazyLinear(torch.nn.Module):
   def __init__(self,out_channels: Optional[int] = None, bias: bool = True) -> None:
     r"""
     NOTE: if you do not initialize 'out_channels', it must be initialized before calling 'forward'.

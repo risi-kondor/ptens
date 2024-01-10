@@ -18,6 +18,8 @@
 #include "Ggraph.hpp"
 #include "Subgraph.hpp"
 #include "Ptensors0b.hpp"
+#include "Ptensors1b.hpp"
+#include "Ptensors2b.hpp"
 #include "SubgraphLayerb.hpp"
 
 
@@ -64,6 +66,9 @@ namespace ptens{
     SubgraphLayer0b(const Ggraph& _G, const Subgraph& _S, const BASE& x):
       BASE(x), G(_G), S(_S){}
 
+    SubgraphLayer0b(const Ggraph& _G, const Subgraph& _S, const AtomsPack0& atoms, const TENSOR& x):
+      BASE(atoms,x), G(_G), S(_S){}
+
     SubgraphLayer0b(const Ggraph& _G, const int nc, const int fcode=0, const int _dev=0):
       G(_G), S(Subgraph::trivial()), BASE(_G.getn(),nc,fcode,_dev){}
 
@@ -106,6 +111,22 @@ namespace ptens{
 
 
   public: // ---- Message passing between subgraph layers -----------------------------------------------------
+
+
+    SubgraphLayer0b(const Ptensors0b<TYPE>& x, const Ggraph& g, const Subgraph& s):
+      SubgraphLayer0b(g,s,g.subgraphs(s),x.get_nc(),0,x.dev){
+      add_gather(x);
+    }
+
+    SubgraphLayer0b(const Ptensors1b<TYPE>& x, const Ggraph& g, const Subgraph& s):
+      SubgraphLayer0b(g,s,g.subgraphs(s),x.get_nc(),0,x.dev){
+      add_gather(x);
+    }
+
+    SubgraphLayer0b(const Ptensors2b<TYPE>& x, const Ggraph& g, const Subgraph& s):
+      SubgraphLayer0b(g,s,g.subgraphs(s),2*x.get_nc(),0,x.dev){
+      add_gather(x);
+    }
 
 
     //SubgraphLayer0b(const SubgraphLayer0b<float>& x, const Subgraph& _S):
