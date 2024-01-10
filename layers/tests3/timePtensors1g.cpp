@@ -56,34 +56,35 @@ int main(int argc, char** argv){
 
   Ptens1 Y0=Ptens1::gather(X0,yatoms); 
   timed_block("Gather 1<-0 (CPU)",[&](){
-    for(int i=0; i<niter; i++) Y0.gather(X0);});
+    for(int i=0; i<niter; i++) Y0.add_gather(X0);});
 
 #ifdef _WITH_CUDA
   Ptens1 Y0g=Ptens1::gather(X0g,yatoms);
   timed_block("Gather 1<-0 (GPU)",[&](){
-      for(int i=0; i<niter; i++) Y0g.gather(X0g);});
+      for(int i=0; i<niter; i++) Y0g.add_gather(X0g);});
 #endif 
 
 
   Ptens1 Y1=Ptens1::gather(X1,yatoms); 
   timed_block("Gather 1<-1 (CPU)",[&](){
-      for(int i=0; i<niter; i++) Y1.gather(X1);});
+      for(int i=0; i<niter; i++) Y1.add_gather(X1);});
 
 #ifdef _WITH_CUDA
   Ptens1 Y1g=Ptens1::gather(X1g,yatoms);
   timed_block("Gather 1<-1 (GPU)",[&](){
-      for(int i=0; i<niter; i++) Y1g.gather(X1g);});
+      for(int i=0; i<niter; i++) Y1g.add_gather(X1g);});
 #endif 
 
+  exit(0);
 
   Ptens1 Y2=Ptens1::gather(X2,yatoms); 
   timed_block("Gather 1<-2 (CPU)",[&](){
-    for(int i=0; i<niter; i++) Y2.gather(X2);});
+    for(int i=0; i<niter; i++) Y2.add_gather(X2);});
 
 #ifdef _WITH_CUDA
   Ptens1 Y2g=Ptens1::gather(X2g,yatoms);
   timed_block("Gather 1<-2 (GPU)",[&](){
-      for(int i=0; i<niter; i++) Y2g.gather(X2g);});
+      for(int i=0; i<niter; i++) Y2g.add_gather(X2g);});
 #endif 
 
 
