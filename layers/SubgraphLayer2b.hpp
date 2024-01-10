@@ -91,7 +91,8 @@ namespace ptens{
     }
 
     static SubgraphLayer2b* new_zeros_like(const SubgraphLayer2b& x){
-      return new SubgraphLayer2b(x.G,x.S,x.TENSOR::zeros_like());
+      return new SubgraphLayer2b(x.zeros_like());
+      //return new SubgraphLayer2b(x.G,x.S,x.TENSOR::zeros_like());
     }
     
     SubgraphLayer2b(const SubgraphLayer2b& x, const int _dev):
