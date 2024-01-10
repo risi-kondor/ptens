@@ -33,7 +33,7 @@ int main(int argc, char** argv){
   cudaDeviceReset(); // why do we need this?
 #endif 
 
-  int N=200;
+  int N=100;
   int nc=256;
   int niter=1;
 
@@ -75,11 +75,10 @@ int main(int argc, char** argv){
       for(int i=0; i<niter; i++) Y1g.add_gather(X1g);});
 #endif 
 
-  exit(0);
 
   Ptens1 Y2=Ptens1::gather(X2,yatoms); 
   timed_block("Gather 1<-2 (CPU)",[&](){
-    for(int i=0; i<niter; i++) Y2.add_gather(X2);});
+      for(int i=0; i<niter; i++) Y2.add_gather(X2);});
 
 #ifdef _WITH_CUDA
   Ptens1 Y2g=Ptens1::gather(X2g,yatoms);
