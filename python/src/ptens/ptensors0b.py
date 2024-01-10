@@ -64,7 +64,7 @@ class ptensors0b(torch.Tensor):
     
     @classmethod
     def cat(self,*args):
-        return Ptensors0b_catFn.apply(self,*args)
+        return Ptensorsb_catFn.apply(self,*args)
 
 
     # ----- Access -------------------------------------------------------------------------------------------

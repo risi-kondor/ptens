@@ -69,6 +69,10 @@ namespace ptens{
     Ptensors2b(const TENSOR& M):
       BASE(M.copy()){} // for diff_class
 
+    Ptensors2b(const AtomsPack2& _atoms, const TENSOR& M):
+      BASE(M.copy()),
+      atoms(_atoms){}
+
     Ptensors2b(const AtomsPack& _atoms, const TENSOR& M):
       BASE(M.copy()),
       atoms(_atoms){}
@@ -80,6 +84,13 @@ namespace ptens{
     Ptensors2b(const AtomsPack& _atoms, const int nc, const int fcode, const int _dev):
       BASE(cnine::Gdims(_atoms.tsize2(),nc),fcode,_dev),
       atoms(_atoms){}
+
+    static Ptensors2b cat(const vector<Ptensors2b>& list){
+      vector<AtomsPack2> v;
+      for(auto& p:list)
+	v.push_back(p.atoms);
+      return Ptensors2b(AtomsPack2::cat(v),cnine::Ltensor<TYPE>::stack(0,list));
+    }
 
 
   public: // ---- Named parameter constructors ---------------------------------------------------------------
@@ -515,6 +526,7 @@ namespace ptens{
       }
       ostringstream oss;
       for(int i=0; i<size(); i++){
+	cout<<atoms_of(i)<<endl;
 	oss<<indent<<(*this)(i)<<endl;
       }
       return oss.str();

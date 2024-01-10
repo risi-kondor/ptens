@@ -69,7 +69,11 @@ namespace ptens{
     Ptensors1b(){}
 
     Ptensors1b(const TENSOR& M):
-      BASE(M.copy()){} // for diff_class
+      BASE(M.copy()){} // for diff_class, unsafe!!
+
+    Ptensors1b(const AtomsPack1& _atoms, const TENSOR& M):
+      BASE(M.copy()),
+      atoms(_atoms){}
 
     Ptensors1b(const AtomsPack& _atoms, const TENSOR& M):
       BASE(M.copy()),
@@ -82,6 +86,13 @@ namespace ptens{
     Ptensors1b(const AtomsPack& _atoms, const int nc, const int fcode, const int _dev):
       BASE(cnine::Gdims(_atoms.tsize1(),nc),fcode,_dev),
       atoms(_atoms){}
+
+    static Ptensors1b cat(const vector<Ptensors1b>& list){
+      vector<AtomsPack1> v;
+      for(auto& p:list)
+	v.push_back(p.atoms);
+      return Ptensors1b(AtomsPack1::cat(v),cnine::Ltensor<TYPE>::stack(0,list));
+    }
 
 
   public: // ---- Named parameter constructors ---------------------------------------------------------------

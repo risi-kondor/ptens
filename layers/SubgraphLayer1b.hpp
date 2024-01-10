@@ -67,6 +67,12 @@ namespace ptens{
     SubgraphLayer1b(const SubgraphLayer1b& x, const int _dev):
       SubgraphLayer1b(x.G,x.S,BASE(x,_dev)){}
 
+    static SubgraphLayer1b cat(const vector<SubgraphLayer1b>& list){
+      vector<AtomsPack1> v;
+      for(auto& p:list)
+	v.push_back(p.atoms);
+      return SubgraphLayer1b(AtomsPack1::cat(v),cnine::Ltensor<TYPE>::stack(0,list));
+    }
 
   public: // ----- Spawning ----------------------------------------------------------------------------------
 

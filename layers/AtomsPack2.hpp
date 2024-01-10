@@ -36,8 +36,18 @@ namespace ptens{
     AtomsPack2(const AtomsPack& _atoms):
       obj(new AtomsPack2obj<int>(_atoms)){}
 
+    AtomsPack2(shared_ptr<AtomsPack2obj<int> >& _obj):
+      obj(_obj){}
+
     AtomsPack2(const initializer_list<initializer_list<int> >& x):
       obj(new AtomsPack2obj<int>(x)){}
+
+    static AtomsPack2 cat(const vector<AtomsPack2>& list){
+      cnine::plist<AtomsPackObjBase*> v;
+      for(int i=0; i<list.size()-1; i++)
+	v.push_back(list[i+1].obj.get());
+      return list[0].obj->cat_maps(v);
+    }
 
 
   public: // ---- Maps ---------------------------------------------------------------------------------------

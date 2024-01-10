@@ -25,6 +25,7 @@ pybind11::class_<SGlayer1b,Ptensors1b<float> >(m,"subgraphlayer1b")
 
   .def("cat_channels",[](const SGlayer1b& x, const SGlayer1b& y){
       return cat_channels_sg(x,y);})
+  .def("cat",&SGlayer1b::cat)
   .def("scale_channels",[](SGlayer1b& x, at::Tensor& y){
       return scale_channels_sg(x,ATview<float>(y));})
   .def("mprod",[](const SGlayer1b& x, at::Tensor& M){

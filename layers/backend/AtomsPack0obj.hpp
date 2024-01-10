@@ -69,10 +69,14 @@ namespace ptens{
   public: // ---- Concatenation -----------------------------------------------------------------------------
 
 
-    AtomsPackObjBase* cat_with(const vector<AtomsPackObjBase*>& list){
+    typedef cnine::plist_indexed_object_bank<AtomsPackObjBase,shared_ptr<AtomsPack0obj<int> > > CAT_MAPS; 
+    CAT_MAPS cat_maps=CAT_MAPS([this](const vector<AtomsPackObjBase*>& v)
+      {return shared_ptr<AtomsPack0obj<int> >(cat_with(v));});
+
+    AtomsPack0obj<int>* cat_with(const vector<AtomsPackObjBase*>& list){
       cnine::plist<AtomsPackObj*> v;
       for(auto p:list) v.push_back(p->atoms.get());
-      return new AtomsPack0obj(atoms->cat_maps(v));
+      return new AtomsPack0obj<int>(atoms->cat_maps(v));
     }
 
 

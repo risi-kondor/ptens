@@ -23,7 +23,7 @@ pybind11::class_<SGlayer0,Ptensors0>(m,"subgraph_layer0")
 // ---- Conversions, transport, etc. ------------------------------------------------------------------------
 
 
-  .def("get_grad",&SGlayer0::get_grad)
+  .def("get_grad",[](SGlayer0& x){return x.get_grad();})
   .def("get_gradp",&SGlayer0::get_gradp)
   .def("gradp",&SGlayer0::get_gradp)
   .def("add_to_grad",[](SGlayer0& x, const cnine::loose_ptr<Ptensors0>& y){x.add_to_grad(y);})

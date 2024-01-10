@@ -63,6 +63,13 @@ namespace ptens{
     SubgraphLayer2b(const Ggraph& _G, const Subgraph& _S, const AtomsPack& _atoms, const int nc, const int fcode, const int _dev=0):
       G(_G), S(_S), BASE(_atoms,nc,fcode,_dev){}
 
+    static SubgraphLayer2b cat(const vector<SubgraphLayer2b>& list){
+      vector<AtomsPack2> v;
+      for(auto& p:list)
+	v.push_back(p.atoms);
+      return SubgraphLayer2b(AtomsPack2::cat(v),cnine::Ltensor<TYPE>::stack(0,list));
+    }
+
 
   public: // ----- Spawning ----------------------------------------------------------------------------------
 

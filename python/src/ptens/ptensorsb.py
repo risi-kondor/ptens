@@ -175,6 +175,27 @@ class Ptensorsb_cat_channelsFn(torch.autograd.Function):
         return ptensorsb.dummy(),ptensorsb.dummy()
 
 
+class Ptensorsb_catFn(torch.autograd.Function):
+    
+    @staticmethod
+    def forward(ctx,dummy,*args):
+        r=args[0].dummy()
+        ctx.args=[x.obj for x in args]
+        r.obj=args[0].obj.cat(ctx.args)
+        ctx.r=r.obj
+        return r
+
+    @staticmethod
+    def backward(ctx,g):
+        offs=0
+        dummies=[]
+        for x in ctx.args:
+            x.add_cat_back(ctx.r,offs)
+            offs=offs+len(x)
+            dummies.append(ptensorsb(1))
+        return None, *dummies
+
+
 class Ptensorsb_mprodFn(torch.autograd.Function):
     
     @staticmethod

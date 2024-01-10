@@ -57,7 +57,7 @@ pybind11::class_<Ptensors0/*,cnine::RtensorPack*/>(m,"ptensors0")
   .def("add_to_grad",[](Ptensors0& x, const cnine::loose_ptr<Ptensors0>& y){x.add_to_grad(y);})
 //  .def("add_to_gradp",[](Ptensors0& x, const cnine::loose_ptr<Ptensors0>& y){x.add_to_grad(y);})
 //.def("add_to_grad",&Ptensors0::add_to_grad)
-  .def("get_grad",&Ptensors0::get_grad)
+  .def("get_grad",[](Ptensors0& x){return x.get_grad();})
   .def("get_gradp",&Ptensors0::get_gradp)
   .def("gradp",&Ptensors0::get_gradp)
 

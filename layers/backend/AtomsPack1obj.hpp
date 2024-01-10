@@ -32,19 +32,24 @@ namespace ptens{
 
 
   template<typename DUMMY>
-  class AtomsPack1obj: public AtomsPackObjBase{
+  class AtomsPack1obj: public AtomsPackObjBase{ //, public cnine::observable<AtomsPack1obj<DUMMY> >{
+
   public:
 
+    //typedef cnine::observable<AtomsPack1obj<DUMMY> > OBSERVABLE;
     typedef cnine::Gdims Gdims;
 
 
     AtomsPack1obj(const AtomsPack& _atoms):
+      //OBSERVABLE(this),
       AtomsPackObjBase(_atoms.obj){}
 
     AtomsPack1obj(const shared_ptr<AtomsPackObj>& _atoms):
+      //OBSERVABLE(this),
       AtomsPackObjBase(_atoms){}
 
     AtomsPack1obj(const initializer_list<initializer_list<int> >& x):
+
       AtomsPack1obj(cnine::to_share(new AtomsPackObj(x))){}
 
 
@@ -71,10 +76,14 @@ namespace ptens{
   public: // ---- Concatenation -----------------------------------------------------------------------------
 
 
-    AtomsPackObjBase* cat_with(const vector<AtomsPackObjBase*>& list){
+    typedef cnine::plist_indexed_object_bank<AtomsPackObjBase,shared_ptr<AtomsPack1obj<int> > > CAT_MAPS; 
+    CAT_MAPS cat_maps=CAT_MAPS([this](const vector<AtomsPackObjBase*>& v)
+      {return shared_ptr<AtomsPack1obj<int> >(cat_with(v));});
+
+    AtomsPack1obj<int>* cat_with(const vector<AtomsPackObjBase*>& list){
       cnine::plist<AtomsPackObj*> v;
       for(auto p:list) v.push_back(p->atoms.get());
-      return new AtomsPack1obj(atoms->cat_maps(v));
+      return new AtomsPack1obj<int>(atoms->cat_maps(v));
     }
 
 
