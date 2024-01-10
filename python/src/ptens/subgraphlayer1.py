@@ -69,7 +69,7 @@ class subgraphlayer1(subgraphlayer):
 
     @classmethod
     def gather(self,x,S):
-        return Ptensorsb_Gather1Fn.apply(x,S)
+        return SubgraphLayer1_GatherFn.apply(x,S)
 
     @classmethod
     def gather_from_ptensors(self,x,G,S):
