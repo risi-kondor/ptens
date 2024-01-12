@@ -1111,7 +1111,7 @@ namespace ptens{
     const_cast<AindexPack&>(list).to_device(1);
     const int nthrd=cnine::roundup(std::max(n,list.max_nix()+1),32);
     Ptensors2_reduce0_kernel<<<R.size(),nthrd,(list.max_nix()+1)*4,stream>>>
-      (R.arrg,R.dir.garr(dev),x.arrg+offs,x.dir.garr(dev),list.arrg,list.dir.garr(dev),n);
+      (R.arrg,R.dir.garr(dev),x.arrg+offs,x.dir.garr(dev),list.get_arrg(),list.dir.garr(dev),n);
   }
 
   void Ptensors2_reduce0n_cu(cnine::RtensorPackB& R, const cnine::RtensorPackB& x, const AindexPack& list, 
@@ -1122,7 +1122,7 @@ namespace ptens{
     const_cast<AindexPack&>(list).to_device(1);
     const int nthrd=cnine::roundup(std::max(n,list.max_nix()+1),32);
     Ptensors2_reduce0n_kernel<<<R.size(),nthrd,(list.max_nix()+1)*4,stream>>>
-      (R.arrg,R.dir.garr(dev),x.arrg+offs,x.dir.garr(dev),list.arrg,list.dir.garr(dev),n);
+      (R.arrg,R.dir.garr(dev),x.arrg+offs,x.dir.garr(dev),list.get_arrg(),list.dir.garr(dev),n);
   }
 
   void Ptensors2_reduce0B_cu(cnine::RtensorPackB& R, const cnine::RtensorPackB& x, const AindexPack& list, 
@@ -1133,7 +1133,7 @@ namespace ptens{
     const_cast<AindexPack&>(list).to_device(1);
     const int nthrd=cnine::roundup(std::max(n,list.max_nix()+1),32);
     Ptensors2_reduce0B_kernel<<<R.size(),nthrd,(list.max_nix()+1)*4,stream>>>
-      (R.arrg,R.dir.garr(dev),x.arrg+offs,x.dir.garr(dev),list.arrg,list.dir.garr(dev),n);
+      (R.arrg,R.dir.garr(dev),x.arrg+offs,x.dir.garr(dev),list.get_arrg(),list.dir.garr(dev),n);
   }
 
 
@@ -1170,7 +1170,7 @@ namespace ptens{
     const_cast<AindexPack&>(list).to_device(1);
     const int nthrd=cnine::roundup(std::max(n,list.max_nix()+1),32);
     Ptensors2_reduce1_kernel<<<R.size(),nthrd,(list.max_nix()+1)*4,stream>>>
-      (R.arrg,R.dir.garr(dev),x.arrg+offs,x.dir.garr(dev),list.arrg,list.dir.garr(dev),n);
+      (R.arrg,R.dir.garr(dev),x.arrg+offs,x.dir.garr(dev),list.get_arrg(),list.dir.garr(dev),n);
   }
 
   void Ptensors2_reduce1n_cu(cnine::RtensorPackB& R, const cnine::RtensorPackB& x, const AindexPack& list, 
@@ -1181,7 +1181,7 @@ namespace ptens{
     const_cast<AindexPack&>(list).to_device(1);
     const int nthrd=cnine::roundup(std::max(n,list.max_nix()+1),32);
     Ptensors2_reduce1n_kernel<<<R.size(),nthrd,(list.max_nix()+1)*4,stream>>>
-      (R.arrg,R.dir.garr(dev),x.arrg+offs,x.dir.garr(dev),list.arrg,list.dir.garr(dev),n);
+      (R.arrg,R.dir.garr(dev),x.arrg+offs,x.dir.garr(dev),list.get_arrg(),list.dir.garr(dev),n);
   }
 
   void Ptensors2_reduce1B_cu(cnine::RtensorPackB& R, const cnine::RtensorPackB& x, const AindexPack& list, 
@@ -1192,7 +1192,7 @@ namespace ptens{
     const_cast<AindexPack&>(list).to_device(1);
     const int nthrd=cnine::roundup(std::max(n,list.max_nix()+1),32);
     Ptensors2_reduce1B_kernel<<<R.size(),nthrd,(list.max_nix()+1)*4,stream>>>
-      (R.arrg,R.dir.garr(dev),x.arrg+offs,x.dir.garr(dev),list.arrg,list.dir.garr(dev),n);
+      (R.arrg,R.dir.garr(dev),x.arrg+offs,x.dir.garr(dev),list.get_arrg(),list.dir.garr(dev),n);
   }
 
 
@@ -1219,7 +1219,7 @@ namespace ptens{
     const_cast<AindexPack&>(list).to_device(1);
     const int nthrd=cnine::roundup(std::max(n,list.max_nix()+1),32);
     Ptensors2_reduce2_kernel<<<R.size(),nthrd,(list.max_nix()+1)*4,stream>>>
-      (R.arrg,R.dir.garr(dev),x.arrg+offs,x.dir.garr(dev),list.arrg,list.dir.garr(dev),n);
+      (R.arrg,R.dir.garr(dev),x.arrg+offs,x.dir.garr(dev),list.get_arrg(),list.dir.garr(dev),n);
   }
 
   void Ptensors2_reduce2B_cu(cnine::RtensorPackB& R, const cnine::RtensorPackB& x, const AindexPack& list, 
@@ -1230,7 +1230,7 @@ namespace ptens{
     const_cast<AindexPack&>(list).to_device(1);
     const int nthrd=cnine::roundup(std::max(n,list.max_nix()+1),32);
     Ptensors2_reduce2B_kernel<<<R.size(),nthrd,(list.max_nix()+1)*4,stream>>>
-      (R.arrg,R.dir.garr(dev),x.arrg+offs,x.dir.garr(dev),list.arrg,list.dir.garr(dev),n);
+      (R.arrg,R.dir.garr(dev),x.arrg+offs,x.dir.garr(dev),list.get_arrg(),list.dir.garr(dev),n);
   }
 
 
@@ -1270,7 +1270,7 @@ namespace ptens{
     const_cast<AindexPack&>(list).to_device(1);
     int n=cnine::roundup(std::max(R.nc,list.max_nix()+1),32);
     Ptensors2_broadcast0_kernel<<<list.get_bmap().n,n,(list.max_nix()+1)*4,stream>>>
-      (x.arrg+offs,x.dir.garr(dev),list.arrg,list.dir.garr(dev),R.arrg,R.dir.garr(dev),list.get_barr(1));
+      (x.arrg+offs,x.dir.garr(dev),list.get_arrg(),list.dir.garr(dev),R.arrg,R.dir.garr(dev),list.get_barr(1));
   }
 
   void Ptensors2_broadcast0B_cu(cnine::RtensorPackB& x, const cnine::RtensorPackB& R, const AindexPack& list, 
@@ -1281,7 +1281,7 @@ namespace ptens{
     const_cast<AindexPack&>(list).to_device(1);
     int n=cnine::roundup(std::max(R.nc,list.max_nix()+1),32); // should be x.nc??
     Ptensors2_broadcast0B_kernel<<<list.get_bmap().n,n,(list.max_nix()+1)*4,stream>>>
-      (x.arrg+offs,x.dir.garr(dev),list.arrg,list.dir.garr(dev),R.arrg,R.dir.garr(dev),list.get_barr(1));
+      (x.arrg+offs,x.dir.garr(dev),list.get_arrg(),list.dir.garr(dev),R.arrg,R.dir.garr(dev),list.get_barr(1));
   }
 
   void Ptensors2_broadcast0Bn_cu(cnine::RtensorPackB& x, const cnine::RtensorPackB& R, const AindexPack& list, 
@@ -1292,7 +1292,7 @@ namespace ptens{
     const_cast<AindexPack&>(list).to_device(1);
     int n=cnine::roundup(std::max(R.nc,list.max_nix()+1),32); // should be x.nc??
     Ptensors2_broadcast0Bn_kernel<<<list.get_bmap().n,n,(list.max_nix()+1)*4,stream>>>
-      (x.arrg+offs,x.dir.garr(dev),list.arrg,list.dir.garr(dev),R.arrg,R.dir.garr(dev),list.get_barr(1));
+      (x.arrg+offs,x.dir.garr(dev),list.get_arrg(),list.dir.garr(dev),R.arrg,R.dir.garr(dev),list.get_barr(1));
   }
 
 
@@ -1332,7 +1332,7 @@ namespace ptens{
     const_cast<AindexPack&>(list).to_device(1);
     int n=cnine::roundup(std::max(R.nc,list.max_nix()+1),32); // change dim_of?
     Ptensors2_broadcast1_kernel<<<list.get_bmap().n,n,(list.max_nix()+1)*4,stream>>>
-      (x.arrg+offs,x.dir.garr(dev),list.arrg,list.dir.garr(dev),R.arrg,R.dir.garr(dev),list.get_barr(1));
+      (x.arrg+offs,x.dir.garr(dev),list.get_arrg(),list.dir.garr(dev),R.arrg,R.dir.garr(dev),list.get_barr(1));
   }
 
   void Ptensors2_broadcast1B_cu(cnine::RtensorPackB& x, const cnine::RtensorPackB& R, const AindexPack& list, 
@@ -1343,7 +1343,7 @@ namespace ptens{
     const_cast<AindexPack&>(list).to_device(1);
     int n=cnine::roundup(std::max(R.nc,list.max_nix()+1),32);
     Ptensors2_broadcast1B_kernel<<<list.get_bmap().n,n,(list.max_nix()+1)*4,stream>>>
-      (x.arrg+offs,x.dir.garr(dev),list.arrg,list.dir.garr(dev),R.arrg,R.dir.garr(dev),list.get_barr(1));
+      (x.arrg+offs,x.dir.garr(dev),list.get_arrg(),list.dir.garr(dev),R.arrg,R.dir.garr(dev),list.get_barr(1));
   }
 
   void Ptensors2_broadcast1Bn_cu(cnine::RtensorPackB& x, const cnine::RtensorPackB& R, const AindexPack& list, 
@@ -1354,7 +1354,7 @@ namespace ptens{
     const_cast<AindexPack&>(list).to_device(1);
     int n=cnine::roundup(std::max(R.nc,list.max_nix()+1),32);
     Ptensors2_broadcast1Bn_kernel<<<list.get_bmap().n,n,(list.max_nix()+1)*4,stream>>>
-      (x.arrg+offs,x.dir.garr(dev),list.arrg,list.dir.garr(dev),R.arrg,R.dir.garr(dev),list.get_barr(1));
+      (x.arrg+offs,x.dir.garr(dev),list.get_arrg(),list.dir.garr(dev),R.arrg,R.dir.garr(dev),list.get_barr(1));
   }
 
 
@@ -1386,7 +1386,7 @@ namespace ptens{
     const_cast<AindexPack&>(list).to_device(1);
     int n=cnine::roundup(std::max(R.nc,list.max_nix()+1),32);
     Ptensors2_broadcast2_kernel<<<list.get_bmap().n,n,(list.max_nix()+1)*4,stream>>>
-      (x.arrg+offs,x.dir.garr(dev),list.arrg,list.dir.garr(dev),R.arrg,R.dir.garr(dev),list.get_barr(1));
+      (x.arrg+offs,x.dir.garr(dev),list.get_arrg(),list.dir.garr(dev),R.arrg,R.dir.garr(dev),list.get_barr(1));
   }
 
   void Ptensors2_broadcast2B_cu(cnine::RtensorPackB& x, const cnine::RtensorPackB& R, const AindexPack& list, 
@@ -1397,7 +1397,7 @@ namespace ptens{
     const_cast<AindexPack&>(list).to_device(1);
     int n=cnine::roundup(std::max(R.nc,list.max_nix()+1),32);
     Ptensors2_broadcast2B_kernel<<<list.get_bmap().n,n,(list.max_nix()+1)*4,stream>>>
-      (x.arrg+offs,x.dir.garr(dev),list.arrg,list.dir.garr(dev),R.arrg,R.dir.garr(dev),list.get_barr(1));
+      (x.arrg+offs,x.dir.garr(dev),list.get_arrg(),list.dir.garr(dev),R.arrg,R.dir.garr(dev),list.get_barr(1));
   }
 
 

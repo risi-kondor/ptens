@@ -144,7 +144,7 @@ namespace ptens{
     PTENS_ASSRT(x.dev==1);
     const_cast<AindexPack&>(list).to_device(1);
     if(R.size()==0) return;
-    Ptensors0_reduce0_kernel<<<R.size(),n,0,stream>>>(R.arrg,R.dir.garr(dev),x.arrg+offs,x.dir.garr(dev),list.arrg,list.dir.garr(dev),n);
+    Ptensors0_reduce0_kernel<<<R.size(),n,0,stream>>>(R.arrg,R.dir.garr(dev),x.arrg+offs,x.dir.garr(dev),list.get_arrg(),list.dir.garr(dev),n);
   }
 
   void Ptensors0_broadcast0_cu(cnine::RtensorPackB& x, const cnine::RtensorPackB& R, const int offs, const cudaStream_t& stream){
@@ -163,7 +163,7 @@ namespace ptens{
     if(list.get_bmap().n==0) return;
     const_cast<AindexPack&>(list).to_device(1);
     Ptensors0_broadcast0_kernel<<<list.get_bmap().n,R.nc,0,stream>>>
-      (x.arrg+offs,x.dir.garr(dev),list.arrg,list.dir.garr(dev),R.arrg,R.dir.garr(dev),list.get_barr(1));
+      (x.arrg+offs,x.dir.garr(dev),list.get_arrg(),list.dir.garr(dev),R.arrg,R.dir.garr(dev),list.get_barr(1));
   }
 
   void Ptensors0_gather_cu(cnine::RtensorPackB& r, const cnine::RtensorPackB& x, const cnine::CSRmatrix<float>& gmap, const cudaStream_t& stream){
