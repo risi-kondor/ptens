@@ -40,16 +40,16 @@ namespace ptens{
     typedef cnine::Gdims Gdims;
 
 
+    ~AtomsPack1obj(){
+    }
+
     AtomsPack1obj(const AtomsPack& _atoms):
-      //OBSERVABLE(this),
       AtomsPackObjBase(_atoms.obj){}
 
     AtomsPack1obj(const shared_ptr<AtomsPackObj>& _atoms):
-      //OBSERVABLE(this),
       AtomsPackObjBase(_atoms){}
 
     AtomsPack1obj(const initializer_list<initializer_list<int> >& x):
-
       AtomsPack1obj(cnine::to_share(new AtomsPackObj(x))){}
 
 
@@ -126,8 +126,9 @@ namespace ptens{
 	int in_tensor=in_lists.head(m);
 	int out_tensor=out_lists.head(m);
 	int k=in_lists.size_of(m);
-	for(int j=0; j<k; j++)
+	for(int j=0; j<k; j++){
 	  direct.push_back(2*index_of(out_tensor,out_lists(m,j))+1,y.index_of(in_tensor,in_lists(m,j)));
+	}
       }
 
       cnine::GatherMapProgram R;

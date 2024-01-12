@@ -25,13 +25,6 @@
 
 namespace ptens{
 
-  //template<typename TYPE> class SubgraphLayer0b;
-  //template<typename TYPE> class SubgraphLayer1b;
-  //template<typename TYPE> class SubgraphLayer2b;
-
-  //template<typename TYPE> inline SubgraphLayer0b<TYPE> gather0(const SubgraphLayer1b<TYPE>& x, const Subgraph& _S);
-  //template<typename TYPE> inline SubgraphLayer0b<TYPE> gather0(const SubgraphLayer2b<TYPE>& x, const Subgraph& _S);
-
 
   template<typename TYPE> 
   class SubgraphLayer0b: public Ptensors0b<TYPE>{
@@ -43,15 +36,6 @@ namespace ptens{
     using BASE::BASE;
     using BASE::atoms;
     using BASE::add_gather;
-    //using BASE::G;
-    //using BASE::S;
-    //using TLAYER::dev;
-    //using TLAYER::getn;
-    //using TLAYER::get_nc;
-    //using TLAYER::get_grad;
-    //using TLAYER::tensor;
-    //using TLAYER::inp;
-    //using TLAYER::diff2;
 
     const Ggraph G;
     const Subgraph S;
@@ -113,33 +97,24 @@ namespace ptens{
   public: // ---- Message passing between subgraph layers -----------------------------------------------------
 
 
-    SubgraphLayer0b(const Ptensors0b<TYPE>& x, const Ggraph& g, const Subgraph& s):
-      SubgraphLayer0b(g,s,g.subgraphs(s),x.get_nc(),0,x.dev){
+    template<typename SOURCE>
+    static SubgraphLayer0b linmaps(const SOURCE& x){
+      SubgraphLayer0b R(x.get_atoms(),x.get_nc()*vector<int>({1,1,2})[x.getk()],x.get_dev());
+      R.add_linmaps(x);
+      return R;
+    }
+
+    template<typename SOURCE>
+    SubgraphLayer0b(const SOURCE& x, const Subgraph& _S){
+      SubgraphLayer0b(x.G,_S,x.G.subgraphs(_S),x.get_nc()*vector<int>({1,1,2})[x.getk()],0,x.dev);
       add_gather(x);
     }
 
-    SubgraphLayer0b(const Ptensors1b<TYPE>& x, const Ggraph& g, const Subgraph& s):
-      SubgraphLayer0b(g,s,g.subgraphs(s),x.get_nc(),0,x.dev){
+    template<typename SOURCE>
+    SubgraphLayer0b(const SOURCE& x, const Ggraph& _G, const Subgraph& _S){
+      SubgraphLayer0b(_G,_S,_G.subgraphs(_S),x.get_nc()*vector<int>({1,1,2})[x.getk()],0,x.dev);
       add_gather(x);
     }
-
-    SubgraphLayer0b(const Ptensors2b<TYPE>& x, const Ggraph& g, const Subgraph& s):
-      SubgraphLayer0b(g,s,g.subgraphs(s),2*x.get_nc(),0,x.dev){
-      add_gather(x);
-    }
-
-
-    //SubgraphLayer0b(const SubgraphLayer0b<float>& x, const Subgraph& _S):
-    //SubgraphLayer0b(x.G,_S,x.G.subgraphs(_S),x.get_nc(),0,x.dev){
-    //add_gather(x);
-    //}
-
-    //SubgraphLayer0b(const SubgraphLayer1b<float>& x, const Subgraph& _S):
-    //SubgraphLayer0b(gather0<TYPE>(x,_S)){}
-
-    //SubgraphLayer0b(const SubgraphLayer2b<TYPE>& x, const Subgraph& _S):
-    //SubgraphLayer0b(gather0<TYPE>(x,_S)){}
-
 
   };
 
@@ -180,3 +155,37 @@ namespace ptens{
     return R;
   }
   */
+    //template<typename SOURCE>
+    //static SubgraphLayer0b<float> gather(const SOURCE& x, const Subgraph& _S){
+    //int nc=x.get_nc()*vector<int>({1,1,2})[x.getk()];
+    //SubgraphLayer0b<float> R(x.G,_S,x.G.subgraphs(_S),nc,0,x.dev);
+    //R.add_gather(x);
+    //return R;
+    //}
+
+    //SubgraphLayer0b(const Ptensors0b<TYPE>& x, const Ggraph& g, const Subgraph& s):
+    //SubgraphLayer0b(g,s,g.subgraphs(s),x.get_nc(),0,x.dev){
+    //add_gather(x);
+    //}
+
+    //SubgraphLayer0b(const Ptensors1b<TYPE>& x, const Ggraph& g, const Subgraph& s):
+    //SubgraphLayer0b(g,s,g.subgraphs(s),x.get_nc(),0,x.dev){
+    //add_gather(x);
+    //}
+
+    //SubgraphLayer0b(const Ptensors2b<TYPE>& x, const Ggraph& g, const Subgraph& s):
+    //SubgraphLayer0b(g,s,g.subgraphs(s),2*x.get_nc(),0,x.dev){
+    //add_gather(x);
+    //}
+
+
+    //SubgraphLayer0b(const SubgraphLayer0b<float>& x, const Subgraph& _S):
+    //SubgraphLayer0b(x.G,_S,x.G.subgraphs(_S),x.get_nc(),0,x.dev){
+    //add_gather(x);
+    //}
+
+    //SubgraphLayer0b(const SubgraphLayer1b<float>& x, const Subgraph& _S):
+    //SubgraphLayer0b(gather0<TYPE>(x,_S)){}
+
+    //SubgraphLayer0b(const SubgraphLayer2b<TYPE>& x, const Subgraph& _S):
+    //SubgraphLayer0b(gather0<TYPE>(x,_S)){}

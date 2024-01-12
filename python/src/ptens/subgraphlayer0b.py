@@ -160,6 +160,10 @@ class subgraphlayer0b(torch.Tensor):
     #return Ptensorsb_Gather2Fn.apply(self,atoms);
 
     @classmethod
+    def linmaps(self,x):
+        return Ptensorsb_Linmaps0Fn.apply(x)
+
+    @classmethod
     def gather(self,x,S):
         return Ptensorsb_Gather0Fn.apply(x,S)
 

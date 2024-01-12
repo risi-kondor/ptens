@@ -42,17 +42,25 @@ pybind11::class_<SGlayer1b,Ptensors1b<float> >(m,"subgraphlayer1b")
 // ---- Message passing --------------------------------------------------------------------------------------
 
 
-  .def("linmaps0",[](const SGlayer1b& x){return sglinmaps0(x);})
-  .def("linmaps1",[](const SGlayer1b& x){return sglinmaps1(x);})
-  .def("linmaps2",[](const SGlayer1b& x){return sglinmaps2(x);})
+  .def_static("linmaps",[](const SGlayer0b& x){return SGlayer1b::linmaps(x);}) 
+  .def_static("linmaps",[](const SGlayer1b& x){return SGlayer1b::linmaps(x);}) 
+  .def_static("linmaps",[](const SGlayer2b& x){return SGlayer1b::linmaps(x);}) 
+
+  .def(pybind11::init<const SGlayer0b&, const Subgraph&>())
+  .def(pybind11::init<const SGlayer1b&, const Subgraph&>())
+  .def(pybind11::init<const SGlayer2b&, const Subgraph&>())
 
   .def(pybind11::init<const Ptensors0b<float>&, const Ggraph&, const Subgraph&>())
   .def(pybind11::init<const Ptensors1b<float>&, const Ggraph&, const Subgraph&>())
   .def(pybind11::init<const Ptensors2b<float>&, const Ggraph&, const Subgraph&>())
 
-  .def_static("gather",[](const SGlayer0b& x, const Subgraph& a){return gather1(x,a);})
-  .def_static("gather",[](const SGlayer1b& x, const Subgraph& a){return gather1(x,a);})
-  .def_static("gather",[](const SGlayer2b& x, const Subgraph& a){return gather1(x,a);});
+  .def("linmaps0",[](const SGlayer1b& x){return sglinmaps0(x);}) // deprecated
+  .def("linmaps1",[](const SGlayer1b& x){return sglinmaps1(x);}) // deprecated
+  .def("linmaps2",[](const SGlayer1b& x){return sglinmaps2(x);}) // deprecated
+
+  .def_static("gather",[](const SGlayer0b& x, const Subgraph& a){return gather1(x,a);}) // deprecated
+  .def_static("gather",[](const SGlayer1b& x, const Subgraph& a){return gather1(x,a);}) // deprecated
+  .def_static("gather",[](const SGlayer2b& x, const Subgraph& a){return gather1(x,a);}); //deprecated
 
 
 // ---- I/O --------------------------------------------------------------------------------------------------

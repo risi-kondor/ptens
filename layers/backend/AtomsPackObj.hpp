@@ -55,6 +55,9 @@ namespace ptens{
 
     int constk=0;
 
+    ~AtomsPackObj(){
+    }
+
 
   public: // ---- Constructors ------------------------------------------------------------------------------
 

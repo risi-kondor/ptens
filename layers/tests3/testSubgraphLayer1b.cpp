@@ -22,6 +22,8 @@ using namespace cnine;
 
 PtensSession ptens::ptens_session;
 
+typedef Ptensors1b<float> Ptens1;
+
 
 int main(int argc, char** argv){
 
@@ -46,5 +48,10 @@ int main(int argc, char** argv){
 
   auto f2=linear_sg(f1,W,b);
   cout<<f2.str()<<endl;
-  
+
+  AtomsPack xatoms=AtomsPack::random(10,0.5);
+  Ptens1 X1=Ptens1(xatoms,channels=3,filltype=3);
+  SubgraphLayer1b<float> U(X1,G,trivial);
+  cout<<U<<endl;
+
 }

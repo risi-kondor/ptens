@@ -26,6 +26,8 @@ namespace ptens{
 
     shared_ptr<cnine::GatherMapProgram> obj;
 
+    ~MessageMap(){}
+
     MessageMap(const cnine::GatherMapProgram&& _obj):
       obj(new cnine::GatherMapProgram(_obj)){}
 

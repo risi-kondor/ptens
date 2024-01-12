@@ -235,7 +235,14 @@ namespace ptens{
   public: // ---- Message passing ----------------------------------------------------------------------------
 
 
-    template<typename SOURCE>
+    template<typename SOURCE, typename = typename std::enable_if<std::is_base_of<Ptensorsb<float>, SOURCE>::value, SOURCE>::type>
+    inline Ptensors0b<float> linmaps(const SOURCE& x){
+      Ptensors0b<float> R(x.get_atoms(),x.get_nc()*vector<int>({1,1,2})[x.getk()],x.get_dev());
+      R.add_linmaps(x);
+      return R;
+    }
+
+    template<typename SOURCE, typename = typename std::enable_if<std::is_base_of<Ptensorsb<float>, SOURCE>::value, SOURCE>::type>
     static Ptensors0b<TYPE> gather(const SOURCE& x, const AtomsPack& a){
       int nc=x.get_nc()*vector<int>({1,1,2})[x.getk()];
       Ptensors0b<TYPE> R(a,nc,x.get_dev());
@@ -278,10 +285,10 @@ namespace ptens{
       x.atoms.overlaps_mmap(atoms).inv()(*this,x);
     }
 
-    template<typename OUTPUT>
-    void gather_backprop(const OUTPUT& x){
-      x.atoms.overlaps_mmap(atoms).inv()(get_grad(),x.get_grad());
-    }
+    //template<typename OUTPUT>
+    //void gather_backprop(const OUTPUT& x){
+    //x.atoms.overlaps_mmap(atoms).inv()(get_grad(),x.get_grad());
+    //}
 
 
   public: // ---- Reductions ---------------------------------------------------------------------------------

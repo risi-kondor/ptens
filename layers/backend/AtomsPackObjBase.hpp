@@ -37,8 +37,6 @@ namespace ptens{
   public: // ---- Constructors ------------------------------------------------------------------------------
 
 
-    //AtomsPackObjBase(){}
-
     AtomsPackObjBase():
       observable(this){}
 

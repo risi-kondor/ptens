@@ -23,6 +23,8 @@ using namespace cnine;
 
 PtensSession ptens::ptens_session;
 
+typedef Ptensors1b<float> Ptens1;
+
 
 int main(int argc, char** argv){
 
@@ -41,4 +43,5 @@ int main(int argc, char** argv){
 
   SubgraphLayer2b<float> f2(f0,edge);
   cout<<f2<<endl;
+
 }

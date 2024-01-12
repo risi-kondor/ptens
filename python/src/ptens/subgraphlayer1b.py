@@ -62,9 +62,9 @@ class subgraphlayer1b(torch.Tensor):
     def cat(self,*args):
         return Subgraphlayer1b_catFn.apply(self,*args)
 
-    @classmethod
-    def gather(self,x,S):
-        return Ptensorsb_GatherFn.apply(x,S)
+    #@classmethod
+    #def gather(self,x,S):
+    #    return Ptensorsb_GatherFn.apply(x,S)
 
 
 
@@ -157,6 +157,10 @@ class subgraphlayer1b(torch.Tensor):
         #return Ptensorsb_Gather2Fn.apply(self,atoms);
 
     @classmethod
+    def linmaps(self,x):
+        return Ptensorsb_Linmaps1Fn.apply(x,S)
+
+    @classmethod
     def gather(self,x,S):
         return Ptensorsb_Gather1Fn.apply(x,S)
 
@@ -237,20 +241,20 @@ class Subgraphlayer1b_outerFn(torch.autograd.Function):
         return subgraphlayer1b.dummy(), subgraphlayer1b.dummy()
 
 
-class SubgraphLayer1b_GatherFn(torch.autograd.Function):
-
-    @staticmethod
-    def forward(ctx,x,S):
-        r=x.dummy()
-        r.obj=_subgraphlayer1b.gather(x.obj,S.obj)
-        ctx.x=x.obj
-        ctx.r=r.obj
-        return r
-
-    @staticmethod
-    def backward(ctx,g):
-        ctx.x.add_gather_back(ctx.r)
-        return ptensorsb.dummy()
+#class SubgraphLayer1b_GatherFn(torch.autograd.Function):
+#
+#    @staticmethod
+#    def forward(ctx,x,S):
+#        r=x.dummy()
+#        r.obj=_subgraphlayer1b.gather(x.obj,S.obj)
+#        ctx.x=x.obj
+#        ctx.r=r.obj
+#        return r
+#
+#    @staticmethod
+#    def backward(ctx,g):
+#        ctx.x.add_gather_back(ctx.r)
+#        return ptensorsb.dummy()
 
 
 class SubgraphLayer1b_GatherFromPtensorsbFn(torch.autograd.Function):

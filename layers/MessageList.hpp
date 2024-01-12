@@ -26,26 +26,24 @@ namespace ptens{
   template<typename DUMMY> class AtomsPack2obj;
 
 
-  class MessageList{ //: public cnine::observable<MessageList>{
+  class MessageList{
   public:
 
     shared_ptr<const MessageListObj> obj;
 
-    //shared_ptr<AtomsPack0obj<int> > source0;
-    //shared_ptr<AtomsPack1obj<int> > source1;
-    //shared_ptr<AtomsPack2obj<int> > source2;
+    ~MessageList(){}
 
-
+    MessageList(){}
+    
     MessageList(const MessageListObj* _obj):
-      //observable(this), 
       obj(_obj){}
 
 
   public: // ---- Named constructors ------------------------------------------------------------------------
 
 
-    static MessageList overlaps(const cnine::array_pool<int>& x, const cnine::array_pool<int>& y){
-      return MessageList(new MessageListObj(x,y));
+    static MessageList overlaps(const cnine::array_pool<int>& in_atoms, const cnine::array_pool<int>& out_atoms){
+      return MessageList(new MessageListObj(in_atoms,out_atoms));
     }
 
     pair<const cnine::hlists<int>&, const cnine::hlists<int>&> lists() const{
@@ -54,32 +52,6 @@ namespace ptens{
 
 
   public: // ---- Copying ------------------------------------------------------------------------------------
-
-
-    MessageList(const MessageList& x):
-      //observable(this),
-      obj(x.obj){}
-    //obj(x.obj),
-    //source0(x.source0),
-    //source1(x.source1),
-    //source2(x.source2){}
-
-    MessageList(const MessageList& x, const shared_ptr<AtomsPack0obj<int> > s):
-      MessageList(x){
-      obj->source0=s;}
-
-    MessageList(const MessageList& x, const shared_ptr<AtomsPack1obj<int> > s):
-      MessageList(x){
-      obj->source1=s;}
-
-    MessageList(const MessageList& x, const shared_ptr<AtomsPack2obj<int> > s):
-      MessageList(x){
-      obj->source2=s;}
-
-    //MessageList(const MessageList& x, const shared_ptr<AtomsPackObjBase> s):
-    //MessageList(x){
-    //obj->source2=s;}
-
 
 
   public: // ---- I/O ----------------------------------------------------------------------------------------
@@ -105,3 +77,31 @@ namespace ptens{
 }
 
 #endif 
+    /*
+    MessageList(const MessageList& x, const shared_ptr<AtomsPack0obj<int> > s):
+      MessageList(x){
+      obj->source0=s;}
+
+    MessageList(const MessageList& x, const shared_ptr<AtomsPack1obj<int> > s):
+      MessageList(x){
+      obj->source1=s;}
+
+    MessageList(const MessageList& x, const shared_ptr<AtomsPack2obj<int> > s):
+      MessageList(x){
+      obj->source2=s;}
+    */
+
+    //MessageList(const MessageList& x, const shared_ptr<AtomsPackObjBase> s):
+    //MessageList(x){
+    //obj->source2=s;}
+
+
+    //MessageList(const MessageList& x):
+      //observable(this),
+      //obj(x.obj){}
+    //obj(x.obj),
+    //source0(x.source0),
+    //source1(x.source1),
+    //source2(x.source2){}
+
+

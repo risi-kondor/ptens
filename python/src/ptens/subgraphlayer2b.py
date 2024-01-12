@@ -142,15 +142,19 @@ class subgraphlayer2b(torch.Tensor):
     def linmaps2(self,normalized=False):
         return Ptensorsb_Linmaps2Fn.apply(self);
 
-    def gather0(self,atoms):
-        return Ptensorsb_Gather0Fn.apply(self,atoms);
+    #def gather0(self,atoms):
+    #    return Ptensorsb_Gather0Fn.apply(self,atoms);
 
-    def gather1(self,atoms):
-        return Ptensorsb_Gather1Fn.apply(self,atoms);
+    #def gather1(self,atoms):
+    #    return Ptensorsb_Gather1Fn.apply(self,atoms);
 
-    def gather2(self,atoms):
-        return Ptensorsb_Gather2Fn.apply(self,atoms);
+    #def gather2(self,atoms):
+    #    return Ptensorsb_Gather2Fn.apply(self,atoms);
 
+
+    @classmethod
+    def linmaps(self,x):
+        return Ptensorsb_Linmaps2Fn.apply(x)
 
     @classmethod
     def gather(self,x,S):

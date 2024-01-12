@@ -68,6 +68,24 @@ namespace ptens{
     //void for_each_edge(std::function<void(const int, const int, const float)> lambda, const bool self=0) const{
     //obj->for_each_edge(lambda,self);
     //}
+  public: // ---- I/O ----------------------------------------------------------------------------------------
+
+
+    string classname() const{
+      return "TransferrMap";
+    }
+
+    string repr() const{
+      return "TransferMap";
+    }
+
+    string str(const string indent="") const{
+      return obj->str();
+    }
+
+    friend ostream& operator<<(ostream& stream, const TransferMap& v){
+      stream<<v.str(); return stream;}
+
 
   };
 

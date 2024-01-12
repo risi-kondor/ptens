@@ -110,20 +110,39 @@ namespace ptens{
   public: // ---- Message passing between subgraph layers -----------------------------------------------------
 
 
-    SubgraphLayer1b(const Ptensors0b<TYPE>& x, const Ggraph& g, const Subgraph& s):
-      SubgraphLayer1b(g,s,g.subgraphs(s),x.get_nc(),0,x.dev){
+    template<typename SOURCE>
+    static SubgraphLayer1b linmaps(const SOURCE& x){
+      SubgraphLayer1b R(x.get_atoms(),x.get_nc()*vector<int>({1,2,5})[x.getk()],x.get_dev());
+      R.add_linmaps(x);
+      return R;
+    }
+
+    template<typename SOURCE>
+    SubgraphLayer1b(const SOURCE& x, const Subgraph& _S){
+      SubgraphLayer1b(x.G,_S,x.G.subgraphs(_S),x.get_nc()*vector<int>({1,2,5})[x.getk()],0,x.dev);
       add_gather(x);
     }
 
-    SubgraphLayer1b(const Ptensors1b<TYPE>& x, const Ggraph& g, const Subgraph& s):
-      SubgraphLayer1b(g,s,g.subgraphs(s),2*x.get_nc(),0,x.dev){
+    template<typename SOURCE>
+    SubgraphLayer1b(const SOURCE& x, const Ggraph& _G, const Subgraph& _S):
+      SubgraphLayer1b(_G,_S,_G.subgraphs(_S),x.get_nc()*vector<int>({1,2,5})[x.getk()],0,x.dev){
+      add_gather(x);
+    }
+
+    //SubgraphLayer1b(const Ptensors0b<TYPE>& x, const Ggraph& g, const Subgraph& s):
+    //SubgraphLayer1b(g,s,g.subgraphs(s),x.get_nc(),0,x.dev){
+    //add_gather(x);
+    //}
+
+    //SubgraphLayer1b(const Ptensors1b<TYPE>& x, const Ggraph& g, const Subgraph& s):
+    //SubgraphLayer1b(g,s,g.subgraphs(s),2*x.get_nc(),0,x.dev){
       //add_gather(x);
-    }
+    //}
 
-    SubgraphLayer1b(const Ptensors2b<TYPE>& x, const Ggraph& g, const Subgraph& s):
-      SubgraphLayer1b(g,s,g.subgraphs(s),5*x.get_nc(),0,x.dev){
-      add_gather(x);
-    }
+    //SubgraphLayer1b(const Ptensors2b<TYPE>& x, const Ggraph& g, const Subgraph& s):
+    //SubgraphLayer1b(g,s,g.subgraphs(s),5*x.get_nc(),0,x.dev){
+    //add_gather(x);
+    ///}
 
     //SubgraphLayer1b(const NodeLayerb<TYPE>& x, const Subgraph& _S):
     //SubgraphLayer1b(x.G,_S,x.G.subgraphs(_S),2*x.get_nc(),x.get_dev()){
@@ -193,3 +212,10 @@ namespace ptens{
     SubgraphLayer1b(const SubgraphLayer2b<TYPE>& x, const Subgraph& _S):
       SubgraphLayer1b(gather1<TYPE>(x,_S)){}
     */
+    //template<typename SOURCE>
+    //inline SubgraphLayer1b<float> gather(const SOURCE& x, const Subgraph& _S){
+    //SubgraphLayer1b<float> R(x.G,_S,x.G.subgraphs(_S),x.get_nc()*vector<int>({1,2,5})[x.getk()],0,x.dev);
+    //R.add_gather(x);
+    //return R;
+    //}
+

@@ -247,6 +247,13 @@ namespace ptens{
 
 
     template<typename SOURCE>
+    static Ptensors2b<float> linmaps(const SOURCE& x){
+      Ptensors2b<float> R(x.get_atoms(),x.get_nc()*vector<int>({2,5,15})[x.getk()],x.get_dev());
+      R.add_linmaps(x);
+      return R;
+    }
+
+    template<typename SOURCE>
     static Ptensors2b<TYPE> gather(const SOURCE& x, const AtomsPack& a){
       int nc=x.get_nc()*vector<int>({2,5,15})[x.getk()];
       Ptensors2b<TYPE> R(a,nc,x.get_dev());
@@ -300,10 +307,10 @@ namespace ptens{
       x.atoms.overlaps_mmap(atoms).inv()(*this,x);
     }
 
-    template<typename OUTPUT>
-    void gather_backprop(const OUTPUT& x){
-      get_grad().gather_back(x.get_grad());
-    }
+    //template<typename OUTPUT>
+    //void gather_backprop(const OUTPUT& x){
+    //get_grad().gather_back(x.get_grad());
+    //}
 
 
   public: // ---- Reductions ---------------------------------------------------------------------------------

@@ -44,8 +44,13 @@ namespace ptens{
     mutable shared_ptr<AtomsPack1obj<int> > source1=nullptr;
     mutable shared_ptr<AtomsPack2obj<int> > source2=nullptr;
 
+    ~MessageListObj(){}
+
+      
     MessageListObj():
       observable(this){}
+
+    MessageListObj(const MessageListObj& x)=delete;
 
 
   public: // ---- Access -------------------------------------------------------------------------------------
@@ -60,34 +65,34 @@ namespace ptens{
 
 
     // overlaps 
-    MessageListObj(const cnine::array_pool<int>& y, const cnine::array_pool<int>& x):
+    MessageListObj(const cnine::array_pool<int>& in_atoms, const cnine::array_pool<int>& out_atoms):
       observable(this){
       cnine::fnlog timer("MessageListObj::[overlaps]");
 
-      if(x.size()<10){
-	for(int i=0; i<y.size(); i++){
-	  auto v=y(i);
-	  for(int j=0; j<x.size(); j++){
-	    auto w=x(j);
+      if(in_atoms.size()<10){
+	for(int i=0; i<in_atoms.size(); i++){
+	  auto v=in_atoms(i);
+	  for(int j=0; j<out_atoms.size(); j++){
+	    auto w=out_atoms(j);
 	    if([&](){for(auto p:v) if(std::find(w.begin(),w.end(),p)!=w.end()) return true; return false;}())
-	      append_intersection(i,j,y.view_of(i),x.view_of(j));
+	      append_intersection(i,j,in_atoms.view_of(i),out_atoms.view_of(j));
 	  }
 	}
 	return;
       }
 
       cnine::map_of_lists<int,int> in_lists;
-      int nx=x.size();
-      for(int i=0; i<nx; i++)
-	x.for_each_of(i,[&](const int j){in_lists.push_back(j,i);});
+      int n_in=in_atoms.size();
+      for(int i=0; i<n_in; i++)
+	in_atoms.for_each_of(i,[&](const int j){in_lists.push_back(j,i);});
 
       cnine::map_of_maps<int,int,bool> done;
-      int ny=y.size();
-      for(int i=0; i<ny; i++)
-	y.for_each_of(i,[&](const int j){
+      int n_out=out_atoms.size();
+      for(int i=0; i<n_out; i++)
+	out_atoms.for_each_of(i,[&](const int j){
 	    for(auto p:in_lists[j])
 	      if(!done.is_filled(p,i)){
-		append_intersection(p,i,x.view_of(p),y.view_of(i));
+		append_intersection(p,i,in_atoms.view_of(p),out_atoms.view_of(i));
 		done.set(p,i,true);
 	      }
 	  });

@@ -42,7 +42,7 @@ int main(int argc, char** argv){
   cout<<Ptens1::gather(X2,yatoms)<<endl;
 
 
-  //exit(0);
+  exit(0);
   Ptens1 C=Ptens1::cat({X1,X1,X1});
   cout<<C<<endl;
 

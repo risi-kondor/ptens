@@ -245,6 +245,13 @@ namespace ptens{
 
 
     template<typename SOURCE>
+    static Ptensors1b<float> linmaps(const SOURCE& x){
+      Ptensors1b<float> R(x.get_atoms(),x.get_nc()*vector<int>({1,2,5})[x.getk()],x.get_dev());
+      R.add_linmaps(x);
+      return R;
+    }
+
+    template<typename SOURCE>
     static Ptensors1b<TYPE> gather(const SOURCE& x, const AtomsPack& a){
       int nc=x.get_nc()*vector<int>({1,2,5})[x.getk()];
       Ptensors1b<TYPE> R(a,nc,x.get_dev());
@@ -269,7 +276,7 @@ namespace ptens{
     }
 
     void add_linmaps_back(const Ptensors0b<TYPE>& r){
-	broadcast0(r);
+      broadcast0(r);
     }
 
     void add_linmaps_back(const Ptensors1b<TYPE>& r){
@@ -294,10 +301,10 @@ namespace ptens{
       x.atoms.overlaps_mmap(atoms).inv()(*this,x);
     }
 
-    template<typename OUTPUT>
-    void gather_backprop(const OUTPUT& x){
-      get_grad().gather_back(x.get_grad());
-    }
+    //template<typename OUTPUT>
+    //void gather_backprop(const OUTPUT& x){
+    //get_grad().gather_back(x.get_grad());
+    //}
 
 
   public: // ---- Reductions ---------------------------------------------------------------------------------
@@ -356,6 +363,11 @@ namespace ptens{
       BASE::view2().block(0,offs,dim(0),nc)+=X.view2();
     }
 
+
+   public: // ---- Message passing ----------------------------------------------------------------------------
+
+
+    
 
    public: // ---- I/O ----------------------------------------------------------------------------------------
 

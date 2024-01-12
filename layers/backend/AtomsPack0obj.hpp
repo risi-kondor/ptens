@@ -28,9 +28,6 @@ namespace ptens{
   template<typename DUMMY> class AtomsPack1obj;
   template<typename DUMMY> class AtomsPack2obj;
 
-  //template<>
-  //class AtomsPack1obj<int>;
-
 
   template<typename DUMMY>
   class AtomsPack0obj: public AtomsPackObjBase{
