@@ -72,7 +72,7 @@ namespace ptens{
     }
 
     void add_ReLU_back(const Ptensorsb& g, const float alpha){
-      get_grad().BASE::add_ReLU_back(g.get_grad(),alpha);
+      get_grad().BASE::add_ReLU_back(g.get_grad(),*this,alpha);
     }
 
   };
