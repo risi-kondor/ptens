@@ -45,7 +45,8 @@ namespace ptens{
   template<typename OBJ, typename TYPE>
   OBJ linear_sg(const OBJ& x, const cnine::Ltensor<TYPE>& w, const cnine::Ltensor<TYPE>& b){
     OBJ R(x.G,x.S,x.atoms,x*w);
-    R.add_broadcast(0,b);
+    R.view2().add_broadcast0(b.view1());
+    //R.add_broadcast(0,b);
     return R;
   }
 

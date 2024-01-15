@@ -236,19 +236,17 @@ class Ptensorsb_linearFn(torch.autograd.Function):
         r.obj=x.obj.linear(y,b)
         ctx.x=x.obj
         ctx.y=y
+        ctx.b=b
         ctx.r=r.obj
         return r
 
     @staticmethod
     def backward(ctx,g):
         ctx.x.add_linear_back0(ctx.r,ctx.y)
-        print(1)
-        a=ctx.x.linear_back1(ctx.r)
-        print(2)
-        b=ctx.x.linear_back2(ctx.r)
-        print(3)
-        return ptensorsb.dummy(), a, b
-        #return ptensorsb.dummy(), ctx.x.linear_back1(ctx.r), ctx.x.linear_back2(ctx.r)
+        #a=ctx.x.linear_back1(ctx.r)
+        #b=ctx.x.linear_back2(ctx.r)
+        #return ptensorsb.dummy(), a, b
+        return ptensorsb.dummy(), ctx.x.linear_back1(ctx.r), ctx.x.linear_back2(ctx.r)
 
 
 class Ptensorsb_scaleFn(torch.autograd.Function):

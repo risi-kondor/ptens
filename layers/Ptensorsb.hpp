@@ -101,7 +101,8 @@ namespace ptens{
   template<typename OBJ, typename TYPE>
   OBJ linear(const OBJ& x, const cnine::Ltensor<TYPE>& w, const cnine::Ltensor<TYPE>& b){
     OBJ R(x*w,x.atoms);
-    R.add_broadcast(0,b);
+    //R.add_broadcast(0,b);
+    R.view2().add_broadcast0(b.view1());
     return R;
   }
 
