@@ -144,6 +144,14 @@ namespace ptens{
       return Ptensors2b(BASE::gaussian_like(),atoms);
     }
 
+    static Ptensors2b zeros_like(const Ptensors2b& x){
+      return Ptensors2b(x.TENSOR::zeros_like(),x.atoms);
+    }
+
+    static Ptensors2b gaussian_like(const Ptensors2b& x){
+      return Ptensors2b(x.TENSOR::gaussian_like(),x.atoms);
+    }
+
     static Ptensors2b* new_zeros_like(const Ptensors2b& x){
       return new Ptensors2b(x.BASE::zeros_like(),x.atoms);
     }
@@ -280,20 +288,20 @@ namespace ptens{
 
 
     void add_linmaps_back(const Ptensors0b<TYPE>& r){
-      int nc=get_nc();
-      broadcast0(r);
+      broadcast0_shrink(r);
     }
 
     void add_linmaps_back(const Ptensors1b<TYPE>& r){
       int nc=get_nc();
-      broadcast0(r.reduce0(0,nc));
-      add(r.cols(nc,nc));
+      broadcast0_shrink(r.reduce0(0,2*nc));
+      broadcast1_shrink(r.cols(2*nc,3*nc));
     }
 
     void add_linmaps_back(const Ptensors2b<TYPE>& r){
       int nc=get_nc();
-      broadcast0(r.reduce0_shrink(0,nc));
-      add(r.reduce1_shrink(2*nc,nc));
+      broadcast0_shrink(r.reduce0_shrink(0,nc));
+      broadcast1_shrink(r.reduce1_shrink(2*nc,9*nc));
+      // TODO
     }
 
 
@@ -379,7 +387,7 @@ namespace ptens{
       int N=size();
       int dev=get_dev();
 
-      BASE R({dim(0),nc},0,dev);
+      BASE R({atoms.size1(),nc},0,dev);
       Rtensor2_view r=R.view2();
       if(dev==0){
 	for(int i=0; i<N; i++){
@@ -477,7 +485,7 @@ namespace ptens{
       TimedFn T("Ptensors2b","broadcast1_shrink",*this);
       int N=size();
       int dev=get_dev();
-      int nc=X.dim(1);
+      int nc=dim(1);
       PTENS_ASSRT(X.dim(1)==3*nc);
       Rtensor2_view x=X.view2();
       Rtensor2_view x0=x.block(0,0,X.dim(0),nc);
@@ -533,7 +541,7 @@ namespace ptens{
       }
       ostringstream oss;
       for(int i=0; i<size(); i++){
-	cout<<atoms_of(i)<<endl;
+	//cout<<atoms_of(i)<<endl;
 	oss<<indent<<(*this)(i)<<endl;
       }
       return oss.str();

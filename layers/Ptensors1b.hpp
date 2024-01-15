@@ -146,6 +146,14 @@ namespace ptens{
       return Ptensors1b(BASE::gaussian_like(),atoms);
     }
 
+    static Ptensors1b zeros_like(const Ptensors1b& x){
+      return Ptensors1b(x.TENSOR::zeros_like(),x.atoms);
+    }
+
+    static Ptensors1b gaussian_like(const Ptensors1b& x){
+      return Ptensors1b(x.TENSOR::gaussian_like(),x.atoms);
+    }
+
     static Ptensors1b* new_zeros_like(const Ptensors1b& x){
       return new Ptensors1b(x.BASE::zeros_like(),x.atoms);
     }
@@ -327,7 +335,7 @@ namespace ptens{
       TimedFn T("Ptensors1b","reduce0",*this);
       int N=size();
       int dev=get_dev();
-      BASE R({N,get_nc()},0,dev);
+      BASE R({N,nc},0,dev);
       Rtensor2_view r=R.view2();
       if(dev==0){
 	for(int i=0; i<N; i++)

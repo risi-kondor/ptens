@@ -252,7 +252,8 @@ namespace ptens{
     }
 
 
-    cnine::GatherMapB broadcast0(const cnine::hlists<int>& out_lists, const int ncols=2, const int coffs=0, const int cstride=1) const{
+    cnine::GatherMapB broadcast0(const cnine::hlists<int>& out_lists, const int ncols=2, const int coffs=0, 
+      const int cstride=1) const{
       cnine::map_of_lists<int,int> R;
       PTENS_ASSRT(ncols>=2);
       PTENS_ASSRT(coffs<=ncols-2);
@@ -273,7 +274,7 @@ namespace ptens{
 	    R.push_back(ncols*(offs+ix[i0]*n+ix[i1])+coffs,m);
 
       }
-      return cnine::GatherMapB(R,ncols);
+      return cnine::GatherMapB(R,ncols,1,cstride);
     }
 
 
@@ -302,7 +303,7 @@ namespace ptens{
 	  }
 	}
       }
-      return cnine::GatherMapB(R,ncols);
+      return cnine::GatherMapB(R,ncols,1,cstride);
     }
 
 

@@ -19,8 +19,8 @@ pybind11::class_<Ptensors1b<float> >(m,"ptensors1b")
       return Ptensors1b(x.atoms,ATview<float>(M));})
   .def("copy",[](const Ptensors1b<float>& x){return x.copy();})
   .def("copy",[](const Ptensors1b<float>& x, const int _dev){return x.copy(_dev);})
-  .def("zeros_like",&Ptensors1b<float>::zeros_like)
-  .def("randn_like",&Ptensors1b<float>::gaussian_like)
+  .def("zeros_like",[](const Ptensors1b<float>& x){return Ptensors1b<float>::zeros_like(x);})
+  .def("randn_like",[](const Ptensors1b<float>& x){return Ptensors1b<float>::gaussian_like(x);})
 
 
 // ---- Conversions, transport, etc. ------------------------------------------------------------------------
@@ -86,7 +86,8 @@ pybind11::class_<Ptensors1b<float> >(m,"ptensors1b")
 
   .def("ReLU",[](const Ptensors1b<float>& x, const float alpha){
       return ReLU(x,alpha);})
-  .def("add_ReLU_back",&Ptensors1b<float>::add_ReLU_back)
+  .def("add_ReLU_back",[](Ptensors1b<float>& x, const Ptensors1b<float>& g, const float alpha){
+      x.add_ReLU_back(g,alpha);})
 
   .def("inp",[](const Ptensors1b<float>& x, const Ptensors1b<float>& y){return x.inp(y);})
   .def("diff2",[](const Ptensors1b<float>& x, const Ptensors1b<float>& y){return x.diff2(y);})
@@ -95,9 +96,27 @@ pybind11::class_<Ptensors1b<float> >(m,"ptensors1b")
 // ---- Message passing --------------------------------------------------------------------------------------
 
 
-  .def("linmaps0",[](const Ptensors1b<float>& x){return linmaps0(x);})
-  .def("linmaps1",[](const Ptensors1b<float>& x){return linmaps1(x);})
-  .def("linmaps2",[](const Ptensors1b<float>& x){return linmaps2(x);})
+  .def_static("linmaps",[](const Ptensors0b<float>& x){
+      return Ptensors1b<float>::linmaps(x);}) 
+  .def_static("linmaps",[](const Ptensors1b<float>& x){
+      return Ptensors1b<float>::linmaps(x);}) 
+  .def_static("linmaps",[](const Ptensors2b<float>& x){
+      return Ptensors1b<float>::linmaps(x);}) 
+
+  .def_static("gather",[](const Ptensors0b<float>& x, const AtomsPack& a){
+      return Ptensors1b<float>::gather(x,a);}) 
+  .def_static("gather",[](const Ptensors1b<float>& x, const AtomsPack& a){
+      return Ptensors1b<float>::gather(x,a);}) 
+  .def_static("gather",[](const Ptensors2b<float>& x, const AtomsPack& a){
+      return Ptensors1b<float>::gather(x,a);}) 
+
+  .def_static("gather",[](const Ptensors0b<float>& x, const vector<vector<int> >& a){
+      return Ptensors1b<float>::gather(x,a);}) 
+  .def_static("gather",[](const Ptensors1b<float>& x, const vector<vector<int> >& a){
+      return Ptensors1b<float>::gather(x,a);}) 
+  .def_static("gather",[](const Ptensors2b<float>& x, const vector<vector<int> >& a){
+      return Ptensors1b<float>::gather(x,a);}) 
+
   .def("add_linmaps_back",[](Ptensors1b<float>& x, Ptensors0b<float>& g){
       x.get_grad().add_linmaps_back(g.get_grad());})
   .def("add_linmaps_back",[](Ptensors1b<float>& x, Ptensors1b<float>& g){
@@ -105,9 +124,6 @@ pybind11::class_<Ptensors1b<float> >(m,"ptensors1b")
   .def("add_linmaps_back",[](Ptensors1b<float>& x, Ptensors2b<float>& g){
       x.get_grad().add_linmaps_back(g.get_grad());})
 
-  .def("gather0",[](const Ptensors1b<float>& x, const AtomsPack& a){return gather0(x,a);})
-  .def("gather1",[](const Ptensors1b<float>& x, const AtomsPack& a){return gather1(x,a);})
-  .def("gather2",[](const Ptensors1b<float>& x, const AtomsPack& a){return gather2(x,a);})
   .def("add_gather_back",[](Ptensors1b<float>& x, Ptensors0b<float>& g){
       x.get_grad().add_gather_back(g.get_grad());})
   .def("add_gather_back",[](Ptensors1b<float>& x, Ptensors1b<float>& g){
@@ -122,3 +138,13 @@ pybind11::class_<Ptensors1b<float> >(m,"ptensors1b")
   .def("str",&Ptensors1b<float>::str,py::arg("indent")="")
   .def("__str__",&Ptensors1b<float>::str,py::arg("indent")="")
   .def("__repr__",&Ptensors1b<float>::repr);
+
+
+
+//  .def("linmaps0",[](const Ptensors1b<float>& x){return linmaps0(x);})
+//  .def("linmaps1",[](const Ptensors1b<float>& x){return linmaps1(x);})
+//  .def("linmaps2",[](const Ptensors1b<float>& x){return linmaps2(x);})
+
+//  .def("gather0",[](const Ptensors1b<float>& x, const AtomsPack& a){return gather0(x,a);})
+//  .def("gather1",[](const Ptensors1b<float>& x, const AtomsPack& a){return gather1(x,a);})
+//  .def("gather2",[](const Ptensors1b<float>& x, const AtomsPack& a){return gather2(x,a);})

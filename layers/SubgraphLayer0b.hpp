@@ -105,14 +105,14 @@ namespace ptens{
     }
 
     template<typename SOURCE>
-    SubgraphLayer0b(const SOURCE& x, const Subgraph& _S){
-      SubgraphLayer0b(x.G,_S,x.G.subgraphs(_S),x.get_nc()*vector<int>({1,1,2})[x.getk()],0,x.dev);
+    SubgraphLayer0b(const SOURCE& x, const Subgraph& _S):
+      SubgraphLayer0b(x.G,_S,x.G.subgraphs(_S),x.get_nc()*vector<int>({1,1,2})[x.getk()],0,x.dev){
       add_gather(x);
     }
 
     template<typename SOURCE>
-    SubgraphLayer0b(const SOURCE& x, const Ggraph& _G, const Subgraph& _S){
-      SubgraphLayer0b(_G,_S,_G.subgraphs(_S),x.get_nc()*vector<int>({1,1,2})[x.getk()],0,x.dev);
+    SubgraphLayer0b(const SOURCE& x, const Ggraph& _G, const Subgraph& _S):
+      SubgraphLayer0b(_G,_S,_G.subgraphs(_S),x.get_nc()*vector<int>({1,1,2})[x.getk()],0,x.dev){
       add_gather(x);
     }
 

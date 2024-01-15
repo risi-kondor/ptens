@@ -42,9 +42,12 @@ pybind11::class_<SGlayer1b,Ptensors1b<float> >(m,"subgraphlayer1b")
 // ---- Message passing --------------------------------------------------------------------------------------
 
 
-  .def_static("linmaps",[](const SGlayer0b& x){return SGlayer1b::linmaps(x);}) 
-  .def_static("linmaps",[](const SGlayer1b& x){return SGlayer1b::linmaps(x);}) 
-  .def_static("linmaps",[](const SGlayer2b& x){return SGlayer1b::linmaps(x);}) 
+  .def_static("linmaps",[](const SGlayer0b& x){
+      return SGlayer1b::linmaps(x);}) 
+  .def_static("linmaps",[](const SGlayer1b& x){
+      return SGlayer1b::linmaps(x);}) 
+  .def_static("linmaps",[](const SGlayer2b& x){
+      return SGlayer1b::linmaps(x);}) 
 
   .def(pybind11::init<const SGlayer0b&, const Subgraph&>())
   .def(pybind11::init<const SGlayer1b&, const Subgraph&>())
@@ -52,15 +55,7 @@ pybind11::class_<SGlayer1b,Ptensors1b<float> >(m,"subgraphlayer1b")
 
   .def(pybind11::init<const Ptensors0b<float>&, const Ggraph&, const Subgraph&>())
   .def(pybind11::init<const Ptensors1b<float>&, const Ggraph&, const Subgraph&>())
-  .def(pybind11::init<const Ptensors2b<float>&, const Ggraph&, const Subgraph&>())
-
-  .def("linmaps0",[](const SGlayer1b& x){return sglinmaps0(x);}) // deprecated
-  .def("linmaps1",[](const SGlayer1b& x){return sglinmaps1(x);}) // deprecated
-  .def("linmaps2",[](const SGlayer1b& x){return sglinmaps2(x);}) // deprecated
-
-  .def_static("gather",[](const SGlayer0b& x, const Subgraph& a){return gather1(x,a);}) // deprecated
-  .def_static("gather",[](const SGlayer1b& x, const Subgraph& a){return gather1(x,a);}) // deprecated
-  .def_static("gather",[](const SGlayer2b& x, const Subgraph& a){return gather1(x,a);}); //deprecated
+  .def(pybind11::init<const Ptensors2b<float>&, const Ggraph&, const Subgraph&>());
 
 
 // ---- I/O --------------------------------------------------------------------------------------------------
@@ -74,3 +69,11 @@ pybind11::class_<SGlayer1b,Ptensors1b<float> >(m,"subgraphlayer1b")
 //.def("get_dev",&SGlayer0b::get_dev)
 //.def("get_nc",&SGlayer0b::get_nc)
 //.def("get_atoms",[](const SGlayer0b& x){return x.atoms.as_vecs();})
+  //.def("linmaps0",[](const SGlayer1b& x){return sglinmaps0(x);}) // deprecated
+  //.def("linmaps1",[](const SGlayer1b& x){return sglinmaps1(x);}) // deprecated
+  //.def("linmaps2",[](const SGlayer1b& x){return sglinmaps2(x);}) // deprecated
+
+  //.def_static("gather",[](const SGlayer0b& x, const Subgraph& a){return gather1(x,a);}) // deprecated
+  //.def_static("gather",[](const SGlayer1b& x, const Subgraph& a){return gather1(x,a);}) // deprecated
+  //.def_static("gather",[](const SGlayer2b& x, const Subgraph& a){return gather1(x,a);}); //deprecated
+

@@ -42,17 +42,20 @@ pybind11::class_<SGlayer2b,Ptensors2b<float> >(m,"subgraphlayer2b")
 // ---- Message passing --------------------------------------------------------------------------------------
 
 
-  .def("linmaps0",[](const SGlayer2b& x){return sglinmaps0(x);})
-  .def("linmaps1",[](const SGlayer2b& x){return sglinmaps1(x);})
-  .def("linmaps2",[](const SGlayer2b& x){return sglinmaps2(x);})
+  .def_static("linmaps",[](const SGlayer0b& x){
+      return SGlayer2b::linmaps(x);}) 
+  .def_static("linmaps",[](const SGlayer1b& x){
+      return SGlayer2b::linmaps(x);}) 
+  .def_static("linmaps",[](const SGlayer2b& x){
+      return SGlayer2b::linmaps(x);}) 
+
+  .def(pybind11::init<const SGlayer0b&, const Ggraph&, const Subgraph&>())
+  .def(pybind11::init<const SGlayer1b&, const Ggraph&, const Subgraph&>())
+  .def(pybind11::init<const SGlayer2b&, const Ggraph&, const Subgraph&>())
 
   .def(pybind11::init<const Ptensors0b<float>&, const Ggraph&, const Subgraph&>())
   .def(pybind11::init<const Ptensors1b<float>&, const Ggraph&, const Subgraph&>())
-  .def(pybind11::init<const Ptensors2b<float>&, const Ggraph&, const Subgraph&>())
-
-  .def("gather",[](const SGlayer0b& x, const Subgraph& a){return gather2(x,a);})
-  .def("gather",[](const SGlayer1b& x, const Subgraph& a){return gather2(x,a);})
-  .def("gather",[](const SGlayer2b& x, const Subgraph& a){return gather2(x,a);});
+  .def(pybind11::init<const Ptensors2b<float>&, const Ggraph&, const Subgraph&>());
 
 
 // ---- I/O --------------------------------------------------------------------------------------------------
@@ -66,3 +69,11 @@ pybind11::class_<SGlayer2b,Ptensors2b<float> >(m,"subgraphlayer2b")
 //.def("get_dev",&SGlayer0b::get_dev)
 //.def("get_nc",&SGlayer0b::get_nc)
 //.def("get_atoms",[](const SGlayer0b& x){return x.atoms.as_vecs();})
+//.def("linmaps0",[](const SGlayer2b& x){return sglinmaps0(x);})
+//.def("linmaps1",[](const SGlayer2b& x){return sglinmaps1(x);})
+//.def("linmaps2",[](const SGlayer2b& x){return sglinmaps2(x);})
+
+//  .def("gather",[](const SGlayer0b& x, const Subgraph& a){return gather2(x,a);})
+//  .def("gather",[](const SGlayer1b& x, const Subgraph& a){return gather2(x,a);})
+//  .def("gather",[](const SGlayer2b& x, const Subgraph& a){return gather2(x,a);});
+

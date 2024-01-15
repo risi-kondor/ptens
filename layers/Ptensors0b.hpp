@@ -146,6 +146,14 @@ namespace ptens{
       return Ptensors0b(BASE::gaussian_like(),atoms);
     }
 
+    static Ptensors0b zeros_like(const Ptensors0b& x){
+      return Ptensors0b(x.TENSOR::zeros_like(),x.atoms);
+    }
+
+    static Ptensors0b gaussian_like(const Ptensors0b& x){
+      return Ptensors0b(x.TENSOR::gaussian_like(),x.atoms);
+    }
+
     static Ptensors0b* new_zeros_like(const Ptensors0b& x){
       return new Ptensors0b(x.TENSOR::zeros_like(),x.atoms);
     }
@@ -236,7 +244,7 @@ namespace ptens{
 
 
     template<typename SOURCE, typename = typename std::enable_if<std::is_base_of<Ptensorsb<float>, SOURCE>::value, SOURCE>::type>
-    inline Ptensors0b<float> linmaps(const SOURCE& x){
+    static Ptensors0b<float> linmaps(const SOURCE& x){
       Ptensors0b<float> R(x.get_atoms(),x.get_nc()*vector<int>({1,1,2})[x.getk()],x.get_dev());
       R.add_linmaps(x);
       return R;

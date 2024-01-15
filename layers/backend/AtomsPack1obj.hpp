@@ -32,11 +32,10 @@ namespace ptens{
 
 
   template<typename DUMMY>
-  class AtomsPack1obj: public AtomsPackObjBase{ //, public cnine::observable<AtomsPack1obj<DUMMY> >{
+  class AtomsPack1obj: public AtomsPackObjBase{
 
   public:
 
-    //typedef cnine::observable<AtomsPack1obj<DUMMY> > OBSERVABLE;
     typedef cnine::Gdims Gdims;
 
 
@@ -163,7 +162,7 @@ namespace ptens{
       cnine::GatherMapProgram R;
       R.add_var(Gdims(in_lists.size(),2));
       R.add_map(y.reduce0(in_lists),2,0);
-      R.add_map(broadcast0(out_lists,5),1,2);
+      R.add_map(broadcast0(out_lists,5,0,2),1,2);
       R.add_map(new cnine::GatherMapB(direct,5));
       return R;
     }
@@ -182,7 +181,7 @@ namespace ptens{
       return cnine::GatherMapB(R,1,in_columns);
     }
 
-    cnine::GatherMapB broadcast0(const cnine::hlists<int>& out_lists, const int stride=1, const int coffs=0) const{
+    cnine::GatherMapB broadcast0(const cnine::hlists<int>& out_lists, const int stride=1, const int coffs=0, const int out_cols_n=1) const{
       cnine::map_of_lists<int,int> R;
       PTENS_ASSRT(stride>=1);
       PTENS_ASSRT(coffs<=stride-1);
@@ -191,7 +190,7 @@ namespace ptens{
 	out_lists.for_each_of(m,[&](const int x){
 	    R.push_back(stride*index_of(out_tensor,x)+coffs,m);});
       }
-      return cnine::GatherMapB(R,stride);
+      return cnine::GatherMapB(R,stride,1,out_cols_n);
     }
 
 

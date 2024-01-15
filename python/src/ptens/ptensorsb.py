@@ -15,7 +15,10 @@ import torch
 
 import ptens_base
 from ptens_base import ptensors0b as _ptensors0b
+from ptens_base import ptensors1b as _ptensors1b
+from ptens_base import ptensors2b as _ptensors2b
 from ptens.utility import device_id as device_id
+#from ptens.ptensors0b import * 
 
 #import ptens.ptensor0
 #import ptens.ptensors1
@@ -133,13 +136,13 @@ class Ptensorsb_toFn(torch.autograd.Function):
 
     @staticmethod
     def forward(ctx,x,_dev):
-        dev=ptens.device_id(_dev)
+        dev=device_id(_dev)
         r=x.dummy()
         r.obj=x.obj.to_device(dev)
         ctx.x=x.obj
-        ctx.r=R.obj
+        ctx.r=r.obj
         ctx.dev=dev
-        return R
+        return r
 
     @staticmethod
     def backward(ctx,g):
@@ -187,25 +190,25 @@ class Ptensorsb_cat_channelsFn(torch.autograd.Function):
         return ptensorsb.dummy(),ptensorsb.dummy()
 
 
-class Ptensorsb_catFn(torch.autograd.Function):
+# class Ptensorsb_catFn(torch.autograd.Function):
     
-    @staticmethod
-    def forward(ctx,dummy,*args):
-        r=args[0].dummy()
-        ctx.args=[x.obj for x in args]
-        r.obj=args[0].obj.cat(ctx.args)
-        ctx.r=r.obj
-        return r
+#     @staticmethod
+#     def forward(ctx,dummy,*args):
+#         r=args[0].dummy()
+#         ctx.args=[x.obj for x in args]
+#         r.obj=args[0].obj.cat(ctx.args)
+#         ctx.r=r.obj
+#         return r
 
-    @staticmethod
-    def backward(ctx,g):
-        offs=0
-        dummies=[]
-        for x in ctx.args:
-            x.add_cat_back(ctx.r,offs)
-            offs=offs+len(x)
-            dummies.append(ptensorsb(1))
-        return None, *dummies
+#     @staticmethod
+#     def backward(ctx,g):
+#         offs=0
+#         dummies=[]
+#         for x in ctx.args:
+#             x.add_cat_back(ctx.r,offs)
+#             offs=offs+len(x)
+#             dummies.append(ptensorsb(1))
+#         return None, *dummies
 
 
 class Ptensorsb_mprodFn(torch.autograd.Function):
@@ -289,7 +292,7 @@ class Ptensorsb_ReLUFn(torch.autograd.Function):
 
     @staticmethod
     def backward(ctx,g):
-        ctx.x.add_ReLU_back(ctx.r,ctx.x,ctx.alpha)
+        ctx.x.add_ReLU_back(ctx.r,ctx.alpha)
         return ptensorsb.dummy(), None
 
 
@@ -333,7 +336,8 @@ class Ptensorsb_Linmaps0Fn(torch.autograd.Function):
     @staticmethod
     def forward(ctx,x):
         r=x.dummy()
-        r.obj=x.obj.linmaps0()
+        r.obj=_ptensors0b.linmaps(x.obj) 
+        #r.obj=x.obj.linmaps0()
         ctx.x=x.obj
         ctx.r=r.obj
         return r
@@ -349,7 +353,7 @@ class Ptensorsb_Linmaps1Fn(torch.autograd.Function):
     @staticmethod
     def forward(ctx,x):
         r=x.dummy()
-        r.obj=x.obj.linmaps1()
+        r.obj=_ptensors1b.linmaps(x.obj) 
         ctx.x=x.obj
         ctx.r=r.obj
         return r
@@ -365,7 +369,7 @@ class Ptensorsb_Linmaps2Fn(torch.autograd.Function):
     @staticmethod
     def forward(ctx,x):
         r=x.dummy()
-        r.obj=x.obj.linmaps2()
+        r.obj=_ptensors2b.linmaps(x.obj) 
         ctx.x=x.obj
         ctx.r=r.obj
         return r
@@ -381,15 +385,16 @@ class Ptensorsb_Gather0Fn(torch.autograd.Function):
     @staticmethod
     def forward(ctx,x,atoms):
         r=x.dummy()
-        r.obj=x.obj.gather0(atoms)
+        r.obj=_ptensors0b.gather(x.obj,atoms)
+#        r.obj=x.obj.gather0(atoms)
         ctx.x=x.obj
         ctx.r=r.obj
         return r
 
     @staticmethod
     def backward(ctx,g):
-        ctx.x.add_linmaps_back(ctx.r)
-        return ptensorsb.dummy()
+        ctx.x.add_gather_back(ctx.r)
+        return ptensorsb.dummy(), None 
 
 
 class Ptensorsb_Gather1Fn(torch.autograd.Function):
@@ -397,15 +402,16 @@ class Ptensorsb_Gather1Fn(torch.autograd.Function):
     @staticmethod
     def forward(ctx,x,atoms):
         r=x.dummy()
-        r.obj=x.obj.gather1(atoms)
+        r.obj=_ptensors1b.gather(x.obj,atoms)
+        #r.obj=x.obj.gather1(atoms)
         ctx.x=x.obj
         ctx.r=r.obj
         return r
 
     @staticmethod
     def backward(ctx,g):
-        ctx.x.add_linmaps_back(ctx.r)
-        return ptensorsb.dummy()
+        ctx.x.add_gather_back(ctx.r)
+        return ptensorsb.dummy(), None
 
 
 class Ptensorsb_Gather2Fn(torch.autograd.Function):
@@ -413,14 +419,15 @@ class Ptensorsb_Gather2Fn(torch.autograd.Function):
     @staticmethod
     def forward(ctx,x,atoms):
         r=x.dummy()
-        r.obj=x.obj.gather2(atoms)
+        r.obj=_ptensors2b.gather(x.obj,atoms)
+        #r.obj=x.obj.gather2(atoms)
         ctx.x=x.obj
         ctx.r=r.obj
         return r
 
     @staticmethod
     def backward(ctx,g):
-        ctx.x.add_linmaps_back(ctx.r)
-        return ptensorsb.dummy()
+        ctx.x.add_gather_back(ctx.r)
+        return ptensorsb.dummy(), None
 
 

@@ -71,8 +71,8 @@ namespace ptens{
       get_grad().add_mprod(g.get_grad(),M.transp());
     }
 
-    void add_ReLU_back(const Ptensorsb& g, const Ptensorsb& x, const float alpha){
-      get_grad().BASE::add_ReLU_back(g.get_grad(),x,alpha);
+    void add_ReLU_back(const Ptensorsb& g, const float alpha){
+      get_grad().BASE::add_ReLU_back(g.get_grad(),alpha);
     }
 
   };

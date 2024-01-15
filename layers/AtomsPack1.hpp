@@ -82,6 +82,7 @@ namespace ptens{
 
     int size_of(const int i) const{
       return obj->size_of(i);
+
     }
 
     int offset(const int i) const{

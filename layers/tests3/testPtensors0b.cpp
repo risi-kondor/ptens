@@ -37,6 +37,25 @@ int main(int argc, char** argv){
   Ptens1 X1=Ptens1(xatoms,channels=3,filltype=4);
   Ptens2 X2=Ptens2(xatoms,channels=3,filltype=4);
 
+  auto Z0=Ptens0::linmaps(X0);
+  auto Z1=Ptens0::linmaps(X1);
+  auto Z2=Ptens0::linmaps(X2);
+
+  Ptens0 X0ga=Ptens0::zeros_like(X0);
+  Ptens1 X1ga=Ptens1::zeros_like(X1);
+  Ptens2 X2ga=Ptens2::zeros_like(X2); // make sure that Ptens0 cannot be assigned to Ptens1 or Ptens2
+
+  X0ga.add_linmaps_back(Z0);
+  cout<<X0ga<<endl;
+
+  X1ga.add_linmaps_back(Z1);
+  cout<<X1ga<<endl;
+
+  X2ga.add_linmaps_back(Z2);
+  cout<<X2ga<<endl;
+
+  exit(0);
+
   AtomsPack yatoms=AtomsPack::random(8,0.5);
   cout<<Ptens0::gather(X0,yatoms)<<endl;
   cout<<Ptens0::gather(X1,yatoms)<<endl;

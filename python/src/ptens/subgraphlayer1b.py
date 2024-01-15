@@ -138,14 +138,14 @@ class subgraphlayer1b(torch.Tensor):
     # ---- Message passing -----------------------------------------------------------------------------------
     
 
-    def linmaps0(self,normalized=False):
-        return Ptensorsb_Linmaps0Fn.apply(self);
+#     def linmaps0(self,normalized=False):
+#         return Ptensorsb_Linmaps0Fn.apply(self);
 
-    def linmaps1(self,normalized=False):
-        return Ptensorsb_Linmaps1Fn.apply(self);
+#     def linmaps1(self,normalized=False):
+#         return Ptensorsb_Linmaps1Fn.apply(self);
 
-    def linmaps2(self,normalized=False):
-        return Ptensorsb_Linmaps2Fn.apply(self);
+#     def linmaps2(self,normalized=False):
+#         return Ptensorsb_Linmaps2Fn.apply(self);
 
     #def gather0(self,atoms):
         #return Ptensorsb_Gather0Fn.apply(self,atoms);
@@ -158,7 +158,7 @@ class subgraphlayer1b(torch.Tensor):
 
     @classmethod
     def linmaps(self,x):
-        return Ptensorsb_Linmaps1Fn.apply(x,S)
+        return Ptensorsb_Linmaps1Fn.apply(x)
 
     @classmethod
     def gather(self,x,S):
@@ -269,7 +269,7 @@ class SubgraphLayer1b_GatherFromPtensorsbFn(torch.autograd.Function):
 
     @staticmethod
     def backward(ctx,g):
-        ctx.x.add_linmaps_back(ctx.r)
-        return ptensorsb.dummy()
+        ctx.x.add_gather_back(ctx.r)
+        return ptensorsb.dummy(), None, None
 
 

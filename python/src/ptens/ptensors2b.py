@@ -140,23 +140,32 @@ class ptensors2b(torch.Tensor):
     # ---- Message passing -----------------------------------------------------------------------------------
     
 
-    def linmaps0(self,normalized=False):
-        return Ptensorsb_Linmaps0Fn.apply(self);
+    @classmethod
+    def linmaps(self,x):
+        return Ptensorsb_Linmaps2Fn.apply(x)
 
-    def linmaps1(self,normalized=False):
-        return Ptensorsb_Linmaps1Fn.apply(self);
+    @classmethod
+    def gather(self,x,S):
+        return Ptensorsb_Gather2Fn.apply(x,S)
 
-    def linmaps2(self,normalized=False):
-        return Ptensorsb_Linmaps2Fn.apply(self);
 
-    def gather0(self,atoms):
-        return Ptensorsb_Gather0Fn.apply(self,atoms);
+#     def linmaps0(self,normalized=False):
+#         return Ptensorsb_Linmaps0Fn.apply(self);
 
-    def gather1(self,atoms):
-        return Ptensorsb_Gather1Fn.apply(self,atoms);
+#     def linmaps1(self,normalized=False):
+#         return Ptensorsb_Linmaps1Fn.apply(self);
 
-    def gather2(self,atoms):
-        return Ptensorsb_Gather2Fn.apply(self,atoms);
+#     def linmaps2(self,normalized=False):
+#         return Ptensorsb_Linmaps2Fn.apply(self);
+
+#     def gather0(self,atoms):
+#         return Ptensorsb_Gather0Fn.apply(self,atoms);
+
+#     def gather1(self,atoms):
+#         return Ptensorsb_Gather1Fn.apply(self,atoms);
+
+#     def gather2(self,atoms):
+#         return Ptensorsb_Gather2Fn.apply(self,atoms);
 
 
     # ---- I/O ----------------------------------------------------------------------------------------------

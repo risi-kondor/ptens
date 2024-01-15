@@ -31,14 +31,31 @@ int main(int argc, char** argv){
   typedef Ptensors2b<float> Ptens2;
 
   AtomsPack xatoms=AtomsPack::random(8,0.5);
-  Ptens0 X0=Ptens0(xatoms,channels=3,filltype=4);
-  Ptens1 X1=Ptens1(xatoms,channels=3,filltype=4);
-  Ptens2 X2=Ptens2(xatoms,channels=3,filltype=4);
+  Ptens0 X0=Ptens0(xatoms,channels=1,filltype=4);
+  Ptens1 X1=Ptens1(xatoms,channels=1,filltype=4);
+  Ptens2 X2=Ptens2(xatoms,channels=1,filltype=4);
 
   AtomsPack yatoms=AtomsPack::random(8,0.5);
-  cout<<Ptens2::gather(X0,yatoms)<<endl;
-  cout<<Ptens2::gather(X1,yatoms)<<endl;
-  cout<<Ptens2::gather(X2,yatoms)<<endl;
+  auto Y0=Ptens2::gather(X0,yatoms);
+  cout<<Y0<<endl;
+
+  auto Y1=Ptens2::gather(X1,yatoms);
+  cout<<Y1<<endl;
+
+  auto Y2=Ptens2::gather(X2,yatoms);
+  cout<<Y2<<endl;
+
+  exit(0);
+  Ptens0 X0g=Ptens0::zeros_like(X0);
+  Ptens1 X1g=Ptens1::zeros_like(X1);
+  Ptens2 X2g=Ptens2::zeros_like(X2);
+
+  X0g.add_gather_back(Y0);
+  cout<<X0g<<endl;
+  X1g.add_gather_back(Y1);
+  cout<<X1g<<endl;
+  X2g.add_gather_back(Y2);
+  cout<<X2g<<endl;
 
 
   //Ptensors1b<float> Ab(A);
