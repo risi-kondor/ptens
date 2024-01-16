@@ -243,9 +243,6 @@ class Ptensorsb_linearFn(torch.autograd.Function):
     @staticmethod
     def backward(ctx,g):
         ctx.x.add_linear_back0(ctx.r,ctx.y)
-        #a=ctx.x.linear_back1(ctx.r)
-        #b=ctx.x.linear_back2(ctx.r)
-        #return ptensorsb.dummy(), a, b
         return ptensorsb.dummy(), ctx.x.linear_back1(ctx.r), ctx.x.linear_back2(ctx.r)
 
 
@@ -341,7 +338,6 @@ class Ptensorsb_Linmaps0Fn(torch.autograd.Function):
     def forward(ctx,x):
         r=x.dummy()
         r.obj=_ptensors0b.linmaps(x.obj) 
-        #r.obj=x.obj.linmaps0()
         ctx.x=x.obj
         ctx.r=r.obj
         return r
@@ -407,7 +403,6 @@ class Ptensorsb_Gather1Fn(torch.autograd.Function):
     def forward(ctx,x,atoms):
         r=x.dummy()
         r.obj=_ptensors1b.gather(x.obj,atoms)
-        #r.obj=x.obj.gather1(atoms)
         ctx.x=x.obj
         ctx.r=r.obj
         return r
@@ -424,7 +419,6 @@ class Ptensorsb_Gather2Fn(torch.autograd.Function):
     def forward(ctx,x,atoms):
         r=x.dummy()
         r.obj=_ptensors2b.gather(x.obj,atoms)
-        #r.obj=x.obj.gather2(atoms)
         ctx.x=x.obj
         ctx.r=r.obj
         return r

@@ -26,7 +26,7 @@ namespace ptens{
 
 
   template<typename TYPE>
-  class Ptensorsb: public cnine::Ltensor<TYPE>{ //, public cnine::diff_class<OBJ>{
+  class Ptensorsb: public cnine::Ltensor<TYPE>{
   public:
 
     typedef cnine::Ltensor<TYPE> BASE;
@@ -37,8 +37,8 @@ namespace ptens{
 
     virtual ~Ptensorsb(){}
 
-    virtual Ptensorsb& get_grad(){return *this;} // dummy
-    virtual const Ptensorsb& get_grad() const {return *this;} // dummy
+    virtual Ptensorsb& get_grad(){CNINE_UNIMPL();return *this;} // dummy
+    virtual const Ptensorsb& get_grad() const {CNINE_UNIMPL(); return *this;} // dummy
 
 
   public: // ---- Operations ---------------------------------------------------------------------------------
@@ -59,7 +59,7 @@ namespace ptens{
       get_grad()+=g.get_grad().block(0,g.dim(1)-dim(1),dim(0),dim(1));
     }
 
-     void add_mprod_back0(const Ptensorsb& g, const TENSOR& M){
+    void add_mprod_back0(const Ptensorsb& g, const TENSOR& M){
       get_grad().add_mprod(g.get_grad(),M.transp());
     }
 
@@ -101,7 +101,6 @@ namespace ptens{
   template<typename OBJ, typename TYPE>
   OBJ linear(const OBJ& x, const cnine::Ltensor<TYPE>& w, const cnine::Ltensor<TYPE>& b){
     OBJ R(x*w,x.atoms);
-    //R.add_broadcast(0,b);
     R.view2().add_broadcast0(b.view1());
     return R;
   }
