@@ -138,7 +138,7 @@ class Ptensorsb_toFn(torch.autograd.Function):
     def forward(ctx,x,_dev):
         dev=device_id(_dev)
         r=x.dummy()
-        r.obj=x.obj.to_device(dev)
+        r.obj=x.obj.to(dev)
         ctx.x=x.obj
         ctx.r=r.obj
         ctx.dev=dev

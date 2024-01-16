@@ -18,6 +18,8 @@ pybind11::class_<SGlayer2b,Ptensors2b<float> >(m,"subgraphlayer2b")
   .def("copy",[](const SGlayer2b& x, const int _dev){return x.copy(_dev);})
   .def("zeros_like",&SGlayer2b::zeros_like)
   .def("randn_like",&SGlayer2b::gaussian_like)
+
+  .def("to",[](const SGlayer2b& x, const int dev){return SGlayer2b(x,dev);})
   .def("to_device",[](SGlayer2b& x, const int dev){return SGlayer2b(x,dev);})
 
 
