@@ -35,7 +35,7 @@ from ptens.ptensors0 import ptensors0 as ptensors0
 from ptens.ptensors1 import ptensors1 as ptensors1
 from ptens.ptensors2 import ptensors2 as ptensors2
 
-#from ptens.graph import graph as graph
+from ptens.graph import graph as graph
 from ptens.ggraph import ggraph as ggraph
 from ptens.subgraph import subgraph as subgraph
 
