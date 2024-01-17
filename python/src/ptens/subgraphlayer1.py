@@ -177,6 +177,10 @@ class subgraphlayer1(subgraphlayer):
 #         return Subgraph_layer1_Linmaps2Fn.apply(self,normalized);
 
 
+    def autobahn(self,w,b):
+        return Subgraph_layer1_autobahnFn.apply(self,w,b)
+
+
     def transfer0(self,_atoms,G,normalized=False):
         return Subgraph_layer1_Transfer0Fn.apply(self,_atoms,G,normalized)
 
