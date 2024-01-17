@@ -113,7 +113,18 @@ namespace ptens{
     friend ostream& operator<<(ostream& stream, const AtomsPack0& v){
       stream<<v.str(); return stream;}
 
+  };
 
+
+  class AtomsPack0pack: public vector<AtomsPack0>{
+  public:
+
+    int size0() const{
+      int t=0;
+      for(auto& p:*this)
+	t+=p.size();
+      return t;
+    }
 
   };
 

@@ -21,34 +21,15 @@
 
 namespace ptens{
 
-  //template<typename DUMMY> class AtomsPack0obj;
-  //template<typename DUMMY> class AtomsPack1obj;
-  //template<typename DUMMY> class AtomsPack2obj;
 
-
-  class MessageList{
+  class MessageListBatch: public object_pack_s<MessageListObj>{
   public:
 
-    shared_ptr<const MessageListObj> obj;
 
-    ~MessageList(){}
-
-    MessageList(){}
-    
-    MessageList(const MessageListObj* _obj):
-      obj(_obj){}
+    MessageListBatch(){}
 
 
   public: // ---- Named constructors ------------------------------------------------------------------------
-
-
-    static MessageList overlaps(const cnine::array_pool<int>& in_atoms, const cnine::array_pool<int>& out_atoms){
-      return MessageList(new MessageListObj(in_atoms,out_atoms));
-    }
-
-    pair<const cnine::hlists<int>&, const cnine::hlists<int>&> lists() const{
-      return pair<const cnine::hlists<int>&, const cnine::hlists<int>&>(obj->in,obj->out);
-    }
 
 
   public: // ---- Copying ------------------------------------------------------------------------------------
@@ -56,21 +37,6 @@ namespace ptens{
 
   public: // ---- I/O ----------------------------------------------------------------------------------------
 
-
-    string classname() const{
-      return "MessageList";
-    }
-
-    string repr() const{
-      return "MessageList";
-    }
-
-    string str(const string indent="") const{
-      return obj->str();
-    }
-
-    friend ostream& operator<<(ostream& stream, const MessageList& v){
-      stream<<v.str(); return stream;}
 
   };
 

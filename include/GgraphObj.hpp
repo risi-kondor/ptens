@@ -148,7 +148,7 @@ namespace ptens{
   public: // ---- I/O -----------------------------------------------------------------------------------------
 
 
-    string classname() const{
+    static string classname() const{
       return "ptens::GgraphObj";
     }
 
