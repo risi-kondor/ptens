@@ -14,8 +14,6 @@
 #include "Cnine_base.cpp"
 #include "CnineSession.hpp"
 
-#include "LinmapLayers.hpp"
-#include "EMPlayers.hpp"
 #include "BatchedPtensors0b.hpp"
 
 using namespace ptens;
@@ -36,6 +34,8 @@ int main(int argc, char** argv){
   Ptens0 X0({x0,x0,x0});
   cout<<X0<<endl;
 
+  Ptens0 Y0=Ptens0::linmaps(X0);
+  cout<<Y0<<endl;
 
 }
 

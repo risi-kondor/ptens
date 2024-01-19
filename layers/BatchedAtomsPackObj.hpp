@@ -27,6 +27,7 @@ namespace ptens{
 
     typedef cnine::object_pack_s<AtomsPackObj> BASE;
 
+    using BASE::BASE;
     using BASE::size;
     using BASE::operator[];
 

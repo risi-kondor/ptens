@@ -29,13 +29,16 @@ namespace ptens{
   public:
 
     typedef cnine::Ltensor<TYPE> BASE;
-    
+    typedef cnine::Ltensor<TYPE> TENSOR;
+
     using BASE::BASE;
+    using BASE::dim;
+
 
     virtual ~BatchedPtensorsb(){}
 
-    //virtual BatchedPtensorsb& get_grad(){CNINE_UNIMPL();return *this;} // dummy
-    //virtual const BatchedPtensorsb& get_grad() const {CNINE_UNIMPL(); return *this;} // dummy
+    virtual BatchedPtensorsb& get_grad(){CNINE_UNIMPL();return *this;} // dummy
+    virtual const BatchedPtensorsb& get_grad() const {CNINE_UNIMPL(); return *this;} // dummy
 
 
   public: // ---- Operations ---------------------------------------------------------------------------------
@@ -48,7 +51,6 @@ namespace ptens{
     //return OBJ(BASE::stack(0,list),AtomsPackObjBase::cat(v));
     //}
 
-    /*
     void cat_channels_back0(const BatchedPtensorsb& g){
       get_grad()+=g.get_grad().block(0,0,dim(0),dim(1));
     }
@@ -72,12 +74,11 @@ namespace ptens{
     void add_ReLU_back(const BatchedPtensorsb& g, const float alpha){
       get_grad().BASE::add_ReLU_back(g.get_grad(),*this,alpha);
     }
-    */
 
   };
 
-  /*
-  template<typename OBJ>
+
+  template<typename OBJ, typename = typename std::enable_if<std::is_base_of<BatchedPtensorsb<float>, OBJ>::value, OBJ>::type>
   OBJ cat_channels(const OBJ& x, const OBJ& y){
     //PTENS_ASSRT(x.atoms==y.atoms);
     PTENS_ASSRT(x.dim(0)==y.dim(0));
@@ -87,28 +88,27 @@ namespace ptens{
     return R;
   }
 
-  template<typename OBJ, typename TYPE>
+  template<typename OBJ, typename = typename std::enable_if<std::is_base_of<BatchedPtensorsb<float>, OBJ>::value, OBJ>::type, typename TYPE>
   OBJ scale_channels(const OBJ& x, const cnine::Ltensor<TYPE>& s){
     return OBJ(x.scale_columns(s),x.atoms);
   }
 
-  template<typename OBJ, typename TYPE>
+  template<typename OBJ, typename = typename std::enable_if<std::is_base_of<BatchedPtensorsb<float>, OBJ>::value, OBJ>::type, typename TYPE>
   OBJ mprod(const OBJ& x, const cnine::Ltensor<TYPE>& y){
     return OBJ(x*y,x.atoms);
   }
 
-  template<typename OBJ, typename TYPE>
+  template<typename OBJ, typename = typename std::enable_if<std::is_base_of<BatchedPtensorsb<float>, OBJ>::value, OBJ>::type, typename TYPE>
   OBJ linear(const OBJ& x, const cnine::Ltensor<TYPE>& w, const cnine::Ltensor<TYPE>& b){
     OBJ R(x*w,x.atoms);
     R.view2().add_broadcast0(b.view1());
     return R;
   }
 
-  template<typename OBJ, typename TYPE>
+  template<typename OBJ, typename = typename std::enable_if<std::is_base_of<BatchedPtensorsb<float>, OBJ>::value, OBJ>::type, typename TYPE>
   OBJ ReLU(const OBJ& x, TYPE alpha){
     return OBJ(x.ReLU(alpha),x.atoms);
   }
-  */
 
 }
 

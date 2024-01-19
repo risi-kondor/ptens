@@ -59,6 +59,44 @@ namespace ptens{
     }
     */
 
+  public: // ---- Access ------------------------------------------------------------------------------------
+
+
+    int size() const{
+      return obj->size();
+    }
+
+    int tsize() const{
+      return obj->tsize();
+    }
+
+    int offset(const int i) const{
+      return obj->offset(i);
+    }
+
+    int nrows(const int i) const{
+      return obj->nrows(i);
+    }
+
+    SUB& operator[](const int i){
+      return (*obj)[i];
+    }
+
+    const SUB& operator[](const int i) const{
+      return (*obj)[i];
+    }
+
+    //vector<vector<int> > as_vecs() const{
+    //return obj->atoms->as_vecs();
+    //}
+
+    
+
+  public: // ---- Access ------------------------------------------------------------------------------------
+
+
+
+
   public: // ---- Maps ---------------------------------------------------------------------------------------
     
     
@@ -88,37 +126,6 @@ namespace ptens{
     }
 
  
-  public: // ---- Access ------------------------------------------------------------------------------------
-
-
-    int size() const{
-      return obj->size();
-    }
-
-    int row_offset(const int i) const{
-      PTENS_ASSRT(i<=size());
-      if(i==0) return 0; 
-      return obj->row_offsets[i-1];
-    }
-
-    //Atoms operator()(const int i) const{
-    //return (*obj->atoms)(i);
-    //}
-
-    SUB& operator[](const int i){
-      return (*obj)[i];
-    }
-
-    const SUB& operator[](const int i) const{
-      return (*obj)[i];
-    }
-
-    vector<vector<int> > as_vecs() const{
-      return obj->atoms->as_vecs();
-    }
-
-    
-
   public: // ---- I/O ----------------------------------------------------------------------------------------
 
 

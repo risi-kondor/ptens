@@ -35,13 +35,13 @@ namespace ptens{
 			   public cnine::diff_class<BatchedPtensors0b<TYPE> >{
   public:
 
-    typedef  BatchedPtensorsb<TYPE> BASE;
-    typedef  cnine::Ltensor<TYPE> TENSOR;
-
+    typedef BatchedPtensorsb<TYPE> BASE;
+    typedef cnine::Ltensor<TYPE> TENSOR;
+    typedef BatchedAtomsPackN<AtomsPack0obj<int> > BatchedAtomsPack0;
+    
     using cnine::diff_class<BatchedPtensors0b<TYPE> >::grad;
     using BASE::get_dev;
 
-    //AtomsPack0Batch atoms;
     BatchedAtomsPackN<AtomsPack0obj<int> > atoms;
 
 
@@ -56,16 +56,16 @@ namespace ptens{
 
 
     //BatchedPtensors0b(){}
-    /*
-    BatchedPtensors0b(const AtomsPack0batch& _atoms, const TENSOR& M):
+
+    BatchedPtensors0b(const BatchedAtomsPack0& _atoms, const TENSOR& M):
       BASE(M), atoms(_atoms){}
 
-    BatchedPtensors0b(const AtomsPack0batch& _atoms, const int _nc, const int _dev):
+    BatchedPtensors0b(const BatchedAtomsPack0& _atoms, const int _nc, const int _dev):
       BatchedPtensors0b(_atoms,_nc,0,_dev){}
 
-    BatchedPtensors0b(const AtomsPack0batch& _atoms, const int _nc, const int fcode, const int _dev):
-      BASE({atoms.total(),nc},fcode,_dev), atoms(_atoms){}
-    */
+    BatchedPtensors0b(const BatchedAtomsPack0& _atoms, const int _nc, const int fcode, const int _dev):
+      BASE({_atoms.tsize(),_nc},fcode,_dev), atoms(_atoms){}
+
 
     BatchedPtensors0b(const initializer_list<Ptensors0b<TYPE> >& list):
       BASE(cnine::Ltensor<TYPE>::stack(0,list)){
@@ -126,13 +126,16 @@ namespace ptens{
       return TENSOR::dim(1);
     }
 
+    Ptensors0b<TYPE> view_of(const int i) const{
+      return Ptensors0b<TYPE>(TENSOR::rows(atoms.offset(i),atoms.nrows(i)),atoms.obj->obj[i]);
+    }
+
     Ptensors0b<TYPE> operator[](const int i){
-      return Ptensors0b<TYPE>(TENSOR::rows(1,2),atoms[i]);
+      return Ptensors0b<TYPE>(atoms.obj->obj[i],TENSOR::rows(atoms.offset(i)),atoms.nrows(i));
     }
 
     Ptensors0b<TYPE> operator[](const int i) const{
-      int nrows=atoms.row_offset(i+1)-atoms.row_offset(i);
-      return Ptensors0b<TYPE>(atoms.obj->obj[i],TENSOR::rows(atoms.row_offset(i),nrows));
+      return Ptensors0b<TYPE>(atoms.obj->obj[i],TENSOR::rows(atoms.offset(i),atoms.nrows(i)));
     }
 
 
@@ -141,7 +144,7 @@ namespace ptens{
 
     template<typename SOURCE, typename = typename std::enable_if<std::is_base_of<BatchedPtensorsb<float>, SOURCE>::value, SOURCE>::type>
     static BatchedPtensors0b<TYPE> linmaps(const SOURCE& x){
-      BatchedPtensors0b<TYPE> R(x.a,x.get_nc()*vector<int>({1,1,2})[x.getk()],x.get_dev());
+      BatchedPtensors0b<TYPE> R(x.atoms,x.get_nc()*vector<int>({1,1,2})[x.getk()],x.get_dev());
       R.add_linmaps(x);
       return R;
     }
@@ -157,22 +160,14 @@ namespace ptens{
     template<typename SOURCE, typename = typename std::enable_if<std::is_base_of<BatchedPtensorsb<float>, SOURCE>::value, SOURCE>::type>
     void add_linmaps(const SOURCE& x){
       for(int i=0; i<size(); i++)
-	(*this)[i].add_linmaps(x[i]);
+	view_of(i).add_linmaps(x.view_of(i));
     }
 
     template<typename SOURCE, typename = typename std::enable_if<std::is_base_of<BatchedPtensorsb<float>, SOURCE>::value, SOURCE>::type>
     void add_linmaps_back(const SOURCE& x){
       for(int i=0; i<size(); i++)
-	(*this)[i].add_linmaps_back(x[i]);
+	view_of(i).add_linmaps_back(x.view_of(i));
     }
-
-    //void add_linmaps(const Ptensors1bBatch<TYPE>& x){
-      //add(x.reduce0());
-    //}
-
-    //void add_linmaps(const Ptensors2bBatch<TYPE>& x){
-    //add(x.reduce0());
-    //}
 
     template<typename SOURCE>
     void add_gather(const SOURCE& x){

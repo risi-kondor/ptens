@@ -20,14 +20,14 @@ pybind11::class_<Ptensors0/*,cnine::RtensorPack*/>(m,"ptensors0")
   .def_static("sequential",[](const int n, const int _nc, const int _dev){
       return Ptensors0::sequential(n,_nc,_dev);}, py::arg("atoms"),py::arg("nc"),py::arg("device")=0)
 
-//.def_static("raw",[](const vector<vector<int> >& v, const int _nc, const int _dev){
-//    return Ptensors0::raw(AtomsPack(v),_nc,_dev);}, py::arg("atoms"),py::arg("nc"),py::arg("device")=0)
-//.def_static("zero",[](const vector<vector<int> >& v, const int _nc, const int _dev){
-//    return Ptensors0::zero(AtomsPack(v),_nc,_dev);}, py::arg("atoms"),py::arg("nc"),py::arg("device")=0)
-//.def_static("gaussian",[](const vector<vector<int> >& v, const int _nc, const float sigma, const int _dev){
-//    return Ptensors0::gaussian(AtomsPack(v),_nc,sigma,_dev);}, py::arg("atoms"),py::arg("nc"),py::arg("sigma"),py::arg("device")=0)
-//.def_static("sequential",[](const vector<vector<int> >& v, const int _nc, const int _dev){
-//    return Ptensors0::sequential(AtomsPack(v),_nc,_dev);}, py::arg("atoms"),py::arg("nc"),py::arg("device")=0)
+  .def_static("raw",[](const vector<vector<int> >& v, const int _nc, const int _dev){
+      return Ptensors0::raw(AtomsPack(v),_nc,_dev);}, py::arg("atoms"),py::arg("nc"),py::arg("device")=0)
+  .def_static("zero",[](const vector<vector<int> >& v, const int _nc, const int _dev){
+      return Ptensors0::zero(AtomsPack(v),_nc,_dev);}, py::arg("atoms"),py::arg("nc"),py::arg("device")=0)
+  .def_static("gaussian",[](const vector<vector<int> >& v, const int _nc, const float sigma, const int _dev){
+      return Ptensors0::gaussian(AtomsPack(v),_nc,sigma,_dev);}, py::arg("atoms"),py::arg("nc"),py::arg("sigma"),py::arg("device")=0)
+  .def_static("sequential",[](const vector<vector<int> >& v, const int _nc, const int _dev){
+      return Ptensors0::sequential(AtomsPack(v),_nc,_dev);}, py::arg("atoms"),py::arg("nc"),py::arg("device")=0)
 
   .def_static("raw",[](const AtomsPack& _atoms, const int _nc, const int _dev){
       return Ptensors0::raw(_atoms,_nc,_dev);}, py::arg("atoms"),py::arg("nc"),py::arg("device")=0)

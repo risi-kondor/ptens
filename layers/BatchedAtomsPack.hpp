@@ -15,6 +15,7 @@
 #ifndef _ptens_BatchedAtomsPack
 #define _ptens_BatchedAtomsPack
 
+#include "AtomsPack.hpp"
 #include "BatchedAtomsPackObj.hpp"
 
 
@@ -38,6 +39,10 @@ namespace ptens{
 
     BatchedAtomsPack(shared_ptr<BatchedAtomsPackObj> _obj):
       obj(_obj){}
+
+    BatchedAtomsPack(const vector<AtomsPack>& x):
+      BatchedAtomsPack(new BatchedAtomsPackObj(cnine::mapcar<AtomsPack,shared_ptr<AtomsPackObj> >
+	  (x,[](const AtomsPack& y){return y.obj;}))){}
 
 
   public: // ----- Access ------------------------------------------------------------------------------------

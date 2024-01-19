@@ -29,10 +29,15 @@ namespace ptens{
     typedef cnine::object_pack_s<SUB> BASE;
 
     //using BASE::BASE;
+    using BASE::obj;
     using BASE::size;
     using BASE::operator[];
 
     vector<int> row_offsets;
+
+
+  public: // ---- Constructors -------------------------------------------------------------------------------
+
 
     BatchedAtomsPackNobj(const vector<shared_ptr<SUB> >& x):
       BASE(x){
@@ -71,6 +76,24 @@ namespace ptens{
     int getk() const{
       PTENS_ASSRT(size()>0);
       return (*this)[0].getk();
+    }
+
+    int tsize() const{
+      int t=0; 
+      if(getk()==0) for(auto& p:obj) t+=p->atoms->tsize0();
+      if(getk()==1) for(auto& p:obj) t+=p->atoms->tsize1();
+      if(getk()==2) for(auto& p:obj) t+=p->atoms->tsize2();
+      return t;
+    }
+
+    int offset(const int i) const{
+      PTENS_ASSRT(i<=size());
+      if(i==0) return 0; 
+      return row_offsets[i-1];
+    }
+
+    int nrows(const int i) const{
+      return offset(i+1)-offset(i);
     }
 
     /*
@@ -133,6 +156,35 @@ namespace ptens{
       return BatchedMessageMap(std::move(prog));
     }
 
+
+
+
+  public: // ---- I/O ----------------------------------------------------------------------------------------
+
+
+    string classname() const{
+      return "AtomsPack0batchObj";
+    }
+
+    string repr() const{
+      return "AtomsPack0batchObj";
+    }
+
+    //string str(const string indent="") const{
+    //return atoms->str(indent);
+    //}
+
+    friend ostream& operator<<(ostream& stream, const BatchedAtomsPackNobj& v){
+      stream<<v.str(); return stream;}
+
+
+  };
+
+}
+
+#endif 
+
+
     /*
     BatchedMessageMap message_map(const BatchedMessageList& lists, const BatchedAtomsPackNobj<AtomsPack0obj<int> >& y){
       return mmap0(lists,y);}
@@ -168,30 +220,3 @@ namespace ptens{
 	return BatchedMessageMap(prog);
       });
     */
-
-
-
-  public: // ---- I/O ----------------------------------------------------------------------------------------
-
-
-    string classname() const{
-      return "AtomsPack0batchObj";
-    }
-
-    string repr() const{
-      return "AtomsPack0batchObj";
-    }
-
-    //string str(const string indent="") const{
-    //return atoms->str(indent);
-    //}
-
-    friend ostream& operator<<(ostream& stream, const BatchedAtomsPackNobj& v){
-      stream<<v.str(); return stream;}
-
-
-  };
-
-}
-
-#endif 
