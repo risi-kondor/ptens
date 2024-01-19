@@ -103,6 +103,9 @@ class ptensors2b(torch.Tensor):
     # ---- Operations ----------------------------------------------------------------------------------------
 
 
+    def __len__(self):
+	return len(self.obj)
+    
     def __add__(self,y):
         return Ptensorsb_addFn.apply(self,y)
 

@@ -72,6 +72,9 @@ class ptensors2(torch.Tensor):
     # ----- Access -------------------------------------------------------------------------------------------
 
 
+    def __len__(self):
+	return len(self.obj)
+    
     def _get_grad(self):
         return self.obj.get_grad()
     

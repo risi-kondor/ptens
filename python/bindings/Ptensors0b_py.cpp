@@ -32,6 +32,7 @@ pybind11::class_<Ptensors0b<float> >(m,"ptensors0b")
 // ---- Conversions, transport, etc. ------------------------------------------------------------------------
 
 
+  .def("__len__",&Ptensors0b<float>::size)
   .def("add_to_grad",[](Ptensors0b<float>& x, at::Tensor& y){x.add_to_grad(ATview<float>(y));})
   .def("add_to_grad",[](Ptensors0b<float>& x, const Ptensors0b<float>& y, const float c){x.add_to_grad(y,c);})
   .def("get_grad",[](Ptensors0b<float>& x){return x.get_grad();})
