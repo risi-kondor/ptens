@@ -9,7 +9,7 @@ pybind11::class_<ptens::Ggraph>(m,"ggraph")
 
   .def("dense",[](const Ggraph& G){return G.dense().torch();})
 
-  .def("subgraphs",[](const Hgraph& G, const Subgraph& H){
+  .def("subgraphs",[](const Ggraph& G, const Subgraph& H){
       return G.subgraphs(H);})
 
   .def("str",&Ggraph::str,py::arg("indent")="")
