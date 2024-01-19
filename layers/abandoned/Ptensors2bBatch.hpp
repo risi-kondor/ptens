@@ -12,13 +12,13 @@
  *
  */
 
-#ifndef _ptens_Ptensors1bBatch
-#define _ptens_Ptensors1bBatch
+#ifndef _ptens_Ptensors2bBatch
+#define _ptens_Ptensors2bBatch
 
 #include "diff_class.hpp"
 
 #include "AtomsPackBatch.hpp"
-#include "Ptensors1b.hpp"
+#include "Ptensors2b.hpp"
 
 
 namespace ptens{
@@ -28,10 +28,12 @@ namespace ptens{
 
 
   template<typename TYPE>
-  class Ptensors1bBatch: public object_pack<Ptensors1b<TYPE> >, public cnine::diff_class<Ptensors1bBatch<TYPE> >{
+  class Ptensors2bBatch: public cnine::object_pack<Ptensors2b<TYPE> >, public cnine::diff_class<Ptensors2bBatch<TYPE> >{
+  public:
 
-    typedef object_pack<Ptennsors1b<TYPE> > BASE;
+    typedef cnine::object_pack<Ptensors2b<TYPE> > BASE;
 
+    using cnine::diff_class<Ptensors2bBatch<TYPE> >::grad;
     using BASE::obj;
     using BASE::size;
     using BASE::operator[];
@@ -41,77 +43,83 @@ namespace ptens{
 
     AtomsPackBatch atoms;
 
+    ~Ptensors2bBatch(){
+#ifdef WITH_FAKE_GRAD
+      if(grad) delete grad;
+#endif 
+    }
+
 
   public: // ----- Constructors ------------------------------------------------------------------------------
 
 
-    //Ptensors1bBatch(){}
+    //Ptensors2bBatch(){}
 
-    Ptensors1bBatch(const AtomsPackBatch& _atoms):
+    Ptensors2bBatch(const AtomsPackBatch& _atoms):
       atoms(_atoms){}
 
-    Ptensors1bBatch R(const AtomsPackBatch& a, const int _nc, const int _dev):
-      Ptensors1bBatch(a){
-      for(int i=0; i<atoms.size() i++)
-	obj.push_back(Ptensors1b<TYPE>(atoms[i],_nc,_dev));
+    Ptensors2bBatch(const AtomsPackBatch& a, const int _nc, const int _dev):
+      Ptensors2bBatch(a){
+      for(int i=0; i<atoms.size(); i++)
+	obj.push_back(Ptensors2b<TYPE>(atoms[i],_nc,_dev));
     }
 
-    Ptensors1bBatch R(const AtomsPackBatch& a, const int _nc, const int fcode, const int _dev):
-      Ptensors1bBatch(a){
-      for(int i=0; i<atoms.size() i++)
-	obj.push_back(Ptensors1b<TYPE>(atoms[i],_nc,fcode,_dev));
+    Ptensors2bBatch(const AtomsPackBatch& a, const int _nc, const int fcode, const int _dev):
+      Ptensors2bBatch(a){
+      for(int i=0; i<atoms.size(); i++)
+	obj.push_back(Ptensors2b<TYPE>(atoms[i],_nc,fcode,_dev));
     }
 
 
   public: // ----- Spawning ----------------------------------------------------------------------------------
 
 
-    Ptensors1bBatch copy() const{
-      Ptensors1bBatch R(atoms);
+    Ptensors2bBatch copy() const{
+      Ptensors2bBatch R(atoms);
       for(int i=0; i<size(); i++)
 	R.obj.push_back((*this)[i].copy());
       return R;
     }
 
-    Ptensors1b copy(const int _dev) const{
-      Ptensors1bBatch R(atoms);
+    Ptensors2bBatch copy(const int _dev) const{
+      Ptensors2bBatch R(atoms);
       for(int i=0; i<size(); i++)
 	R.obj.push_back((*this)[i].copy(_dev));
       return R;
     }
 
-    Ptensors1b zeros_like() const{
-      Ptensors1bBatch R(atoms);
+    Ptensors2bBatch zeros_like() const{
+      Ptensors2bBatch R(atoms);
       for(int i=0; i<size(); i++)
 	R.obj.push_back((*this)[i].zeros_like());
       return R;
     }
 
-    Ptensors1b gaussian_like() const{
-      Ptensors1bBatch R(atoms);
+    Ptensors2bBatch gaussian_like() const{
+      Ptensors2bBatch R(atoms);
       for(int i=0; i<size(); i++)
 	R.obj.push_back((*this)[i].gaussian_like());
       return R;
     }
 
-    static Ptensors1b zeros_like(const Ptensors1b& x){
-      Ptensors1bBatch R(atoms);
+    static Ptensors2bBatch zeros_like(const Ptensors2bBatch& x){
+      Ptensors2bBatch R(x.atoms);
       for(int i=0; i<size(); i++)
-	R.obj.push_back(Ptensors1b::zeros_like(x[i]));
+	R.obj.push_back(Ptensors2b<TYPE>::zeros_like(x[i]));
       return R;
     }
 
-    static Ptensors1b gaussian_like(const Ptensors1b& x){
-      Ptensors1bBatch R(atoms);
+    static Ptensors2bBatch gaussian_like(const Ptensors2bBatch& x){
+      Ptensors2bBatch R(x.atoms);
       for(int i=0; i<size(); i++)
-	R.obj.push_back(Ptensors1b::gaussian_like(x[i]));
+	R.obj.push_back(Ptensors2b<TYPE>::gaussian_like(x[i]));
       return R;
     }
 
-    static Ptensors1b* new_zeros_like(const Ptensors1b& x){
-      Ptensors1bBatch* R=new Ptensors1bBatch(atoms);
+    static Ptensors2bBatch* new_zeros_like(const Ptensors2bBatch& x){
+      Ptensors2bBatch* R=new Ptensors2bBatch(x.atoms);
       for(int i=0; i<size(); i++)
-	R->obj.push_back(Ptensors1b::zeros_like(x[i]));
+	R->obj.push_back(Ptensors2b<TYPE>::zeros_like(x[i]));
       return R;
     }
     
@@ -147,22 +155,22 @@ namespace ptens{
 
 
     template<typename SOURCE, typename = typename std::enable_if<std::is_base_of<Ptensorsb<float>, SOURCE>::value, SOURCE>::type>
-    static Ptensors1bBatch<TYPE> linmaps(const SOURCE& x){
-      Ptensors1bBatch<float> R(x.atoms,x.get_nc()*vector<int>({1,1,2})[x.getk()],x.get_dev());
+    static Ptensors2bBatch<TYPE> linmaps(const SOURCE& x){
+      Ptensors2bBatch<float> R(x.atoms,x.get_nc()*vector<int>({1,1,2})[x.getk()],x.get_dev());
       R.add_linmaps(x);
       return R;
     }
 
     template<typename SOURCE, typename = typename std::enable_if<std::is_base_of<Ptensorsb<float>, SOURCE>::value, SOURCE>::type>
-    static Ptensors1b<TYPE> gather(const SOURCE& x, const AtomsPackBatch& a){
-      Ptensors1bBatch<float> R(a,x.get_nc()*vector<int>({1,1,2})[x.getk()],x.get_dev());
-      Ptensors1bBatch<TYPE> R(a);
+    static Ptensors2b<TYPE> gather(const SOURCE& x, const AtomsPackBatch& a){
+      //Ptensors2bBatch<float> R(a,x.get_nc()*vector<int>({1,1,2})[x.getk()],x.get_dev());
+      Ptensors2bBatch<TYPE> R(a);
       for(int i=0; i<x.size(); i++)
-	R.obj.push_back(PtensorsOb<TYPE>::gather(x[i],a[i]));
+	R.obj.push_back(Ptensors2b<TYPE>::gather(x[i],a[i]));
       return R;
     }
 
-    void add_linmaps(const Ptensors1bBatch<TYPE>& x){
+    void add_linmaps(const Ptensors0bBatch<TYPE>& x){
       //add(x);
     }
 
@@ -176,7 +184,7 @@ namespace ptens{
 
     template<typename SOURCE>
     void add_gather(const SOURCE& x){
-      (atoms.overlaps_mmap(x.atoms))(*this,x);
+      //(atoms.overlaps_mmap(x.atoms))(*this,x);
     }
 
     template<typename OUTPUT>
@@ -189,7 +197,7 @@ namespace ptens{
 
 
     string classname() const{
-      return "Ptensors1bBatch";
+      return "Ptensors2bBatch";
     }
 
 
@@ -198,4 +206,3 @@ namespace ptens{
 }
 
 #endif 
-

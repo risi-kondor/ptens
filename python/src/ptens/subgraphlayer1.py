@@ -378,7 +378,7 @@ class Subgraph_layer1_autobahnFn(torch.autograd.Function):
      @staticmethod
      def forward(ctx,x,w,b):
          r=ptens.subgraphlayer1(1)
-         r.obj=ptens.autobahn(x,w,b)
+         r.obj=x.obj.autobahn(w,b)
          ctx.x=x.obj
          ctx.w=w
          ctx.b=b

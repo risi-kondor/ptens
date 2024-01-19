@@ -12,31 +12,31 @@
  */
 
 
-#ifndef _ptens_AtomsPackBatch
-#define _ptens_AtomsPackBatch
+#ifndef _ptens_BatchedAtomsPack
+#define _ptens_BatchedAtomsPack
 
-#include "AtomsPackBatchObj.hpp"
+#include "BatchedAtomsPackObj.hpp"
 
 
 namespace ptens{
 
-  class AtomsPackBatch{
+  class BatchedAtomsPack{
   public:
 
 
-    shared_ptr<AtomsPackBatchObj> obj;
+    shared_ptr<BatchedAtomsPackObj> obj;
 
 
   public: // ---- Constructors ------------------------------------------------------------------------------
 
 
-    AtomsPackBatch():
-      obj(new AtomsPackBatchObj()){}
+    BatchedAtomsPack():
+      obj(new BatchedAtomsPackObj()){}
 
-    AtomsPackBatch(AtomsPackBatchObj* _obj):
+    BatchedAtomsPack(BatchedAtomsPackObj* _obj):
       obj(_obj){}
 
-    AtomsPackBatch(shared_ptr<AtomsPackBatchObj> _obj):
+    BatchedAtomsPack(shared_ptr<BatchedAtomsPackObj> _obj):
       obj(_obj){}
 
 
@@ -47,7 +47,7 @@ namespace ptens{
       return obj->size();
     }
 
-    AtomsPack operator[](const int i){
+    AtomsPack operator[](const int i) const{
       PTENS_ASSRT(i<size());
       return obj->obj[i];
     }
@@ -56,27 +56,27 @@ namespace ptens{
   public: // ---- Operations ---------------------------------------------------------------------------------
 
 
-    AtomsPackBatch permute(const cnine::permutation& pi){
-      return AtomsPackBatch(new AtomsPackBatchObj(obj->permute(pi)));
-    } 
+    //BatchedAtomsPack permute(const cnine::permutation& pi){
+    //return BatchedAtomsPack(new BatchedAtomsPackObj(obj->permute(pi)));
+    //} 
     
-    MessageList overlaps_mlist(const AtomsPackBatch& y){
-      return obj->overlaps_mlist(*y.obj);
-    }
+    //MessageListBatch overlaps_mlist(const BatchedAtomsPack& y){
+    //return obj->overlaps_mlist(*y.obj);
+    //}
 
 
   public: // ---- I/O ----------------------------------------------------------------------------------------
 
 
     string classname() const{
-      return "AtomsPackBatch";
+      return "BatchedAtomsPack";
     }
 
     string str(const string indent="") const{
       return obj->str(indent);
     }
 
-    friend ostream& operator<<(ostream& stream, const AtomsPackBatch& v){
+    friend ostream& operator<<(ostream& stream, const BatchedAtomsPack& v){
       stream<<v.str(); return stream;}
 
   };

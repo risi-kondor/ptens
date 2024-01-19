@@ -50,6 +50,10 @@ namespace ptens{
   public: // ---- Access ------------------------------------------------------------------------------------
 
 
+    static int getk(){
+      return 0;
+    }
+
     int offset(const int i) const{
       return i;
     }

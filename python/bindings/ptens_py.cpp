@@ -7,6 +7,7 @@
 #include "PtensSession.hpp"
 
 #include "Hgraph.hpp"
+#include "PtensFindPlantedSubgraphs.hpp"
 #include "Ggraph.hpp"
 #include "Subgraph.hpp"
 #include "Ptensor0.hpp"

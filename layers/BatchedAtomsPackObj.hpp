@@ -9,33 +9,26 @@
  * use is prohibited. All redistributed versions of this file (in 
  * original or modified form) must retain this copyright notice and 
  * must be accompanied by a verbatim copy of the license. 
- *
  */
 
-#ifndef _ptens_MessageList
-#define _ptens_MessageList
 
+#ifndef _ptens_BatchedAtomsPackObj
+#define _ptens_BatchedAtomsPackObj
+
+#include "object_pack_s.hpp"
 #include "AtomsPackObj.hpp"
-#include "MessageListObj.hpp"
-#include "observable.hpp"
+
 
 namespace ptens{
 
 
-  class MessageListBatch: public object_pack_s<MessageListObj>{
+  class BatchedAtomsPackObj: public cnine::object_pack_s<AtomsPackObj>{
   public:
 
+    typedef cnine::object_pack_s<AtomsPackObj> BASE;
 
-    MessageListBatch(){}
-
-
-  public: // ---- Named constructors ------------------------------------------------------------------------
-
-
-  public: // ---- Copying ------------------------------------------------------------------------------------
-
-
-  public: // ---- I/O ----------------------------------------------------------------------------------------
+    using BASE::size;
+    using BASE::operator[];
 
 
   };

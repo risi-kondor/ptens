@@ -150,6 +150,10 @@ namespace ptens{
       return Ptensors0b(x.TENSOR::zeros_like(),x.atoms);
     }
 
+    static Ptensors0b zeros_like(const Ptensors0b& x, const int nc){
+      return Ptensors0b(TENSOR({x.dim(0),nc},0,x.get_dev()),x.atoms);
+    }
+
     static Ptensors0b gaussian_like(const Ptensors0b& x){
       return Ptensors0b(x.TENSOR::gaussian_like(),x.atoms);
     }
