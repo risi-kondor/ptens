@@ -40,9 +40,16 @@ int main(int argc, char** argv){
   SubgraphLayer0b<float> f0(G,5,4);
   cout<<f0<<endl;
 
-  SubgraphLayer1b<float> f1=gather1(f0,edge);
+  SubgraphLayer1b<float> f1=gather1(f0,Subgraph::star(99));
+  cout<<"-------"<<endl;
   cout<<f1.str()<<endl;
 
+  SubgraphLayer1b<float> f2=gather1(f1,Subgraph::star(99));
+
+  f1.add_gather_back(f2);
+  cout<<f1.str()<<endl;
+
+  /*
   Ltensor<float> W({5,5},filltype=4);
   Ltensor<float> b({5},filltype=4);
 
@@ -53,5 +60,6 @@ int main(int argc, char** argv){
   Ptens1 X1=Ptens1(xatoms,channels=3,filltype=3);
   SubgraphLayer1b<float> U(X1,G,trivial);
   cout<<U<<endl;
+  */
 
 }
