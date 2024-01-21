@@ -42,7 +42,7 @@ pybind11::class_<Ptensors1b<float> >(m,"ptensors1b")
   .def("__len__",&Ptensors1b<float>::size)
   .def("get_dev",&Ptensors1b<float>::get_dev)
   .def("get_nc",&Ptensors1b<float>::get_nc)
-  .def("get_atoms",[](const Ptensors1b<float>& x){return *x.atoms.obj->atoms;})
+  .def("get_atoms",[](const Ptensors1b<float>& x){return x.get_atoms();})
   .def("dim",&Ptensors1b<float>::dim)
 
   .def("to",[](const Ptensors1b<float>& x, const int dev){return Ptensors1b<float>(x,dev);})
