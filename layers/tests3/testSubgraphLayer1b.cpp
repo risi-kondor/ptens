@@ -27,6 +27,10 @@ typedef Ptensors1b<float> Ptens1;
 
 int main(int argc, char** argv){
 
+  cnine_session session;
+
+  cudaDeviceReset();
+
   Ggraph G=Ggraph::random(10);
   cout<<G<<endl;
 
@@ -37,7 +41,7 @@ int main(int argc, char** argv){
   Subgraph triangle=Subgraph::triangle();
   cout<<triangle<<endl;
 
-  SubgraphLayer0b<float> f0(G,5,4);
+  SubgraphLayer0b<float> f0(G,5,4,1);
   cout<<f0<<endl;
 
   SubgraphLayer1b<float> f1=gather1(f0,Subgraph::star(99));
@@ -46,8 +50,8 @@ int main(int argc, char** argv){
 
   SubgraphLayer1b<float> f2=gather1(f1,Subgraph::star(99));
 
-  f1.add_gather_back(f2);
-  cout<<f1.str()<<endl;
+  f1.get_grad().add_gather_back(f2);
+  cout<<f1.get_grad()<<endl;
 
   /*
   Ltensor<float> W({5,5},filltype=4);
