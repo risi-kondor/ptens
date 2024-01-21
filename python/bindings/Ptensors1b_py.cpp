@@ -61,7 +61,7 @@ pybind11::class_<Ptensors1b<float> >(m,"ptensors1b")
 
   .def_static("cat",&Ptensors1b<float>::cat)
   .def("add_cat_back",[](Ptensors1b<float>& x, Ptensors1b<float>& r, const int offs){
-      x.get_grad()+=r.slices(0,offs,x.dim(0));})
+      x.get_grad()+=r.get_grad().slices(0,offs,x.dim(0));})
 
 //.def("outer",&Ptensors1b::outer)
 //.def("outer_back0",&Ptensors1b::outer_back0)
