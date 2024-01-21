@@ -28,8 +28,10 @@ pybind11::class_<Ptensors2b<float> >(m,"ptensors2b")
 
 
   .def("__len__",&Ptensors2b<float>::size)
-  .def("add_to_grad",[](Ptensors2b<float>& x, at::Tensor& y){x.add_to_grad(ATview<float>(y));})
-  .def("add_to_grad",[](Ptensors2b<float>& x, const Ptensors2b<float>& y, const float c){x.add_to_grad(y,c);})
+//.def("add_to_grad",[](Ptensors2b<float>& x, at::Tensor& y){x.add_to_grad(ATview<float>(y));})
+//.def("add_to_grad",[](Ptensors2b<float>& x, const Ptensors2b<float>& y, const float c){x.add_to_grad(y,c);})
+  .def("add_to_grad",[](Ptensors2b<float>& x, at::Tensor& y){x.get_grad().add(ATview<float>(y));})
+  .def("add_to_grad",[](Ptensors2b<float>& x, const Ptensors2b<float>& y, const float c){x.get_grad().add(y,c);})
   .def("get_grad",[](Ptensors2b<float>& x){return x.get_grad();})
 
   .def("__getitem__",[](const Ptensors2b<float>& x, const int i){return x(i);})

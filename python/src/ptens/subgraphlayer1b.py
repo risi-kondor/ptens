@@ -269,7 +269,9 @@ class SubgraphLayer1b_GatherFromPtensorsbFn(torch.autograd.Function):
 
     @staticmethod
     def backward(ctx,g):
+        #print(ctx.r.get_grad())
         ctx.x.add_gather_back(ctx.r)
+        #print(ctx.x.get_grad())
         return ptensorsb.dummy(), None, None
 
 

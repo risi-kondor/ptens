@@ -56,6 +56,10 @@ int main(int argc, char** argv){
   cout<<Y1<<endl;
   cout<<Y2<<endl;
 
+  Ptens1& a=Y1.get_grad();
+  Ptens1 b(a);
+  exit(0);
+
   Ptens0 X0g=Ptens0::zeros_like(X0);
   Ptens1 X1g=Ptens1::zeros_like(X1);
   Ptens2 X2g=Ptens2::zeros_like(X2);

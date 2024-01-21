@@ -26,9 +26,11 @@ pybind11::class_<Ptensors1b<float> >(m,"ptensors1b")
 // ---- Conversions, transport, etc. ------------------------------------------------------------------------
 
 
-  .def("add_to_grad",[](Ptensors1b<float>& x, at::Tensor& y){x.add_to_grad(ATview<float>(y));})
-  .def("add_to_grad",[](Ptensors1b<float>& x, const Ptensors1b<float>& y, const float c){x.add_to_grad(y,c);})
-  .def("get_grad",[](Ptensors1b<float>& x){return x.get_grad();})
+//.def("add_to_grad",[](Ptensors1b<float>& x, at::Tensor& y){x.add_to_grad(ATview<float>(y));})
+//.def("add_to_grad",[](Ptensors1b<float>& x, const Ptensors1b<float>& y, const float c){x.add_to_grad(y,c);})
+  .def("add_to_grad",[](Ptensors1b<float>& x, at::Tensor& y){x.get_grad().add(ATview<float>(y));})
+  .def("add_to_grad",[](Ptensors1b<float>& x, const Ptensors1b<float>& y, const float c){x.get_grad().add(y,c);})
+  .def("get_grad",[](Ptensors1b<float>& x){return Ptensors1b<float>(x.get_grad());})
 
   .def("__getitem__",[](const Ptensors1b<float>& x, const int i){return x(i);})
   .def("torch",[](const Ptensors1b<float>& x){return x.torch();})
