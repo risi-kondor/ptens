@@ -37,6 +37,9 @@ namespace ptens{
     BatchedAtomsPack(BatchedAtomsPackObj* _obj):
       obj(_obj){}
 
+    BatchedAtomsPack(BatchedAtomsPackObj&& _obj):
+      obj(new BatchedAtomsPackObj(_obj)){}
+
     BatchedAtomsPack(shared_ptr<BatchedAtomsPackObj> _obj):
       obj(_obj){}
 

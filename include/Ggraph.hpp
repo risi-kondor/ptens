@@ -17,6 +17,9 @@
 #include "Hgraph.hpp"
 #include "GgraphObj.hpp"
 #include "Subgraph.hpp"
+#include "PtensSession.hpp"
+
+extern ptens::PtensSession ptens_session;
 
 
 namespace ptens{
@@ -25,22 +28,25 @@ namespace ptens{
   class Ggraph{
   public:
 
-    //typedef Hgraph BASE;
-    typedef GgraphObj BASE;
+    //typedef Hgraph OBJ;
+    typedef GgraphObj OBJ;
 
-    shared_ptr<BASE> obj;
+    shared_ptr<OBJ> obj;
 
     Ggraph():
-      obj(new BASE()){};
+      obj(new OBJ()){};
 
-    Ggraph(BASE* x):
+    Ggraph(OBJ* x):
+      obj(x){}
+
+    Ggraph(shared_ptr<OBJ>& x):
       obj(x){}
 
     Ggraph(const initializer_list<pair<int,int> >& list, const int n=-1): 
-      obj(new BASE(n,list)){};
+      obj(new OBJ(n,list)){};
 
     Ggraph(const cnine::RtensorA& M):
-      obj(new BASE(cnine::Tensor<float>(M))){}
+      obj(new OBJ(cnine::Tensor<float>(M))){}
 
     //Ggraph(const Ggraph& x):
     //obj(x.obj){}
@@ -50,17 +56,32 @@ namespace ptens{
 
 
     static Ggraph random(const int _n, const float p=0.5){
-      return new BASE(BASE::random(_n,p));}
+      return new OBJ(OBJ::random(_n,p));}
 
     static Ggraph from_edges(int n, const cnine::Tensor<int>& M){
       if(n==-1) n=M.max()+1;
-      return new BASE(n,M);
+      return new OBJ(n,M);
+    }
+
+    static Ggraph from_edge_list(int n, const cnine::Tensor<int>& M){
+      if(n==-1) n=M.max()+1;
+      return new OBJ(n,M);
+    }
+
+    static Ggraph cached_from_edge_list(const cnine::Tensor<int>& M){
+      auto [id,G]=ptens_session.graph_cache.from_edge_list(M);
+      return Ggraph(G);
+    }
+
+    static Ggraph cached_from_edge_list(int n, const cnine::Tensor<int>& M){
+      auto [id,G]=ptens_session.graph_cache.from_edge_list(M);
+      return Ggraph(G);
     }
 
     // replace this
     static Ggraph edges(int n, const cnine::RtensorA& M){
       if(n==-1) n=M.max()+1;
-      return new BASE(n,M);
+      return new OBJ(n,M);
     }
 
 
@@ -83,6 +104,10 @@ namespace ptens{
       return obj->dense().rtensor();
     }
 
+    cnine::Ltensor<int> edge_list() const{
+      return obj->edge_list();
+    }
+
     bool operator==(const Ggraph& x) const{
       return obj==x.obj;
     }
@@ -92,7 +117,7 @@ namespace ptens{
 
 
     Ggraph permute(const cnine::permutation& pi) const{
-      return Ggraph(new BASE(obj->permute(pi)));
+      return Ggraph(new OBJ(obj->permute(pi)));
     }
 
     //cnine::array_pool<int> subgraphs_list(const Subgraph& H) const{

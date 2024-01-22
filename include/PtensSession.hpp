@@ -24,6 +24,7 @@
 
 #include "Ptens_base.hpp"
 #include "SubgraphObj.hpp"
+#include "GgraphCache.hpp"
 
 
 namespace ptens{
@@ -38,6 +39,7 @@ namespace ptens{
     //cnine::object_bank<Subgraph,SubgraphObj> subgraph_bank([]
     //(const Subgraph& x){return new SubgraphObj(x);});
     std::unordered_set<SubgraphObj> subgraphs;
+    GgraphCache graph_cache;
 
 
     PtensSession(const int _nthreads=1){

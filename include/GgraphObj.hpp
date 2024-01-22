@@ -21,6 +21,7 @@
 #include "SubgraphObj.hpp"
 #include "RtensorA.hpp"
 #include "AtomsPack.hpp"
+#include "Ltensor.hpp"
 
 
 namespace ptens{
@@ -48,6 +49,27 @@ namespace ptens{
       return BASE::random(_n,p);
     }
 
+    static GgraphObj from_edges(int n, const cnine::Tensor<int>& M){
+      GgraphObj R(n);
+      PTENS_ASSRT(M.ndims()==2);
+      PTENS_ASSRT(M.dim(0)==2);
+      for(int i=0; i<M.dims(1); i++)
+	R.set(M(0,i),M(1,i),1.0);
+      return R;
+    }
+
+    static GgraphObj from_edges(const cnine::Tensor<int>& M){
+      return GgraphObj::from_edges(M.max()+1,M);
+    }
+
+    static GgraphObj* from_edges_p(const cnine::Tensor<int>& M){
+      auto R=new GgraphObj(M.max()+1);
+      PTENS_ASSRT(M.ndims()==2);
+      PTENS_ASSRT(M.dim(0)==2);
+      for(int i=0; i<M.dims(1); i++)
+	R->set(M(0,i),M(1,i),1.0);
+      return R;
+    }
 
     // eliminate this eventually
     GgraphObj(const int n, const cnine::RtensorA& M):
@@ -57,6 +79,8 @@ namespace ptens{
       for(int i=0; i<M.dims(1); i++)
 	set(M(0,i),M(1,i),1.0);
     }
+
+    //static GgraphObj cached(const )
 
 
   public: // ---- Conversions ---------------------------------------------------------------------------------
@@ -76,6 +100,21 @@ namespace ptens{
   public: // ---- Access --------------------------------------------------------------------------------------
 
 
+    cnine::Ltensor<int> edge_list() const{
+      int N=nedges()*2;
+      cnine::Ltensor<int> R({2,N},0);
+      int t=0;
+      for_each_edge([&](const int i, const int j, const float v){
+	  R.set(0,t,i);
+	  R.set(1,t,j);
+	  R.set(0,t+1,j);
+	  R.set(1,t+1,i);
+	  t+=2;
+	});
+      return R;
+    }
+
+
   public: // ---- Operations ---------------------------------------------------------------------------------
 
 
@@ -91,7 +130,7 @@ namespace ptens{
      }
 
 
-    AtomsPack subgraphs(const SubgraphObj& H){
+    AtomsPack subgraphs(const SubgraphObj& H) const{
       auto it=subgraphpack_cache.find(H);
       if(it!=subgraphpack_cache.end()) return it->second;
       else{
