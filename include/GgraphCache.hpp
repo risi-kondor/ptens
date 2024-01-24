@@ -33,6 +33,11 @@ namespace ptens{
   public: // ---- Access -------------------------------------------------------------------------------------
 
 
+    void cache(const int key, const shared_ptr<GgraphObj>& x){
+      (*this)[key]=x;
+      edge_list_map[x->edge_list()]=key;
+    }
+
     shared_ptr<GgraphObj> operator()(const int key){
       auto it=find(key);
       if(it==BASE::end())

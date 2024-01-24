@@ -34,4 +34,12 @@ int main(int argc, char** argv){
 
   auto U=BatchedGgraph({M,M,M});
   cout<<U<<endl;
+
+  Ggraph A1=Ggraph::random(4,0.5);
+  Ggraph A2=Ggraph::random(6,0.5);
+  A1.cache(77);
+  A2.cache(78);
+
+  BatchedGgraph C(vector<int>({77,77,78}));
+  cout<<C<<endl;
 }

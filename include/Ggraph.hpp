@@ -42,11 +42,18 @@ namespace ptens{
     Ggraph(shared_ptr<OBJ>& x):
       obj(x){}
 
+    Ggraph(const shared_ptr<OBJ>& x):
+      obj(x){}
+
     Ggraph(const initializer_list<pair<int,int> >& list, const int n=-1): 
       obj(new OBJ(n,list)){};
 
     Ggraph(const cnine::RtensorA& M):
       obj(new OBJ(cnine::Tensor<float>(M))){}
+
+
+    Ggraph(const int key):
+      Ggraph(ptens_session.graph_cache(key)){}
 
     //Ggraph(const Ggraph& x):
     //obj(x.obj){}
@@ -58,9 +65,26 @@ namespace ptens{
     static Ggraph random(const int _n, const float p=0.5){
       return new OBJ(OBJ::random(_n,p));}
 
-    static Ggraph from_edges(int n, const cnine::Tensor<int>& M){
+    static Ggraph from_edges(const cnine::Tensor<int>& M, const bool cached=false){
+      int n=M.max()+1;
+      if(!cached) return new OBJ(n,M);
+      return ptens_session.graph_cache.from_edge_list(M).second;
+    }
+
+    static Ggraph from_edges(int n, const cnine::Tensor<int>& M, const bool cached=false){
       if(n==-1) n=M.max()+1;
-      return new OBJ(n,M);
+      if(!cached) return new OBJ(n,M);
+      return ptens_session.graph_cache.from_edge_list(M).second;
+    }
+
+    static Ggraph from_edges(const cnine::Tensor<int>& M, const int key){
+      int n=M.max()+1;
+      return ptens_session.graph_cache.from_edge_list(key,M);
+    }
+
+    static Ggraph from_edges(int n, const cnine::Tensor<int>& M, const int key){
+      if(n==-1) n=M.max()+1;
+      return ptens_session.graph_cache.from_edge_list(key,M);
     }
 
     static Ggraph from_edge_list(int n, const cnine::Tensor<int>& M){
@@ -106,6 +130,10 @@ namespace ptens{
 
     cnine::Ltensor<int> edge_list() const{
       return obj->edge_list();
+    }
+
+    void cache(const int key) const{
+      ptens_session.graph_cache.cache(key,obj);
     }
 
     bool operator==(const Ggraph& x) const{

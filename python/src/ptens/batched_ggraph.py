@@ -13,47 +13,39 @@
 #
 import torch
 import ptens_base
-from ptens_base import ggraph as _ggraph
+from ptens_base import batched_ggraph as _batched_ggraph
 
 
-class ggraph:
+class batched_ggraph:
 
     @classmethod
-    def from_cache(self,key):
-        G=ggraph()
-	G.obj=_ggraph(key)
+    def from_cache(self,keys):
+        G=batched_ggraph()
+        G.obj=_batched_ggraph(key)
         return G
 
     @classmethod
-    def from_edge_index(self,M,n=-1,labels=None,m=None):
-        G=ggraph()
-        if labels is None:
-            if m is None:
-                G.obj=_ggraph.edge_index(M,n)
-            else:
-                G.obj=_ggraph.edge_index(M,n,m)
-        else:
-            G.obj=_ggraph.edge_index(M,labels,n)
+    def from_graphs(self,graphs):
+        G=batched_ggraph()
+        G.obj=_batched_ggraph([x.obj for x in graphs])
         return G
 
     @classmethod
-    def from_matrix(self,M,labels=None):
-        G=ggraph()
-        if labels is None:
-            G.obj=_ggraph(M)
-        else:
-            G.obj=_ggraph.matrix(M,labels)
+    def from_edge_index(self,M,indicators):
+        G=batched_ggraph()
+        G.obj=_batched_ggraph(M,indicators)
         return G
 
-    @classmethod
-    def random(self,_n,_p):
-        G=ggraph()
-        G.obj=_ggraph.random(_n,_p)
-        return G
 
-    def torch(self):
-        return self.obj.dense()
+    def __len__(self):
+        return len(self.obj)
+    
+    def __getitem__(self,i):
+        r=ptens.ggraph()
+        r.obj=__getitem__(self.obj)
+        return r
 
+    
     def subgraphs(self,H):
         return self.obj.subgraphs(H.obj)
 

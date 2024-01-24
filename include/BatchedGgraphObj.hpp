@@ -18,6 +18,8 @@
 #include "Ggraph.hpp"
 #include "BatchedAtomsPack.hpp"
 
+extern ptens::PtensSession ptens_session;
+
 
 namespace ptens{
 
@@ -28,6 +30,12 @@ namespace ptens{
     typedef cnine::object_pack_s<GgraphObj> BASE;
 
     using BASE::BASE;
+
+
+    BatchedGgraphObj(const vector<int>& keys){
+      for(auto p: keys)
+	obj.push_back(ptens_session.graph_cache(p));
+    }
 
 
   public: //  ---- Named constructors -------------------------------------------------------------------------

@@ -46,15 +46,18 @@ namespace ptens{
       BatchedGgraph(new BatchedGgraphObj(cnine::mapcar<Ggraph,shared_ptr<GgraphObj> >
 	  (x,[](const Ggraph& y){return y.obj;}))){}
 
+    BatchedGgraph(const vector<int>& keys):
+      BatchedGgraph(new BatchedGgraphObj(keys)){}
+
 
   public: //  ---- Named constructors -------------------------------------------------------------------------
 
 
-    static BatchedGgraph from_edge_list(const vector<int>& sizes, const cnine::Tensor<int>& M, const bool cached=false){
+    static BatchedGgraph from_edge_list(const vector<int>& sizes, const cnine::TensorView<int>& M, const bool cached=false){
       return BatchedGgraphObj::from_edge_list_p(sizes,M,cached);
     }
 
-    static BatchedGgraph from_edge_list(const cnine::Tensor<int>& M, vector<int>& indicators){
+    static BatchedGgraph from_edge_list(const cnine::TensorView<int>& M, vector<int>& indicators, const bool cached=false){
       vector<int> sizes;
       int i=0;
       int t=0;
@@ -67,13 +70,23 @@ namespace ptens{
 	}
       }
       sizes.push_back(indicators.size()-t);
-      return BatchedGgraph::from_edge_list(sizes,M);
+      return BatchedGgraph::from_edge_list(sizes,M,cached);
     }
 
 
 
   public: // ---- Access --------------------------------------------------------------------------------------
 
+
+    int size() const{
+      return obj->size();
+    }
+
+    Ggraph operator[](const int i) const{
+      PTENS_ASSRT(i<size());
+      return obj->obj[i];
+    }
+    
 
   public: // ---- Operations ----------------------------------------------------------------------------------
 

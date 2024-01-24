@@ -10,6 +10,10 @@
 #include "PtensFindPlantedSubgraphs.hpp"
 #include "Ggraph.hpp"
 #include "Subgraph.hpp"
+
+#include "BatchedGgraph.hpp"
+#include "BatchedAtomsPack.hpp"
+
 #include "Ptensor0.hpp"
 #include "Ptensor1.hpp"
 #include "Ptensor2.hpp"
@@ -86,6 +90,8 @@ PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
 #include "SubgraphLayer1b_py.cpp"
 #include "SubgraphLayer2b_py.cpp"
 
+#include "BatchedGgraph_py.cpp"
+#include "BatchedAtomsPack_py.cpp"
 
 
 
