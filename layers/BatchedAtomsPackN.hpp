@@ -99,7 +99,9 @@ namespace ptens{
 
   public: // ---- Maps ---------------------------------------------------------------------------------------
     
-    
+
+    // unused
+    /*
     template<typename SOURCE>
     BatchedMessageList overlaps_mlist(const SOURCE& x) const{
       return obj->overlaps_mlist(*x.obj);
@@ -124,6 +126,7 @@ namespace ptens{
     BatchedMessageMap inverse_overlaps_mmap(const SOURCE& x) const{
       return inverse_message_map(overlaps_mlist(x),x);
     }
+    /*
 
  
   public: // ---- I/O ----------------------------------------------------------------------------------------

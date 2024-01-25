@@ -1,28 +1,30 @@
 typedef cnine::ATview<float> TVIEW;
 
-pybind11::class_<BatchedBatchedPtensors0b<float> >(m,"batched_ptensors0b")
+pybind11::class_<BatchedPtensors0b<float> >(m,"batched_ptensors0b")
 
-  .def(py::init([](at::Tensor& M){
-	return BatchedPtensors0b(Ltensor<float>(TVIEW(M)));}))
-  .def(py::init([](const AtomsPack& atoms, at::Tensor& M){
-	return BatchedPtensors0b(atoms,Ltensor<float>(TVIEW(M)));}))
-  .def(py::init([](const vector<vector<int> >& atoms, at::Tensor& M){
-	return BatchedPtensors0b(AtomsPack(atoms),Ltensor<float>(TVIEW(M)));}))
+//.def(py::init([](at::Tensor& M){
+//	return BatchedPtensors0b(Ltensor<float>(TVIEW(M)));}))
+  .def(py::init([](const BatchedAtomsPack& atoms, vector<at::Tensor>& M){
+	vector<TVIEW> v;
+	for(int i=0; i<M.size(); i++) v.push_back(TVIEW(M[i]));
+	return BatchedPtensors0b(atoms,v);}))
+//.def(py::init([](const vector<vector<int> >& atoms, at::Tensor& M){
+//	return BatchedPtensors0b(AtomsPack(atoms),Ltensor<float>(TVIEW(M)));}))
 
-  .def_static("create",[](const int n, const int _nc, const int fcode, const int _dev){
-      return BatchedPtensors0b<float>(n,_nc,fcode,_dev);}, 
-    py::arg("atoms"),py::arg("nc"),py::arg("fcode")=0,py::arg("device")=0)
+//  .def_static("create",[](const int n, const int _nc, const int fcode, const int _dev){
+//      return BatchedPtensors0b<float>(n,_nc,fcode,_dev);}, 
+//    py::arg("atoms"),py::arg("nc"),py::arg("fcode")=0,py::arg("device")=0)
 
-  .def_static("create",[](const vector<vector<int> > _atoms, const int _nc, const int fcode, const int _dev){
-      return BatchedPtensors0b<float>(AtomsPack(_atoms),_nc,fcode,_dev);}, 
-    py::arg("atoms"),py::arg("nc"),py::arg("fcode")=0,py::arg("device")=0)
+//  .def_static("create",[](const vector<vector<int> > _atoms, const int _nc, const int fcode, const int _dev){
+//      return BatchedPtensors0b<float>(AtomsPack(_atoms),_nc,fcode,_dev);}, 
+//    py::arg("atoms"),py::arg("nc"),py::arg("fcode")=0,py::arg("device")=0)
 
-  .def_static("create",[](const AtomsPack& _atoms, const int _nc, const int fcode, const int _dev){
+  .def_static("create",[](const BatchedAtomsPack& _atoms, const int _nc, const int fcode, const int _dev){
       return BatchedPtensors0b<float>(_atoms,cnine::channels=_nc,cnine::filltype=fcode,cnine::device=_dev);}, 
     py::arg("atoms"),py::arg("nc"),py::arg("fcode")=0,py::arg("device")=0)
 
-  .def("like",[](const BatchedPtensors0b<float>& x, at::Tensor& M){
-      return BatchedPtensors0b(x.atoms,ATview<float>(M));})
+//  .def("like",[](const BatchedPtensors0b<float>& x, at::Tensor& M){
+//      return BatchedPtensors0b(x.atoms,ATview<float>(M));})
   .def("copy",[](const BatchedPtensors0b<float>& x){return x.copy();})
   .def("copy",[](const BatchedPtensors0b<float>& x, const int _dev){return x.copy(_dev);})
   .def("zeros_like",[](const BatchedPtensors0b<float>& x){return BatchedPtensors0b<float>::zeros_like(x);})
@@ -51,8 +53,8 @@ pybind11::class_<BatchedBatchedPtensors0b<float> >(m,"batched_ptensors0b")
   .def("get_atoms",[](const BatchedPtensors0b<float>& x){return x.get_atoms();})
   .def("dim",&BatchedPtensors0b<float>::dim)
 
-  .def("to",[](const BatchedPtensors0b<float>& x, const int dev){return BatchedPtensors0b<float>(x,dev);})
-  .def("to_device",&BatchedPtensors0b<float>::move_to_device)
+//.def("to",[](const BatchedPtensors0b<float>& x, const int dev){return BatchedPtensors0b<float>(x,dev);})
+//.def("to_device",&BatchedPtensors0b<float>::move_to_device)
 
 
 // ---- Operations -------------------------------------------------------------------------------------------

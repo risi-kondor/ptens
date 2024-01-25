@@ -126,19 +126,23 @@ namespace ptens{
 
   public: // ---- Message lists ----------------------------------------------------------------------------
 
+    // UNUSED
     // not cached
+    /*
     template<typename SRC>
     BatchedMessageList overlaps_mlist(const SRC& x){
       BatchedMessageList R;
       for(int i=0; i<size(); i++)
 	R.obj.push_back((*this)[i].atoms->overlaps_mlist(x[i].atoms).obj);
       return R;
-    }
-
-
+      }
+    */
+    
   public: // ---- Message maps -----------------------------------------------------------------------------
 
+    //unused
     // not cached
+    /*
     template<typename SRC>
     BatchedMessageMap message_map(const BatchedMessageList& lists, const SRC& y){
       cnine::GatherMapProgramPack prog;
@@ -146,8 +150,10 @@ namespace ptens{
 	prog.obj.push_back((*this)[i]->message_map(lists[i],y[i]));
       return BatchedMessageMap(std::move(prog));
     }
+    */
 
     // not cached
+    /*
     template<typename SRC>
     BatchedMessageMap inverse_message_map(const BatchedMessageList& lists, const SRC& y){
       cnine::GatherMapProgramPack prog;
@@ -155,7 +161,7 @@ namespace ptens{
 	prog.obj.push_back((*this)[i]->message_map(lists[i],y[i]).inv());
       return BatchedMessageMap(std::move(prog));
     }
-
+    */
 
 
 

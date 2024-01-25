@@ -171,19 +171,27 @@ namespace ptens{
 
     template<typename SOURCE>
     void add_gather(const SOURCE& x){
-      (atoms.overlaps_mmap(x.atoms))(*this,x);
+      //(atoms.overlaps_mmap(x.atoms))(*this,x);
+      for(int i=0; i<size(); i++)
+	view_of(i).add_gather(x.view_of(i));
     }
 
     template<typename OUTPUT>
     void add_gather_back(const OUTPUT& x){
-      x.atoms.inverse_overlaps_mmap(atoms)(*this,x);
+      //x.atoms.inverse_overlaps_mmap(atoms)(*this,x);
+      for(int i=0; i<size(); i++)
+	view_of(i).add_gather_back(x.view_of(i));
     }
 
     
   public: // ---- I/O ----------------------------------------------------------------------------------------
 
 
-    string classname() const{
+    static string classname(){
+      return "BatchedPtensors0b";
+    }
+
+    string repr() const{
       return "BatchedPtensors0b";
     }
 

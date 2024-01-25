@@ -93,6 +93,7 @@ PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
 #include "BatchedGgraph_py.cpp"
 #include "BatchedAtomsPack_py.cpp"
 
+#include "BatchedPtensors0b_py.cpp"
 
 
 }

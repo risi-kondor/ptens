@@ -21,7 +21,7 @@ class ggraph:
     @classmethod
     def from_cache(self,key):
         G=ggraph()
-	G.obj=_ggraph(key)
+        G.obj=_ggraph(key)
         return G
 
     @classmethod
