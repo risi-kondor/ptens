@@ -46,6 +46,8 @@
 #include "SubgraphLayer1b.hpp"
 #include "SubgraphLayer2b.hpp"
 
+#include "BatchedPtensors0b.hpp"
+
 
 namespace ptens{ 
   PtensSession ptens_session;
