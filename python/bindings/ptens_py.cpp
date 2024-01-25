@@ -47,6 +47,8 @@
 #include "SubgraphLayer2b.hpp"
 
 #include "BatchedPtensors0b.hpp"
+#include "BatchedPtensors1b.hpp"
+#include "BatchedPtensors2b.hpp"
 
 
 namespace ptens{ 
@@ -96,6 +98,8 @@ PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
 #include "BatchedAtomsPack_py.cpp"
 
 #include "BatchedPtensors0b_py.cpp"
+#include "BatchedPtensors1b_py.cpp"
+#include "BatchedPtensors2b_py.cpp"
 
 
 }

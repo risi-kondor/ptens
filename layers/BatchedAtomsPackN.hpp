@@ -36,6 +36,10 @@ namespace ptens{
     BatchedAtomsPackN(const vector<shared_ptr<SUB> >& x):
       obj(new BatchedAtomsPackNobj<SUB>(x)){}
 
+    BatchedAtomsPackN(const BatchedAtomsPack& x):
+      obj(new BatchedAtomsPackNobj<SUB>(*x.obj)){}
+
+
     /*
     BatchedAtomsPackN(){}
 
@@ -126,7 +130,7 @@ namespace ptens{
     BatchedMessageMap inverse_overlaps_mmap(const SOURCE& x) const{
       return inverse_message_map(overlaps_mlist(x),x);
     }
-    /*
+    */
 
  
   public: // ---- I/O ----------------------------------------------------------------------------------------

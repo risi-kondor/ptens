@@ -17,6 +17,7 @@
 
 #include "BatchedMessageMap.hpp"
 #include "BatchedMessageList.hpp"
+#include "BatchedAtomsPackObj.hpp"
 
 
 namespace ptens{
@@ -41,6 +42,17 @@ namespace ptens{
 
     BatchedAtomsPackNobj(const vector<shared_ptr<SUB> >& x):
       BASE(x){
+      make_row_offsets();
+    }
+    
+    BatchedAtomsPackNobj(const BatchedAtomsPackObj& _atoms){
+      for(auto& p: _atoms.obj)
+	obj.push_back(to_share(new SUB(p)));
+      make_row_offsets();
+    }
+
+
+    void make_row_offsets(){
       row_offsets.resize(size());
       int t=0;
       if(getk()==0){
@@ -64,18 +76,16 @@ namespace ptens{
     }
 
 
-    //BatchedAtomsPackNobj(const AtomsPackBatch& _atoms){
-    //for(auto& p: _atoms.obj)
-    //obj.push_back(to_share(new SUB(_atoms)));
-    //}
-
-
   public: // ---- Access ------------------------------------------------------------------------------------
 
 
     int getk() const{
       PTENS_ASSRT(size()>0);
       return (*this)[0].getk();
+    }
+
+    BatchedAtomsPack get_atoms() const{
+      return BatchedAtomsPack(); // TODO 
     }
 
     int tsize() const{

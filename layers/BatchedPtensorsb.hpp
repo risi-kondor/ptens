@@ -78,9 +78,9 @@ namespace ptens{
   };
 
 
+  /*
   template<typename OBJ, typename = typename std::enable_if<std::is_base_of<BatchedPtensorsb<float>, OBJ>::value, OBJ>::type>
   OBJ cat_channels(const OBJ& x, const OBJ& y){
-    //PTENS_ASSRT(x.atoms==y.atoms);
     PTENS_ASSRT(x.dim(0)==y.dim(0));
     OBJ R({x.dim(0),x.dim(1)+y.dim(1)},0,x.get_dev());
     R.block(0,0,x.dim(0),x.dim(1))+=x;
@@ -109,6 +109,7 @@ namespace ptens{
   OBJ ReLU(const OBJ& x, TYPE alpha){
     return OBJ(x.ReLU(alpha),x.atoms);
   }
+  */
 
 }
 

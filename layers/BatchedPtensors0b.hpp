@@ -66,6 +66,9 @@ namespace ptens{
     BatchedPtensors0b(const BatchedAtomsPack0& _atoms, const int _nc, const int fcode, const int _dev):
       BASE({_atoms.tsize(),_nc},fcode,_dev), atoms(_atoms){}
 
+    BatchedPtensors0b(const BatchedAtomsPack& _atoms, const int _nc, const int _dev):
+      BatchedPtensors0b(BatchedAtomsPack0(_atoms),_nc,0,_dev){}
+
 
     BatchedPtensors0b(const initializer_list<Ptensors0b<TYPE> >& list):
       BASE(cnine::Ltensor<TYPE>::stack(0,list)){
@@ -111,6 +114,14 @@ namespace ptens{
     }
     
 
+  public: // ----- Conversions -------------------------------------------------------------------------------
+
+
+    BatchedPtensors0b(const TENSOR& x, const BatchedAtomsPack0& _atoms):
+      BASE(x),
+      atoms(_atoms){}
+
+
   public: // ----- Access ------------------------------------------------------------------------------------
 
 
@@ -124,6 +135,18 @@ namespace ptens{
 
     int get_nc() const{
       return TENSOR::dim(1);
+    }
+
+    BatchedAtomsPack get_atoms() const{
+      return atoms.obj->get_atoms();
+    }
+
+    BatchedPtensors0b& get_grad(){
+      return cnine::diff_class<BatchedPtensors0b<TYPE> >::get_grad();
+    }
+
+    const BatchedPtensors0b& get_grad() const{
+      return cnine::diff_class<BatchedPtensors0b<TYPE> >::get_grad();
     }
 
     Ptensors0b<TYPE> view_of(const int i) const{
@@ -144,7 +167,7 @@ namespace ptens{
 
     template<typename SOURCE, typename = typename std::enable_if<std::is_base_of<BatchedPtensorsb<float>, SOURCE>::value, SOURCE>::type>
     static BatchedPtensors0b<TYPE> linmaps(const SOURCE& x){
-      BatchedPtensors0b<TYPE> R(x.atoms,x.get_nc()*vector<int>({1,1,2})[x.getk()],x.get_dev());
+      BatchedPtensors0b<TYPE> R(x.get_atoms(),x.get_nc()*vector<int>({1,1,2})[x.getk()],x.get_dev());
       R.add_linmaps(x);
       return R;
     }

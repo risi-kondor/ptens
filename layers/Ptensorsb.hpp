@@ -77,7 +77,9 @@ namespace ptens{
 
   };
 
+  // this is used for BatchedPtensorsb as well 
 
+  //template<typename OBJ, typename = typename std::enable_if<std::is_base_of<Ptensorsb<float>, OBJ>::value, OBJ>::type>
   template<typename OBJ>
   OBJ cat_channels(const OBJ& x, const OBJ& y){
     //PTENS_ASSRT(x.atoms==y.atoms);
@@ -88,17 +90,20 @@ namespace ptens{
     return R;
   }
 
+  //template<typename OBJ, typename = typename std::enable_if<std::is_base_of<Ptensorsb<float>, OBJ>::value, OBJ>::type, typename TYPE>
   template<typename OBJ, typename TYPE>
   OBJ scale_channels(const OBJ& x, const cnine::Ltensor<TYPE>& s){
     return OBJ(x.scale_columns(s),x.atoms);
   }
 
   template<typename OBJ, typename TYPE>
+  //template<typename OBJ, typename = typename std::enable_if<std::is_base_of<Ptensorsb<float>, OBJ>::value, OBJ>::type, typename TYPE>
   OBJ mprod(const OBJ& x, const cnine::Ltensor<TYPE>& y){
     return OBJ(x*y,x.atoms);
   }
 
   template<typename OBJ, typename TYPE>
+  //template<typename OBJ, typename = typename std::enable_if<std::is_base_of<Ptensorsb<float>, OBJ>::value, OBJ>::type, typename TYPE>
   OBJ linear(const OBJ& x, const cnine::Ltensor<TYPE>& w, const cnine::Ltensor<TYPE>& b){
     OBJ R(x*w,x.atoms);
     R.view2().add_broadcast0(b.view1());
@@ -106,6 +111,7 @@ namespace ptens{
   }
 
   template<typename OBJ, typename TYPE>
+  //template<typename OBJ, typename = typename std::enable_if<std::is_base_of<Ptensorsb<float>, OBJ>::value, OBJ>::type, typename TYPE>
   OBJ ReLU(const OBJ& x, TYPE alpha){
     return OBJ(x.ReLU(alpha),x.atoms);
   }

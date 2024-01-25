@@ -55,6 +55,10 @@ namespace ptens{
   public: // ---- Access ------------------------------------------------------------------------------------
 
 
+    static int getk(){
+      return 1;
+    }
+
     int size1() const{
       return atoms->tsize1();
     }
