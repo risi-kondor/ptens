@@ -98,11 +98,11 @@ namespace ptens{
     }
 
     static BatchedPtensors0b zeros_like(const BatchedPtensors0b& x){
-      return BatchedPtensors0b(x.atoms,x.TENSOR::zeros_like());
+      return BatchedPtensors0b(x.TENSOR::zeros_like(),x.atoms);
     }
 
     static BatchedPtensors0b zeros_like(const BatchedPtensors0b& x, const int nc){
-      return BatchedPtensors0b(x.atoms,x.TENSOR({TENSOR::dim(0),nc},0,get_dev()));
+      return BatchedPtensors0b(TENSOR({x.dim(0),nc},0,get_dev()),x.atoms);
     }
 
     static BatchedPtensors0b gaussian_like(const BatchedPtensors0b& x){

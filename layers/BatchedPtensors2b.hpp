@@ -102,7 +102,7 @@ namespace ptens{
     }
 
     static BatchedPtensors2b zeros_like(const BatchedPtensors2b& x, const int nc){
-      return BatchedPtensors2b(x.atoms,x.TENSOR({TENSOR::dim(0),nc},0,get_dev()));
+      return BatchedPtensors2b(x.atoms,TENSOR({x.dim(0),nc},0,get_dev()));
     }
 
     static BatchedPtensors2b gaussian_like(const BatchedPtensors2b& x){

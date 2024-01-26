@@ -176,7 +176,7 @@ class Ptensorsb_cat_channelsFn(torch.autograd.Function):
     
     @staticmethod
     def forward(ctx,x,y):
-        r=x.dummy(1)
+        r=x.dummy()
         r.obj=x.obj.cat_channels(y.obj)
         ctx.x=x.obj
         ctx.y=y.obj
