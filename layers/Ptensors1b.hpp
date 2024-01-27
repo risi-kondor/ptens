@@ -91,7 +91,7 @@ namespace ptens{
       vector<AtomsPack1> v;
       for(auto& p:list)
 	v.push_back(p.atoms);
-      return Ptensors1b(AtomsPack1::cat(v),cnine::Ltensor<TYPE>::stack(0,list));
+      return Ptensors1b(cnine::Ltensor<TYPE>::stack(0,list),AtomsPack1::cat(v));
     }
 
 
