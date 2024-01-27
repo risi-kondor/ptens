@@ -84,7 +84,7 @@ namespace ptens{
   OBJ cat_channels(const OBJ& x, const OBJ& y){
     //PTENS_ASSRT(x.atoms==y.atoms);
     PTENS_ASSRT(x.dim(0)==y.dim(0));
-    OBJ R({x.dim(0),x.dim(1)+y.dim(1)},0,x.get_dev());
+    OBJ R(typename OBJ::TENSOR(cnine::Gdims(x.dim(0),x.dim(1)+y.dim(1)),0,x.get_dev()),x.atoms);
     R.block(0,0,x.dim(0),x.dim(1))+=x;
     R.block(0,x.dim(1),x.dim(0),y.dim(1))+=y;
     return R;

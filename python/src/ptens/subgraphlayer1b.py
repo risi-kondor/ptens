@@ -193,7 +193,7 @@ class Subgraphlayer1b_likeFn(torch.autograd.Function):
     @staticmethod
     def forward(ctx,x,M):
         r=subgraphlayer1b(1)
-        r.obj=_subgraph_layer1b.like(x.obj,M)
+        r.obj=_subgraphlayer1b.like(x.obj,M)
         ctx.r=r.obj
         return r
 
