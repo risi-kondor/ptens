@@ -136,8 +136,8 @@ namespace ptens{
 
       cnine::GatherMapProgram R;
       R.add_var(Gdims(in_lists.size(),1));
-      //R.add_map(y.reduce0(in_lists),2,0);
-      //R.add_map(broadcast0(out_lists,2),1,2);
+      R.add_map(y.reduce0(in_lists),2,0);
+      R.add_map(broadcast0(out_lists,2),1,2);
       R.add_map(new cnine::GatherMapB(direct,2));
       return R;
     }

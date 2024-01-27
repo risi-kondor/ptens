@@ -62,8 +62,10 @@ pybind11::class_<Ptensors0b<float> >(m,"ptensors0b")
   .def("add_back",[](Ptensors0b<float>& x, const Ptensors0b<float>& g){x.add_to_grad(g.get_grad());})
 
   .def("cat_channels",[](const Ptensors0b<float>& x, const Ptensors0b<float>& y){return cat_channels(x,y);})
-  .def("cat_channels_back0",&Ptensors0b<float>::cat_channels_back0)
-  .def("cat_channels_back1",&Ptensors0b<float>::cat_channels_back1)
+  .def("cat_channels_back0",[](Ptensors0b<float>& x, const Ptensors0b<float>& r){return x.cat_channels_back0(r);})
+  .def("cat_channels_back1",[](Ptensors0b<float>& x, const Ptensors0b<float>& r){return x.cat_channels_back1(r);})
+//  .def("cat_channels_back0",&Ptensors0b<float>::cat_channels_back0)
+//.def("cat_channels_back1",&Ptensors0b<float>::cat_channels_back1)
 
   .def("cat",&Ptensors0b<float>::cat)
   .def("add_cat_back",[](Ptensors0b<float>& x, Ptensors0b<float>& r, const int offs){
