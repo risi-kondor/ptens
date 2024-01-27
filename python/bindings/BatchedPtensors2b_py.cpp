@@ -1,7 +1,7 @@
 typedef BatchedPtensors2b<float> BPtensors2; 
 typedef cnine::ATview<float> TVIEW;
 
-pybind11::class_<BatchedPtensors2b<float> >(m,"batched_ptensors0b")
+pybind11::class_<BatchedPtensors2b<float> >(m,"batched_ptensors2b")
 
 //.def(py::init([](at::Tensor& M){
 //	return BPtensors2(Ltensor<float>(TVIEW(M)));}))
