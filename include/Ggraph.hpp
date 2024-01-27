@@ -51,6 +51,9 @@ namespace ptens{
     Ggraph(const cnine::RtensorA& M):
       obj(new OBJ(cnine::Tensor<float>(M))){}
 
+    Ggraph(const cnine::Ltensor<float>& M):
+      obj(new OBJ(M)){}
+
 
     Ggraph(const int key):
       Ggraph(ptens_session.graph_cache(key)){}

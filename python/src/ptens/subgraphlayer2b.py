@@ -35,7 +35,7 @@ class subgraphlayer2b(torch.Tensor):
     
     @classmethod
     def like(self,x,M):
-        return SubgraphLayer2b_likeFn.apply(x,M)
+        return Subgraphlayer2b_likeFn.apply(x,M)
 
     @classmethod
     def zeros(self, _G, _S, _nc, device='cpu'):
@@ -162,7 +162,7 @@ class subgraphlayer2b(torch.Tensor):
 
     @classmethod
     def gather_from_ptensors(self,x,G,S):
-        return SubgraphLayer2b_GatherFromPtensorsbFn.apply(x,G,S)
+        return Subgraphlayer2b_GatherFromPtensorsbFn.apply(x,G,S)
 
 
     # ---- I/O ----------------------------------------------------------------------------------------------
@@ -195,7 +195,7 @@ class Subgraphlayer2b_likeFn(torch.autograd.Function):
 
     @staticmethod
     def backward(ctx,g):
-        return ctx.r.get_grad().torch(), None
+        return None, ctx.r.get_grad().torch()
 
 
 class Subgraphlayer2b_catFn(torch.autograd.Function):
@@ -237,7 +237,7 @@ class Subgraphlayer2b_outerFn(torch.autograd.Function):
         return subgraphlayer2b.dummy(), subgraphlayer2b.dummy()
 
 
-class SubgraphLayer2b_GatherFromPtensorsbFn(torch.autograd.Function):
+class Subgraphlayer2b_GatherFromPtensorsbFn(torch.autograd.Function):
 
     @staticmethod
     def forward(ctx,x,G,S):

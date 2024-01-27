@@ -1,6 +1,6 @@
 pybind11::class_<ptens::Ggraph>(m,"ggraph")
 
-  .def(pybind11::init<const at::Tensor&>())
+  .def(pybind11::init([](const at::Tensor& x){return Ggraph(cnine::Ltensor<float>(x));}))
 
   .def(pybind11::init<const int>())
 

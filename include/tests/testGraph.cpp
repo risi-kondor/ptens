@@ -26,12 +26,28 @@ PtensSession ptens::ptens_session;
 
 int main(int argc, char** argv){
 
-  Ggraph M=Ggraph::random(5,0.5);
-  cout<<M<<endl;
-
-  Subgraph A=Subgraph::triangle();
+  Ltensor<float> A({{0.0, 1, 1, 1, 0, 0},
+        {1.0, 0, 0, 1, 1, 1},
+	  {1.0, 0, 0, 0, 1, 1},
+	    {1.0, 1, 0, 0, 0, 1},
+	      {0.0, 1, 1, 0, 0, 1},
+		{0.0, 1, 1, 1, 1, 0}});
   cout<<A<<endl;
 
-  auto U=M.subgraphs(A);
+  Ggraph M=Ggraph(A);
+  auto Z=Subgraph::cycle(5);
+  cout<<Z<<endl;
+
+  auto V=M.subgraphs(Z);
+  cout<<V<<endl;
+  exit(0);
+
+  //Ggraph M=Ggraph::random(5,0.5);
+  cout<<M<<endl;
+
+  Subgraph S=Subgraph::triangle();
+  cout<<S<<endl;
+
+  auto U=M.subgraphs(S);
   cout<<U<<endl;
 }

@@ -24,7 +24,7 @@ def _scalar_mult(x, alpha):
 
 # %%
 # G = p.ggraph.random(6,0.6)
-device = 'cuda'
+device = 'cpu'
 E =  torch.tensor([[0, 1, 1, 1, 0, 0],
         [1, 0, 0, 1, 1, 1],
         [1, 0, 0, 0, 1, 1],
@@ -41,6 +41,7 @@ node = p.subgraph.trivial()
 cycle5 = p.subgraph.cycle(5)
 cycle6 = p.subgraph.cycle(6)
 cycle7 = p.subgraph.cycle(7)
+
 
 
 M = torch.arange(6).view(6,1).float()
