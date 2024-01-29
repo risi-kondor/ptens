@@ -11,8 +11,8 @@ pybind11::class_<BatchedPtensors1b<float> >(m,"batched_ptensors1b")
 //	for(int i=0; i<M.size(); i++) v.push_back(TVIEW(M[i]));
 //	return BPtensors1(atoms,v);}))
 
-//.def(py::init([](const vector<vector<int> >& atoms, at::Tensor& M){
-//	return BPtensors1(AtomsPack(atoms),Ltensor<float>(TVIEW(M)));}))
+  .def(py::init([](const vector<vector<vector<int> > >& atoms, at::Tensor& M){
+	return BPtensors1(BatchedAtomsPack(atoms),Ltensor<float>(TVIEW(M)));}))
 
 //  .def_static("create",[](const int n, const int _nc, const int fcode, const int _dev){
 //      return BPtensors1(n,_nc,fcode,_dev);}, 

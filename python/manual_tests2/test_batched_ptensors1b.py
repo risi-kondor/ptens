@@ -11,9 +11,7 @@ x=p.batched_ptensors1b.randn(atoms,3)
 print(x)
 print(x.torch())
 
-exit()
-
-A=p.ptensors1b.from_matrix(M,atoms)
+A=p.batched_ptensors1b.from_matrix(M,atoms)
 print(A)
 print(A.torch())
 
@@ -24,5 +22,4 @@ M2=torch.randn([3,3])
 print(M2)
 print(A*M2)
 
-S=torch.randn([3])
 
