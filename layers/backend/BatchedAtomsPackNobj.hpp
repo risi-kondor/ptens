@@ -40,6 +40,8 @@ namespace ptens{
   public: // ---- Constructors -------------------------------------------------------------------------------
 
 
+    BatchedAtomsPackNobj(){}
+
     BatchedAtomsPackNobj(const vector<shared_ptr<SUB> >& x):
       BASE(x){
       make_row_offsets();
@@ -85,7 +87,10 @@ namespace ptens{
     }
 
     BatchedAtomsPack get_atoms() const{
-      return BatchedAtomsPack(); // TODO 
+      auto R=new BatchedAtomsPackObj();
+      for(auto& p:obj)
+	R->obj.push_back(p->atoms);
+      return BatchedAtomsPack(R);
     }
 
     int tsize() const{

@@ -69,6 +69,9 @@ namespace ptens{
     BatchedPtensors0b(const BatchedAtomsPack& _atoms, const int _nc, const int _dev):
       BatchedPtensors0b(BatchedAtomsPack0(_atoms),_nc,0,_dev){}
 
+    BatchedPtensors0b(const BatchedAtomsPack& _atoms, const int _nc, const int fcode, const int _dev):
+      BatchedPtensors0b(BatchedAtomsPack0(_atoms),_nc,fcode,_dev){}
+
 
     BatchedPtensors0b(const initializer_list<Ptensors0b<TYPE> >& list):
       BASE(cnine::Ltensor<TYPE>::stack(0,list)){
@@ -77,6 +80,38 @@ namespace ptens{
       atoms=BatchedAtomsPackN<AtomsPack0obj<int> >(x);
     }
 	
+
+  public: // ---- Named parameter constructors ---------------------------------------------------------------
+
+
+    struct vparams{
+      int nc=1;
+      int fcode=0;
+      int dev=0;
+    };      
+
+    template<typename... Args>
+    BatchedPtensors0b(const BatchedAtomsPack& _atoms, const Args&... args):
+      atoms(_atoms){
+      vparams v;
+      unroller(v,args...);
+      BASE::reset(BASE({atoms.tsize(),v.nc},v.fcode,v.dev));
+    }
+
+    template<typename... Args>
+    void unroller(vparams& v, const cnine::ChannelsArgument& x, const Args&... args){
+      v.nc=x.get(); unroller(v, args...);}
+
+    template<typename... Args>
+    void unroller(vparams& v, const cnine::FillArgument& x, const Args&... args){
+      v.fcode=x.get(); unroller(v, args...);}
+
+    template<typename... Args>
+    void unroller(vparams& v, const cnine::DeviceArgument& x, const Args&... args){
+      v.dev=x.get(); unroller(v, args...);}
+
+    void unroller(vparams& v){}
+
 
   public: // ----- Spawning ----------------------------------------------------------------------------------
 
@@ -173,7 +208,7 @@ namespace ptens{
     }
 
     template<typename SOURCE, typename = typename std::enable_if<std::is_base_of<BatchedPtensorsb<float>, SOURCE>::value, SOURCE>::type>
-    static Ptensors0b<TYPE> gather(const SOURCE& x, const BatchedAtomsPack& a){
+    static BatchedPtensors0b<TYPE> gather(const SOURCE& x, const BatchedAtomsPack& a){
       BatchedPtensors0b<TYPE> R(a,x.get_nc()*vector<int>({1,1,2})[x.getk()],x.get_dev());
       R.add_gather(x);
       return R;

@@ -14,15 +14,18 @@
 
 #include "Cnine_base.cpp"
 
-#include "SubgraphLayer0b.hpp"
-#include "SubgraphLayer1b.hpp"
+#include "BatchedPtensors0b.hpp"
+#include "BatchedPtensors1b.hpp"
+#include "BatchedSubgraphLayer1b.hpp"
+//#include "BatchedSubgraphLayer1b.hpp"
 
 using namespace ptens;
 using namespace cnine;
 
 PtensSession ptens::ptens_session;
 
-typedef Ptensors1b<float> Ptens1;
+typedef BatchedPtensors0b<float> BPtens0;
+typedef BatchedPtensors1b<float> BPtens1;
 
 
 int main(int argc, char** argv){
@@ -33,11 +36,12 @@ int main(int argc, char** argv){
 
   Subgraph trivial=Subgraph::trivial();
 
-  //AtomsPack xatoms=AtomsPack::random(10,0.5);
-  //Ptens1 X1=Ptens1(xatoms,channels=3,filltype=3);
-  //SubgraphLayer0b<float> U(X1,G,trivial);
-  //cout<<U<<endl;
+  AtomsPack xatoms0=AtomsPack::random(10,0.5);
+  BatchedAtomsPack xatoms({xatoms0,xatoms0,xatoms0});
 
+  BPtens1 X1=BPtens1(xatoms,channels=3,filltype=3);
 
+  BatchedSubgraphLayer1b<float> U(X1,G,trivial);
+  cout<<U<<endl;
 
 }

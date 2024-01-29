@@ -69,6 +69,9 @@ namespace ptens{
     BatchedPtensors2b(const BatchedAtomsPack& _atoms, const int _nc, const int _dev):
       BatchedPtensors2b(BatchedAtomsPack2(_atoms),_nc,0,_dev){}
 
+    BatchedPtensors2b(const BatchedAtomsPack& _atoms, const int _nc, const int fcode, const int _dev):
+      BatchedPtensors2b(BatchedAtomsPack2(_atoms),_nc,fcode,_dev){}
+
 
     BatchedPtensors2b(const initializer_list<Ptensors2b<TYPE> >& list):
       BASE(cnine::Ltensor<TYPE>::stack(0,list)){
@@ -77,6 +80,38 @@ namespace ptens{
       atoms=BatchedAtomsPackN<AtomsPack2obj<int> >(x);
     }
 	
+
+  public: // ---- Named parameter constructors ---------------------------------------------------------------
+
+
+    struct vparams{
+      int nc=1;
+      int fcode=0;
+      int dev=0;
+    };      
+
+    template<typename... Args>
+    BatchedPtensors2b(const BatchedAtomsPack& _atoms, const Args&... args):
+      atoms(_atoms){
+      vparams v;
+      unroller(v,args...);
+      BASE::reset(BASE({atoms.tsize(),v.nc},v.fcode,v.dev));
+    }
+
+    template<typename... Args>
+    void unroller(vparams& v, const cnine::ChannelsArgument& x, const Args&... args){
+      v.nc=x.get(); unroller(v, args...);}
+
+    template<typename... Args>
+    void unroller(vparams& v, const cnine::FillArgument& x, const Args&... args){
+      v.fcode=x.get(); unroller(v, args...);}
+
+    template<typename... Args>
+    void unroller(vparams& v, const cnine::DeviceArgument& x, const Args&... args){
+      v.dev=x.get(); unroller(v, args...);}
+
+    void unroller(vparams& v){}
+
 
   public: // ----- Spawning ----------------------------------------------------------------------------------
 
@@ -126,7 +161,7 @@ namespace ptens{
 
 
     static int getk(){
-      return 0;
+      return 2;
     }
 
     int size() const{
@@ -173,7 +208,7 @@ namespace ptens{
     }
 
     template<typename SOURCE, typename = typename std::enable_if<std::is_base_of<BatchedPtensorsb<float>, SOURCE>::value, SOURCE>::type>
-    static Ptensors2b<TYPE> gather(const SOURCE& x, const BatchedAtomsPack& a){
+    static BatchedPtensors2b<TYPE> gather(const SOURCE& x, const BatchedAtomsPack& a){
       BatchedPtensors2b<TYPE> R(a,x.get_nc()*vector<int>({1,2,5})[x.getk()],x.get_dev());
       R.add_gather(x);
       return R;

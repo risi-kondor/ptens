@@ -16,6 +16,8 @@
 #define _ptens_BatchedAtomsPackN
 
 #include "BatchedAtomsPackNobj.hpp"
+#include "AtomsPackObjBase.hpp"
+#include "AtomsPack1obj.hpp"
 
 
 namespace ptens{
@@ -32,6 +34,12 @@ namespace ptens{
 
 
     BatchedAtomsPackN(){}
+
+    BatchedAtomsPackN(BatchedAtomsPackNobj<SUB>* _obj):
+      obj(_obj){}
+
+    BatchedAtomsPackN(BatchedAtomsPackNobj<SUB>&& _obj):
+      obj(new BatchedAtomsPackNobj<SUB>(_obj)){}
 
     BatchedAtomsPackN(const vector<shared_ptr<SUB> >& x):
       obj(new BatchedAtomsPackNobj<SUB>(x)){}
@@ -54,14 +62,23 @@ namespace ptens{
 
     BatchedAtomsPackN(const initializer_list<initializer_list<int> >& x):
       obj(new BatchedAtomsPackNobj<int>(x)){}
+    */
 
     static BatchedAtomsPackN cat(const vector<BatchedAtomsPackN>& list){
-      cnine::plist<AtomsPackObjBase*> v;
-      for(int i=0; i<list.size()-1; i++)
-	v.push_back(list[i+1].obj.get());
-      return list[0].obj->cat_maps(v);
+      auto R=new BatchedAtomsPackNobj<SUB>();
+      PTENS_ASSRT(list.size()>0);
+      int N=list[0].size();
+      for(int i=0; i<N; i++){
+	cnine::plist<AtomsPackObjBase*> v;
+	for(int j=0; j<list.size()-1; j++)
+	  v.push_back(static_cast<AtomsPackObjBase*>(const_cast<SUB*>(&list[j+1][i])));
+	//v.push_back(static_cast<AtomsPackObjBase*>(const_cast<AtomsPack1obj<int>*>(&list[j+1][i])));
+        R->obj.push_back(const_cast<SUB&>(list[0][i]).cat_maps(v));
+      //R->obj.push_back(const_cast<AtomsPack1obj<int>&>(list[0][i]).cat_maps(v));
+      }
+      return BatchedAtomsPackN(R);
     }
-    */
+
 
   public: // ---- Access ------------------------------------------------------------------------------------
 

@@ -20,7 +20,7 @@
 #include "Ptensors0b.hpp"
 #include "Ptensors1b.hpp"
 #include "Ptensors2b.hpp"
-#include "SubgraphLayerb.hpp"
+//#include "SubgraphLayerb.hpp"
 
 
 namespace ptens{
@@ -97,6 +97,7 @@ namespace ptens{
   public: // ---- Message passing between subgraph layers -----------------------------------------------------
 
 
+    // TODO 
     template<typename SOURCE>
     static SubgraphLayer0b linmaps(const SOURCE& x){
       SubgraphLayer0b R(x.get_atoms(),x.get_nc()*vector<int>({1,1,2})[x.getk()],x.get_dev());

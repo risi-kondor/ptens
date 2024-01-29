@@ -82,6 +82,13 @@ namespace ptens{
       return obj->size();
     }
 
+    int getn() const{
+      int t=0;
+      for(auto& p:obj->obj)
+	t+=p->getn();
+      return t;
+    }
+
     Ggraph operator[](const int i) const{
       PTENS_ASSRT(i<size());
       return obj->obj[i];

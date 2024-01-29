@@ -69,6 +69,9 @@ namespace ptens{
     BatchedPtensors1b(const BatchedAtomsPack& _atoms, const int _nc, const int _dev):
       BatchedPtensors1b(BatchedAtomsPack1(_atoms),_nc,0,_dev){}
 
+    BatchedPtensors1b(const BatchedAtomsPack& _atoms, const int _nc, const int fcode, const int _dev):
+      BatchedPtensors1b(BatchedAtomsPack1(_atoms),_nc,fcode,_dev){}
+
 
     BatchedPtensors1b(const initializer_list<Ptensors1b<TYPE> >& list):
       BASE(cnine::Ltensor<TYPE>::stack(0,list)){
@@ -77,6 +80,53 @@ namespace ptens{
       atoms=BatchedAtomsPackN<AtomsPack1obj<int> >(x);
     }
 	
+    static BatchedPtensors1b cat(const vector<BatchedPtensors1b>& list){
+      PTENS_ASSRT(list.size()>0);
+      vector<BatchedAtomsPack1> v;
+      for(auto& p:list)
+	v.push_back(p.atoms);
+      BatchedPtensors1b R(BatchedAtomsPack1::cat(v),list[0].get_nc(),list[0].get_dev());
+      for(int i=0; i<list[0].size(); i++){
+	vector<cnine::Ltensor<TYPE> > w;
+	for(int j=0; j<list.size(); j++)
+	  w.push_back(list[j].view_of(i));
+	//R.view_of(i).cnine:: template Ltensor<TYPE>::operator=(cnine::Ltensor<TYPE>::stack(0,w));
+      }
+      return R;
+    }
+
+
+  public: // ---- Named parameter constructors ---------------------------------------------------------------
+
+
+    struct vparams{
+      int nc=1;
+      int fcode=0;
+      int dev=0;
+    };      
+
+    template<typename... Args>
+    BatchedPtensors1b(const BatchedAtomsPack& _atoms, const Args&... args):
+      atoms(_atoms){
+      vparams v;
+      unroller(v,args...);
+      BASE::reset(BASE({atoms.tsize(),v.nc},v.fcode,v.dev));
+    }
+
+    template<typename... Args>
+    void unroller(vparams& v, const cnine::ChannelsArgument& x, const Args&... args){
+      v.nc=x.get(); unroller(v, args...);}
+
+    template<typename... Args>
+    void unroller(vparams& v, const cnine::FillArgument& x, const Args&... args){
+      v.fcode=x.get(); unroller(v, args...);}
+
+    template<typename... Args>
+    void unroller(vparams& v, const cnine::DeviceArgument& x, const Args&... args){
+      v.dev=x.get(); unroller(v, args...);}
+
+    void unroller(vparams& v){}
+
 
   public: // ----- Spawning ----------------------------------------------------------------------------------
 
@@ -126,7 +176,7 @@ namespace ptens{
 
 
     static int getk(){
-      return 0;
+      return 1;
     }
 
     int size() const{
@@ -167,13 +217,13 @@ namespace ptens{
 
     template<typename SOURCE, typename = typename std::enable_if<std::is_base_of<BatchedPtensorsb<float>, SOURCE>::value, SOURCE>::type>
     static BatchedPtensors1b<TYPE> linmaps(const SOURCE& x){
-      BatchedPtensors1b<TYPE> R(x.get_atoms(),x.get_nc()*vector<int>({1,1,2})[x.getk()],x.get_dev());
+      BatchedPtensors1b<TYPE> R(x.get_atoms(),x.get_nc()*vector<int>({1,2,5})[x.getk()],x.get_dev());
       R.add_linmaps(x);
       return R;
     }
 
     template<typename SOURCE, typename = typename std::enable_if<std::is_base_of<BatchedPtensorsb<float>, SOURCE>::value, SOURCE>::type>
-    static Ptensors1b<TYPE> gather(const SOURCE& x, const BatchedAtomsPack& a){
+    static BatchedPtensors1b<TYPE> gather(const SOURCE& x, const BatchedAtomsPack& a){
       BatchedPtensors1b<TYPE> R(a,x.get_nc()*vector<int>({1,2,5})[x.getk()],x.get_dev());
       R.add_gather(x);
       return R;
@@ -188,8 +238,9 @@ namespace ptens{
 
     template<typename SOURCE, typename = typename std::enable_if<std::is_base_of<BatchedPtensorsb<float>, SOURCE>::value, SOURCE>::type>
     void add_linmaps_back(const SOURCE& x){
-      for(int i=0; i<size(); i++)
+      for(int i=0; i<size(); i++){
 	view_of(i).add_linmaps_back(x.view_of(i));
+      }
     }
 
     template<typename SOURCE>
