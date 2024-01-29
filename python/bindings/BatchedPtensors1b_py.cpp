@@ -12,7 +12,7 @@ pybind11::class_<BatchedPtensors1b<float> >(m,"batched_ptensors1b")
 //	return BPtensors1(atoms,v);}))
 
   .def(py::init([](const vector<vector<vector<int> > >& atoms, at::Tensor& M){
-	return BPtensors1(BatchedAtomsPack(atoms),Ltensor<float>(TVIEW(M)));}))
+	return BPtensors1(BatchedAtomsPack(atoms),Ltensor<float>(M));})) // maybe should remove ATview from other too?
 
 //  .def_static("create",[](const int n, const int _nc, const int fcode, const int _dev){
 //      return BPtensors1(n,_nc,fcode,_dev);}, 
@@ -43,7 +43,7 @@ pybind11::class_<BatchedPtensors1b<float> >(m,"batched_ptensors1b")
   .def("add_to_grad",[](BPtensors1& x, const BPtensors1& y, const float c){x.get_grad().add(y,c);})
   .def("get_grad",[](BPtensors1& x){return x.get_grad();})
 
-  .def("__getitem__",[](const BPtensors1& x, const int i){return x(i);})
+  .def("__getitem__",[](const BPtensors1& x, const int i){return x[i];})
   .def("torch",[](const BPtensors1& x){return x.torch();})
 
 
@@ -110,12 +110,9 @@ pybind11::class_<BatchedPtensors1b<float> >(m,"batched_ptensors1b")
 // ---- Message passing --------------------------------------------------------------------------------------
 
 
-  .def_static("linmaps",[](const BatchedPtensors0b<float>& x){
-      return BPtensors1::linmaps(x);}) 
-  .def_static("linmaps",[](const BatchedPtensors1b<float>& x){
-      return BPtensors1::linmaps(x);}) 
-  .def_static("linmaps",[](const BatchedPtensors2b<float>& x){
-      return BPtensors1::linmaps(x);}) 
+  .def_static("linmaps",[](const BatchedPtensors0b<float>& x){return BPtensors1::linmaps(x);}) 
+  .def_static("linmaps",[](const BatchedPtensors1b<float>& x){return BPtensors1::linmaps(x);}) 
+  .def_static("linmaps",[](const BatchedPtensors2b<float>& x){return BPtensors1::linmaps(x);}) 
 
   .def_static("gather",[](const BatchedPtensors0b<float>& x, const BatchedAtomsPack& a){
       return BPtensors1::gather(x,a);}) 

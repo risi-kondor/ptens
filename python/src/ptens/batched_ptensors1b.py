@@ -77,6 +77,9 @@ class batched_ptensors1b(torch.Tensor):
     def __len__(self):
         return len(self.obj)
     
+    def __getitem__(self,i):
+        return batched_ptensors1b.init(self.obj[i])
+
     def _get_grad(self):
         return self.obj.get_grad()
 

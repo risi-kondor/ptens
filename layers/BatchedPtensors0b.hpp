@@ -22,7 +22,7 @@
 #include "BatchedAtomsPackN.hpp"
 #include "Ptensors0b.hpp"
 #include "BatchedPtensorsb.hpp"
-
+#include "MultiLoop.hpp"
 
 namespace ptens{
 
@@ -57,6 +57,16 @@ namespace ptens{
 
     //BatchedPtensors0b(){}
 
+    BatchedPtensors0b(const TENSOR& M, const vector<int> sizes):
+      BASE(M){
+      vector<shared_ptr<AtomsPack0obj<int> > > x;
+      for(auto p:sizes) x.push_back(to_share(new AtomsPack0obj<int>(p)));
+      atoms=BatchedAtomsPackN<AtomsPack0obj<int> >(x);
+    }
+
+    BatchedPtensors0b(const BatchedAtomsPack& _atoms, const TENSOR& M):
+      BASE(M), atoms(BatchedAtomsPack0(_atoms)){}
+
     BatchedPtensors0b(const BatchedAtomsPack0& _atoms, const TENSOR& M):
       BASE(M), atoms(_atoms){}
 
@@ -80,6 +90,14 @@ namespace ptens{
       atoms=BatchedAtomsPackN<AtomsPack0obj<int> >(x);
     }
 	
+    /*
+    BatchedPtensors0b(const vector<const TENSOR&> M):
+      BASE(cnine::Ltensor<TYPE>::stack(0,M)){
+      vector<shared_ptr<AtomsPack0obj<int> > > x;
+      for(auto& p:M) x.push_back(to_share(new AtomsPack0obj<int>(p.dim(0))));
+      atoms=BatchedAtomsPackN<AtomsPack0obj<int> >(x);
+    }
+    */
 
   public: // ---- Named parameter constructors ---------------------------------------------------------------
 
@@ -217,28 +235,32 @@ namespace ptens{
 
     template<typename SOURCE, typename = typename std::enable_if<std::is_base_of<BatchedPtensorsb<float>, SOURCE>::value, SOURCE>::type>
     void add_linmaps(const SOURCE& x){
-      for(int i=0; i<size(); i++)
-	view_of(i).add_linmaps(x.view_of(i));
+      //for(int i=0; i<size(); i++)
+      //view_of(i).add_linmaps(x.view_of(i));
+      cnine::MultiLoop(size(),[&](const int i){view_of(i).add_linmaps(x.view_of(i));});
     }
 
     template<typename SOURCE, typename = typename std::enable_if<std::is_base_of<BatchedPtensorsb<float>, SOURCE>::value, SOURCE>::type>
     void add_linmaps_back(const SOURCE& x){
-      for(int i=0; i<size(); i++)
-	view_of(i).add_linmaps_back(x.view_of(i));
+      //for(int i=0; i<size(); i++)
+      //view_of(i).add_linmaps_back(x.view_of(i));
+      cnine::MultiLoop(size(),[&](const int i){view_of(i).add_linmaps_back(x.view_of(i));});
     }
 
     template<typename SOURCE>
     void add_gather(const SOURCE& x){
       //(atoms.overlaps_mmap(x.atoms))(*this,x);
-      for(int i=0; i<size(); i++)
-	view_of(i).add_gather(x.view_of(i));
+      //for(int i=0; i<size(); i++)
+      //view_of(i).add_gather(x.view_of(i));
+      cnine::MultiLoop(size(),[&](const int i){view_of(i).add_gather(x.view_of(i));});
     }
 
     template<typename OUTPUT>
     void add_gather_back(const OUTPUT& x){
       //x.atoms.inverse_overlaps_mmap(atoms)(*this,x);
-      for(int i=0; i<size(); i++)
-	view_of(i).add_gather_back(x.view_of(i));
+      //for(int i=0; i<size(); i++)
+      //view_of(i).add_gather_back(x.view_of(i));
+      cnine::MultiLoop(size(),[&](const int i){view_of(i).add_gather_back(x.view_of(i));});
     }
 
     

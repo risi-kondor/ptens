@@ -3,16 +3,24 @@ typedef cnine::ATview<float> TVIEW;
 
 pybind11::class_<BatchedPtensors0b<float> >(m,"batched_ptensors0b")
 
-//.def(py::init([](at::Tensor& M){
-//	return BPtensors0(Ltensor<float>(TVIEW(M)));}))
+//  .def(py::init([](vector<at::Tensor>& M){
+//	vector<const Ltensor<float> > v;
+//	for(auto& p:M) v.push_back(Ltensor<float>(p));
+//	return BPtensors0(v);}))
 
 //  .def(py::init([](const BatchedAtomsPack& atoms, vector<at::Tensor>& M){
 //	vector<TVIEW> v;
 //	for(int i=0; i<M.size(); i++) v.push_back(TVIEW(M[i]));
 //	return BPtensors0(atoms,v);}))
 
-.def(py::init([](const vector<vector<vector<int> > >& atoms, at::Tensor& M){
-      return BPtensors0(BatchedAtomsPack(atoms),Ltensor<float>(TVIEW(M)));}))
+  .def(py::init([](at::Tensor& M, const vector<int>& sizes){
+	return BPtensors0(Ltensor<float>(M),sizes);})) // revert to this!
+  
+  .def_static("from_tensors",[](at::Tensor& M, const vector<int>& sizes){
+      return BPtensors0(Ltensor<float>(M),sizes);})
+
+  .def(py::init([](const vector<vector<vector<int> > >& atoms, at::Tensor& M){
+	return BPtensors0(BatchedAtomsPack(atoms),Ltensor<float>(M));}))
 
 //  .def_static("create",[](const int n, const int _nc, const int fcode, const int _dev){
 //      return BPtensors0(n,_nc,fcode,_dev);}, 
@@ -42,7 +50,7 @@ pybind11::class_<BatchedPtensors0b<float> >(m,"batched_ptensors0b")
   .def("add_to_grad",[](BPtensors0& x, const BPtensors0& y, const float c){x.get_grad().add(y,c);})
   .def("get_grad",[](BPtensors0& x){return x.get_grad();})
 
-  .def("__getitem__",[](const BPtensors0& x, const int i){return x(i);})
+  .def("__getitem__",[](const BPtensors0& x, const int i){return x[i];})
   .def("torch",[](const BPtensors0& x){return x.torch();})
 
 

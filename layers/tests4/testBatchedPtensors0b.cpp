@@ -37,6 +37,10 @@ int main(int argc, char** argv){
   Ptens0 Y0=Ptens0::linmaps(X0);
   cout<<Y0<<endl;
 
+  Ltensor<float> M({8,2},filltype=3);
+  Ptens0 Z(M,{2,3,3});
+  cout<<Z<<endl;
+
 }
 
 

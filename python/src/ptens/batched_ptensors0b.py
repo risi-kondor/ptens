@@ -175,12 +175,9 @@ class batched_ptensors0b(torch.Tensor):
 class Batched_ptensors0b_fromMxFn(torch.autograd.Function):
 
     @staticmethod
-    def forward(ctx,x,atoms=None):
+    def forward(ctx,x,atoms):
         R=batched_ptensors0b(1)
-        if atoms is None:
-            R.obj=_batched_ptensors0b(x)
-        else:
-            R.obj=_batched_ptensors0b(atoms,x)
+        R.obj=_batched_ptensors0b.from_tensors(x,atoms)
         ctx.r=R.obj
         return R
 

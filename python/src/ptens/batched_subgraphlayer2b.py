@@ -149,7 +149,7 @@ class batched_subgraphlayer2b(torch.Tensor):
 
     @classmethod
     def gather(self,x,S):
-        return BatachedPtensors2b_Gather0Fn.apply(x,S)
+        return BatchedPtensors2b_GatherFn.apply(x,S)
 
     @classmethod
     def gather_from_ptensors(self,x,G,S):

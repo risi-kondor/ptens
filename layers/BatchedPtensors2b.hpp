@@ -58,6 +58,9 @@ namespace ptens{
 
     //BatchedPtensors2b(){}
 
+    BatchedPtensors2b(const BatchedAtomsPack& _atoms, const TENSOR& M):
+      BASE(M), atoms(BatchedAtomsPack2(_atoms)){}
+
     BatchedPtensors2b(const BatchedAtomsPack2& _atoms, const TENSOR& M):
       BASE(M), atoms(_atoms){}
 
@@ -203,14 +206,14 @@ namespace ptens{
 
     template<typename SOURCE, typename = typename std::enable_if<std::is_base_of<BatchedPtensorsb<float>, SOURCE>::value, SOURCE>::type>
     static BatchedPtensors2b<TYPE> linmaps(const SOURCE& x){
-      BatchedPtensors2b<TYPE> R(x.get_atoms(),x.get_nc()*vector<int>({1,1,2})[x.getk()],x.get_dev());
+      BatchedPtensors2b<TYPE> R(x.get_atoms(),x.get_nc()*vector<int>({2,5,15})[x.getk()],x.get_dev());
       R.add_linmaps(x);
       return R;
     }
 
     template<typename SOURCE, typename = typename std::enable_if<std::is_base_of<BatchedPtensorsb<float>, SOURCE>::value, SOURCE>::type>
     static BatchedPtensors2b<TYPE> gather(const SOURCE& x, const BatchedAtomsPack& a){
-      BatchedPtensors2b<TYPE> R(a,x.get_nc()*vector<int>({1,2,5})[x.getk()],x.get_dev());
+      BatchedPtensors2b<TYPE> R(a,x.get_nc()*vector<int>({2,5,15})[x.getk()],x.get_dev());
       R.add_gather(x);
       return R;
     }

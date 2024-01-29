@@ -1,5 +1,6 @@
 import torch
 import ptens as p
+import ptens_base
 
 atoms0=[[1,2],[4],[0,2,5],[3,1]]
 atoms1=[[1],[2,4],[1,2,5],[0,1]]
@@ -12,9 +13,14 @@ print(x)
 print(x.torch())
 
 A=p.batched_ptensors1b.from_matrix(M,atoms)
-print(A)
+print(A[0])
 print(A.torch())
 
+s=ptens_base.batched_atomspack([[[1,2],[3,4]],[[2,3]],[[1,2]]])
+
+B=p.batched_ptensors2b.gather(A,s);
+print(B)
+exit()
 #B=A.relu(A)
 #print(B)
 

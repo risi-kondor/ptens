@@ -57,6 +57,9 @@ namespace ptens{
 
     //BatchedPtensors1b(){}
 
+    BatchedPtensors1b(const BatchedAtomsPack& _atoms, const TENSOR& M):
+      BASE(M), atoms(BatchedAtomsPack1(_atoms)){}
+
     BatchedPtensors1b(const BatchedAtomsPack1& _atoms, const TENSOR& M):
       BASE(M), atoms(_atoms){}
 
@@ -208,7 +211,7 @@ namespace ptens{
     //}
 
     Ptensors1b<TYPE> operator[](const int i) const{
-      return Ptensors1b<TYPE>(atoms.obj->obj[i],TENSOR::rows(atoms.offset(i),atoms.nrows(i)));
+      return Ptensors1b<TYPE>(AtomsPack1(atoms.obj->obj[i]),TENSOR::rows(atoms.offset(i),atoms.nrows(i)));
     }
 
 
@@ -232,29 +235,32 @@ namespace ptens{
 
     template<typename SOURCE, typename = typename std::enable_if<std::is_base_of<BatchedPtensorsb<float>, SOURCE>::value, SOURCE>::type>
     void add_linmaps(const SOURCE& x){
-      for(int i=0; i<size(); i++)
-	view_of(i).add_linmaps(x.view_of(i));
+      //for(int i=0; i<size(); i++)
+      //view_of(i).add_linmaps(x.view_of(i));
+      cnine::MultiLoop(size(),[&](const int i){view_of(i).add_linmaps(x.view_of(i));});
     }
 
     template<typename SOURCE, typename = typename std::enable_if<std::is_base_of<BatchedPtensorsb<float>, SOURCE>::value, SOURCE>::type>
     void add_linmaps_back(const SOURCE& x){
-      for(int i=0; i<size(); i++){
-	view_of(i).add_linmaps_back(x.view_of(i));
-      }
+      //for(int i=0; i<size(); i++)
+      //view_of(i).add_linmaps_back(x.view_of(i));
+      cnine::MultiLoop(size(),[&](const int i){view_of(i).add_linmaps_back(x.view_of(i));});
     }
 
     template<typename SOURCE>
     void add_gather(const SOURCE& x){
       //(atoms.overlaps_mmap(x.atoms))(*this,x);
-      for(int i=0; i<size(); i++)
-	view_of(i).add_gather(x.view_of(i));
+      //for(int i=0; i<size(); i++)
+      //view_of(i).add_gather(x.view_of(i));
+      cnine::MultiLoop(size(),[&](const int i){view_of(i).add_gather(x.view_of(i));});
     }
 
     template<typename OUTPUT>
     void add_gather_back(const OUTPUT& x){
       //x.atoms.inverse_overlaps_mmap(atoms)(*this,x);
-      for(int i=0; i<size(); i++)
-	view_of(i).add_gather_back(x.view_of(i));
+      //for(int i=0; i<size(); i++)
+      //view_of(i).add_gather_back(x.view_of(i));
+      cnine::MultiLoop(size(),[&](const int i){view_of(i).add_gather_back(x.view_of(i));});
     }
 
     

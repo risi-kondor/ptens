@@ -21,7 +21,7 @@ class batched_ggraph:
     @classmethod
     def from_cache(self,keys):
         G=batched_ggraph()
-        G.obj=_batched_ggraph(key)
+        G.obj=_batched_ggraph(keys)
         return G
 
     @classmethod

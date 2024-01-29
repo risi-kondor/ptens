@@ -12,7 +12,7 @@ pybind11::class_<BatchedPtensors2b<float> >(m,"batched_ptensors2b")
 //	return BPtensors2(atoms,v);}))
 
   .def(py::init([](const vector<vector<vector<int> > >& atoms, at::Tensor& M){
-	return BPtensors2(BatchedAtomsPack(atoms),Ltensor<float>(TVIEW(M)));}))
+	return BPtensors2(BatchedAtomsPack(atoms),Ltensor<float>(M));}))
 
 //  .def_static("create",[](const int n, const int _nc, const int fcode, const int _dev){
 //      return BPtensors2(n,_nc,fcode,_dev);}, 
@@ -43,7 +43,7 @@ pybind11::class_<BatchedPtensors2b<float> >(m,"batched_ptensors2b")
   .def("add_to_grad",[](BPtensors2& x, const BPtensors2& y, const float c){x.get_grad().add(y,c);})
   .def("get_grad",[](BPtensors2& x){return x.get_grad();})
 
-  .def("__getitem__",[](const BPtensors2& x, const int i){return x(i);})
+  .def("__getitem__",[](const BPtensors2& x, const int i){return x[i];})
   .def("torch",[](const BPtensors2& x){return x.torch();})
 
 

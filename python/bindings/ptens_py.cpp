@@ -56,7 +56,7 @@
 
 
 namespace ptens{ 
-  PtensSession ptens_session;
+  PtensSession ptens_session(8);
 }
 
 PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {

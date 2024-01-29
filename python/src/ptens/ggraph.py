@@ -51,6 +51,9 @@ class ggraph:
         G.obj=_ggraph.random(_n,_p)
         return G
 
+    def cache(self,key):
+        self.obj.cache(key)
+        
     def torch(self):
         return self.obj.dense()
 
