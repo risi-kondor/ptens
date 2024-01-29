@@ -32,6 +32,19 @@ namespace ptens{
     using BASE::operator[];
 
 
+  public: // ---- Constructors -------------------------------------------------------------------------------
+
+
+    BatchedAtomsPackObj(const vector<vector<vector<int> > >& v){
+      for(auto& p:v)
+	obj.push_back(to_share(new AtomsPackObj(p)));
+    }
+
+    BatchedAtomsPackObj(const initializer_list<initializer_list<initializer_list<int> > >& v){
+      for(auto& p:v)
+	obj.push_back(to_share(new AtomsPackObj(p)));
+    }
+
   };
 
 }

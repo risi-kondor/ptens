@@ -47,6 +47,13 @@ namespace ptens{
       BatchedAtomsPack(new BatchedAtomsPackObj(cnine::mapcar<AtomsPack,shared_ptr<AtomsPackObj> >
 	  (x,[](const AtomsPack& y){return y.obj;}))){}
 
+    BatchedAtomsPack(const vector<vector<vector<int> > >& x):
+      obj(new BatchedAtomsPackObj(x)){}
+
+    BatchedAtomsPack(const initializer_list<initializer_list<initializer_list<int> > >& x):
+      obj(new BatchedAtomsPackObj(x)){}
+
+
 
   public: // ----- Access ------------------------------------------------------------------------------------
 

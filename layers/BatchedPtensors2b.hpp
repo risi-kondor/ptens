@@ -22,6 +22,7 @@
 #include "BatchedAtomsPackN.hpp"
 #include "Ptensors2b.hpp"
 #include "BatchedPtensorsb.hpp"
+#include "SubgraphLayerb.hpp"
 
 
 namespace ptens{

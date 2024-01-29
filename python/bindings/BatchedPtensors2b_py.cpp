@@ -18,9 +18,9 @@ pybind11::class_<BatchedPtensors2b<float> >(m,"batched_ptensors2b")
 //      return BPtensors2(n,_nc,fcode,_dev);}, 
 //    py::arg("atoms"),py::arg("nc"),py::arg("fcode")=0,py::arg("device")=0)
 
-//  .def_static("create",[](const vector<vector<int> > _atoms, const int _nc, const int fcode, const int _dev){
-//      return BPtensors2(AtomsPack(_atoms),_nc,fcode,_dev);}, 
-//    py::arg("atoms"),py::arg("nc"),py::arg("fcode")=0,py::arg("device")=0)
+  .def_static("create",[](const vector<vector<vector<int> > >_atoms, const int _nc, const int fcode, const int _dev){
+      return BPtensors2(BatchedAtomsPack(_atoms),_nc,fcode,_dev);}, 
+    py::arg("atoms"),py::arg("nc"),py::arg("fcode")=0,py::arg("device")=0)
 
   .def_static("create",[](const BatchedAtomsPack& _atoms, const int _nc, const int fcode, const int _dev){
       return BPtensors2(_atoms,_nc,fcode,_dev);})

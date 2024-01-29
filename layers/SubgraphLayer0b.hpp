@@ -20,7 +20,7 @@
 #include "Ptensors0b.hpp"
 #include "Ptensors1b.hpp"
 #include "Ptensors2b.hpp"
-//#include "SubgraphLayerb.hpp"
+#include "SubgraphLayerb.hpp"
 
 
 namespace ptens{

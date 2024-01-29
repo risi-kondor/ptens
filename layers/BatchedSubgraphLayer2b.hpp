@@ -46,8 +46,8 @@ namespace ptens{
     //BatchedSubgraphLayer0b(const BatchedGgraph& _G, const TENSOR& x):
     //BASE(x), G(_G), S(Subgraph::trivial()){}
 
-    //BatchedSubgraphLayer0b(const Ggraph& _G, const Subgraph& _S, const BASE& x):
-    //BASE(x), G(_G), S(_S){}
+    BatchedSubgraphLayer2b(const BatchedGgraph& _G, const Subgraph& _S, const BASE& x):
+      BASE(x), G(_G), S(_S){}
 
     BatchedSubgraphLayer2b(const BatchedGgraph& _G, const Subgraph& _S, const BatchedAtomsPack2& atoms, const TENSOR& x):
       BASE(atoms,x), G(_G), S(_S){}

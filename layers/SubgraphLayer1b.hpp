@@ -19,6 +19,7 @@
 #include "Subgraph.hpp"
 #include "SubgraphLayer0b.hpp"
 #include "Ptensors1b.hpp"
+#include "SubgraphLayerb.hpp"
 
 
 namespace ptens{

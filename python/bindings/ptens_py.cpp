@@ -50,6 +50,10 @@
 #include "BatchedPtensors1b.hpp"
 #include "BatchedPtensors2b.hpp"
 
+#include "BatchedSubgraphLayer0b.hpp"
+#include "BatchedSubgraphLayer1b.hpp"
+#include "BatchedSubgraphLayer2b.hpp"
+
 
 namespace ptens{ 
   PtensSession ptens_session;
@@ -101,5 +105,8 @@ PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
 #include "BatchedPtensors1b_py.cpp"
 #include "BatchedPtensors2b_py.cpp"
 
+#include "BatchedSubgraphLayer0b_py.cpp"
+#include "BatchedSubgraphLayer1b_py.cpp"
+#include "BatchedSubgraphLayer2b_py.cpp"
 
 }
