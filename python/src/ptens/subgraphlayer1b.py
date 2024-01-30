@@ -250,6 +250,7 @@ class Subgraphlayer1b_autobahnFn(torch.autograd.Function):
          r=subgraphlayer1b.dummy()
          r.obj=x.obj.autobahn(w,b)
          ctx.x=x.obj
+         ctx.r=r.obj
          ctx.w=w
          ctx.b=b
          return r
@@ -258,7 +259,7 @@ class Subgraphlayer1b_autobahnFn(torch.autograd.Function):
          wg=torch.zeros_like(ctx.w)
          bg=torch.zeros_like(ctx.b)
          ctx.x.add_autobahn_back0(ctx.r,ctx.w)
-         ctx.x.add_autobahn_back1(wg,bg,ctx.r)
+         ctx.x.autobahn_back1(wg,bg,ctx.r)
          return subgraphlayer1b.dummy(),wg,bg
 
 
