@@ -35,6 +35,11 @@ namespace ptens{
     using BASE::BASE;
     using BASE::atoms;
     using BASE::add_gather;
+    using BASE::get_nc;
+    using BASE::get_grad;
+    using BASE::view3;
+
+    using TENSOR::get_arr;
 
     const BatchedGgraph G;
     const Subgraph S;
@@ -83,6 +88,10 @@ namespace ptens{
       return BatchedSubgraphLayer1b(G,S,BASE::zeros_like());
     }
 
+    BatchedSubgraphLayer1b zeros_like(const int nc) const{
+      return BatchedSubgraphLayer1b(G,S,BASE::zeros_like(nc));
+    }
+
     BatchedSubgraphLayer1b gaussian_like() const{
       return BatchedSubgraphLayer1b(G,S,BASE::gaussian_like());
     }
@@ -94,6 +103,22 @@ namespace ptens{
     //BatchedSubgraphLayer0b(const BatchedSubgraphLayer0b& x, const int _dev):
     //BatchedSubgraphLayer0b(x.G,x.S,BASE(x,_dev)){}
 
+
+  public: // ---- Access -------------------------------------------------------------------------------------
+
+    /*
+    const cnine::Rtensor3_view view3() const{
+      int K=S.getn();
+      int nc=get_nc();
+      return cnine::Rtensor3_view(const_cast<float*>(get_arr()),dim(0)/K,K,nc,K*nc,nc,1);
+    }
+
+    cnine::Rtensor3_view view3(){
+      int K=S.getn();
+      int nc=get_nc();
+      return cnine::Rtensor3_view(get_arr(),dim(0)/K,K,nc,K*nc,nc,1);
+    }
+    */
 
   public: // ---- Message passing between subgraph layers -----------------------------------------------------
 
@@ -116,6 +141,109 @@ namespace ptens{
       BatchedSubgraphLayer1b(_G,_S,_G.subgraphs(_S),x.get_nc()*vector<int>({1,2,5})[x.getk()],0,x.dev){
       add_gather(x);
     }
+
+
+  public: // ---- Autobahn -----------------------------------------------------------------------------------
+
+
+    // abstract these into a separate template 
+    BatchedSubgraphLayer1b autobahn(const TENSOR& W, const TENSOR& B) const{
+      S.make_eigenbasis();
+      int K=S.getn();
+      PTENS_ASSRT(W.dims.size()==3);
+      PTENS_ASSRT(W.dims[0]==S.obj->eblocks.size());
+      PTENS_ASSRT(W.dims[1]==get_nc());
+      PTENS_ASSRT(B.dims.size()==2);
+      PTENS_ASSRT(B.dims[0]==S.obj->eblocks.size());
+      PTENS_ASSRT(B.dims[1]==W.dims[2]);
+
+      BatchedSubgraphLayer1b R=zeros_like(W.dims[2]);
+      for_each_eigenslice(R.view3(K),view3(K),[&]
+	(cnine::Rtensor2_view rslice, cnine::Rtensor2_view xslice, const int b){
+	  rslice.add_matmul_AA(xslice,W.view3().slice0(b));
+	  rslice.add_broadcast0(B.view2().slice0(b));	
+	},true);
+      return R;
+    }
+
+
+   void add_autobahn_back0(const BatchedPtensors1b<TYPE>& r, const TENSOR& W){
+      S.make_eigenbasis();
+      int K=S.getn();
+      PTENS_ASSRT(W.dims.size()==3);
+      PTENS_ASSRT(W.dims[0]==S.obj->eblocks.size());
+      PTENS_ASSRT(W.dims[1]==get_nc());
+      PTENS_ASSRT(W.dims[2]==r.get_nc());
+
+      for_each_eigenslice(get_grad().view3(K),r.get_grad().view3(K),[&]
+	(cnine::Rtensor2_view rslice, cnine::Rtensor2_view xslice, const int b){
+	  rslice.add_matmul_AT(xslice,W.view3().slice0(b));
+	},true);
+    }
+
+
+    void add_autobahn_back1_to(const TENSOR& W, const TENSOR& B, const BatchedPtensors1b<TYPE>& r){
+      S.make_eigenbasis();
+      int K=S.getn();
+      PTENS_ASSRT(W.dims.size()==3);
+      PTENS_ASSRT(W.dims[0]==S.obj->eblocks.size());
+      PTENS_ASSRT(W.dims[1]==get_nc());
+      PTENS_ASSRT(W.dims[2]==r.get_nc());
+      PTENS_ASSRT(B.dims.size()==2);
+      PTENS_ASSRT(B.dims[0]==S.obj->eblocks.size());
+      PTENS_ASSRT(B.dims[1]==r.get_nc());
+
+      for_each_eigenslice(view3(K),r.get_grad().view3(K),[&]
+	(cnine::Rtensor2_view xslice, cnine::Rtensor2_view rslice, const int b){
+	  W.view3().slice0(b).add_matmul_TA(xslice,rslice); // OK
+	  rslice.sum0_into(B.view2().slice0(b)); 
+	});
+    }
+
+
+    void for_each_eigenslice(const cnine::Rtensor3_view x, const cnine::Rtensor3_view y,
+      std::function<void(const cnine::Rtensor2_view& xslice, const cnine::Rtensor2_view& yslice, const int b)> lambda,
+			     const bool inplace_add=false) const{
+      S.make_eigenbasis();
+      int N=x.n0;
+      int K=x.n1;
+      int xnc=x.n2;
+      int ync=y.n2;
+      int nblocks=S.obj->eblocks.size();
+
+      cnine::Rtensor2_view E=S.obj->evecs.view2();
+      const auto& blocks=S.obj->eblocks;
+
+      PTENS_ASSRT(y.n0==N);
+      PTENS_ASSRT(y.n1==K);
+      PTENS_ASSRT(E.n0==K);
+      PTENS_ASSRT(E.n1==K);
+      PTENS_ASSRT(x.dev==y.dev);
+
+      auto X=cnine::Ltensor<float>({N,K,xnc},0,x.dev);
+      if(!inplace_add) X.view3().add_mprod(E.transp(),x);
+
+      auto Y=cnine::Tensor<float>({N,K,ync},0,x.dev);
+      Y.view3().add_mprod(E.transp(),y);
+
+      int offs=0;
+      for(int b=0; b<nblocks; b++){
+	for(int i=offs; i<offs+blocks[b]; i++)
+	  lambda(X.view3().slice1(i),Y.view3().slice1(i),b);
+	offs+=blocks[b];
+      }
+
+      if(inplace_add) const_cast<cnine::Rtensor3_view&>(x).add_mprod(E,X.view3());
+    }
+
+
+   public: // ---- I/O ----------------------------------------------------------------------------------------
+
+
+    string classname() const{
+      return "BatchedSubgraphLayer1b";
+    }
+
 
   };
 

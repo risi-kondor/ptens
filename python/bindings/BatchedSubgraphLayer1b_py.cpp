@@ -16,7 +16,7 @@ pybind11::class_<BSGlayer1b,BatchedPtensors1b<float> >(m,"batched_subgraphlayer1
 
   .def("copy",[](const BSGlayer1b& x){return x.copy();})
   .def("copy",[](const BSGlayer1b& x, const int _dev){return x.copy(_dev);})
-  .def("zeros_like",&BSGlayer1b::zeros_like)
+  .def("zeros_like",[](const BSGlayer1b& x){return x.zeros_like();})
   .def("randn_like",&BSGlayer1b::gaussian_like)
 
 //.def("to",[](const BSGlayer1b& x, const int dev){return BSGlayer1b(x,dev);})
@@ -54,7 +54,14 @@ pybind11::class_<BSGlayer1b,BatchedPtensors1b<float> >(m,"batched_subgraphlayer1
 
   .def(pybind11::init<const BatchedPtensors0b<float>&, const BatchedGgraph&, const Subgraph&>())
   .def(pybind11::init<const BatchedPtensors1b<float>&, const BatchedGgraph&, const Subgraph&>())
-  .def(pybind11::init<const BatchedPtensors2b<float>&, const BatchedGgraph&, const Subgraph&>());
+  .def(pybind11::init<const BatchedPtensors2b<float>&, const BatchedGgraph&, const Subgraph&>())
+
+  .def("autobahn",[](const BSGlayer1b& x, at::Tensor& W, at::Tensor& B){
+      return x.autobahn(ATview<float>(W),ATview<float>(B));})
+  .def("add_autobahn_back0",[](BSGlayer1b& x, BSGlayer1b& r, at::Tensor& W){
+      x.add_autobahn_back0(r.get_grad(),ATview<float>(W));})
+  .def("autobahn_back1",[](BSGlayer1b& x, at::Tensor& W, at::Tensor& B, BSGlayer1b& r){
+      x.add_autobahn_back1_to(ATview<float>(W), ATview<float>(B),r.get_grad());});
 
 
 // ---- I/O --------------------------------------------------------------------------------------------------

@@ -81,8 +81,9 @@ int main(int argc, char** argv){
   X2g.add_gather_back(Y2);
   cout<<X2g<<endl;
 
-  //auto C=BPtens1::cat({X1,X1,X1});
-  //cout<<C<<endl;
+  cout<<6666<<endl;
+  auto C=BPtens1::cat({X1,X1,X1});
+  cout<<C<<endl;
 
   //Ptensors1b<float> Ab(A);
   //cout<<Ab<<endl;

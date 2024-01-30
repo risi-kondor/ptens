@@ -16,6 +16,6 @@ class Autobahn(torch.nn.Module):
           self.w = torch.nn.init.xavier_uniform_(self.w)
           self.b = torch.nn.init.zeros_(self.b)
 
-  def forward(self, x: ptens.subgraphlayer1) -> ptens.subgraphlayer1:
+  def forward(self, x: ptens.subgraphlayer1b) -> ptens.subgraphlayer1b:
       return x.autobahn(self.w,self.b)
 

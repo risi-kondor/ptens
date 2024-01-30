@@ -247,6 +247,14 @@ namespace ptens{
     }
 
 
+   public: // ---- I/O ----------------------------------------------------------------------------------------
+
+
+    string classname() const{
+      return "Subgraphlayer1b";
+    }
+
+
   };
 
 

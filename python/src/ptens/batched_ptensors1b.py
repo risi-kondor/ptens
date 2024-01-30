@@ -211,7 +211,7 @@ class Batched_ptensors1b_catFn(torch.autograd.Function):
             x.add_cat_back(ctx.r,offs)
             offs=offs+x.dim(0)
             dummies.append(batched_ptensors1b.dummy())
-        return None, *dummies #it was *dummies
+        return None, *dummies
 
 
 class Batched_ptensors1b_outerFn(torch.autograd.Function):

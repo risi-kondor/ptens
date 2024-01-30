@@ -71,11 +71,13 @@ namespace ptens{
       for(int i=0; i<N; i++){
 	cnine::plist<AtomsPackObjBase*> v;
 	for(int j=0; j<list.size()-1; j++)
-	  v.push_back(static_cast<AtomsPackObjBase*>(const_cast<SUB*>(&list[j+1][i])));
+	  v.push_back(list[j+1].obj->obj[i].get());
+	//v.push_back(static_cast<AtomsPackObjBase*>(const_cast<SUB*>(&list[j+1][i])));
 	//v.push_back(static_cast<AtomsPackObjBase*>(const_cast<AtomsPack1obj<int>*>(&list[j+1][i])));
-        R->obj.push_back(const_cast<SUB&>(list[0][i]).cat_maps(v));
-      //R->obj.push_back(const_cast<AtomsPack1obj<int>&>(list[0][i]).cat_maps(v));
+        //R->obj.push_back(const_cast<SUB&>(list[0][i]).cat_maps(v));
+        R->obj.push_back(list[0].obj->obj[i]->cat_maps(v));
       }
+      R->make_row_offsets();
       return BatchedAtomsPackN(R);
     }
 

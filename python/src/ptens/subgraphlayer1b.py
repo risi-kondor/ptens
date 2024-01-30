@@ -205,7 +205,7 @@ class Subgraphlayer1b_catFn(torch.autograd.Function):
             x.add_cat_back(ctx.r,offs)
             offs=offs+x.dim(0)
             dummies.append(subgraphlayer1b.dummy())
-        return None, dummies #it was *dummies
+        return None, *dummies #it was *dummies
 
 
 class Subgraphlayer1b_outerFn(torch.autograd.Function):
@@ -230,7 +230,7 @@ class Subgraphlayer1b_GatherFromPtensorsbFn(torch.autograd.Function):
 
     @staticmethod
     def forward(ctx,x,G,S):
-        r=x.dummy()
+	r=subgraphlayer1b.dummy()
         r.obj=_subgraphlayer1b(x.obj,G.obj,S.obj)
         ctx.x=x.obj
         ctx.r=r.obj
@@ -259,7 +259,7 @@ class Subgraphlayer1b_autobahnFn(torch.autograd.Function):
          bg=torch.zeros_like(ctx.b)
          ctx.x.add_autobahn_back0(ctx.r,ctx.w)
          ctx.x.add_autobahn_back1(wg,bg,ctx.r)
-         return subgraphlayer1.dummy(),wg,bg
+         return subgraphlayer1b.dummy(),wg,bg
 
 
 

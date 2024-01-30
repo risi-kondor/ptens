@@ -241,7 +241,7 @@ class Subgraphlayer2b_GatherFromPtensorsbFn(torch.autograd.Function):
 
     @staticmethod
     def forward(ctx,x,G,S):
-        r=x.dummy()
+        r=subgraphlayer2b.dummy()
         r.obj=_subgraphlayer2b(x.obj,G.obj,S.obj)
         ctx.x=x.obj
         ctx.r=R.obj

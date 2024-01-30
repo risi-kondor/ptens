@@ -409,7 +409,7 @@ namespace ptens{
       }
       ostringstream oss;
       for(int i=0; i<size(); i++){
-	oss<<indent<<(*this)(i)<<endl;
+	oss<<(*this)(i).str(indent)<<endl;
       }
       return oss.str();
     }

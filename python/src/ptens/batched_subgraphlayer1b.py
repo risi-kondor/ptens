@@ -155,6 +155,9 @@ class batched_subgraphlayer1b(torch.Tensor):
     def gather_from_ptensors(self,x,G,S):
         return Batched_subgraphlayer1b_GatherFromPtensorsbFn.apply(x,G,S)
 
+    def autobahn(self,w,b):
+        return BatchedSubgraphlayer1b_autobahnFn.apply(self,w,b)
+
 
     # ---- I/O ----------------------------------------------------------------------------------------------
 
@@ -256,5 +259,23 @@ class Batched_subgraphlayer1b_GatherFromPtensorsbFn(torch.autograd.Function):
     def backward(ctx,g):
         ctx.x.add_gather_back(ctx.r)
         return ptensorsb.dummy(), None, None
+
+# this could be shared with subgraphlayer1b
+class BatchedSubgraphlayer1b_autobahnFn(torch.autograd.Function):
+     @staticmethod
+     def forward(ctx,x,w,b):
+         r=batched_subgraphlayer1b.dummy()
+         r.obj=x.obj.autobahn(w,b)
+         ctx.x=x.obj
+         ctx.w=w
+         ctx.b=b
+         return r
+     @staticmethod
+     def backward(ctx,g):
+         wg=torch.zeros_like(ctx.w)
+         bg=torch.zeros_like(ctx.b)
+         ctx.x.add_autobahn_back0(ctx.r,ctx.w)
+         ctx.x.add_autobahn_back1(wg,bg,ctx.r)
+         return batched_subgraphlayer1.dummy(),wg,bg
 
 

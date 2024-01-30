@@ -80,6 +80,20 @@ namespace ptens{
     //}
 
 
+    BatchedAtomsPack cat(const vector<BatchedAtomsPack>& v){
+      PTENS_ASSRT(v.size()>0);
+      int N=v[0].size();
+      auto R=new BatchedAtomsPackObj();
+      for(int i=0; i<N; i++){
+	vector<shared_ptr<AtomsPackObj> > w;
+	for(auto& p: v)
+	  w.push_back(p.obj->obj[i]);
+	R->obj.push_back(AtomsPackObj::cat(w));
+      }
+      return BatchedAtomsPack(R);
+    }
+
+
   public: // ---- I/O ----------------------------------------------------------------------------------------
 
 

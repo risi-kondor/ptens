@@ -22,9 +22,15 @@
 
 namespace ptens{
 
+  class BatchedAtomsPackNobjBase: public cnine::observable<BatchedAtomsPackNobjBase>{
+  public:
+    BatchedAtomsPackNobjBase():
+      observable(this){}
+  };
+
 
   template<typename SUB>
-  class BatchedAtomsPackNobj: public cnine::object_pack_s<SUB>{
+  class BatchedAtomsPackNobj: public BatchedAtomsPackNobjBase, public cnine::object_pack_s<SUB>{
   public:
 
     typedef cnine::object_pack_s<SUB> BASE;
@@ -103,6 +109,7 @@ namespace ptens{
 
     int offset(const int i) const{
       PTENS_ASSRT(i<=size());
+      PTENS_ASSRT(i<row_offsets.size()+1);
       if(i==0) return 0; 
       return row_offsets[i-1];
     }
@@ -127,17 +134,27 @@ namespace ptens{
 
   public: // ---- Concatenation -----------------------------------------------------------------------------
 
-    /*
-    typedef cnine::plist_indexed_object_bank<AtomsPackObjBase,shared_ptr<AtomsPack0batchObj<int> > > CAT_MAPS; 
-    CAT_MAPS cat_maps=CAT_MAPS([this](const vector<AtomsPackObjBase*>& v)
-      {return shared_ptr<AtomsPack0batchObj<int> >(cat_with(v));});
 
-    AtomsPack0batchObj<int>* cat_with(const vector<AtomsPackObjBase*>& list){
-      cnine::plist<AtomsPackObj*> v;
-      for(auto p:list) v.push_back(p->atoms.get());
-      return new AtomsPack0batchObj<int>(atoms->cat_maps(v));
+    /*
+    typedef cnine::plist_indexed_object_bank<BatchedAtomsPackNobj,shared_ptr<BatchedAtomsPackNobj> > CAT_MAPS; 
+    CAT_MAPS cat_maps=CAT_MAPS([this](const vector<BatchedAtomsPackNobj*>& v)
+      {return shared_ptr<BatchedAtomsPackNobj<int> >(cat_with(v));});
+
+    BatchedAtomsPackNobj* cat_with(const vector<BatchedAtomsPackNobj*>& list){
+      PTENS_ASSRT(list.size()>0);
+      int N=list[0]->size();
+      auto R=new BatchedAtomsPackNobj();
+      for(int i=0; i<N; i++){
+	cnine::plist<SUB*> v;
+	for(auto p:list) v.push_back();
+	R->obj->push_back(to_share(new SUB)
+      }
+      R->make_row_offsets();
+      return R;
+      return new BatchedAtomsPackNobj(atoms->cat_maps(v));
     }
     */
+
 
   public: // ---- Message lists ----------------------------------------------------------------------------
 

@@ -247,6 +247,16 @@ namespace ptens{
   public: // ---- Concatenation ------------------------------------------------------------------------------
 
 
+    static shared_ptr<AtomsPackObj> cat(const vector<shared_ptr<AtomsPackObj> >& list){
+      PTENS_ASSRT(list.size()>0);
+      vector<AtomsPackObj*> v;
+      bool first=true;
+      for(auto p:list)
+	if(first) first=false; 
+	else v.push_back(p.get());
+      return (*list.begin())->cat_maps(cnine::plist<AtomsPackObj*>(v));
+    }
+
     static shared_ptr<AtomsPackObj> cat(const vector<reference_wrapper<AtomsPackObj> >& list){
       PTENS_ASSRT(list.size()>0);
       vector<AtomsPackObj*> v;
