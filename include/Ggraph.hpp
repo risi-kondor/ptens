@@ -96,13 +96,13 @@ namespace ptens{
     }
 
     static Ggraph cached_from_edge_list(const cnine::Tensor<int>& M){
-      auto [id,G]=ptens_session.graph_cache.from_edge_list(M);
-      return Ggraph(G);
+      auto r=ptens_session.graph_cache.from_edge_list(M);
+      return Ggraph(r.second);
     }
 
     static Ggraph cached_from_edge_list(int n, const cnine::Tensor<int>& M){
-      auto [id,G]=ptens_session.graph_cache.from_edge_list(M);
-      return Ggraph(G);
+      auto r=ptens_session.graph_cache.from_edge_list(M);
+      return Ggraph(r.second);
     }
 
     // replace this
