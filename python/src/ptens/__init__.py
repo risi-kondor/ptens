@@ -66,3 +66,4 @@ from ptens.batched_subgraphlayer0b import batched_subgraphlayer0b as batched_sub
 from ptens.batched_subgraphlayer1b import batched_subgraphlayer1b as batched_subgraphlayer1b
 from ptens.batched_subgraphlayer2b import batched_subgraphlayer2b as batched_subgraphlayer2b
 
+from ptens.autobahn import Autobahn

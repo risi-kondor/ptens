@@ -142,6 +142,10 @@ namespace ptens{
       return Ptensors1b(TENSOR::zeros_like(),atoms);
     }
 
+    Ptensors1b zeros_like(const int nc) const{
+      return Ptensors1b(TENSOR({dim(0),nc},0,get_dev()),atoms);
+    }
+
     Ptensors1b gaussian_like() const{
       return Ptensors1b(BASE::gaussian_like(),atoms);
     }
@@ -243,6 +247,16 @@ namespace ptens{
 
     Ptensor1 operator()(const int i) const{
       return Ptensor1(cnine::RtensorA(tensor_of(i).view2()),atoms_of(i));
+    }
+
+    const cnine::Rtensor3_view view3(const int K) const{
+      int nc=get_nc();
+      return cnine::Rtensor3_view(const_cast<float*>(get_arr()),dim(0)/K,K,nc,K*nc,nc,1);
+    }
+
+    cnine::Rtensor3_view view3(const int K){
+      int nc=get_nc();
+      return cnine::Rtensor3_view(get_arr(),dim(0)/K,K,nc,K*nc,nc,1);
     }
 
 

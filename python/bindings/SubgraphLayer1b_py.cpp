@@ -16,7 +16,7 @@ pybind11::class_<SGlayer1b,Ptensors1b<float> >(m,"subgraphlayer1b")
 
   .def("copy",[](const SGlayer1b& x){return x.copy();})
   .def("copy",[](const SGlayer1b& x, const int _dev){return x.copy(_dev);})
-  .def("zeros_like",&SGlayer1b::zeros_like)
+  .def("zeros_like",[](const SGlayer1b& x){return x.zeros_like();})
   .def("randn_like",&SGlayer1b::gaussian_like)
 
   .def("to",[](const SGlayer1b& x, const int dev){return SGlayer1b(x,dev);})
@@ -44,12 +44,9 @@ pybind11::class_<SGlayer1b,Ptensors1b<float> >(m,"subgraphlayer1b")
 // ---- Message passing --------------------------------------------------------------------------------------
 
 
-  .def_static("linmaps",[](const SGlayer0b& x){
-      return SGlayer1b::linmaps(x);}) 
-  .def_static("linmaps",[](const SGlayer1b& x){
-      return SGlayer1b::linmaps(x);}) 
-  .def_static("linmaps",[](const SGlayer2b& x){
-      return SGlayer1b::linmaps(x);}) 
+  .def_static("linmaps",[](const SGlayer0b& x){return SGlayer1b::linmaps(x);}) 
+  .def_static("linmaps",[](const SGlayer1b& x){return SGlayer1b::linmaps(x);}) 
+  .def_static("linmaps",[](const SGlayer2b& x){return SGlayer1b::linmaps(x);}) 
 
   .def(pybind11::init<const SGlayer0b&, const Subgraph&>())
   .def(pybind11::init<const SGlayer1b&, const Subgraph&>())
@@ -57,7 +54,14 @@ pybind11::class_<SGlayer1b,Ptensors1b<float> >(m,"subgraphlayer1b")
 
   .def(pybind11::init<const Ptensors0b<float>&, const Ggraph&, const Subgraph&>())
   .def(pybind11::init<const Ptensors1b<float>&, const Ggraph&, const Subgraph&>())
-  .def(pybind11::init<const Ptensors2b<float>&, const Ggraph&, const Subgraph&>());
+  .def(pybind11::init<const Ptensors2b<float>&, const Ggraph&, const Subgraph&>())
+
+  .def("autobahn",[](const SGlayer1b& x, at::Tensor& W, at::Tensor& B){
+      return x.autobahn(ATview<float>(W),ATview<float>(B));})
+  .def("add_autobahn_back0",[](SGlayer1b& x, SGlayer1b& r, at::Tensor& W){
+      x.add_autobahn_back0(r.get_grad(),ATview<float>(W));})
+  .def("autobahn_back1",[](SGlayer1b& x, at::Tensor& W, at::Tensor& B, SGlayer1b& r){
+      x.add_autobahn_back1_to(ATview<float>(W), ATview<float>(B),r.get_grad());});
 
 
 // ---- I/O --------------------------------------------------------------------------------------------------

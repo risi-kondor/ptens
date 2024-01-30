@@ -1,3 +1,6 @@
+import torch
+import ptens
+
 class Autobahn(torch.nn.Module):
 
   def __init__(self, in_channels: int, out_channels: int, S:ptens.subgraph) -> None:

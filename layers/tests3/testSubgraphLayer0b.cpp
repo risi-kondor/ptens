@@ -16,6 +16,7 @@
 
 #include "SubgraphLayer0b.hpp"
 #include "SubgraphLayer1b.hpp"
+#include "BatchedGgraph.hpp"
 
 using namespace ptens;
 using namespace cnine;

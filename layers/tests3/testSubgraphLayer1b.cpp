@@ -29,7 +29,7 @@ int main(int argc, char** argv){
 
   cnine_session session;
 
-  cudaDeviceReset();
+  //cudaDeviceReset();
 
   Ggraph G=Ggraph::random(10);
   cout<<G<<endl;
@@ -49,8 +49,9 @@ int main(int argc, char** argv){
   cout<<f1.str()<<endl;
 
   SubgraphLayer1b<float> f2=gather1(f1,Subgraph::star(99));
+  //f2.get_grad()=f2;
 
-  f1.get_grad().add_gather_back(f2);
+  f1.get_grad()add_gather_back(f2);
   cout<<f1.get_grad()<<endl;
 
   /*
