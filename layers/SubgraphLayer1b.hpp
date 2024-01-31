@@ -230,10 +230,14 @@ namespace ptens{
       PTENS_ASSRT(E.n1==K);
       PTENS_ASSRT(x.dev==y.dev);
 
+      cout<<x.dev<<y.dev<<E.dev<<endl;
+
       auto X=cnine::Ltensor<float>({N,K,xnc},0,x.dev);
+      cout<<X.view3().dev<<endl;
       if(!inplace_add) X.view3().add_mprod(E.transp(),x);
 
       auto Y=cnine::Tensor<float>({N,K,ync},0,x.dev);
+      cout<<Y.view3().dev<<endl;
       Y.view3().add_mprod(E.transp(),y);
 
       int offs=0;
