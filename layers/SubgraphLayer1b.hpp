@@ -214,7 +214,7 @@ namespace ptens{
 
 
     void for_each_eigenslice(const cnine::Rtensor3_view x, const cnine::Rtensor3_view y,
-      std::function<void(const cnine::Rtensor2_view& xslice, const cnine::Rtensor2_view& yslice, const int b)> lambda,
+      std::function<void(cnine::Rtensor2_view xslice, cnine::Rtensor2_view yslice, const int b)> lambda,
 			     const bool inplace_add=false) const{
       S.make_eigenbasis();
       int N=x.n0;
@@ -223,7 +223,7 @@ namespace ptens{
       int ync=y.n2;
       int nblocks=S.obj->eblocks.size();
 
-      S.obj.move_to_device(x.dev);
+      S.obj->evecs.move_to_device(x.dev);
       cnine::Rtensor2_view E=S.obj->evecs.view2();
       const auto& blocks=S.obj->eblocks;
 
@@ -233,20 +233,17 @@ namespace ptens{
       PTENS_ASSRT(E.n1==K);
       PTENS_ASSRT(x.dev==y.dev);
 
-      cout<<x.dev<<y.dev<<E.dev<<endl;
-
       auto X=cnine::Ltensor<float>({N,K,xnc},0,x.dev);
-      cout<<X.view3(K).dev<<endl;
       if(!inplace_add) X.view3().add_mprod(E.transp(),x);
 
       auto Y=cnine::Tensor<float>({N,K,ync},0,x.dev);
-      cout<<Y.view3(K).dev<<endl;
       Y.view3().add_mprod(E.transp(),y);
 
       int offs=0;
       for(int b=0; b<nblocks; b++){
-	for(int i=offs; i<offs+blocks[b]; i++)
+	for(int i=offs; i<offs+blocks[b]; i++){
 	  lambda(X.view3().slice1(i),Y.view3().slice1(i),b);
+	}
 	offs+=blocks[b];
       }
 

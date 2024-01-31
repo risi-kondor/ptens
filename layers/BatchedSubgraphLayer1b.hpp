@@ -211,6 +211,7 @@ namespace ptens{
       int ync=y.n2;
       int nblocks=S.obj->eblocks.size();
 
+      S.obj->evecs.move_to_device(x.dev);
       cnine::Rtensor2_view E=S.obj->evecs.view2();
       const auto& blocks=S.obj->eblocks;
 
