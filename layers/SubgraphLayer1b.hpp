@@ -47,6 +47,7 @@ namespace ptens{
     //using TLAYER::getn;
     using BASE::get_nc;
     using BASE::get_grad;
+    using BASE::view3;
     //using TLAYER::tensor;
     //using TLAYER::inp;
     //using TLAYER::diff2;
@@ -83,6 +84,7 @@ namespace ptens{
       return SubgraphLayer1b(AtomsPack1::cat(v),cnine::Ltensor<TYPE>::stack(0,list));
     }
 
+
   public: // ----- Spawning ----------------------------------------------------------------------------------
 
 
@@ -117,7 +119,7 @@ namespace ptens{
 
   public: // ---- Access -------------------------------------------------------------------------------------
 
-    
+    /*
     const cnine::Rtensor3_view view3() const{
       int K=S.getn();
       int nc=get_nc();
@@ -129,7 +131,7 @@ namespace ptens{
       int nc=get_nc();
       return cnine::Rtensor3_view(get_arr(),dim(0)/K,K,nc,K*nc,nc,1);
     }
-
+    */
 
   public: // ---- Message passing between subgraph layers -----------------------------------------------------
 
@@ -159,7 +161,7 @@ namespace ptens{
 
     SubgraphLayer1b autobahn(const TENSOR& W, const TENSOR& B) const{
       S.make_eigenbasis();
-      //int K=S.getn();
+      int K=S.getn();
       PTENS_ASSRT(W.dims.size()==3);
       PTENS_ASSRT(W.dims[0]==S.obj->eblocks.size());
       PTENS_ASSRT(W.dims[1]==get_nc());
@@ -168,7 +170,7 @@ namespace ptens{
       PTENS_ASSRT(B.dims[1]==W.dims[2]);
 
       SubgraphLayer1b R=zeros_like(W.dims[2]);
-      for_each_eigenslice(R.view3(),view3(),[&]
+      for_each_eigenslice(R.view3(K),view3(K),[&]
 	(cnine::Rtensor2_view rslice, cnine::Rtensor2_view xslice, const int b){
 	  rslice.add_matmul_AA(xslice,W.view3().slice0(b)); // OK
 	  rslice.add_broadcast0(B.view2().slice0(b)); // OK	
@@ -203,7 +205,7 @@ namespace ptens{
       PTENS_ASSRT(B.dims[0]==S.obj->eblocks.size());
       PTENS_ASSRT(B.dims[1]==r.get_nc());
 
-      for_each_eigenslice(view3(),r.get_grad().view3(K),[&]
+      for_each_eigenslice(view3(K),r.get_grad().view3(K),[&]
 	(cnine::Rtensor2_view xslice, cnine::Rtensor2_view rslice, const int b){
 	  W.view3().slice0(b).add_matmul_TA(xslice,rslice); // OK
 	  rslice.sum0_into(B.view2().slice0(b)); 
@@ -221,6 +223,7 @@ namespace ptens{
       int ync=y.n2;
       int nblocks=S.obj->eblocks.size();
 
+      S.obj.move_to_device(x.dev);
       cnine::Rtensor2_view E=S.obj->evecs.view2();
       const auto& blocks=S.obj->eblocks;
 
@@ -233,11 +236,11 @@ namespace ptens{
       cout<<x.dev<<y.dev<<E.dev<<endl;
 
       auto X=cnine::Ltensor<float>({N,K,xnc},0,x.dev);
-      cout<<X.view3().dev<<endl;
+      cout<<X.view3(K).dev<<endl;
       if(!inplace_add) X.view3().add_mprod(E.transp(),x);
 
       auto Y=cnine::Tensor<float>({N,K,ync},0,x.dev);
-      cout<<Y.view3().dev<<endl;
+      cout<<Y.view3(K).dev<<endl;
       Y.view3().add_mprod(E.transp(),y);
 
       int offs=0;

@@ -251,12 +251,12 @@ namespace ptens{
 
     const cnine::Rtensor3_view view3(const int K) const{
       int nc=get_nc();
-      return cnine::Rtensor3_view(const_cast<float*>(get_arr()),dim(0)/K,K,nc,K*nc,nc,1);
+      return cnine::Rtensor3_view(const_cast<float*>(get_arr()),dim(0)/K,K,nc,K*nc,nc,1,get_dev());
     }
 
     cnine::Rtensor3_view view3(const int K){
       int nc=get_nc();
-      return cnine::Rtensor3_view(get_arr(),dim(0)/K,K,nc,K*nc,nc,1);
+      return cnine::Rtensor3_view(get_arr(),dim(0)/K,K,nc,K*nc,nc,1,get_dev());
     }
 
 
