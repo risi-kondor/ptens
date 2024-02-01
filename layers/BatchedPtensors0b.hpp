@@ -58,7 +58,7 @@ namespace ptens{
     //BatchedPtensors0b(){}
 
     BatchedPtensors0b(const TENSOR& M, const vector<int> sizes):
-      BASE(M.copy(0)){
+      BASE(M.copy()){
 	  vector<shared_ptr<AtomsPack0obj<int> > > x;
       for(auto p:sizes) x.push_back(to_share(new AtomsPack0obj<int>(p)));
       atoms=BatchedAtomsPackN<AtomsPack0obj<int> >(x);
