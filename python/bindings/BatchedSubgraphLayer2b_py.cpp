@@ -27,8 +27,7 @@ pybind11::class_<BSGlayer2b,BatchedPtensors2b<float> >(m,"batched_subgraphlayer2
 
   .def("add",[](BSGlayer2b& r, const BSGlayer2b& x){r.add(x);})
 
-  .def("cat_channels",[](const BSGlayer2b& x, const BSGlayer2b& y){
-      return cat_channels_sg(x,y);})
+  .def("cat_channels",[](const BSGlayer2b& x, const BSGlayer2b& y){return cat_channels_sg(x,y);})
 //.def("cat",&BSGlayer2b::cat)
 //.def("scale_channels",[](BSGlayer2b& x, at::Tensor& y){
 //      return scale_channels_sg(x,ATview<float>(y));})
