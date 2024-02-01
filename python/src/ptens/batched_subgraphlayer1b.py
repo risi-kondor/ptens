@@ -291,6 +291,6 @@ class BatchedSubgraphlayer1b_autobahnFn(torch.autograd.Function):
          bg=torch.zeros_like(ctx.b)
          ctx.x.add_autobahn_back0(ctx.r,ctx.w)
          ctx.x.autobahn_back1(wg,bg,ctx.r)
-         return batched_subgraphlayer1.dummy(),wg,bg
+         return batched_subgraphlayer1b.dummy(),wg,bg
 
 
