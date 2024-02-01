@@ -70,6 +70,23 @@ namespace ptens{
     }
     */
 
+    static BatchedSubgraphLayer0b from_vertex_features(const vector<int>& graphs, const TENSOR& M){
+      BatchedGgraph G(graphs);
+      vector<int> sizes;
+      for(int i=0; i<G.size(); i++)
+	sizes.push_back(G[i].getn());
+      return BatchedSubgraphLayer0b(G,Subgraph::trivial(),BASE(M,sizes));
+    }
+
+    static BatchedSubgraphLayer0b from_edge_features(const vector<int>& graphs, const TENSOR& M){
+      BatchedGgraph G(graphs);
+      auto atoms=new BatchedAtomsPackNobj<AtomsPack0obj<int> >();
+      for(int i=0; i<G.size(); i++)
+	atoms->obj.push_back(to_share(new AtomsPack0obj<int>(G[i].original_edges())));
+      atoms->make_row_offsets();
+      return BatchedSubgraphLayer0b(G,Subgraph::edge(),BASE(BatchedAtomsPack0(atoms),M));
+    }
+
 
   public: // ----- Spawning ----------------------------------------------------------------------------------
 

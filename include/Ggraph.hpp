@@ -68,6 +68,12 @@ namespace ptens{
     static Ggraph random(const int _n, const float p=0.5){
       return new OBJ(OBJ::random(_n,p));}
 
+    static Ggraph from_edges(const cnine::Ltensor<int>& M, const bool cached=false){
+      int n=M.max()+1;
+      if(!cached) return new OBJ(n,M);
+      return ptens_session.graph_cache.from_edge_list(M).second;
+    }
+
     static Ggraph from_edges(const cnine::Tensor<int>& M, const bool cached=false){
       int n=M.max()+1;
       if(!cached) return new OBJ(n,M);
@@ -134,6 +140,11 @@ namespace ptens{
     cnine::Ltensor<int> edge_list() const{
       return obj->edge_list();
     }
+
+    AtomsPack original_edges() const{
+      return obj->original_edges;
+    }
+
 
     void cache(const int key) const{
       ptens_session.graph_cache.cache(key,obj);

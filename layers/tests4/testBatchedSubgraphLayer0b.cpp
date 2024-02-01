@@ -29,18 +29,36 @@ typedef BatchedPtensors1b<float> BPtens1;
 
 int main(int argc, char** argv){
 
-  Ggraph g0=Ggraph::random(10);
+  int n=6;
+
+  Ggraph g0=Ggraph::random(n);
   BatchedGgraph G({g0,g0,g0});
   cout<<G<<endl;
 
   Subgraph trivial=Subgraph::trivial();
 
-  AtomsPack xatoms0=AtomsPack::random(10,0.5);
+  AtomsPack xatoms0=AtomsPack::random(n,0.5);
   BatchedAtomsPack xatoms({xatoms0,xatoms0,xatoms0});
 
   BPtens1 X1=BPtens1(xatoms,channels=3,filltype=3);
 
   BatchedSubgraphLayer0b<float> U(X1,G,trivial);
   cout<<U<<endl;
+
+  cout<<666666<<endl;
+
+  Ggraph g1=Ggraph::from_edges(g0.edge_list());
+  g1.cache(0);
+  Ltensor<float> M({3*n,3},3);
+  Ltensor<float> P({6*g0.nedges(),3},3);
+  //cout<<M<<endl;
+
+  auto V=BatchedSubgraphLayer0b<float>::from_vertex_features({0,0,0},M);
+  cout<<V<<endl;
+  
+  auto W=BatchedSubgraphLayer0b<float>::from_edge_features({0,0,0},P);
+  cout<<W<<endl;
+  
+
 
 }

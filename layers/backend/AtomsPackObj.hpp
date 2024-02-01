@@ -33,6 +33,9 @@
 
 namespace ptens{
 
+  template<typename DUMMY>
+  class AtomsPack1obj;
+
 
   class AtomsPackObj: public cnine::array_pool<int>, public cnine::observable<AtomsPackObj>{
   public:
@@ -54,6 +57,9 @@ namespace ptens{
 	{return shared_ptr<AtomsPackObj>(new AtomsPackObj(cat_with(v)));});
 
     int constk=0;
+
+    shared_ptr<AtomsPack1obj<int> > cached_pack1;
+
 
     ~AtomsPackObj(){
     }

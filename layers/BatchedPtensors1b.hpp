@@ -22,6 +22,7 @@
 #include "BatchedAtomsPackN.hpp"
 #include "Ptensors1b.hpp"
 #include "BatchedPtensorsb.hpp"
+#include "MultiLoop.hpp"
 
 
 namespace ptens{

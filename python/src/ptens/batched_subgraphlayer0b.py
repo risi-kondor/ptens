@@ -44,6 +44,14 @@ class batched_subgraphlayer0b(torch.Tensor):
         return Batched_subgraphlayer0b_fromMxFn.apply(M,atoms)
             
     @classmethod
+    def from_vertex_features(self,graphs,M):
+        return BatchedSubgraphlayer0b_fromVertexFeaturesFn.apply(graphs,M)
+            
+    @classmethod
+    def from_edge_features(self,graphs,M):
+        return BatchedSubgraphlayer0b_fromEdgeFeaturesFn.apply(graphs,M)
+            
+    @classmethod
     def like(self,x,M):
         return Batched_subgraphlayer0b_likeFn.apply(x,M)
 
@@ -175,12 +183,40 @@ class batched_subgraphlayer0b(torch.Tensor):
 # ----- Transport and conversions ----------------------------------------------------------------------------
 
 
-class Batched_subgraphlayer0b_fromMxFn(torch.autograd.Function):
+# class Batched_subgraphlayer0b_fromMxFn(torch.autograd.Function):
+
+#     @staticmethod
+#     def forward(ctx,G,x):
+#         R=batched_subgraphlayer0b.dummy()
+#         R.obj=_batched_subgraphlayer0b(G.obj,x)
+#         ctx.r=R.obj
+#         return R
+
+#     @staticmethod
+#     def backward(ctx,g):
+#         return None, ctx.r.get_grad().torch()
+
+
+class BatchedSubgraphlayer0b_fromVertexFeaturesFn(torch.autograd.Function):
 
     @staticmethod
-    def forward(ctx,G,x):
-        R=batched_subgraphlayer0b(1)
-        R.obj=_batched_subgraphlayer0b(G.obj,x)
+    def forward(ctx,graphs,M):
+        R=batched_subgraphlayer0b.dummy()
+        R.obj=_batched_subgraphlayer0b.from_vertex_features(graphs,M)
+        ctx.r=R.obj
+        return R
+
+    @staticmethod
+    def backward(ctx,g):
+        return None, ctx.r.get_grad().torch()
+
+
+class BatchedSubgraphlayer0b_fromEdgeFeaturesFn(torch.autograd.Function):
+
+    @staticmethod
+    def forward(ctx,graphs,M):
+        R=batched_subgraphlayer0b.dummy()
+        R.obj=_batched_subgraphlayer0b.from_edge_features(graphs,M)
         ctx.r=R.obj
         return R
 

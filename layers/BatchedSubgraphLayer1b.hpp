@@ -63,6 +63,16 @@ namespace ptens{
     BatchedSubgraphLayer1b(const BatchedGgraph& _G, const Subgraph& _S, const BatchedAtomsPack& _atoms, const int nc, const int fcode, const int _dev=0):
       G(_G), S(_S), BASE(_atoms,nc,fcode,_dev){}
 
+
+    static BatchedSubgraphLayer1b from_edge_features(const vector<int>& graphs, const TENSOR& M){
+      BatchedGgraph G(graphs);
+      auto atoms=new BatchedAtomsPackNobj<AtomsPack1obj<int> >();
+      for(int i=0; i<G.size(); i++)
+	atoms->obj.push_back(to_share(new AtomsPack1obj<int>(G[i].original_edges())));
+      atoms->make_row_offsets();
+      return BatchedSubgraphLayer1b(G,Subgraph::edge(),BASE(BatchedAtomsPack1(atoms),M));
+    }
+
     /*
     static BatchedSubgraphLayer0b cat(const vector<BatchedSubgraphLayer0b>& list){
       vector<AtomsPack0> v;

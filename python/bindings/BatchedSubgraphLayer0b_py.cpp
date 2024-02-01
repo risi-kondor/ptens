@@ -11,6 +11,12 @@ pybind11::class_<BSGlayer0b,BatchedPtensors0b<float> >(m,"batched_subgraphlayer0
 //    return BSGlayer0b(G,_nc,fcode,_dev);}, 
 //  py::arg("graph"),py::arg("nc"),py::arg("fcode")=0,py::arg("device")=0)
 
+  .def_static("from_vertex_features",[](const vector<int>& keys, at::Tensor&M){
+      return BSGlayer0b::from_vertex_features(keys,ATview<float>(M));})
+
+  .def_static("from_edge_features",[](const vector<int>& keys, at::Tensor&M){
+      return BSGlayer0b::from_edge_features(keys,ATview<float>(M));})
+
   .def_static("like",[](const BSGlayer0b& x, at::Tensor& M){
       return BSGlayer0b(x.G,x.S,x.atoms,ATview<float>(M));})
 

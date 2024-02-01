@@ -37,6 +37,8 @@ namespace ptens{
     using BASE::BASE;
     using BASE::nedges;
 
+    AtomsPack original_edges;
+
 
     GgraphObj(const initializer_list<pair<int,int> >& list, const int n): 
       BASE(n,list){}
@@ -55,6 +57,7 @@ namespace ptens{
       PTENS_ASSRT(M.dim(0)==2);
       for(int i=0; i<M.dims(1); i++)
 	R.set(M(0,i),M(1,i),1.0);
+      R.original_edges=AtomsPack(M.transp());
       return R;
     }
 
@@ -69,6 +72,24 @@ namespace ptens{
       for(int i=0; i<M.dims(1); i++)
 	R->set(M(0,i),M(1,i),1.0);
       return R;
+    }
+
+    GgraphObj(int n, const cnine::Tensor<int>& M):
+      GgraphObj(n){
+      PTENS_ASSRT(M.ndims()==2);
+      PTENS_ASSRT(M.dim(0)==2);
+      for(int i=0; i<M.dims(1); i++)
+	set(M(0,i),M(1,i),1.0);
+      original_edges=AtomsPack(M.transp());
+    }
+
+    GgraphObj(int n, const cnine::Ltensor<int>& M):
+      GgraphObj(n){
+      PTENS_ASSRT(M.ndims()==2);
+      PTENS_ASSRT(M.dim(0)==2);
+      for(int i=0; i<M.dims(1); i++)
+	set(M(0,i),M(1,i),1.0);
+      original_edges=AtomsPack(M.transp());
     }
 
     // eliminate this eventually

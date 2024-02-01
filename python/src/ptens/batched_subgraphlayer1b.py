@@ -192,6 +192,20 @@ class Batched_subgraphlayer1b_fromMxFn(torch.autograd.Function):
         return None, ctx.r.get_grad().torch()
 
 
+class BatchedSubgraphlayer1b_fromEdgeFeaturesFn(torch.autograd.Function):
+
+    @staticmethod
+    def forward(ctx,graphs,M):
+        R=batched_subgraphlayer1b.dummy()
+        R.obj=_batched_subgraphlayer1b.from_edge_features(graphs,M)
+        ctx.r=R.obj
+        return R
+
+    @staticmethod
+    def backward(ctx,g):
+        return None, ctx.r.get_grad().torch()
+
+
 class Batched_subgraphlayer1b_likeFn(torch.autograd.Function):
 
     @staticmethod

@@ -59,10 +59,10 @@ namespace ptens{
     //BatchedPtensors2b(){}
 
     BatchedPtensors2b(const BatchedAtomsPack& _atoms, const TENSOR& M):
-      BASE(M), atoms(BatchedAtomsPack2(_atoms)){}
+      BASE(M.copy()), atoms(BatchedAtomsPack2(_atoms)){}
 
     BatchedPtensors2b(const BatchedAtomsPack2& _atoms, const TENSOR& M):
-      BASE(M), atoms(_atoms){}
+      BASE(M.copy()), atoms(_atoms){}
 
     BatchedPtensors2b(const BatchedAtomsPack2& _atoms, const int _nc, const int _dev):
       BatchedPtensors2b(_atoms,_nc,0,_dev){}
