@@ -217,7 +217,7 @@ class Batched_subgraphlayer1b_likeFn(torch.autograd.Function):
 
     @staticmethod
     def backward(ctx,g):
-        return ctx.r.get_grad().torch(), None
+        return None, ctx.r.get_grad().torch()
 
 
 class Batched_subgraphlayer1b_catFn(torch.autograd.Function):
