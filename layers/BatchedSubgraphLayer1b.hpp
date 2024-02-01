@@ -212,7 +212,7 @@ namespace ptens{
 
 
     void for_each_eigenslice(const cnine::Rtensor3_view x, const cnine::Rtensor3_view y,
-      std::function<void(const cnine::Rtensor2_view& xslice, const cnine::Rtensor2_view& yslice, const int b)> lambda,
+      std::function<void(cnine::Rtensor2_view xslice, cnine::Rtensor2_view yslice, const int b)> lambda,
 			     const bool inplace_add=false) const{
       S.make_eigenbasis();
       int N=x.n0;
