@@ -33,8 +33,9 @@
 
 namespace ptens{
 
-  template<typename DUMMY>
-  class AtomsPack1obj;
+  template<typename DUMMY> class AtomsPack0obj;
+  template<typename DUMMY> class AtomsPack1obj;
+  template<typename DUMMY> class AtomsPack2obj;
 
 
   class AtomsPackObj: public cnine::array_pool<int>, public cnine::observable<AtomsPackObj>{
@@ -58,7 +59,10 @@ namespace ptens{
 
     int constk=0;
 
-    shared_ptr<AtomsPack1obj<int> > cached_pack1;
+    bool cache_packs=false;
+    mutable shared_ptr<AtomsPack0obj<int> > cached_pack0;
+    mutable shared_ptr<AtomsPack1obj<int> > cached_pack1;
+    mutable shared_ptr<AtomsPack2obj<int> > cached_pack2;
 
 
     ~AtomsPackObj(){
@@ -247,6 +251,13 @@ namespace ptens{
       for(int i=0; i<size(); i++)
 	R.push_back({size_of(i),size_of(i),nc});
       return R;
+    }
+
+    void release_cached_packs(){
+      cached_pack0.reset();
+      cached_pack1.reset();
+      cached_pack2.reset();
+      cache_packs=false;
     }
 
 

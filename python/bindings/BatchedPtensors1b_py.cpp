@@ -25,8 +25,8 @@ pybind11::class_<BatchedPtensors1b<float> >(m,"batched_ptensors1b")
   .def_static("create",[](const BatchedAtomsPack& _atoms, const int _nc, const int fcode, const int _dev){
       return BPtensors1(_atoms,_nc,fcode,_dev);})
   
-//  .def("like",[](const BPtensors1<float>& x, at::Tensor& M){
-//      return BPtensors1(x.atoms,ATview<float>(M));})
+  .def("like",[](const BPtensors1& x, at::Tensor& M){
+      return BPtensors1(x.atoms,ATview<float>(M));})
   .def("copy",[](const BPtensors1& x){return x.copy();})
   .def("copy",[](const BPtensors1& x, const int _dev){return x.copy(_dev);})
   .def("zeros_like",[](const BPtensors1& x){return BPtensors1::zeros_like(x);})

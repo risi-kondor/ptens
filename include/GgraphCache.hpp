@@ -35,6 +35,7 @@ namespace ptens{
 
     void cache(const int key, const shared_ptr<GgraphObj>& x){
       (*this)[key]=x;
+      x->is_cached=true;
       edge_list_map[x->edge_list()]=key;
     }
 

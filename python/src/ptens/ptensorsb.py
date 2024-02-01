@@ -110,7 +110,7 @@ class ptensorsb(torch.Tensor):
 class Ptensorsb_likeFn(torch.autograd.Function):
     @staticmethod
     def forward(ctx,x,M):
-        r=ptensorsb(1)
+        r=x.dummy()
         r.obj=x.obj.like(M)
         ctx.r=r.obj
         return r
@@ -120,7 +120,6 @@ class Ptensorsb_likeFn(torch.autograd.Function):
 
 
 class Ptensorsb_toMxFn(torch.autograd.Function):
-
     @staticmethod
     def forward(ctx,x):
         ctx.x=x.obj

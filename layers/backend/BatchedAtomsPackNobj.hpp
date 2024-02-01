@@ -54,8 +54,10 @@ namespace ptens{
     }
     
     BatchedAtomsPackNobj(const BatchedAtomsPackObj& _atoms){
-      for(auto& p: _atoms.obj)
-	obj.push_back(to_share(new SUB(p)));
+      for(auto& p: _atoms.obj){
+	obj.push_back(SUB::make_or_cached(p));
+	//obj.push_back(to_share(new SUB(p)));
+      }
       make_row_offsets();
     }
 

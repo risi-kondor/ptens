@@ -16,7 +16,6 @@ pybind11::class_<BSGlayer1b,BatchedPtensors1b<float> >(m,"batched_subgraphlayer1
 
   .def_static("like",[](const BSGlayer1b& x, at::Tensor& M){
       return BSGlayer1b(x.G,x.S,x.atoms,ATview<float>(M));})
-
   .def("copy",[](const BSGlayer1b& x){return x.copy();})
   .def("copy",[](const BSGlayer1b& x, const int _dev){return x.copy(_dev);})
   .def("zeros_like",[](const BSGlayer1b& x){return x.zeros_like();})

@@ -37,7 +37,13 @@ namespace ptens{
     using BASE::BASE;
     using BASE::nedges;
 
+    bool is_cached=false;
     AtomsPack original_edges;
+
+    ~GgraphObj(){
+      for(auto& p:subgraphpack_cache)
+	p.second.obj->release_cached_packs();
+    }
 
 
     GgraphObj(const initializer_list<pair<int,int> >& list, const int n): 
@@ -159,21 +165,25 @@ namespace ptens{
 	cnine::flog timer("GgraphObj::finding subgraphs");
 
 	if(H.getn()==1 && H.labeled==false && H.nedges()==0){
-	  subgraphpack_cache[H]=AtomsPack(getn());
-	  return subgraphpack_cache[H];
+	  AtomsPack r(getn());
+	  if(is_cached) r.obj->cache_packs=true; 
+	  subgraphpack_cache[H]=r;
+	  return r;
 	}
 
 	if(H.getn()==2 && H.labeled==false && H.nedges()==1){
 	  AtomsPack r;
 	  for_each_edge([&](const int i, const int j, const float v){
 	      if(i<j) r.push_back({i,j});});
+	  if(is_cached) r.obj->cache_packs=true; 
 	  subgraphpack_cache[H]=r;
 	  return r;
 	}
 
-	subgraphpack_cache[H]=AtomsPack(new AtomsPackObj
-	  (cnine::Tensor<int>(cnine::FindPlantedSubgraphs<float>(*this,H))));
-	return subgraphpack_cache[H];
+	AtomsPack r(new AtomsPackObj(cnine::Tensor<int>(cnine::FindPlantedSubgraphs<float>(*this,H))));
+	if(is_cached) r.obj->cache_packs=true; 
+	subgraphpack_cache[H]=r;
+	return r;
       }
     }
 

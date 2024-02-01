@@ -60,6 +60,17 @@ namespace ptens{
       AtomsPack2obj(cnine::to_share(new AtomsPackObj(x))){}
 
 
+    static shared_ptr<AtomsPack2obj<DUMMY> > make_or_cached(const AtomsPack& _atoms){
+      return make_or_cached(_atoms.obj);}
+
+    static shared_ptr<AtomsPack2obj<DUMMY> > make_or_cached(const shared_ptr<AtomsPackObj>& _atoms){
+      if(_atoms->cached_pack2) return _atoms->cached_pack2;
+      shared_ptr<AtomsPack2obj<DUMMY> > r(new AtomsPack2obj(_atoms));
+      if(_atoms->cache_packs) _atoms->cached_pack2=r;
+      return r;
+    }
+
+
   public: // ---- Access ------------------------------------------------------------------------------------
 
 

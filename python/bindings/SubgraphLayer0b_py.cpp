@@ -13,7 +13,6 @@ pybind11::class_<SGlayer0b,Ptensors0b<float> >(m,"subgraphlayer0b")
 
   .def_static("like",[](const SGlayer0b& x, at::Tensor& M){
       return SGlayer0b(x.G,x.S,x.atoms,ATview<float>(M));})
-
   .def("copy",[](const SGlayer0b& x){return x.copy();})
   .def("copy",[](const SGlayer0b& x, const int _dev){return x.copy(_dev);})
   .def("zeros_like",&SGlayer0b::zeros_like)
