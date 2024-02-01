@@ -239,11 +239,11 @@ namespace ptens{
 
       int offs=0;
       for(int b=0; b<nblocks; b++){
-	for(int i=offs; i<offs+blocks[b]; i++)
+	for(int i=offs; i<offs+blocks[b]; i++){
 	  lambda(X.view3().slice1(i),Y.view3().slice1(i),b);
+	}
 	offs+=blocks[b];
       }
-
       if(inplace_add) const_cast<cnine::Rtensor3_view&>(x).add_mprod(E,X.view3());
     }
 
