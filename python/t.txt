@@ -1,0 +1,17 @@
+AtomsPack1obj::[1<-1] n=34800 total_time=2803.381621ms
+BatchedPtensors1b::add_ReLU_back() n=3500 total_time=231.698624ms
+BatchedPtensors1b::add_linear_back0() n=3500 total_time=163.949350ms
+BatchedPtensors1b::add_linear_back1() n=3500 total_time=252.519606ms
+BatchedPtensors1b::add_linear_back2() n=3500 total_time=9891.553678ms
+BatchedSubgraphLayer1b::ReLU() n=5796 total_time=723.727343ms
+BatchedSubgraphLayer1b::linear() n=5796 total_time=733.486088ms
+GatherMapB::GatherMapB(const map_of_lists<int,int>& map) n=135900 total_time=348.255240ms
+GatherMapB::make_arrg() n=243900 total_time=4507.816917ms
+GatherMapB::make_inv() n=108000 total_time=3743.102637ms
+GatherRowsMulti::operator()(G) n=308096 total_time=32221.214792ms
+GgraphObj::finding subgraphs n=9600 total_time=1693.814579ms
+MessageListObj::[overlaps] n=66300 total_time=4758.402331ms
+
+Cnine log closed after 132.782336 seconds.
+----------------------------------------------------------------------
+

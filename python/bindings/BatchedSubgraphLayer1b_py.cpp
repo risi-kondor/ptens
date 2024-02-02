@@ -37,8 +37,10 @@ pybind11::class_<BSGlayer1b,BatchedPtensors1b<float> >(m,"batched_subgraphlayer1
   .def("mprod",[](const BSGlayer1b& x, at::Tensor& M){
       return mprod_sg(x,ATview<float>(M));})
   .def("linear",[](const BSGlayer1b& x, at::Tensor& y, at::Tensor& b){
+      cnine::fnlog timer("BatchedSubgraphLayer1b::linear()");
       return linear_sg(x,ATview<float>(y),ATview<float>(b));})
   .def("ReLU",[](const BSGlayer1b& x, const float alpha){
+      cnine::fnlog timer("BatchedSubgraphLayer1b::ReLU()");
       return ReLU_sg(x,alpha);})
 
 

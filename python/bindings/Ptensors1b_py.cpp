@@ -82,10 +82,13 @@ pybind11::class_<Ptensors1b<float> >(m,"ptensors1b")
   .def("linear",[](const Ptensors1b<float>& x, at::Tensor& y, at::Tensor& b){
       return linear(x,ATview<float>(y),ATview<float>(b));})
   .def("add_linear_back0",[](Ptensors1b<float>& r, const Ptensors1b<float>& g, at::Tensor& y){
+      cnine::fnlog timer("Ptensorsb::add_linear_back0()");
       r.add_linear_back0(g,ATview<float>(y));})
   .def("linear_back1",[](const Ptensors1b<float>& x, const Ptensors1b<float>& g){
+      cnine::fnlog timer("Ptensorsb::add_linear_back1()");
       return (x.transp()*g.get_grad()).torch();})
   .def("linear_back2",[](const Ptensors1b<float>& x, Ptensors1b<float>& g){
+      cnine::fnlog timer("Ptensorsb::add_linear_back2()");
       return g.get_grad().sum(0).torch();})
 
   .def("ReLU",[](const Ptensors1b<float>& x, const float alpha){

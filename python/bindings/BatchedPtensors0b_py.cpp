@@ -90,10 +90,13 @@ pybind11::class_<BatchedPtensors0b<float> >(m,"batched_ptensors0b")
       r.add_scale_channels_back(g,ATview<float>(y));})
 
   .def("mprod",[](const BPtensors0& x, at::Tensor& M){
+      cnine::fnlog timer("BatchedPtensors1b::mprod()");
       return mprod(x,ATview<float>(M));})
   .def("add_mprod_back0",[](BPtensors0& r, const BPtensors0& g, at::Tensor& M){
+      cnine::fnlog timer("BatchedPtensors1b::mprod_back0()");
       r.add_mprod_back0(g,ATview<float>(M));})
   .def("mprod_back1",[](const BPtensors0& x, const BPtensors0& g){
+      cnine::fnlog timer("BatchedPtensors1b::mprod_back1()");
       return (x.transp()*g.get_grad()).torch();})
 
   .def("linear",[](const BPtensors0& x, at::Tensor& y, at::Tensor& b){
