@@ -73,6 +73,10 @@ namespace ptens{
       return atoms->tsize1();
     }
 
+    int tsize() const{
+      return atoms->tsize1();
+    }
+
     int size_of(const int i) const{
       return atoms->size_of(i);
     }
@@ -125,7 +129,7 @@ namespace ptens{
 	direct.push_back(index_of(out_tensor,out_lists(m,0)),y.index_of(in_tensor));
       }
       
-      return cnine::GatherMapProgram(new cnine::GatherMapB(direct));
+      return cnine::GatherMapProgram(tsize(),y.tsize(),new cnine::GatherMapB(direct));
     }
   
 
@@ -144,7 +148,7 @@ namespace ptens{
 	}
       }
 
-      cnine::GatherMapProgram R;
+      cnine::GatherMapProgram R(tsize(),y.tsize());
       R.add_var(Gdims(in_lists.size(),1));
       R.add_map(y.reduce0(in_lists),2,0);
       R.add_map(broadcast0(out_lists,2),1,2);

@@ -64,6 +64,10 @@ namespace ptens{
       return 0;
     }
 
+    int tsize() const{
+      return atoms->tsize0();
+    }
+
     int offset(const int i) const{
       return i;
     }
@@ -114,7 +118,7 @@ namespace ptens{
 	int out_tensor=out.head(m);
 	direct.push_back(index_of(out_tensor),y.index_of(in_tensor));
       }
-      return cnine::GatherMapProgram(new cnine::GatherMapB(direct));
+      return cnine::GatherMapProgram(tsize(),y.tsize(),new cnine::GatherMapB(direct));
     };
   
 
@@ -127,7 +131,7 @@ namespace ptens{
 	int out_tensor=out_lists.head(m);
 	direct.push_back(index_of(out_tensor),y.index_of(in_tensor,in_lists(m,0)));
       }
-      return cnine::GatherMapProgram(new cnine::GatherMapB(direct));
+      return cnine::GatherMapProgram(tsize(),y.tsize(),new cnine::GatherMapB(direct));
     }
 
 

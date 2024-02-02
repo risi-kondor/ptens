@@ -252,7 +252,16 @@ namespace ptens{
       //(atoms.overlaps_mmap(x.atoms))(*this,x);
       //for(int i=0; i<size(); i++)
       //view_of(i).add_gather(x.view_of(i));
-      cnine::MultiLoop(size(),[&](const int i){view_of(i).add_gather(x.view_of(i));});
+      //cnine::MultiLoop(size(),[&](const int i){view_of(i).add_gather(x.view_of(i));});
+      int N=size();
+      PTENS_ASSRT(N==x.size());
+      cnine::GatherMapProgramPack P;
+      for(int i=0; i<N; i++){
+	MessageList mlist=atoms.obj->obj[i]->atoms->overlaps_mlist(*x.atoms.obj->obj[i]->atoms);
+	MessageMap mmap=atoms.obj->obj[i]->message_map(*mlist.obj,*x.atoms.obj->obj[i]);
+	P.obj.push_back(mmap.obj);
+      }
+      P(*this,x);
     }
 
     template<typename OUTPUT>
@@ -260,7 +269,16 @@ namespace ptens{
       //x.atoms.inverse_overlaps_mmap(atoms)(*this,x);
       //for(int i=0; i<size(); i++)
       //view_of(i).add_gather_back(x.view_of(i));
-      cnine::MultiLoop(size(),[&](const int i){view_of(i).add_gather_back(x.view_of(i));});
+      //cnine::MultiLoop(size(),[&](const int i){view_of(i).add_gather_back(x.view_of(i));});
+      int N=size();
+      PTENS_ASSRT(N==x.size());
+      cnine::GatherMapProgramPack P;
+      for(int i=0; i<N; i++){
+	MessageList mlist=x.atoms.obj->obj[i]->atoms->overlaps_mlist(*atoms.obj->obj[i]->atoms);
+	MessageMap mmap=x.atoms.obj->obj[i]->message_map(*mlist.obj,*atoms.obj->obj[i]);
+	P.obj.push_back(to_share(new cnine::GatherMapProgram(mmap.obj->inv()))); // eliminate the copy here 
+      }
+      P(*this,x);
     }
 
     

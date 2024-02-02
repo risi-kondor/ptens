@@ -53,7 +53,7 @@ namespace ptens{
   public: // ---- Maps ---------------------------------------------------------------------------------------
     
     
-   template<typename SOURCE>
+    template<typename SOURCE>
     MessageList overlaps_mlist(const SOURCE& x) const{
       return obj->atoms->overlaps_mlist(*x.obj->atoms);
     }
