@@ -72,9 +72,15 @@ pybind11::class_<BatchedPtensors0b<float> >(m,"batched_ptensors0b")
   .def("add",[](BPtensors0& r, const BPtensors0& x){r.add(x);})
   .def("add_back",[](BPtensors0& x, const BPtensors0& g){x.add_to_grad(g.get_grad());})
 
-  .def("cat_channels",[](const BPtensors0& x, const BPtensors0& y){return cat_channels(x,y);})
-  .def("cat_channels_back0",[](BPtensors0& x, const BPtensors0& r){return x.cat_channels_back0(r);})
-  .def("cat_channels_back1",[](BPtensors0& x, const BPtensors0& r){return x.cat_channels_back1(r);})
+  .def("cat_channels",[](const BPtensors0& x, const BPtensors0& y){
+      cnine::fnlog timer("BatchedSubgraphLayer0b::cat_channels()");
+      return cat_channels(x,y);})
+  .def("cat_channels_back0",[](BPtensors0& x, const BPtensors0& r){
+      cnine::fnlog timer("BatchedSubgraphLayerb::cat_channels_back0()");
+      return x.cat_channels_back0(r);})
+  .def("cat_channels_back1",[](BPtensors0& x, const BPtensors0& r){
+      cnine::fnlog timer("BatchedSubgraphLayerb::cat_channels_back1()");
+      return x.cat_channels_back1(r);})
 
 //  .def("cat",&BPtensors0::cat)
 //  .def("add_cat_back",[](BPtensors0& x, BPtensors0& r, const int offs){
@@ -100,17 +106,28 @@ pybind11::class_<BatchedPtensors0b<float> >(m,"batched_ptensors0b")
       return (x.transp()*g.get_grad()).torch();})
 
   .def("linear",[](const BPtensors0& x, at::Tensor& y, at::Tensor& b){
+      cnine::fnlog timer("BatchedPtensors0b::linear()");
       return linear(x,ATview<float>(y),ATview<float>(b));})
   .def("add_linear_back0",[](BPtensors0& r, const BPtensors0& g, at::Tensor& y){
+      cnine::fnlog timer("BatchedPtensors0b::linear_back0()");
       r.add_linear_back0(g,ATview<float>(y));})
   .def("linear_back1",[](const BPtensors0& x, const BPtensors0& g){
+      cnine::fnlog timer("BatchedPtensors1b::linear_back0()");
       return (x.transp()*g.get_grad()).torch();})
   .def("linear_back2",[](const BPtensors0& x, BPtensors0& g){
-      return g.get_grad().sum(0).torch();})
+      cnine::fnlog timer("BatchedPtensors0b::linear_back2()");
+      auto& p=g.get_grad();
+      Ltensor<float> xg({p.dim(1)},0,p.get_dev());
+      p.view2().reduce0_destructively_into(xg.view1());
+      return xg.torch();
+      //return g.get_grad().sum(0).torch();
+    })
 
   .def("ReLU",[](const BPtensors0& x, const float alpha){
+      cnine::fnlog timer("BatchedPtensors0b::add_ReLU()");
       return ReLU(x,alpha);})
   .def("add_ReLU_back",[](BPtensors0& x, const BPtensors0& g, const float alpha){
+      cnine::fnlog timer("BatchedPtensors0b::add_ReLU_back()");
       x.add_ReLU_back(g,alpha);})
 
   .def("inp",[](const BPtensors0& x, const BPtensors0& y){return x.inp(y);})

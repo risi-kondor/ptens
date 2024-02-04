@@ -82,8 +82,8 @@ def main():
     _nvcc_compile_args = ['-D_WITH_CUDA',
                           '-D_WITH_CUBLAS',
                           '-D_DEF_CGCMEM',
-                          '-DWITH_FAKE_GRAD'
-                          #'-default-stream=per-thread'
+                          '-DWITH_FAKE_GRAD',
+                          '--default-stream=per-thread'
                           # '-rdc=true'
                           ]
 
