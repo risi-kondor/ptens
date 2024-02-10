@@ -124,10 +124,13 @@ pybind11::class_<BatchedPtensors1b<float> >(m,"batched_ptensors1b")
   .def_static("linmaps",[](const BatchedPtensors2b<float>& x){return BPtensors1::linmaps(x);}) 
 
   .def_static("gather",[](const BatchedPtensors0b<float>& x, const BatchedAtomsPack& a){
+      cnine::fnlog timer("BatchedPtensors1b::gather0()");
       return BPtensors1::gather(x,a);}) 
   .def_static("gather",[](const BatchedPtensors1b<float>& x, const BatchedAtomsPack& a){
+      cnine::fnlog timer("BatchedPtensors1b::gather1()");
       return BPtensors1::gather(x,a);}) 
   .def_static("gather",[](const BatchedPtensors2b<float>& x, const BatchedAtomsPack& a){
+      cnine::fnlog timer("BatchedPtensors1b::gather2()");
       return BPtensors1::gather(x,a);}) 
 
   .def("add_linmaps_back",[](BPtensors1& x, BatchedPtensors0b<float>& g){
@@ -138,10 +141,13 @@ pybind11::class_<BatchedPtensors1b<float> >(m,"batched_ptensors1b")
       x.get_grad().add_linmaps_back(g.get_grad());})
 
   .def("add_gather_back",[](BPtensors1& x, BatchedPtensors0b<float>& g){
+      cnine::fnlog timer("BatchedPtensors1b::gather0_back()");
       x.get_grad().add_gather_back(g.get_grad());})
   .def("add_gather_back",[](BPtensors1& x, BatchedPtensors1b<float>& g){
+      cnine::fnlog timer("BatchedPtensors1b::gather1_back()");
       x.get_grad().add_gather_back(g.get_grad());})
   .def("add_gather_back",[](BPtensors1& x, BatchedPtensors2b<float>& g){
+      cnine::fnlog timer("BatchedPtensors1b::gather2_back()");
       x.get_grad().add_gather_back(g.get_grad());})
 
 
