@@ -294,3 +294,18 @@ class Batched_subgraphlayer0b_GatherFromPtensorsbFn(torch.autograd.Function):
         return ptensorsb.dummy(), None, None
 
 
+class BatchedSubgraphlayer0b_GatherFn(torch.autograd.Function):
+
+    @staticmethod
+    def forward(ctx,x,S):
+        r=x.dummy()
+        r.obj=_batched_subgraphlayer0b(x.obj,S)
+        ctx.x=x.obj
+        ctx.r=r.obj
+        return r
+
+    @staticmethod
+    def backward(ctx,g):
+        ctx.x.add_gather_back(ctx.r)
+        return batched_subgraphlayer0b.dummy(), None 
+

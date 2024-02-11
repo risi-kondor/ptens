@@ -56,9 +56,19 @@ pybind11::class_<BSGlayer0b,BatchedPtensors0b<float> >(m,"batched_subgraphlayer0
   .def_static("linmaps",[](const BSGlayer1b& x){return BSGlayer1b::linmaps(x);}) 
   .def_static("linmaps",[](const BSGlayer2b& x){return BSGlayer1b::linmaps(x);}) 
 
-  .def(pybind11::init<const BSGlayer0b&, const Subgraph&>())
-  .def(pybind11::init<const BSGlayer1b&, const Subgraph&>())
-  .def(pybind11::init<const BSGlayer2b&, const Subgraph&>())
+  .def(pybind11::init([](const BSGlayer0b& x, const Subgraph& S){
+	cnine::fntracer fn_tracer("BatchedSubgraphLayer0b from BSGlayer0b");
+	return BatchedSubgraphLayer0b(x,S);}))
+  .def(pybind11::init([](const BSGlayer1b& x, const Subgraph& S){
+	cnine::fntracer fn_tracer("BatchedSubgraphLayer0b from BSGlayer1b");
+	return BatchedSubgraphLayer0b(x,S);}))
+  .def(pybind11::init([](const BSGlayer2b& x, const Subgraph& S){
+	cnine::fntracer fn_tracer("BatchedSubgraphLayer0b from BSGlayer2b");
+	return BatchedSubgraphLayer0b(x,S);}))
+
+//.def(pybind11::init<const BSGlayer0b&, const Subgraph&>())
+//.def(pybind11::init<const BSGlayer1b&, const Subgraph&>())
+//.def(pybind11::init<const BSGlayer2b&, const Subgraph&>())
 
   .def(pybind11::init<const BatchedPtensors0b<float>&, const BatchedGgraph&, const Subgraph&>())
   .def(pybind11::init<const BatchedPtensors1b<float>&, const BatchedGgraph&, const Subgraph&>())
