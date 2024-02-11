@@ -290,7 +290,7 @@ namespace ptens{
     }
 
     string repr() const{
-      return "BatchedPtensors0b";
+      return "<BatchedPtensors0b[N="+to_string(size())+",nrows="+to_string(TENSOR::dim(0))+",nc="+to_string(get_nc())+"]>";
     }
 
     string str(const string indent="") const{ 

@@ -253,6 +253,10 @@ namespace ptens{
       return "BatchedPtensors2b";
     }
 
+    string repr() const{
+      return "<BatchedPtensors2b[N="+to_string(size())+",nrows="+to_string(TENSOR::dim(0))+",nc="+to_string(get_nc())+"]>";
+    }
+
     string str(const string indent="") const{ 
       ostringstream oss;
       for(int i=0; i<size(); i++)

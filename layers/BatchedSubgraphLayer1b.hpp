@@ -256,6 +256,10 @@ namespace ptens{
       return "BatchedSubgraphLayer1b";
     }
 
+    string repr() const{
+      return "<BSGlayer0b[N="+to_string(size())+",nrows="+to_string(TENSOR::dim(0))+",nc="+to_string(get_nc())+"]>";
+    }
+
 
   };
 
