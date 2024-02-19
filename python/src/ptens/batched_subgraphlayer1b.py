@@ -264,11 +264,11 @@ class BatchedSubgraphlayer1b_GatherFromPtensorsbFn(torch.autograd.Function):
 
     @staticmethod
     def forward(ctx,x,G,S):
-        #r=batched_subgraphlayer1b.dummy()
+        r=batched_subgraphlayer1b.dummy()
         #r.obj=_batched_subgraphlayer1b(x.obj,G.obj,S.obj)
         nc=x.obj.get_nc()*_batched_subgraphlayer1b.n_gather_maps(x.obj.getk())
-        r=torch.zeros([_batched_subgraphlayer1b.nrows(G.obj,S.obj),nc],device=device_str(x.get_dev()))
-        r.obj=_batched_subgraphlayer1b(r,x.obj,G.obj,S.obj)
+        r.mx=torch.zeros([_batched_subgraphlayer1b.nrows(G.obj,S.obj),nc],device=device_str(x.get_dev()))
+        r.obj=_batched_subgraphlayer1b(r.mx,x.obj,G.obj,S.obj)
         ctx.x=x.obj
         ctx.r=r.obj
         return r

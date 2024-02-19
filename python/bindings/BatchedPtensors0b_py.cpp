@@ -43,6 +43,7 @@ pybind11::class_<BatchedPtensors0b<float> >(m,"batched_ptensors0b")
 // ---- Conversions, transport, etc. ------------------------------------------------------------------------
 
 
+  .def("getk",[](const BPtensors0& x){return 0;})
   .def("__len__",&BPtensors0::size)
 //.def("add_to_grad",[](BPtensors0& x, at::Tensor& y){x.add_to_grad(ATview<float>(y));})
 //.def("add_to_grad",[](BPtensors0& x, const BPtensors0& y, const float c){x.add_to_grad(y,c);})
