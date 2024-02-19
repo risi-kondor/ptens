@@ -73,11 +73,17 @@ namespace ptens{
     BatchedPtensors1b(const BatchedAtomsPack1& _atoms, const int _nc, const int fcode, const int _dev):
       BASE({_atoms.tsize(),_nc},fcode,_dev), atoms(_atoms){}
 
+    BatchedPtensors1b(TYPE* _arr, const BatchedAtomsPack1& _atoms, const int _nc, const int _dev):
+      BASE(_arr,{_atoms.tsize(),_nc},_dev), atoms(_atoms){}
+
     BatchedPtensors1b(const BatchedAtomsPack& _atoms, const int _nc, const int _dev):
       BatchedPtensors1b(BatchedAtomsPack1(_atoms),_nc,0,_dev){}
 
     BatchedPtensors1b(const BatchedAtomsPack& _atoms, const int _nc, const int fcode, const int _dev):
       BatchedPtensors1b(BatchedAtomsPack1(_atoms),_nc,fcode,_dev){}
+
+    BatchedPtensors1b(TYPE* _arr, const BatchedAtomsPack& _atoms, const int _nc, const int _dev):
+      BatchedPtensors1b(_arr,BatchedAtomsPack1(_atoms),_nc,_dev){}
 
 
     BatchedPtensors1b(const initializer_list<Ptensors1b<TYPE> >& list):
@@ -233,6 +239,16 @@ namespace ptens{
       int nc=get_nc();
       return cnine::Rtensor3_view(get_arr(),dim(0)/K,K,nc,K*nc,nc,1,get_dev());
     }
+
+
+    static int nrows(const BatchedAtomsPack& _atoms){
+      return BatchedAtomsPack1(_atoms).tsize();
+    }
+
+    //template<typename SOURCE, typename = typename std::enable_if<std::is_base_of<BatchedPtensorsb<float>, SOURCE>::value, SOURCE>::type>
+    //static int nchannels(const SOURCE& x){
+    //return x.get_nc()*vector<int>({1,2,5})[x.getk()];
+    //}
 
 
   public: // ---- Message passing ----------------------------------------------------------------------------

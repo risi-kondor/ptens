@@ -25,3 +25,9 @@ def device_id(device):
     if device=='cuda:0':
         return 1
     return 0
+
+def device_str(dev):
+    if dev==0:
+        return 'cpu' 
+    if dev==1:
+        return 'cuda' 

@@ -17,6 +17,7 @@ import torch
 import ptens_base
 from ptens_base import batched_subgraphlayer1b as _batched_subgraphlayer1b
 from ptens.utility import device_id as device_id
+from ptens.utility import device_str as device_str
 from ptens.ptensorsb import * 
 from ptens.batched_ptensors1b import BatchedPtensors1b_LinmapsFn
 from ptens.batched_ptensors1b import BatchedPtensors1b_GatherFn
@@ -153,7 +154,7 @@ class batched_subgraphlayer1b(torch.Tensor):
 
     @classmethod
     def gather_from_ptensors(self,x,G,S):
-        return Batched_subgraphlayer1b_GatherFromPtensorsbFn.apply(x,G,S)
+        return BatchedSubgraphlayer1b_GatherFromPtensorsbFn.apply(x,G,S)
 
     def autobahn(self,w,b):
         return BatchedSubgraphlayer1b_autobahnFn.apply(self,w,b)
@@ -259,12 +260,15 @@ class Batched_subgraphlayer1b_outerFn(torch.autograd.Function):
         return batched_subgraphlayer1b.dummy(), batched_subgraphlayer1b.dummy()
 
 
-class Batched_subgraphlayer1b_GatherFromPtensorsbFn(torch.autograd.Function):
+class BatchedSubgraphlayer1b_GatherFromPtensorsbFn(torch.autograd.Function):
 
     @staticmethod
     def forward(ctx,x,G,S):
-        r=batched_subgraphlayer1b.dummy()
-        r.obj=_batched_subgraphlayer1b(x.obj,G.obj,S.obj)
+        #r=batched_subgraphlayer1b.dummy()
+        #r.obj=_batched_subgraphlayer1b(x.obj,G.obj,S.obj)
+        nc=x.obj.get_nc()*_batched_subgraphlayer1b.n_gather_maps(x.obj.getk())
+        r=torch.zeros([_batched_subgraphlayer1b.nrows(G.obj,S.obj),nc],device=device_str(x.get_dev()))
+        r.obj=_batched_subgraphlayer1b(r,x.obj,G.obj,S.obj)
         ctx.x=x.obj
         ctx.r=r.obj
         return r

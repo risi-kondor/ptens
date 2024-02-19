@@ -64,6 +64,10 @@ namespace ptens{
       G(_G), S(_S), BASE(_atoms,nc,fcode,_dev){}
 
 
+    BatchedSubgraphLayer1b(TYPE* _arr, const BatchedGgraph& _G, const Subgraph& _S, const BatchedAtomsPack& _atoms, const int nc, const int _dev=0):
+      G(_G), S(_S), BASE(_arr,_atoms,nc,_dev){}
+
+
     static BatchedSubgraphLayer1b from_edge_features(const vector<int>& graphs, const TENSOR& M){
       BatchedGgraph G(graphs);
       auto atoms=new BatchedAtomsPackNobj<AtomsPack1obj<int> >();
@@ -116,6 +120,12 @@ namespace ptens{
 
   public: // ---- Access -------------------------------------------------------------------------------------
 
+
+    static int nrows(const BatchedGgraph& _G, const Subgraph& _S){
+      return BASE::nrows(_G.subgraphs(_S));
+    }
+
+
     /*
     const cnine::Rtensor3_view view3() const{
       int K=S.getn();
@@ -150,6 +160,14 @@ namespace ptens{
     BatchedSubgraphLayer1b(const SOURCE& x, const BatchedGgraph& _G, const Subgraph& _S):
       BatchedSubgraphLayer1b(_G,_S,_G.subgraphs(_S),x.get_nc()*vector<int>({1,2,5})[x.getk()],0,x.dev){
       cnine::fnlog timer("BatchedSubgraphLayer1b::init::gather");
+      add_gather(x);
+    }
+
+
+    template<typename SOURCE>
+    BatchedSubgraphLayer1b(TYPE* _arr, const SOURCE& x, const BatchedGgraph& _G, const Subgraph& _S):
+      BatchedSubgraphLayer1b(_arr,_G,_S,_G.subgraphs(_S),x.get_nc()*vector<int>({1,2,5})[x.getk()],x.dev){
+      cnine::fnlog timer("BatchedSubgraphLayer1b::init::gather(ATen)");
       add_gather(x);
     }
 
