@@ -275,8 +275,9 @@ class BatchedSubgraphlayer1b_GatherFromPtensorsbFn(torch.autograd.Function):
 
     @staticmethod
     def backward(ctx,g):
-        ctx.x.mxg=torch.zeros_like(ctx.x.mx)
-        ctx.x.add_gather_back(ctx.r)
+        if ctx.x.mxg==None:
+            ctx.x.mxg=torch.zeros_like(ctx.x.mx)
+        ctx.x.add_gather_back(ctx.x.mxg,ctx.r)
         return ptensorsb.dummy(), None, None
 
 # this could be shared with subgraphlayer1b

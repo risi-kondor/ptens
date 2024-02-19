@@ -182,6 +182,10 @@ namespace ptens{
       return new BatchedPtensors1b(x.TENSOR::zeros_like(),x.atoms);
     }
     
+    static BatchedPtensors1b* new_like(TYPE* _arr, const BatchedPtensors1b& x){
+      return new BatchedPtensors1b(x.TENSOR::like(_arr),x.atoms);
+    }
+    
 
   public: // ----- Conversions -------------------------------------------------------------------------------
 
@@ -216,6 +220,11 @@ namespace ptens{
 
     const BatchedPtensors1b& get_grad() const{
       return cnine::diff_class<BatchedPtensors1b<TYPE> >::get_grad();
+    }
+
+    BatchedPtensors1b& get_grad(TYPE* _arr){
+      if(!grad) grad=OBJ::new_like(_arr,*this);
+      return *grad;
     }
 
     Ptensors1b<TYPE> view_of(const int i) const{
