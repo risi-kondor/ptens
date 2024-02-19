@@ -223,7 +223,7 @@ namespace ptens{
     }
 
     BatchedPtensors1b& get_grad(TYPE* _arr){
-      if(!grad) grad=OBJ::new_like(_arr,*this);
+      if(!grad) grad=new_like(_arr,*this);
       return *grad;
     }
 
