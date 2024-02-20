@@ -281,8 +281,8 @@ class BatchedSubgraphlayer1b_GatherFromPtensorsbFn(torch.autograd.Function):
 	#    ctx.x.add_gather_back(ctx.x.mxg,ctx.r)
 	#else:
 	#    ctx.x.add_gather_back(ctx.r)
-	ctx.x.add_gather_back(ctx.r)
-	return ptensorsb.dummy(), None, None
+        ctx.x.add_gather_back(ctx.r)
+        return ptensorsb.dummy(), None, None
      
 # this could be shared with subgraphlayer1b
 class BatchedSubgraphlayer1b_autobahnFn(torch.autograd.Function):
