@@ -167,7 +167,7 @@ namespace ptens{
     }
 
     static BatchedPtensors1b zeros_like(const BatchedPtensors1b& x){
-      return BatchedPtensors1b(x.TENSOR::zeros_like(),x.atoms);
+      return BatchedPtensors1b(x.BASE::zeros_like(),x.atoms);
     }
 
     static BatchedPtensors1b zeros_like(const BatchedPtensors1b& x, const int nc){
@@ -179,7 +179,7 @@ namespace ptens{
     }
 
     static BatchedPtensors1b* new_zeros_like(const BatchedPtensors1b& x){
-      return new BatchedPtensors1b(x.TENSOR::zeros_like(),x.atoms);
+      return new BatchedPtensors1b(x.BASE::zeros_like(),x.atoms);
     }
     
     static BatchedPtensors1b* new_like(TYPE* _arr, const BatchedPtensors1b& x){

@@ -34,6 +34,8 @@ namespace ptens{
     typedef cnine::Ltensor<TYPE> TENSOR;
 
     using BASE::BASE;
+    using BASE::dims;
+    using BASE::dev;
     using BASE::dim;
     using BASE::reset;
 
@@ -60,6 +62,11 @@ namespace ptens{
     BatchedPtensorsb copy(const BatchedPtensorsb& x){
       if(ptens_session.managed_gmem && x.get_dev()==1) return BASE::copy(*ptens_session.managed_gmem,x);
       else return BASE::copy(x); 
+    }
+
+    BatchedPtensorsb zeros_like() const{
+      if(ptens_session.managed_gmem && dev==1) return BASE(*ptens_session.managed_gmem,dims,0,dev);
+      else return BASE::zeros_like();
     }
 
 

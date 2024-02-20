@@ -108,7 +108,7 @@ namespace ptens{
     }
 
     static BatchedSubgraphLayer0b* new_zeros_like(const BatchedSubgraphLayer0b& x){
-      return new BatchedSubgraphLayer0b(x.G,x.S,x.TENSOR::zeros_like());
+      return new BatchedSubgraphLayer0b(x.G,x.S,x.BASE::zeros_like());
     }
     
     //BatchedSubgraphLayer0b(const BatchedSubgraphLayer0b& x, const int _dev):
