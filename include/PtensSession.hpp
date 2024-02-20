@@ -21,6 +21,7 @@
 
 #include "CnineSession.hpp"
 #include "object_bank.hpp"
+#include "MemoryManager.hpp"
 
 #include "Ptens_base.hpp"
 #include "SubgraphObj.hpp"
@@ -36,31 +37,30 @@ namespace ptens{
     cnine::cnine_session* cnine_session=nullptr;
 
     ofstream logfile;
-    //cnine::object_bank<Subgraph,SubgraphObj> subgraph_bank([]
-    //(const Subgraph& x){return new SubgraphObj(x);});
     std::unordered_set<SubgraphObj> subgraphs;
     GgraphCache graph_cache;
+    cnine::MemoryManager* managed_gmem=nullptr;
 
 
     PtensSession(const int _nthreads=1){
 
       cnine_session=new cnine::cnine_session(_nthreads);
 
-      #ifdef _WITH_CUDA
+#ifdef _WITH_CUDA
       cout<<"Initializing ptens with GPU support."<<endl;
-      #else
+#else
       cout<<"Initializing ptens without GPU support."<<endl;
-      #endif
+#endif
 
 
       logfile.open("ptens.log");
       auto time = std::chrono::system_clock::now();
       std::time_t timet = std::chrono::system_clock::to_time_t(time);
-      #ifdef _WITH_CUDA
+#ifdef _WITH_CUDA
       logfile<<"Ptens session started with CUDA at "<<std::ctime(&timet)<<endl;
-      #else
+#else
       logfile<<"Ptens session started without CUDA at "<<std::ctime(&timet)<<endl;
-      #endif 
+#endif 
       
     }
 
@@ -68,6 +68,7 @@ namespace ptens{
     ~PtensSession(){
 
       cout<<"Shutting down ptens."<<endl;
+      if(managed_gmem) delete managed_gmem;
       std::time_t timet = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
       logfile<<endl<<"Ptens session shut down at "<<std::ctime(&timet)<<endl<<endl<<endl;
       logfile.close();

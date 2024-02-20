@@ -23,6 +23,8 @@
 
 namespace ptens{
 
+  extern PtensSession ptens_session;
+
 
   template<typename TYPE>
   class BatchedPtensorsb: public cnine::Ltensor<TYPE>{
@@ -33,9 +35,35 @@ namespace ptens{
 
     using BASE::BASE;
     using BASE::dim;
+    using BASE::reset;
 
 
     virtual ~BatchedPtensorsb(){}
+
+
+  public: // ---- Constructors -------------------------------------------------------------------------------------
+
+
+    BatchedPtensorsb(const BASE& x):
+      BASE(x){}
+
+    //BatchedPtensorsb(const BatchedPtensorsb& x):
+    //BASE(x){}
+
+    BatchedPtensorsb(const cnine::Gdims& _dims, const int fcode, const int _dev){
+      if(ptens_session.managed_gmem && _dev==1)
+	reset(BASE(*ptens_session.managed_gmem,_dims,fcode,_dev));
+      else
+	reset(BASE(_dims,fcode,_dev));
+    }
+
+    BatchedPtensorsb copy(const BatchedPtensorsb& x){
+      if(ptens_session.managed_gmem && x.get_dev()==1) return BASE::copy(*ptens_session.managed_gmem,x);
+      else return BASE::copy(x); 
+    }
+
+
+  public: // ---- Access -------------------------------------------------------------------------------------
 
     virtual BatchedPtensorsb& get_grad(){CNINE_UNIMPL();return *this;} // dummy
     virtual const BatchedPtensorsb& get_grad() const {CNINE_UNIMPL(); return *this;} // dummy

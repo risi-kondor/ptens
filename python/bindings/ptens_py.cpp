@@ -3,8 +3,11 @@
 #include <pybind11/complex.h>
 
 #include "Cnine_base.cpp"
-
 #include "PtensSession.hpp"
+
+#include "SimpleMemoryManager.hpp"
+#include "Tensor.hpp"
+#include "ATview.hpp"
 
 #include "Hgraph.hpp"
 #include "PtensFindPlantedSubgraphs.hpp"
@@ -20,8 +23,6 @@
 #include "Ptensors0.hpp"
 #include "Ptensors1.hpp"
 #include "Ptensors2.hpp"
-#include "Tensor.hpp"
-#include "ATview.hpp"
 
 #include "LinmapFunctions.hpp"
 #include "MsgFunctions.hpp"
@@ -61,11 +62,12 @@ namespace ptens{
 
 PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
 
-
   using namespace cnine;
   using namespace ptens;
   namespace py=pybind11;
   
+
+#include "PtensGlobal_py.cpp"
 
 #include "AtomsPack_py.cpp"
 #include "Hgraph_py.cpp"
