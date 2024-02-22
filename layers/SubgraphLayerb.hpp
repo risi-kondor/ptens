@@ -15,17 +15,29 @@
 #ifndef _ptens_SubgraphLayerb
 #define _ptens_SubgraphLayerb
 
+#include "PtensSession.hpp"
+
 namespace ptens{
 
   //template<typename OBJ>
   //OBJ sg_add(const OBJ& x, const OBJ& y){
   //return OBJ(x.G,x.S,x.add(y));
   //}
+  extern PtensSession ptens_session;
+
 
   template<typename OBJ>
     OBJ cat_channels_sg(const OBJ& x, const OBJ& y){
     //PTENS_ASSRT(x.atoms==y.atoms);
     PTENS_ASSRT(x.dim(0)==y.dim(0));
+
+    if(ptens_session.managed_gmem && x.get_dev()==1){
+      OBJ R(x.G,x.S,x.atoms,
+	cnine::Ltensor<float>(*ptens_session.managed_gmem,{x.dim(0),x.dim(1)+y.dim(1)},0,x.get_dev()));
+      R.block(0,0,x.dim(0),x.dim(1))+=x;
+      R.block(0,x.dim(1),x.dim(0),y.dim(1))+=y;
+      return R;
+    }
     OBJ R(x.G,x.S,x.atoms,cnine::Ltensor<float>({x.dim(0),x.dim(1)+y.dim(1)},0,x.get_dev()));
     R.block(0,0,x.dim(0),x.dim(1))+=x;
     R.block(0,x.dim(1),x.dim(0),y.dim(1))+=y;
