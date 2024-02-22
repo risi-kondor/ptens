@@ -53,7 +53,10 @@ namespace ptens{
     //BASE(x){}
 
     BatchedPtensorsb(const cnine::Gdims& _dims, const int fcode, const int _dev):
-      BASE(BASE::vram_managed(ptens_session.managed_gmem,_dims,fcode,_dev)){}
+      BASE(BASE::vram_managed(ptens_session.managed_gmem,_dims,fcode,_dev)){
+      //if(ptens_session.managed_gmem) cout<<ptens_session.managed_gmem->size()<<endl;
+      //else cout<<"---"<<endl;
+    }
     //BASE(ptens_session.managed_gmem,_dims,fcode,_dev){}
     //      if(ptens_session.managed_gmem && _dev==1)
     //reset(BASE(*ptens_session.managed_gmem,_dims,fcode,_dev));
