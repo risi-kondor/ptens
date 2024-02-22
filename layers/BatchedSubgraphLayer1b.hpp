@@ -111,7 +111,9 @@ namespace ptens{
     }
 
     static BatchedSubgraphLayer1b* new_zeros_like(const BatchedSubgraphLayer1b& x){
-      return new BatchedSubgraphLayer1b(x.G,x.S,x.TENSOR::zeros_like());
+      //cnine::using_vram_manager vv(ptens_session.managed_gmem);
+      //return new BatchedSubgraphLayer1b(x.G,x.S,x.TENSOR::zeros_like());
+      return new BatchedSubgraphLayer1b(x.G,x.S,x.BASE::zeros_like());
     }
     
     //BatchedSubgraphLayer0b(const BatchedSubgraphLayer0b& x, const int _dev):
@@ -233,6 +235,7 @@ namespace ptens{
     void for_each_eigenslice(const cnine::Rtensor3_view x, const cnine::Rtensor3_view y,
       std::function<void(cnine::Rtensor2_view xslice, cnine::Rtensor2_view yslice, const int b)> lambda,
 			     const bool inplace_add=false) const{
+      cnine::using_vram_manager vv(ptens_session.managed_gmem);
       S.make_eigenbasis();
       int N=x.n0;
       int K=x.n1;

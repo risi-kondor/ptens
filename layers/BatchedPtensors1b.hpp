@@ -62,19 +62,17 @@ namespace ptens{
     //BatchedPtensors1b(){}
 
     BatchedPtensors1b(const BatchedAtomsPack& _atoms, const TENSOR& M):
-      BASE(M.copy()), atoms(BatchedAtomsPack1(_atoms)){}
+      BASE(M.copy(ptens_session.managed_gmem)), atoms(BatchedAtomsPack1(_atoms)){}
 
     BatchedPtensors1b(const BatchedAtomsPack1& _atoms, const TENSOR& M):
-      BASE(M.copy()), atoms(_atoms){}
-
-    BatchedPtensors1b(const BatchedAtomsPack1& _atoms, const int _nc, const int _dev):
-      BatchedPtensors1b(_atoms,_nc,0,_dev){}
+      BASE(M.copy(ptens_session.managed_gmem)), atoms(_atoms){}
 
     BatchedPtensors1b(const BatchedAtomsPack1& _atoms, const int _nc, const int fcode, const int _dev):
       BASE({_atoms.tsize(),_nc},fcode,_dev), atoms(_atoms){}
 
-    BatchedPtensors1b(TYPE* _arr, const BatchedAtomsPack1& _atoms, const int _nc, const int _dev):
-      BASE(_arr,{_atoms.tsize(),_nc},_dev), atoms(_atoms){}
+
+    BatchedPtensors1b(const BatchedAtomsPack1& _atoms, const int _nc, const int _dev):
+      BatchedPtensors1b(_atoms,_nc,0,_dev){}
 
     BatchedPtensors1b(const BatchedAtomsPack& _atoms, const int _nc, const int _dev):
       BatchedPtensors1b(BatchedAtomsPack1(_atoms),_nc,0,_dev){}
@@ -82,10 +80,15 @@ namespace ptens{
     BatchedPtensors1b(const BatchedAtomsPack& _atoms, const int _nc, const int fcode, const int _dev):
       BatchedPtensors1b(BatchedAtomsPack1(_atoms),_nc,fcode,_dev){}
 
+
+    BatchedPtensors1b(TYPE* _arr, const BatchedAtomsPack1& _atoms, const int _nc, const int _dev):
+      BASE(_arr,{_atoms.tsize(),_nc},_dev), atoms(_atoms){}
+
     BatchedPtensors1b(TYPE* _arr, const BatchedAtomsPack& _atoms, const int _nc, const int _dev):
       BatchedPtensors1b(_arr,BatchedAtomsPack1(_atoms),_nc,_dev){}
 
 
+    // TODO 
     BatchedPtensors1b(const initializer_list<Ptensors1b<TYPE> >& list):
       BASE(cnine::Ltensor<TYPE>::stack(0,list)){
       vector<shared_ptr<AtomsPack1obj<int> > > x;
@@ -94,6 +97,7 @@ namespace ptens{
     }
 	
     static BatchedPtensors1b cat(const vector<BatchedPtensors1b>& list){
+      cnine::using_vram_manager vv(ptens_session.managed_gmem);
       PTENS_ASSRT(list.size()>0);
       vector<BatchedAtomsPack1> v;
       for(auto& p:list)
@@ -147,42 +151,52 @@ namespace ptens{
 
 
     BatchedPtensors1b copy() const{
+      cnine::using_vram_manager vv(ptens_session.managed_gmem);
       return BatchedPtensors1b(TENSOR::copy(),atoms);
     }
 
     BatchedPtensors1b copy(const int _dev) const{
+      cnine::using_vram_manager vv(ptens_session.managed_gmem);
       return BatchedPtensors1b(TENSOR::copy(_dev),atoms);
     }
 
     BatchedPtensors1b zeros_like() const{
+      cnine::using_vram_manager vv(ptens_session.managed_gmem);
       return BatchedPtensors1b(TENSOR::zeros_like(),atoms);
     }
 
     BatchedPtensors1b zeros_like(const int nc) const{
+      cnine::using_vram_manager vv(ptens_session.managed_gmem);
       return BatchedPtensors1b(TENSOR({dim(0),nc},0,get_dev()),atoms);
     }
 
     BatchedPtensors1b gaussian_like() const{
+      cnine::using_vram_manager vv(ptens_session.managed_gmem);
       return BatchedPtensors1b(TENSOR::gaussian_like(),atoms);
     }
 
     static BatchedPtensors1b zeros_like(const BatchedPtensors1b& x){
+      cnine::using_vram_manager vv(ptens_session.managed_gmem);
       return BatchedPtensors1b(x.BASE::zeros_like(),x.atoms);
     }
 
     static BatchedPtensors1b zeros_like(const BatchedPtensors1b& x, const int nc){
+      cnine::using_vram_manager vv(ptens_session.managed_gmem);
       return BatchedPtensors1b(TENSOR({x.dim(0),nc},0,get_dev()),x.atoms);
     }
 
     static BatchedPtensors1b gaussian_like(const BatchedPtensors1b& x){
+      cnine::using_vram_manager vv(ptens_session.managed_gmem);
       return BatchedPtensors1b(x.TENSOR::gaussian_like(),x.atoms);
     }
 
     static BatchedPtensors1b* new_zeros_like(const BatchedPtensors1b& x){
+      cnine::using_vram_manager vv(ptens_session.managed_gmem);
       return new BatchedPtensors1b(x.BASE::zeros_like(),x.atoms);
     }
     
     static BatchedPtensors1b* new_like(TYPE* _arr, const BatchedPtensors1b& x){
+      cnine::using_vram_manager vv(ptens_session.managed_gmem);
       return new BatchedPtensors1b(x.TENSOR::like(_arr),x.atoms);
     }
     

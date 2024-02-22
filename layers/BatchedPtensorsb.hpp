@@ -52,25 +52,34 @@ namespace ptens{
     //BatchedPtensorsb(const BatchedPtensorsb& x):
     //BASE(x){}
 
-    BatchedPtensorsb(const cnine::Gdims& _dims, const int fcode, const int _dev){
-      if(ptens_session.managed_gmem && _dev==1)
-	reset(BASE(*ptens_session.managed_gmem,_dims,fcode,_dev));
-      else
-	reset(BASE(_dims,fcode,_dev));
-    }
+    BatchedPtensorsb(const cnine::Gdims& _dims, const int fcode, const int _dev):
+      BASE(BASE::vram_managed(ptens_session.managed_gmem,_dims,fcode,_dev)){}
+    //BASE(ptens_session.managed_gmem,_dims,fcode,_dev){}
+    //      if(ptens_session.managed_gmem && _dev==1)
+    //reset(BASE(*ptens_session.managed_gmem,_dims,fcode,_dev));
+    //else
+    //reset(BASE(_dims,fcode,_dev));
+    //}
 
     BatchedPtensorsb copy(const BatchedPtensorsb& x){
-      if(ptens_session.managed_gmem && x.get_dev()==1) return BASE::copy(*ptens_session.managed_gmem,x);
-      else return BASE::copy(x); 
+      cnine::using_vram_manager vv(ptens_session.managed_gmem);
+      return BASE::copy(x); 
+      //if(ptens_session.managed_gmem && x.get_dev()==1) 
+      //return BASE::copy(*ptens_session.managed_gmem,x);
+      //else return BASE::copy(x); 
     }
 
     BatchedPtensorsb zeros_like() const{
-      if(ptens_session.managed_gmem && dev==1) return BASE(*ptens_session.managed_gmem,dims,0,dev);
-      else return BASE::zeros_like();
+      cnine::using_vram_manager vv(ptens_session.managed_gmem);
+      return BASE::zeros_like();
+      //if(ptens_session.managed_gmem && dev==1) 
+      //return BASE(*ptens_session.managed_gmem,dims,0,dev);
+      //else return BASE::zeros_like();
     }
 
 
   public: // ---- Access -------------------------------------------------------------------------------------
+
 
     virtual BatchedPtensorsb& get_grad(){CNINE_UNIMPL();return *this;} // dummy
     virtual const BatchedPtensorsb& get_grad() const {CNINE_UNIMPL(); return *this;} // dummy
