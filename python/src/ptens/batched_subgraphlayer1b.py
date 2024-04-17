@@ -239,7 +239,7 @@ class Batched_subgraphlayer1b_catFn(torch.autograd.Function):
             x.add_cat_back(ctx.r,offs)
             offs=offs+x.dim(0)
             dummies.append(batched_subgraphlayer1b.dummy())
-        return None, dummies #it was *dummies
+        return None, *dummies #it was *dummies
 
 
 class Batched_subgraphlayer1b_outerFn(torch.autograd.Function):
