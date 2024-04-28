@@ -18,7 +18,7 @@ import ptens_base
 from ptens_base import batched_subgraphlayer2b as _batched_subgraphlayer2b
 from ptens.utility import device_id as device_id
 from ptens.ptensorsb import * 
-from ptens.batched_ptensors2b import BatchedPtensors2b_LinmapsFn
+#from ptens.batched_ptensors2b import BatchedPtensors2b_LinmapsFn
 from ptens.batched_ptensors2b import BatchedPtensors2b_GatherFn
 
 #import ptens.ptensor0
@@ -145,7 +145,7 @@ class batched_subgraphlayer2b(torch.Tensor):
 
     @classmethod
     def linmaps(self,x):
-        return BatchedPtensors2b_LinmapsFn.apply(x)
+        return BatchedSubgraphlayer2b_LinmapsFn.apply(x)
 
     @classmethod
     def gather(self,x,S):
@@ -240,6 +240,22 @@ class Batched_subgraphlayer2b_outerFn(torch.autograd.Function):
         ctx.x.outer_back0(ctx.r,ctx.y)
         ctx.y.outer_back0(ctx.r,ctxxy)
         return batched_subgraphlayer2b.dummy(), batched_subgraphlayer2b.dummy()
+
+
+class BatchedSubgraphlayer2b_LinmapsFn(torch.autograd.Function):
+
+    @staticmethod
+    def forward(ctx,x):
+        r=x.dummy()
+        r.obj=_batched_subgraphlayer2b.linmaps(x.obj) 
+        ctx.x=x.obj
+        ctx.r=r.obj
+        return r
+        
+    @staticmethod
+    def backward(ctx,g):
+        ctx.x.add_linmaps_back(ctx.r)
+        return x.dummy()
 
 
 class Batched_subgraphlayer2b_GatherFromPtensorsbFn(torch.autograd.Function):

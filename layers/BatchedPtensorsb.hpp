@@ -49,35 +49,18 @@ namespace ptens{
     BatchedPtensorsb(const BASE& x):
       BASE(x){}
 
-    //BatchedPtensorsb(const BatchedPtensorsb& x):
-    //BASE(x){}
-
     BatchedPtensorsb(const cnine::Gdims& _dims, const int fcode, const int _dev):
       BASE(BASE::vram_managed(ptens_session.managed_gmem,_dims,fcode,_dev)){
-      //if(ptens_session.managed_gmem) cout<<ptens_session.managed_gmem->size()<<endl;
-      //else cout<<"---"<<endl;
     }
-    //BASE(ptens_session.managed_gmem,_dims,fcode,_dev){}
-    //      if(ptens_session.managed_gmem && _dev==1)
-    //reset(BASE(*ptens_session.managed_gmem,_dims,fcode,_dev));
-    //else
-    //reset(BASE(_dims,fcode,_dev));
-    //}
 
     BatchedPtensorsb copy(const BatchedPtensorsb& x){
       cnine::using_vram_manager vv(ptens_session.managed_gmem);
       return BASE::copy(x); 
-      //if(ptens_session.managed_gmem && x.get_dev()==1) 
-      //return BASE::copy(*ptens_session.managed_gmem,x);
-      //else return BASE::copy(x); 
     }
 
     BatchedPtensorsb zeros_like() const{
       cnine::using_vram_manager vv(ptens_session.managed_gmem);
       return BASE::zeros_like();
-      //if(ptens_session.managed_gmem && dev==1) 
-      //return BASE(*ptens_session.managed_gmem,dims,0,dev);
-      //else return BASE::zeros_like();
     }
 
 
@@ -124,39 +107,6 @@ namespace ptens{
 
   };
 
-
-  /*
-  template<typename OBJ, typename = typename std::enable_if<std::is_base_of<BatchedPtensorsb<float>, OBJ>::value, OBJ>::type>
-  OBJ cat_channels(const OBJ& x, const OBJ& y){
-    PTENS_ASSRT(x.dim(0)==y.dim(0));
-    OBJ R({x.dim(0),x.dim(1)+y.dim(1)},0,x.get_dev());
-    R.block(0,0,x.dim(0),x.dim(1))+=x;
-    R.block(0,x.dim(1),x.dim(0),y.dim(1))+=y;
-    return R;
-  }
-
-  template<typename OBJ, typename = typename std::enable_if<std::is_base_of<BatchedPtensorsb<float>, OBJ>::value, OBJ>::type, typename TYPE>
-  OBJ scale_channels(const OBJ& x, const cnine::Ltensor<TYPE>& s){
-    return OBJ(x.scale_columns(s),x.atoms);
-  }
-
-  template<typename OBJ, typename = typename std::enable_if<std::is_base_of<BatchedPtensorsb<float>, OBJ>::value, OBJ>::type, typename TYPE>
-  OBJ mprod(const OBJ& x, const cnine::Ltensor<TYPE>& y){
-    return OBJ(x*y,x.atoms);
-  }
-
-  template<typename OBJ, typename = typename std::enable_if<std::is_base_of<BatchedPtensorsb<float>, OBJ>::value, OBJ>::type, typename TYPE>
-  OBJ linear(const OBJ& x, const cnine::Ltensor<TYPE>& w, const cnine::Ltensor<TYPE>& b){
-    OBJ R(x*w,x.atoms);
-    R.view2().add_broadcast0(b.view1());
-    return R;
-  }
-
-  template<typename OBJ, typename = typename std::enable_if<std::is_base_of<BatchedPtensorsb<float>, OBJ>::value, OBJ>::type, typename TYPE>
-  OBJ ReLU(const OBJ& x, TYPE alpha){
-    return OBJ(x.ReLU(alpha),x.atoms);
-  }
-  */
 
 }
 

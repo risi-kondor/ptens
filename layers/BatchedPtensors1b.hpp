@@ -27,8 +27,8 @@
 
 namespace ptens{
 
-  template<typename TYPE> class Ptensors1bBatch;
-  template<typename TYPE> class Ptensors2bBatch;
+  //template<typename TYPE> class Ptensors1bBatch;
+  //template<typename TYPE> class Ptensors2bBatch;
 
 
   template<typename TYPE>

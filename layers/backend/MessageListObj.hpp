@@ -40,9 +40,9 @@ namespace ptens{
     cnine::hlists<int> in;
     cnine::hlists<int> out;
 
-    mutable shared_ptr<AtomsPack0obj<int> > source0=nullptr;
-    mutable shared_ptr<AtomsPack1obj<int> > source1=nullptr;
-    mutable shared_ptr<AtomsPack2obj<int> > source2=nullptr;
+    //mutable shared_ptr<AtomsPack0obj<int> > source0=nullptr;
+    //mutable shared_ptr<AtomsPack1obj<int> > source1=nullptr;
+    //mutable shared_ptr<AtomsPack2obj<int> > source2=nullptr;
 
     ~MessageListObj(){}
 

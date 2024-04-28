@@ -140,7 +140,7 @@ class subgraphlayer1b(torch.Tensor):
 
     @classmethod
     def linmaps(self,x):
-        return Ptensorsb_Linmaps1Fn.apply(x)
+        return Subgraphlayer1b_LinmapsFn.apply(x)
 
     @classmethod
     def gather(self,x,S):
@@ -224,6 +224,22 @@ class Subgraphlayer1b_outerFn(torch.autograd.Function):
         ctx.x.outer_back0(ctx.r,ctx.y)
         ctx.y.outer_back0(ctx.r,ctx.y)
         return subgraphlayer1b.dummy(), subgraphlayer1b.dummy()
+
+
+class Subgraphlayer1b_LinmapsFn(torch.autograd.Function):
+
+    @staticmethod
+    def forward(ctx,x):
+        r=subgraphlayer0b.dummy()
+        r.obj=_subgraphlayer1b.linmaps(x.obj) 
+        ctx.x=x.obj
+        ctx.r=r.obj
+        return r
+        
+    @staticmethod
+    def backward(ctx,g):
+        ctx.x.add_linmaps_back(ctx.r)
+        return x.dummy()
 
 
 class Subgraphlayer1b_GatherFromPtensorsbFn(torch.autograd.Function):
