@@ -27,5 +27,5 @@ print("------")
 
 U=Z.torch()
 
-#U.backward(U)
-#print(A.grad)
+U.backward(U)
+print(A.grad)
