@@ -130,9 +130,12 @@ pybind11::class_<BatchedPtensors1b<float> >(m,"batched_ptensors1b")
 // ---- Message passing --------------------------------------------------------------------------------------
 
 
-  .def_static("linmaps",[](const BatchedPtensors0b<float>& x){return BPtensors1::linmaps(x);}) 
-  .def_static("linmaps",[](const BatchedPtensors1b<float>& x){return BPtensors1::linmaps(x);}) 
-  .def_static("linmaps",[](const BatchedPtensors2b<float>& x){return BPtensors1::linmaps(x);}) 
+  .def_static("linmaps",[](const BatchedPtensors0b<float>& x){
+      return BPtensors1::linmaps(x);}) 
+  .def_static("linmaps",[](const BatchedPtensors1b<float>& x){
+      return BPtensors1::linmaps(x);}) 
+  .def_static("linmaps",[](const BatchedPtensors2b<float>& x){
+      return BPtensors1::linmaps(x);}) 
 
   .def_static("gather",[](const BatchedPtensors0b<float>& x, const BatchedAtomsPack& a){
       cnine::fnlog timer("BatchedPtensors1b::gather0()");

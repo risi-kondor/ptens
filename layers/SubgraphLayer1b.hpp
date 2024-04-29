@@ -41,16 +41,9 @@ namespace ptens{
     using BASE::BASE;
     using BASE::atoms;
     using BASE::add_gather;
-    //using BASE::G;
-    //using BASE::S;
-    //using TLAYER::dev;
-    //using TLAYER::getn;
     using BASE::get_nc;
     using BASE::get_grad;
     using BASE::view3;
-    //using TLAYER::tensor;
-    //using TLAYER::inp;
-    //using TLAYER::diff2;
 
     using TENSOR::dim;
     using TENSOR::get_arr;

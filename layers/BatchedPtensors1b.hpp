@@ -27,8 +27,8 @@
 
 namespace ptens{
 
-  template<typename TYPE> class Ptensors1bBatch;
-  template<typename TYPE> class Ptensors2bBatch;
+  //template<typename TYPE> class Ptensors1bBatch;
+  //template<typename TYPE> class Ptensors2bBatch;
 
 
   template<typename TYPE>
@@ -294,16 +294,16 @@ namespace ptens{
 
     template<typename SOURCE, typename = typename std::enable_if<std::is_base_of<BatchedPtensorsb<float>, SOURCE>::value, SOURCE>::type>
     void add_linmaps(const SOURCE& x){
-      //for(int i=0; i<size(); i++)
-      //view_of(i).add_linmaps(x.view_of(i));
-      cnine::MultiLoop(size(),[&](const int i){view_of(i).add_linmaps(x.view_of(i));});
+      for(int i=0; i<size(); i++)
+	view_of(i).add_linmaps(x.view_of(i));
+      //cnine::MultiLoop(size(),[&](const int i){view_of(i).add_linmaps(x.view_of(i));});
     }
 
     template<typename SOURCE, typename = typename std::enable_if<std::is_base_of<BatchedPtensorsb<float>, SOURCE>::value, SOURCE>::type>
     void add_linmaps_back(const SOURCE& x){
-      //for(int i=0; i<size(); i++)
-      //view_of(i).add_linmaps_back(x.view_of(i));
-      cnine::MultiLoop(size(),[&](const int i){view_of(i).add_linmaps_back(x.view_of(i));});
+      for(int i=0; i<size(); i++)
+	view_of(i).add_linmaps_back(x.view_of(i));
+      //cnine::MultiLoop(size(),[&](const int i){view_of(i).add_linmaps_back(x.view_of(i));});
     }
 
     template<typename SOURCE>

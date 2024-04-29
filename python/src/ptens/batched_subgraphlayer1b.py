@@ -19,12 +19,8 @@ from ptens_base import batched_subgraphlayer1b as _batched_subgraphlayer1b
 from ptens.utility import device_id as device_id
 from ptens.utility import device_str as device_str
 from ptens.ptensorsb import * 
-from ptens.batched_ptensors1b import BatchedPtensors1b_LinmapsFn
+#from ptens.batched_ptensors1b import BatchedPtensors1b_LinmapsFn
 from ptens.batched_ptensors1b import BatchedPtensors1b_GatherFn
-
-#import ptens.ptensor0
-#import ptens.ptensors1
-#import ptens.ptensors2 
 
 
 class batched_subgraphlayer1b(torch.Tensor):
@@ -40,31 +36,31 @@ class batched_subgraphlayer1b(torch.Tensor):
         R.obj=obj
         return R
     
-    @classmethod
-    def from_matrix(self,M,atoms):
-        return Batched_subgraphlayer1b_fromMxFn.apply(M,atoms)
+#    @classmethod
+#    def from_matrix(self,M,atoms):
+#        return Batched_subgraphlayer1b_fromMxFn.apply(M,atoms)
             
     @classmethod
     def like(self,x,M):
         return Batched_subgraphlayer1b_likeFn.apply(x,M)
 
-    @classmethod
-    def zeros(self, _G, _nc, device='cpu'):
-        R=batched_subgraphlayer1b(1)
-        R.obj=_batched_subgraphlayer1b.create(_G.obj,_nc,0,device_id(device))
-        return R
+#     @classmethod
+#     def zeros(self, _G, _nc, device='cpu'):
+#         R=batched_subgraphlayer1b(1)
+#         R.obj=_batched_subgraphlayer1b.create(_G.obj,_nc,0,device_id(device))
+#         return R
 
-    @classmethod
-    def randn(self, _G, _nc, device='cpu'):
-        R=batched_subgraphlayer1b(1)
-        R.obj=_batched_subgraphlayer1b.create(_G.obj,_nc,4,device_id(device))
-        return R
+#     @classmethod
+#     def randn(self, _G, _nc, device='cpu'):
+#         R=batched_subgraphlayer1b(1)
+#         R.obj=_batched_subgraphlayer1b.create(_G.obj,_nc,4,device_id(device))
+#         return R
 
-    @classmethod
-    def sequential(self, _G, _nc, device='cpu'):
-        R=batched_subgraphlayer1b(1)
-        R.obj=_batched_subgraphlayer1b.create(_G.obj,_nc,3,device_id(device))
-        return R
+#     @classmethod
+#     def sequential(self, _G, _nc, device='cpu'):
+#         R=batched_subgraphlayer1b(1)
+#         R.obj=_batched_subgraphlayer1b.create(_G.obj,_nc,3,device_id(device))
+#         return R
 
     def randn_like(self):
         return batched_subgraphlayer1b.init(self.obj.randn_like())
@@ -146,7 +142,7 @@ class batched_subgraphlayer1b(torch.Tensor):
 
     @classmethod
     def linmaps(self,x):
-        return BatchedPtensors1b_LinmapsFn.apply(x)
+        return BatchedSubgraphlayer1b_LinmapsFn.apply(x)
 
     @classmethod
     def gather(self,x,S):
@@ -173,24 +169,6 @@ class batched_subgraphlayer1b(torch.Tensor):
 # ------------------------------------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------------------------------------
-
-
-
-# ----- Transport and conversions ----------------------------------------------------------------------------
-
-
-class Batched_subgraphlayer1b_fromMxFn(torch.autograd.Function):
-
-    @staticmethod
-    def forward(ctx,G,x):
-        R=batched_subgraphlayer1b(1)
-        R.obj=_batched_subgraphlayer1b(G.obj,x)
-        ctx.r=R.obj
-        return R
-
-    @staticmethod
-    def backward(ctx,g):
-        return None, ctx.r.get_grad().torch()
 
 
 class BatchedSubgraphlayer1b_fromEdgeFeaturesFn(torch.autograd.Function):
@@ -260,30 +238,54 @@ class Batched_subgraphlayer1b_outerFn(torch.autograd.Function):
         return batched_subgraphlayer1b.dummy(), batched_subgraphlayer1b.dummy()
 
 
+class BatchedSubgraphlayer1b_LinmapsFn(torch.autograd.Function):
+
+    @staticmethod
+    def forward(ctx,x):
+        r=x.dummy()
+        r.obj=_batched_subgraphlayer1b.linmaps(x.obj) 
+        ctx.x=x.obj
+        ctx.r=r.obj
+        return r
+        
+    @staticmethod
+    def backward(ctx,g):
+        ctx.x.add_linmaps_back(ctx.r)
+        return batched_subgraphlayer1b.dummy()
+
+
 class BatchedSubgraphlayer1b_GatherFromPtensorsbFn(torch.autograd.Function):
 
     @staticmethod
     def forward(ctx,x,G,S):
         r=batched_subgraphlayer1b.dummy()
         r.obj=_batched_subgraphlayer1b(x.obj,G.obj,S.obj)
-        #nc=x.obj.get_nc()*_batched_subgraphlayer1b.n_gather_maps(x.obj.getk())
-        #r.mx=torch.zeros([_batched_subgraphlayer1b.nrows(G.obj,S.obj),nc],device=device_str(x.get_dev()))
-        #r.obj=_batched_subgraphlayer1b(r.mx,x.obj,G.obj,S.obj)
         ctx.x=x.obj
         ctx.r=r.obj
         return r
 
     @staticmethod
     def backward(ctx,g):
-	#if hasattr(ctx.x,'mx'):
-	#    if not hasattr(ctx.x,'mxg'):
-	#	ctx.x.mxg=torch.zeros_like(ctx.x.mx)
-	#    ctx.x.add_gather_back(ctx.x.mxg,ctx.r)
-	#else:
-	#    ctx.x.add_gather_back(ctx.r)
         ctx.x.add_gather_back(ctx.r)
-        return ptensorsb.dummy(), None, None
-     
+        return batched_subgraphlayer1b.dummy(), None, None
+
+
+class BatchedSubgraphlayer1b_GatherFn(torch.autograd.Function):
+
+    @staticmethod
+    def forward(ctx,x,S):
+        r=x.dummy()
+        r.obj=_batched_subgraphlayer1b(x.obj,S)
+        ctx.x=x.obj
+        ctx.r=r.obj
+        return r
+
+    @staticmethod
+    def backward(ctx,g):
+        ctx.x.add_gather_back(ctx.r)
+        return batched_subgraphlayer1b.dummy(), None 
+
+
 # this could be shared with subgraphlayer1b
 class BatchedSubgraphlayer1b_autobahnFn(torch.autograd.Function):
      @staticmethod
@@ -303,19 +305,18 @@ class BatchedSubgraphlayer1b_autobahnFn(torch.autograd.Function):
          ctx.x.autobahn_back1(wg,bg,ctx.r)
          return batched_subgraphlayer1b.dummy(),wg,bg
 
-class BatchedSubgraphlayer1b_GatherFn(torch.autograd.Function):
 
-    @staticmethod
-    def forward(ctx,x,S):
-        r=x.dummy()
-        r.obj=_batched_subgraphlayer1b(x.obj,S)
-        ctx.x=x.obj
-        ctx.r=r.obj
-        return r
+# class Batched_subgraphlayer1b_fromMxFn(torch.autograd.Function):
 
-    @staticmethod
-    def backward(ctx,g):
-        ctx.x.add_gather_back(ctx.r)
-        return batched_subgraphlayer1b.dummy(), None 
+#     @staticmethod
+#     def forward(ctx,G,x):
+#         R=batched_subgraphlayer1b(1)
+#         R.obj=_batched_subgraphlayer1b(G.obj,x)
+#         ctx.r=R.obj
+#         return R
+
+#     @staticmethod
+#     def backward(ctx,g):
+#         return None, ctx.r.get_grad().torch()
 
 

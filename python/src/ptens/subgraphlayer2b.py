@@ -133,28 +133,9 @@ class subgraphlayer2b(torch.Tensor):
     # ---- Message passing -----------------------------------------------------------------------------------
     
 
-#     def linmaps0(self,normalized=False):
-#         return Ptensorsb_Linmaps0Fn.apply(self);
-
-#     def linmaps1(self,normalized=False):
-#         return Ptensorsb_Linmaps1Fn.apply(self);
-
-#     def linmaps2(self,normalized=False):
-#         return Ptensorsb_Linmaps2Fn.apply(self);
-
-    #def gather0(self,atoms):
-    #    return Ptensorsb_Gather0Fn.apply(self,atoms);
-
-    #def gather1(self,atoms):
-    #    return Ptensorsb_Gather1Fn.apply(self,atoms);
-
-    #def gather2(self,atoms):
-    #    return Ptensorsb_Gather2Fn.apply(self,atoms);
-
-
     @classmethod
     def linmaps(self,x):
-        return Ptensorsb_Linmaps2Fn.apply(x)
+        return Subgraphlayer2b_LinmapsFn.apply(x)
 
     @classmethod
     def gather(self,x,S):
@@ -235,6 +216,22 @@ class Subgraphlayer2b_outerFn(torch.autograd.Function):
         ctx.x.outer_back0(ctx.r,ctx.y)
         ctx.y.outer_back0(ctx.r,ctxxy)
         return subgraphlayer2b.dummy(), subgraphlayer2b.dummy()
+
+
+class Subgraphlayer2b_LinmapsFn(torch.autograd.Function):
+
+    @staticmethod
+    def forward(ctx,x):
+        r=subgraphlayer2b.dummy()
+        r.obj=_subgraphlayer2b.linmaps(x.obj) 
+        ctx.x=x.obj
+        ctx.r=r.obj
+        return r
+        
+    @staticmethod
+    def backward(ctx,g):
+        ctx.x.add_linmaps_back(ctx.r)
+        return x.dummy()
 
 
 class Subgraphlayer2b_GatherFromPtensorsbFn(torch.autograd.Function):

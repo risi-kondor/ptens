@@ -18,12 +18,8 @@ import ptens_base
 from ptens_base import batched_subgraphlayer0b as _batched_subgraphlayer0b
 from ptens.utility import device_id as device_id
 from ptens.ptensorsb import * 
-from ptens.batched_ptensors0b import BatchedPtensors0b_LinmapsFn
+#from ptens.batched_ptensors0b import BatchedPtensors0b_LinmapsFn
 from ptens.batched_ptensors0b import BatchedPtensors0b_GatherFn
-
-#import ptens.ptensor0
-#import ptens.ptensors1
-#import ptens.ptensors2 
 
 
 class batched_subgraphlayer0b(torch.Tensor):
@@ -39,9 +35,9 @@ class batched_subgraphlayer0b(torch.Tensor):
         R.obj=obj
         return R
     
-    @classmethod
-    def from_matrix(self,M,atoms):
-        return Batched_subgraphlayer0b_fromMxFn.apply(M,atoms)
+#    @classmethod
+#    def from_matrix(self,M,atoms):
+#        return Batched_subgraphlayer0b_fromMxFn.apply(M,atoms)
             
     @classmethod
     def from_vertex_features(self,graphs,M):
@@ -55,23 +51,23 @@ class batched_subgraphlayer0b(torch.Tensor):
     def like(self,x,M):
         return Batched_subgraphlayer0b_likeFn.apply(x,M)
 
-    @classmethod
-    def zeros(self, _G, _nc, device='cpu'):
-        R=batched_subgraphlayer0b(1)
-        R.obj=_batched_subgraphlayer0b.create(_G.obj,_nc,0,device_id(device))
-        return R
+#     @classmethod
+#     def zeros(self, _G, _nc, device='cpu'):
+#         R=batched_subgraphlayer0b(1)
+#         R.obj=_batched_subgraphlayer0b.create(_G.obj,_nc,0,device_id(device))
+#         return R
 
-    @classmethod
-    def randn(self, _G, _nc, device='cpu'):
-        R=batched_subgraphlayer0b(1)
-        R.obj=_batched_subgraphlayer0b.create(_G.obj,_nc,4,device_id(device))
-        return R
+#     @classmethod
+#     def randn(self, _G, _nc, device='cpu'):
+#         R=batched_subgraphlayer0b(1)
+#         R.obj=_batched_subgraphlayer0b.create(_G.obj,_nc,4,device_id(device))
+#         return R
 
-    @classmethod
-    def sequential(self, _G, _nc, device='cpu'):
-        R=batched_subgraphlayer0b(1)
-        R.obj=_batched_subgraphlayer0b.create(_G.obj,_nc,3,device_id(device))
-        return R
+#     @classmethod
+#     def sequential(self, _G, _nc, device='cpu'):
+#         R=batched_subgraphlayer0b(1)
+#         R.obj=_batched_subgraphlayer0b.create(_G.obj,_nc,3,device_id(device))
+#         return R
 
     def randn_like(self):
         return batched_subgraphlayer0b.init(self.obj.randn_like())
@@ -153,7 +149,7 @@ class batched_subgraphlayer0b(torch.Tensor):
 
     @classmethod
     def linmaps(self,x):
-        return BatchedPtensors0b_LinmapsFn.apply(x)
+        return BatchedSubgraphlayer0b_LinmapsFn.apply(x)
 
     @classmethod
     def gather(self,x,S):
@@ -276,6 +272,22 @@ class Batched_subgraphlayer0b_outerFn(torch.autograd.Function):
         ctx.x.outer_back0(ctx.r,ctx.y)
         ctx.y.outer_back0(ctx.r,ctxxy)
         return batched_subgraphlayer0b.dummy(), batched_subgraphlayer0b.dummy()
+
+
+class BatchedSubgraphlayer0b_LinmapsFn(torch.autograd.Function):
+
+    @staticmethod
+    def forward(ctx,x):
+        r=x.dummy()
+        r.obj=_batched_subgraphlayer0b.linmaps(x.obj) 
+        ctx.x=x.obj
+        ctx.r=r.obj
+        return r
+        
+    @staticmethod
+    def backward(ctx,g):
+        ctx.x.add_linmaps_back(ctx.r)
+        return x.dummy()
 
 
 class Batched_subgraphlayer0b_GatherFromPtensorsbFn(torch.autograd.Function):
