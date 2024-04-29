@@ -296,7 +296,7 @@ namespace ptens{
     void add_linmaps(const SOURCE& x){
       //for(int i=0; i<size(); i++)
       //view_of(i).add_linmaps(x.view_of(i));
-      cnine::MultiLoop(size(),[&](const int i){view_of(i).add_linmaps(x.view_of(i));});
+      //cnine::MultiLoop(size(),[&](const int i){view_of(i).add_linmaps(x.view_of(i));});
     }
 
     template<typename SOURCE, typename = typename std::enable_if<std::is_base_of<BatchedPtensorsb<float>, SOURCE>::value, SOURCE>::type>
