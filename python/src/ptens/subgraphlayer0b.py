@@ -198,7 +198,7 @@ class Subgraphlayer0b_likeFn(torch.autograd.Function):
 
     @staticmethod
     def backward(ctx,g):
-        return ctx.r.get_grad().torch(), None
+        return subgraphlayer0b.dummy(), ctx.r.get_grad().torch(), None
 
 
 class Subgraphlayer0b_catFn(torch.autograd.Function):
