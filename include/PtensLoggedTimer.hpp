@@ -22,7 +22,7 @@
 #include "PtensSession.hpp"
 
 //extern ptens::PtensLog* ptens_log;
-extern ptens::PtensSession ptens_session;
+extern ptens::PtensSession ptens::ptens_session;
 
 
 namespace ptens{

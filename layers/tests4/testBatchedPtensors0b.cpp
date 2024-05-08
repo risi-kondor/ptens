@@ -13,13 +13,16 @@
  */
 #include "Cnine_base.cpp"
 #include "CnineSession.hpp"
+#include "PtensSession.hpp"
+
+namespace ptens{ 
+  PtensSession ptens_session;
+}
 
 #include "BatchedPtensors0b.hpp"
 
 using namespace ptens;
 using namespace cnine;
-
-PtensSession ptens_session;
 
 
 int main(int argc, char** argv){

@@ -338,10 +338,10 @@ namespace ptens{
       int dev=get_dev();
       BASE R({N,get_nc()},0,dev);
       Rtensor2_view r=R.view2();
-      if(dev==0){
-	for(int i=0; i<N; i++)
-	  view2_of(i).sum0_into(r.slice0(i));
-      }
+      //if(dev==0){
+      for(int i=0; i<N; i++)
+	view2_of(i).sum0_into(r.slice0(i));
+      //}
       return R;
     }
 
@@ -351,10 +351,10 @@ namespace ptens{
       int dev=get_dev();
       BASE R({N,nc},0,dev);
       Rtensor2_view r=R.view2();
-      if(dev==0){
-	for(int i=0; i<N; i++)
-	  view2_of(i,offs,nc).sum0_into(r.slice0(i));
-      }
+      //if(dev==0){
+      for(int i=0; i<N; i++)
+	view2_of(i,offs,nc).sum0_into(r.slice0(i));
+      //}
       return R;
     }
 
@@ -373,10 +373,10 @@ namespace ptens{
       PTENS_ASSRT(X.dim(0)==N);
       Rtensor2_view x=X.view2();
       
-      if(get_dev()==0){
-	for(int i=0; i<N; i++)
-	  view2_of(i,offs,nc)+=cnine::repeat0(x.slice0(i),size_of(i));
-      }
+      //if(get_dev()==0){
+      for(int i=0; i<N; i++)
+	view2_of(i,offs,nc)+=cnine::repeat0(x.slice0(i),size_of(i));
+      //}
     }
 
     void broadcast1(const BASE& X, const int offs=0){
