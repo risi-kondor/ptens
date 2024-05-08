@@ -42,11 +42,11 @@ pybind11::class_<BSGlayer0b,BatchedPtensors0b<float> >(m,"batched_subgraphlayer0
 
 
   .def_static("linmaps",[](const BSGlayer0b& x){
-      return BSGlayer1b::linmaps(x);}) 
+      return BSGlayer0b::linmaps(x);}) 
   .def_static("linmaps",[](const BSGlayer1b& x){
-      return BSGlayer1b::linmaps(x);}) 
+      return BSGlayer0b::linmaps(x);}) 
   .def_static("linmaps",[](const BSGlayer2b& x){
-      return BSGlayer1b::linmaps(x);}) 
+      return BSGlayer0b::linmaps(x);}) 
 
   .def(pybind11::init([](const BSGlayer0b& x, const Subgraph& S){
 	cnine::fnlog timer("BatchedSubgraphLayer0b::init(BatchedPtensors0b)");

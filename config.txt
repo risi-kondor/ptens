@@ -7,7 +7,7 @@ CNINE_ROOT=$(ROOTDIR)/../cnine/
 
 # ---- EIGEN OPTIONS ------------------------------------
 
-EIGENDIR=/usr/local/include
+# EIGENDIR=/usr/local/include
 
 
 # ---- CUDA OPTIONS ----------------------------------

@@ -13,6 +13,11 @@
  */
 
 #include "Cnine_base.cpp"
+#include "PtensSession.hpp"
+
+namespace ptens{
+  PtensSession ptens_session;
+}
 
 #include "BatchedPtensors0b.hpp"
 #include "BatchedPtensors1b.hpp"
@@ -22,7 +27,7 @@
 using namespace ptens;
 using namespace cnine;
 
-PtensSession ptens::ptens_session;
+//PtensSession ptens::ptens_session;
 
 typedef BatchedPtensors0b<float> BPtens0;
 typedef BatchedPtensors1b<float> BPtens1;

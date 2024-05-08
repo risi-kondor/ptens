@@ -13,6 +13,11 @@
  */
 #include "Cnine_base.cpp"
 #include "CnineSession.hpp"
+#include "PtensSession.hpp"
+
+namespace ptens{ 
+  PtensSession ptens_session;
+}
 
 #include "BatchedPtensors0b.hpp"
 #include "BatchedPtensors1b.hpp"
@@ -20,8 +25,6 @@
 
 using namespace ptens;
 using namespace cnine;
-
-PtensSession ptens_session;
 
 
 int main(int argc, char** argv){
@@ -38,7 +41,7 @@ int main(int argc, char** argv){
   BPtens2 X2=BPtens2(bxatoms,channels=3,filltype=3);
 
   //cout<<X0<<endl;
-  //cout<<X1<<endl;
+  cout<<X1<<endl;
   //cout<<X2<<endl;
 
   auto Z1=BPtens1::linmaps(X1);
