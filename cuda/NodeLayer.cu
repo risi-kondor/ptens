@@ -27,6 +27,10 @@ namespace cnine{
 }
 //extern cnine::CnineLog cnine::cnine_log;
 
+#include "PtensSession.hpp"
+namespace ptens{
+  extern PtensSession ptens_session;
+}
 
 #include "Ptensors0.hpp"
 #include "Ptensors1.hpp"
