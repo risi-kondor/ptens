@@ -20,6 +20,9 @@ X=p.batched_ptensors0b.from_matrix(A,[5,5,5,5])
 
 Y=p.batched_subgraphlayer1b.gather_from_ptensors(X,G,S)
 print(Y)
+at=Y.get_atoms()
+print(at)
+print(at.torch())
 
 Z=p.batched_subgraphlayer1b.linmaps(Y)
 print(Z)

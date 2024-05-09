@@ -91,8 +91,8 @@ class batched_ptensors2b(torch.Tensor):
     def get_nc(self):
         return self.obj.get_nc()
 
-    #def get_atoms(self):
-    #    return self.obj.get_atoms()
+    def get_atoms(self):
+        return self.obj.get_atoms()
     
     #def atoms_of(self, i):
     #    return self.obj.atoms_of(i)

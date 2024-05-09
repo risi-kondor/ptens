@@ -9,6 +9,7 @@ pybind11::class_<AtomsPack>(m,"atomspack")
 
   .def("__len__",&AtomsPack::size)
   .def("__getitem__",[](const AtomsPack& x, const int i){return vector<int>(x[i]);})
+  .def("torch",[](const AtomsPack& x){return x.as_vecs();})
 
   .def("str",&AtomsPack::str,py::arg("indent")="")
   .def("__str__",&AtomsPack::str,py::arg("indent")="")

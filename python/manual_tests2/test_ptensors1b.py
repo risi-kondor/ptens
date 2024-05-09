@@ -11,6 +11,8 @@ A=p.ptensors1b.from_matrix(M,atoms)
 print(A)
 print(A.torch())
 
+print(A.get_atoms().torch()[1])
+
 #B=A.relu(A)
 #print(B)
 

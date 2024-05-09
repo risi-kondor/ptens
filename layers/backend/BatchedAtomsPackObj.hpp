@@ -46,6 +46,16 @@ namespace ptens{
     }
 
 
+  public: // ---- Access -------------------------------------------------------------------------------------
+
+
+    vector<vector<vector<int > > > as_vecs() const{
+      vector<vector<vector<int > > > R;
+      for(int i=0; i<size(); i++)
+	R.push_back((*this)[i].as_vecs());
+      return R;
+    }
+
   };
 
 }

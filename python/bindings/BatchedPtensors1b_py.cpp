@@ -52,7 +52,7 @@ pybind11::class_<BatchedPtensors1b<float> >(m,"batched_ptensors1b")
 
   .def("get_dev",&BPtensors1::get_dev)
   .def("get_nc",&BPtensors1::get_nc)
-//.def("get_atoms",[](const BPtensors1& x){return x.get_atoms();})
+  .def("get_atoms",[](const BPtensors1& x){return x.get_atoms();})
   .def("dim",&BPtensors1::dim)
 
 //.def("to",[](const BPtensors1& x, const int dev){return BPtensors1(x,dev);})

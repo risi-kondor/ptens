@@ -66,7 +66,11 @@ namespace ptens{
       PTENS_ASSRT(i<size());
       return obj->obj[i];
     }
-    
+
+    vector<vector<vector<int> > > as_vecs() const{
+      return obj->as_vecs();
+    }
+
 
   public: // ---- Operations ---------------------------------------------------------------------------------
 
