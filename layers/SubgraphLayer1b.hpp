@@ -41,9 +41,12 @@ namespace ptens{
     using BASE::BASE;
     using BASE::atoms;
     using BASE::add_gather;
+    using BASE::size;
     using BASE::get_nc;
+    using BASE::get_dev;
     using BASE::get_grad;
     using BASE::view3;
+    using BASE::cols;
 
     using TENSOR::dim;
     using TENSOR::get_arr;
@@ -130,13 +133,6 @@ namespace ptens{
 
 
     template<typename SOURCE>
-    static SubgraphLayer1b linmaps(const SOURCE& x){
-      SubgraphLayer1b R(x.get_atoms(),x.get_nc()*vector<int>({1,2,5})[x.getk()],x.get_dev());
-      R.add_linmaps(x);
-      return R;
-    }
-
-    template<typename SOURCE>
     SubgraphLayer1b(const SOURCE& x, const Subgraph& _S):
       SubgraphLayer1b(x.G,_S,x.G.subgraphs(_S),x.get_nc()*vector<int>({1,2,5})[x.getk()],0,x.dev){
       add_gather(x);
@@ -146,6 +142,49 @@ namespace ptens{
     SubgraphLayer1b(const SOURCE& x, const Ggraph& _G, const Subgraph& _S):
       SubgraphLayer1b(_G,_S,_G.subgraphs(_S),x.get_nc()*vector<int>({1,2,5})[x.getk()],0,x.dev){
       add_gather(x);
+    }
+
+
+  public: // ---- Linmaps ------------------------------------------------------------------------------------
+
+
+    template<typename SOURCE>
+    static SubgraphLayer1b linmaps(const SOURCE& x){
+      SubgraphLayer1b R(x.get_atoms(),x.get_nc()*vector<int>({1,2,5})[x.getk()],x.get_dev());
+      R.add_linmaps(x);
+      return R;
+    }
+
+    void add_linmaps(const Ptensors1b<TYPE>& x){
+      int nc=x.get_nc();
+      broadcast0(x.reduce0());
+      cols(nc,nc)+=x;
+    }
+
+    void add_linmaps_back(const Ptensors1b<TYPE>& r){
+      int nc=get_nc();
+      broadcast0(r.reduce0(0,nc));
+      add(r.cols(nc,nc));
+    }
+
+    Ptensorsb<TYPE> reduce0() const{
+      TimedFn T("SubgraphLayer1b","reduce0",*this);
+      Ptensorsb<TYPE> R({size(),get_nc()},0,get_dev());
+      view3(S.getn()).sum1_into(R.view2());
+      return R;
+    }
+
+    Ptensorsb<TYPE> reduce0(const int offs, const int nc) const{
+      TimedFn T("SubgraphLayer1b","reduce0",*this);
+      Ptensorsb<TYPE> R({size(),nc},0,get_dev());
+      view3(S.getn(),offs,nc).sum1_into(R.view2());
+      return R;
+    }
+
+    void broadcast0(const Ptensorsb<TYPE>& x, const int offs=0){
+      TimedFn T("SubgraphLayer1b","broadcast0",*this);
+      PTENS_ASSRT(x.ndims()==2);
+      view3(S.getn(),offs,x.dim(1))+=cnine::repeat1(x.view2(),S.getn());
     }
 
 

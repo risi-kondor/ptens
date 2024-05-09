@@ -35,8 +35,11 @@ namespace ptens{
     using BASE::BASE;
     using BASE::atoms;
     using BASE::add_gather;
+    using BASE::dim;
+    using BASE::get_dev;
     using BASE::get_nc;
     using BASE::get_grad;
+    using BASE::cols;
     using BASE::view3;
 
     using TENSOR::get_arr;
@@ -146,13 +149,6 @@ namespace ptens{
 
 
     template<typename SOURCE>
-    static BatchedSubgraphLayer1b linmaps(const SOURCE& x){
-      BatchedSubgraphLayer1b R(x.G,x.S,x.get_atoms(),x.get_nc()*vector<int>({1,2,5})[x.getk()],0,x.get_dev());
-      R.add_linmaps(x);
-      return R;
-    }
-
-    template<typename SOURCE>
     BatchedSubgraphLayer1b(const SOURCE& x, const Subgraph& _S):
       BatchedSubgraphLayer1b(x.G,_S,x.G.subgraphs(_S),x.get_nc()*vector<int>({1,2,5})[x.getk()],0,x.dev){
       add_gather(x);
@@ -173,6 +169,64 @@ namespace ptens{
       add_gather(x);
     }
 
+
+  public: // ---- Linmaps -----------------------------------------------------------------------------------
+
+
+    template<typename SOURCE>
+    static BatchedSubgraphLayer1b linmaps(const SOURCE& x){
+      BatchedSubgraphLayer1b R(x.G,x.S,x.get_atoms(),x.get_nc()*vector<int>({1,2,5})[x.getk()],0,x.get_dev());
+      R.add_linmaps(x);
+      return R;
+    }
+
+    void add_linmaps(const BatchedSubgraphLayer0b<TYPE>& x){
+      BASE::add_linmaps(x);
+    }
+
+    void add_linmaps(const BatchedSubgraphLayer1b<TYPE>& x){
+      int nc=x.get_nc();
+      broadcast0(x.reduce0());
+      cols(nc,nc)+=x;
+      //for(int i=0; i<size(); i++)
+      //view_of(i).add_linmaps(x.view_of(i));
+      //cnine::MultiLoop(size(),[&](const int i){view_of(i).add_linmaps(x.view_of(i));});
+    }
+
+    //void add_linmaps(const BatchedSubgraphLayer2b<TYPE>& x){
+    //BASE::add_limnmaps(x);
+    //}
+
+    void add_linmaps_back(const BatchedSubgraphLayer1b<TYPE>& x){
+      int nc=get_nc();
+      broadcast0(x.reduce0(0,nc));
+      add(x.cols(nc,nc));
+      //for(int i=0; i<size(); i++)
+      //view_of(i).add_linmaps_back(x.view_of(i));
+      //cnine::MultiLoop(size(),[&](const int i){view_of(i).add_linmaps_back(x.view_of(i));});
+    }
+
+    Ptensorsb<TYPE> reduce0() const{
+      TimedFn T("BatchedSubgraphLayer1b","reduce0",*this);
+      Ptensorsb<TYPE> R({dim(0)/S.getn(),get_nc()},0,get_dev());
+      view3(S.getn()).sum1_into(R.view2());
+      return R;
+    }
+
+    Ptensorsb<TYPE> reduce0(const int offs, const int nc) const{
+      TimedFn T("BatchedSubgraphLayer1b","reduce0",*this);
+      Ptensorsb<TYPE> R({dim(0)/S.getn(),nc},0,get_dev());
+      view3(S.getn(),offs,nc).sum1_into(R.view2());
+      return R;
+    }
+
+    void broadcast0(const Ptensorsb<TYPE>& x, const int offs=0){
+      TimedFn T("SubgraphLayer1b","broadcast0",*this);
+      PTENS_ASSRT(x.ndims()==2);
+      cout<<view3(S.getn(),offs,x.dim(1)).repr()<<endl;
+      cout<<cnine::repeat1(x.view2(),dim(1)).repr()<<endl;
+      view3(S.getn(),offs,x.dim(1))+=cnine::repeat1(x.view2(),S.getn());
+    }
 
   public: // ---- Autobahn -----------------------------------------------------------------------------------
 

@@ -263,6 +263,16 @@ namespace ptens{
       return cnine::Rtensor3_view(get_arr(),dim(0)/K,K,nc,K*nc,nc,1,get_dev());
     }
 
+    const cnine::Rtensor3_view view3(const int K, const int offs, const int nc) const{
+      int _nc=get_nc();
+      return cnine::Rtensor3_view(const_cast<float*>(get_arr())+offs,dim(0)/K,K,nc,K*_nc,_nc,1,get_dev());
+    }
+
+    cnine::Rtensor3_view view3(const int K, const int offs, const int nc){
+      int _nc=get_nc();
+      return cnine::Rtensor3_view(get_arr()+offs,dim(0)/K,K,nc,K*_nc,_nc,1,get_dev());
+    }
+
 
     static int nrows(const BatchedAtomsPack& _atoms){
       return BatchedAtomsPack1(_atoms).tsize();
