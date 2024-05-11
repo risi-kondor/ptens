@@ -64,6 +64,8 @@ namespace ptens{
 	{return shared_ptr<AtomsPackObj>(new AtomsPackObj(cat_with(v)));});
 
     int constk=0;
+    mutable int _tsize2=-1;
+    mutable vector<int> offsets2;
 
     bool cache_packs=false;
     mutable shared_ptr<AtomsPack0obj<int> > cached_pack0;
@@ -226,21 +228,6 @@ namespace ptens{
       return k;
     }
 
-    int tsize0() const{
-      return size();
-    }
-
-    int tsize1() const{
-      return get_tail(); 
-    }
-
-    int tsize2() const{
-      int t=0;
-      for(int i=0; i<size(); i++)
-	t+=size_of(i)*size_of(i);
-      return t;
-    }
-
     cnine::array_pool<int> dims1(const int nc) const{
       array_pool<int> R;
       for(int i=0; i<size(); i++)
@@ -260,6 +247,68 @@ namespace ptens{
       cached_pack1.reset();
       cached_pack2.reset();
       cache_packs=false;
+    }
+
+
+  public: // ---- Layout of corresponding matrix -------------------------------------------------------------
+
+
+    int tsize0() const{
+      return size();
+    }
+
+    int tsize1() const{
+      return BASE::get_tail(); 
+    }
+
+    int tsize2() const{
+      if(_tsize2==-1){
+	int t=0; 
+	for(int i=0; i<size(); i++) 
+	  t+=pow(BASE::size_of(i),2);
+	_tsize2=t;
+      }
+      return _tsize2;
+    }
+
+
+    int nrows0(const int i) const{
+      PTENS_ASSRT(i<size());
+      return 1;
+    }
+
+    int nrows1(const int i) const{
+      PTENS_ASSRT(i<size());
+      return BASE::size_of(i);
+    }
+
+    int nrows2(const int i) const{
+      PTENS_ASSRT(i<size());
+      return pow(BASE::size_of(i),2);
+    }
+
+
+    int row_offset0(const int i) const{
+      PTENS_ASSRT(i<size());
+      return i;
+    }
+
+    int row_offset1(const int i) const{
+      PTENS_ASSRT(i<size());
+      return BASE::offset(i);
+    }
+
+    int row_offset2(const int i) const{
+      PTENS_ASSRT(i<size());
+      if(offsets2.size()==0){
+	offsets2.resize(size());
+	int t=0;
+	for(int i=0; i<size(); i++){
+	  offsets2[i]=t;
+	  t+=pow(BASE::size_of(i),2);
+	}
+      }
+      return offsets2[i];
     }
 
 

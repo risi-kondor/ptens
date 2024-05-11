@@ -122,18 +122,6 @@ namespace ptens{
       push_back(vector<int>(v));
     }
 
-    int tsize0() const{
-      return obj->tsize0();
-    }
-
-    int tsize1() const{
-      return obj->tsize1();
-    }
-
-    int tsize2() const{
-      return obj->tsize2();
-    }
-
     vector<vector<int> > as_vecs() const{
       return obj->as_vecs();
     }
@@ -161,6 +149,26 @@ namespace ptens{
     int gather_to_nodes_map_size(const int dev) const{
       return obj->gather_to_nodes_map()->n;
     }
+
+
+  public: // ---- Layout of corresponding matrix --------------------------------------------------------------
+
+
+    int tsize0() const {return obj->tsize0();}
+    int tsize1() const {return obj->tsize1();}
+    int tsize2() const{return obj->tsize2();}
+
+    int nrows0() const {return obj->tsize0();}
+    int nrows1() const {return obj->tsize1();}
+    int nrows2() const {return obj->tsize2();}
+
+    int nrows0(const int i) const {return obj->nrows0(i);}
+    int nrows1(const int i) const {return obj->nrows1(i);}
+    int nrows2(const int i) const {return obj->nrows2(i);}
+
+    int row_offset0(const int i) const {return obj->row_offset0(i);}
+    int row_offset1(const int i) const {return obj->row_offset1(i);}
+    int row_offset2(const int i) const {return obj->row_offset2(i);}
 
 
   public: // ---- Concatenation ------------------------------------------------------------------------------
