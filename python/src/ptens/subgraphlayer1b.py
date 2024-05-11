@@ -143,12 +143,12 @@ class subgraphlayer1b(torch.Tensor):
         return Subgraphlayer1b_LinmapsFn.apply(x)
 
     @classmethod
-    def gather(self,x,S):
-        return Ptensorsb_Gather1Fn.apply(x,S)
+    def gather(self,x,S,min_overlaps=1):
+        return Ptensorsb_Gather1Fn.apply(x,S,min_overlaps)
 
     @classmethod
-    def gather_from_ptensors(self,x,G,S):
-        return Subgraphlayer1b_GatherFromPtensorsbFn.apply(x,G,S)
+    def gather_from_ptensors(self,x,G,S,min_overlaps=1):
+        return Subgraphlayer1b_GatherFromPtensorsbFn.apply(x,G,S,min_overlaps)
 
     def autobahn(self,w,b):
         return Subgraphlayer1b_autobahnFn.apply(self,w,b)
@@ -245,9 +245,9 @@ class Subgraphlayer1b_LinmapsFn(torch.autograd.Function):
 class Subgraphlayer1b_GatherFromPtensorsbFn(torch.autograd.Function):
 
     @staticmethod
-    def forward(ctx,x,G,S):
+    def forward(ctx,x,G,S,min_overlaps):
         r=subgraphlayer1b.dummy()
-        r.obj=_subgraphlayer1b(x.obj,G.obj,S.obj)
+        r.obj=_subgraphlayer1b(x.obj,G.obj,S.obj,min_overlaps)
         ctx.x=x.obj
         ctx.r=r.obj
         return r
@@ -255,9 +255,9 @@ class Subgraphlayer1b_GatherFromPtensorsbFn(torch.autograd.Function):
     @staticmethod
     def backward(ctx,g):
         #print(ctx.r.get_grad())
-        ctx.x.add_gather_back(ctx.r)
+        ctx.x.add_gather_back_alt(ctx.r)
         #print(ctx.x.get_grad())
-        return ptensorsb.dummy(), None, None
+        return ptensorsb.dummy(), None, None, None
 
 
 class Subgraphlayer1b_autobahnFn(torch.autograd.Function):

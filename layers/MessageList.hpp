@@ -42,8 +42,14 @@ namespace ptens{
   public: // ---- Named constructors ------------------------------------------------------------------------
 
 
-    static MessageList overlaps(const cnine::array_pool<int>& in_atoms, const cnine::array_pool<int>& out_atoms){
+    static MessageList overlaps(const cnine::array_pool<int>& in_atoms, 
+      const cnine::array_pool<int>& out_atoms){
       return MessageList(new MessageListObj(in_atoms,out_atoms));
+    }
+
+    static MessageList overlaps(const cnine::array_pool<int>& in_atoms, 
+      const cnine::array_pool<int>& out_atoms, const int min_overlaps){
+      return MessageList(new MessageListObj(in_atoms,out_atoms,min_overlaps));
     }
 
     pair<const cnine::hlists<int>&, const cnine::hlists<int>&> lists() const{

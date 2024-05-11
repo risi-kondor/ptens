@@ -145,12 +145,12 @@ class batched_subgraphlayer1b(torch.Tensor):
         return BatchedSubgraphlayer1b_LinmapsFn.apply(x)
 
     @classmethod
-    def gather(self,x,S):
-        return BatchedSubgraphlayer1b_GatherFn.apply(x,S)
+    def gather(self,x,S,min_overlaps=1):
+        return BatchedSubgraphlayer1b_GatherFn.apply(x,S,min_overlaps)
 
     @classmethod
-    def gather_from_ptensors(self,x,G,S):
-        return BatchedSubgraphlayer1b_GatherFromPtensorsbFn.apply(x,G,S)
+    def gather_from_ptensors(self,x,G,S,min_overlaps=1):
+        return BatchedSubgraphlayer1b_GatherFromPtensorsbFn.apply(x,G,S,min_overlaps)
 
     def autobahn(self,w,b):
         return BatchedSubgraphlayer1b_autobahnFn.apply(self,w,b)
@@ -257,33 +257,33 @@ class BatchedSubgraphlayer1b_LinmapsFn(torch.autograd.Function):
 class BatchedSubgraphlayer1b_GatherFromPtensorsbFn(torch.autograd.Function):
 
     @staticmethod
-    def forward(ctx,x,G,S):
+    def forward(ctx,x,G,S,min_overlaps):
         r=batched_subgraphlayer1b.dummy()
-        r.obj=_batched_subgraphlayer1b(x.obj,G.obj,S.obj)
+        r.obj=_batched_subgraphlayer1b(x.obj,G.obj,S.obj,min_overlaps)
         ctx.x=x.obj
         ctx.r=r.obj
         return r
 
     @staticmethod
     def backward(ctx,g):
-        ctx.x.add_gather_back(ctx.r)
-        return batched_subgraphlayer1b.dummy(), None, None
+        ctx.x.add_gather_back_alt(ctx.r)
+        return batched_subgraphlayer1b.dummy(), None, None, None
 
 
 class BatchedSubgraphlayer1b_GatherFn(torch.autograd.Function):
 
     @staticmethod
-    def forward(ctx,x,S):
+    def forward(ctx,x,S,min_overlaps):
         r=x.dummy()
-        r.obj=_batched_subgraphlayer1b(x.obj,S)
+        r.obj=_batched_subgraphlayer1b(x.obj,S.obj,min_overlaps)
         ctx.x=x.obj
         ctx.r=r.obj
         return r
 
     @staticmethod
     def backward(ctx,g):
-        ctx.x.add_gather_back(ctx.r)
-        return batched_subgraphlayer1b.dummy(), None 
+        ctx.x.add_gather_back_alt(ctx.r)
+        return batched_subgraphlayer1b.dummy(), None, None  
 
 
 # this could be shared with subgraphlayer1b

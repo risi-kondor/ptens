@@ -24,6 +24,9 @@ namespace ptens{
 
 
   template<typename TYPE> 
+  class BatchedSubgraphLayer0b;
+
+  template<typename TYPE> 
   class BatchedSubgraphLayer1b: public BatchedPtensors1b<TYPE>{
   public:
 
@@ -149,24 +152,24 @@ namespace ptens{
 
 
     template<typename SOURCE>
-    BatchedSubgraphLayer1b(const SOURCE& x, const Subgraph& _S):
+    BatchedSubgraphLayer1b(const SOURCE& x, const Subgraph& _S, const int min_overlap=1):
       BatchedSubgraphLayer1b(x.G,_S,x.G.subgraphs(_S),x.get_nc()*vector<int>({1,2,5})[x.getk()],0,x.dev){
-      add_gather(x);
+      add_gather(x,min_overlap);
     }
 
     template<typename SOURCE>
-    BatchedSubgraphLayer1b(const SOURCE& x, const BatchedGgraph& _G, const Subgraph& _S):
+    BatchedSubgraphLayer1b(const SOURCE& x, const BatchedGgraph& _G, const Subgraph& _S, const int min_overlap=1):
       BatchedSubgraphLayer1b(_G,_S,_G.subgraphs(_S),x.get_nc()*vector<int>({1,2,5})[x.getk()],0,x.dev){
       cnine::fnlog timer("BatchedSubgraphLayer1b::init::gather");
-      add_gather(x);
+      add_gather(x,min_overlap);
     }
 
 
     template<typename SOURCE>
-    BatchedSubgraphLayer1b(TYPE* _arr, const SOURCE& x, const BatchedGgraph& _G, const Subgraph& _S):
+    BatchedSubgraphLayer1b(TYPE* _arr, const SOURCE& x, const BatchedGgraph& _G, const Subgraph& _S, const int min_overlap=1):
       BatchedSubgraphLayer1b(_arr,_G,_S,_G.subgraphs(_S),x.get_nc()*vector<int>({1,2,5})[x.getk()],x.dev){
       cnine::fnlog timer("BatchedSubgraphLayer1b::init::gather(ATen)");
-      add_gather(x);
+      add_gather(x,min_overlap);
     }
 
 
@@ -223,8 +226,6 @@ namespace ptens{
     void broadcast0(const Ptensorsb<TYPE>& x, const int offs=0){
       TimedFn T("SubgraphLayer1b","broadcast0",*this);
       PTENS_ASSRT(x.ndims()==2);
-      cout<<view3(S.getn(),offs,x.dim(1)).repr()<<endl;
-      cout<<cnine::repeat1(x.view2(),dim(1)).repr()<<endl;
       view3(S.getn(),offs,x.dim(1))+=cnine::repeat1(x.view2(),S.getn());
     }
 
@@ -332,7 +333,7 @@ namespace ptens{
     }
 
     string repr() const{
-      return "<BSGlayer0b[N="+to_string(BASE::size())+",nrows="+to_string(TENSOR::dim(0))+",nc="+to_string(get_nc())+"]>";
+      return "<BSGlayer1b[N="+to_string(BASE::size())+",nrows="+to_string(TENSOR::dim(0))+",nc="+to_string(get_nc())+"]>";
     }
 
 

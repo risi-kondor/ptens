@@ -48,13 +48,13 @@ pybind11::class_<SGlayer1b,Ptensors1b<float> >(m,"subgraphlayer1b")
   .def_static("linmaps",[](const SGlayer1b& x){return SGlayer1b::linmaps(x);}) 
   .def_static("linmaps",[](const SGlayer2b& x){return SGlayer1b::linmaps(x);}) 
 
-  .def(pybind11::init<const SGlayer0b&, const Subgraph&>())
-  .def(pybind11::init<const SGlayer1b&, const Subgraph&>())
-  .def(pybind11::init<const SGlayer2b&, const Subgraph&>())
+  .def(pybind11::init<const SGlayer0b&, const Subgraph&, const int>())
+  .def(pybind11::init<const SGlayer1b&, const Subgraph&, const int>())
+  .def(pybind11::init<const SGlayer2b&, const Subgraph&, const int>())
 
-  .def(pybind11::init<const Ptensors0b<float>&, const Ggraph&, const Subgraph&>())
-  .def(pybind11::init<const Ptensors1b<float>&, const Ggraph&, const Subgraph&>())
-  .def(pybind11::init<const Ptensors2b<float>&, const Ggraph&, const Subgraph&>())
+  .def(pybind11::init<const Ptensors0b<float>&, const Ggraph&, const Subgraph&, const int>())
+  .def(pybind11::init<const Ptensors1b<float>&, const Ggraph&, const Subgraph&, const int>())
+  .def(pybind11::init<const Ptensors2b<float>&, const Ggraph&, const Subgraph&, const int>())
 
   .def("autobahn",[](const SGlayer1b& x, at::Tensor& W, at::Tensor& B){
       return x.autobahn(ATview<float>(W),ATview<float>(B));})

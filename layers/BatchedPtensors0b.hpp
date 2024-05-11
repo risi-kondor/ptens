@@ -281,6 +281,13 @@ namespace ptens{
       P(*this,x);
     }
 
+    template<typename OUTPUT>
+    void add_gather_back_alt(const OUTPUT& x){
+      int N=size();
+      PTENS_ASSRT(N==x.size());
+      x.backward_program(get_grad(),x.get_grad());
+    }
+
     
   public: // ---- I/O ----------------------------------------------------------------------------------------
 

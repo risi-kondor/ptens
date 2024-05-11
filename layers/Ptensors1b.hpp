@@ -273,21 +273,13 @@ namespace ptens{
   public: // ---- Operations ---------------------------------------------------------------------------------
 
 
-  public: // ---- Message passing ----------------------------------------------------------------------------
+  public: // ---- Linmaps ----------------------------------------------------------------------------
 
 
     template<typename SOURCE>
     static Ptensors1b<float> linmaps(const SOURCE& x){
       Ptensors1b<float> R(x.get_atoms(),x.get_nc()*vector<int>({1,2,5})[x.getk()],x.get_dev());
       R.add_linmaps(x);
-      return R;
-    }
-
-    template<typename SOURCE>
-    static Ptensors1b<TYPE> gather(const SOURCE& x, const AtomsPack& a){
-      int nc=x.get_nc()*vector<int>({1,2,5})[x.getk()];
-      Ptensors1b<TYPE> R(a,nc,x.get_dev());
-      R.add_gather(x);
       return R;
     }
 
@@ -322,15 +314,31 @@ namespace ptens{
       broadcast0(r.reduce0_shrink(0,nc));
       add(r.reduce1_shrink(2*nc,nc));
     }
+
+  public: // ---- Message passing ----------------------------------------------------------------------------
+
     
     template<typename SOURCE>
-    void add_gather(const SOURCE& x){
-      (atoms.overlaps_mmap(x.atoms))(*this,x);
+    static Ptensors1b<TYPE> gather(const SOURCE& x, const AtomsPack& a, const int min_overlaps=1){
+      int nc=x.get_nc()*vector<int>({1,2,5})[x.getk()];
+      Ptensors1b<TYPE> R(a,nc,x.get_dev());
+      R.add_gather(x,min_overlaps);
+      return R;
+    }
+
+    template<typename SOURCE>
+    void add_gather(const SOURCE& x, const int min_overlaps=1){
+      (atoms.overlaps_mmap(x.atoms,min_overlaps))(*this,x);
     }
 
     template<typename OUTPUT>
     void add_gather_back(const OUTPUT& x){
       x.atoms.overlaps_mmap(atoms).inv()(*this,x);
+    }
+
+    template<typename OUTPUT>
+    void add_gather_back_alt(const OUTPUT& x){ // TODO
+      x.atoms.overlaps_mmap(atoms).inv()(this->get_grad(),x.get_grad());
     }
 
     //template<typename OUTPUT>

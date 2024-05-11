@@ -110,18 +110,18 @@ pybind11::class_<Ptensors1b<float> >(m,"ptensors1b")
   .def_static("linmaps",[](const Ptensors2b<float>& x){
       return Ptensors1b<float>::linmaps(x);}) 
 
-  .def_static("gather",[](const Ptensors0b<float>& x, const AtomsPack& a){
+  .def_static("gather",[](const Ptensors0b<float>& x, const AtomsPack& a, const int min_overlaps){
       return Ptensors1b<float>::gather(x,a);}) 
-  .def_static("gather",[](const Ptensors1b<float>& x, const AtomsPack& a){
-      return Ptensors1b<float>::gather(x,a);}) 
-  .def_static("gather",[](const Ptensors2b<float>& x, const AtomsPack& a){
+  .def_static("gather",[](const Ptensors1b<float>& x, const AtomsPack& a, const int min_overlaps){
+      return Ptensors1b<float>::gather(x,a,min_overlaps);}) 
+  .def_static("gather",[](const Ptensors2b<float>& x, const AtomsPack& a, const int min_overlaps){
       return Ptensors1b<float>::gather(x,a);}) 
 
-  .def_static("gather",[](const Ptensors0b<float>& x, const vector<vector<int> >& a){
+  .def_static("gather",[](const Ptensors0b<float>& x, const vector<vector<int> >& a, const int min_overlaps){
       return Ptensors1b<float>::gather(x,a);}) 
-  .def_static("gather",[](const Ptensors1b<float>& x, const vector<vector<int> >& a){
-      return Ptensors1b<float>::gather(x,a);}) 
-  .def_static("gather",[](const Ptensors2b<float>& x, const vector<vector<int> >& a){
+  .def_static("gather",[](const Ptensors1b<float>& x, const vector<vector<int> >& a, const int min_overlaps){
+      return Ptensors1b<float>::gather(x,a,min_overlaps);}) 
+  .def_static("gather",[](const Ptensors2b<float>& x, const vector<vector<int> >& a, const int min_overlaps){
       return Ptensors1b<float>::gather(x,a);}) 
 
   .def("add_linmaps_back",[](Ptensors1b<float>& x, Ptensors0b<float>& g){
@@ -135,6 +135,8 @@ pybind11::class_<Ptensors1b<float> >(m,"ptensors1b")
       x.get_grad().add_gather_back(g.get_grad());})
   .def("add_gather_back",[](Ptensors1b<float>& x, Ptensors1b<float>& g){
       x.get_grad().add_gather_back(g.get_grad());})
+  .def("add_gather_back_alt",[](Ptensors1b<float>& x, Ptensors1b<float>& g){
+      x.add_gather_back(g);})
   .def("add_gather_back",[](Ptensors1b<float>& x, Ptensors2b<float>& g){
       x.get_grad().add_gather_back(g.get_grad());})
 

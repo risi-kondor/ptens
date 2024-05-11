@@ -140,6 +140,8 @@ pybind11::class_<Ptensors0b<float> >(m,"ptensors0b")
       x.get_grad().add_gather_back(g.get_grad());})
   .def("add_gather_back",[](Ptensors0b<float>& x, Ptensors1b<float>& g){
       x.get_grad().add_gather_back(g.get_grad());})
+  .def("add_gather_back_alt",[](Ptensors0b<float>& x, Ptensors1b<float>& g){
+      x.add_gather_back(g);})
   .def("add_gather_back",[](Ptensors0b<float>& x, Ptensors2b<float>& g){
       x.get_grad().add_gather_back(g.get_grad());})
 

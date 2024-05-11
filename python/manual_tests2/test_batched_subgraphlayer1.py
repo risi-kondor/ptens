@@ -1,5 +1,6 @@
 import torch
 import ptens as p
+import ptens_base
 
 p.ggraph.random(5,0.5).cache(0)
 p.ggraph.random(5,0.5).cache(1)
@@ -32,3 +33,8 @@ U=Z.torch()
 
 U.backward(U)
 print(A.grad)
+
+print("2------2")
+
+W=p.batched_subgraphlayer1b.gather(Y,S)
+print(W)

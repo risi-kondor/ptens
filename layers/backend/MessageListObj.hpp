@@ -40,10 +40,6 @@ namespace ptens{
     cnine::hlists<int> in;
     cnine::hlists<int> out;
 
-    //mutable shared_ptr<AtomsPack0obj<int> > source0=nullptr;
-    //mutable shared_ptr<AtomsPack1obj<int> > source1=nullptr;
-    //mutable shared_ptr<AtomsPack2obj<int> > source2=nullptr;
-
     ~MessageListObj(){}
 
       
@@ -65,7 +61,8 @@ namespace ptens{
 
 
     // overlaps 
-    MessageListObj(const cnine::array_pool<int>& in_atoms, const cnine::array_pool<int>& out_atoms):
+    MessageListObj(const cnine::array_pool<int>& in_atoms, const cnine::array_pool<int>& out_atoms, 
+      const int min_overlap=1):
       observable(this){
       cnine::fnlog timer("MessageListObj::[overlaps]");
 
@@ -75,7 +72,7 @@ namespace ptens{
 	  for(int j=0; j<out_atoms.size(); j++){
 	    auto w=out_atoms(j);
 	    if([&](){for(auto p:v) if(std::find(w.begin(),w.end(),p)!=w.end()) return true; return false;}())
-	      append_intersection(i,j,in_atoms.view_of(i),out_atoms.view_of(j));
+	      append_intersection(i,j,in_atoms.view_of(i),out_atoms.view_of(j),min_overlap);
 	  }
 	}
 	return;
@@ -92,14 +89,15 @@ namespace ptens{
 	out_atoms.for_each_of(i,[&](const int j){
 	    for(auto p:in_lists[j])
 	      if(!done.is_filled(p,i)){
-		append_intersection(p,i,in_atoms.view_of(p),out_atoms.view_of(i));
+		append_intersection(p,i,in_atoms.view_of(p),out_atoms.view_of(i), min_overlap);
 		done.set(p,i,true);
 	      }
 	  });
     }
 
 
-    void append_intersection(const int xi, const int yi, const cnine::Itensor1_view& x, const cnine::Itensor1_view& y){
+    void append_intersection(const int xi, const int yi, const cnine::Itensor1_view& x, const cnine::Itensor1_view& y, 
+			     const int min_overlap=1){
       vector<int> v_in;
       vector<int> v_out;
       for(int i=0; i<x.n0; i++){
@@ -111,8 +109,11 @@ namespace ptens{
 	    break;
 	  }
       }
-      in.push_back(xi,v_in);
-      out.push_back(yi,v_out);
+
+      if(v_in.size()>=min_overlap){
+	in.push_back(xi,v_in);
+	out.push_back(yi,v_out);
+      }
     }
 
 

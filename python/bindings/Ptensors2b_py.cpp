@@ -121,6 +121,8 @@ pybind11::class_<Ptensors2b<float> >(m,"ptensors2b")
       return Ptensors2b<float>::gather(x,a);}) 
   .def_static("gather",[](const Ptensors1b<float>& x, const vector<vector<int> >& a){
       return Ptensors2b<float>::gather(x,a);}) 
+  .def("add_gather_back_alt",[](Ptensors2b<float>& x, Ptensors1b<float>& g){
+      x.add_gather_back(g);})
   .def_static("gather",[](const Ptensors2b<float>& x, const vector<vector<int> >& a){
       return Ptensors2b<float>::gather(x,a);}) 
 
@@ -135,6 +137,8 @@ pybind11::class_<Ptensors2b<float> >(m,"ptensors2b")
       x.get_grad().add_gather_back(g.get_grad());})
   .def("add_gather_back",[](Ptensors2b<float>& x, Ptensors1b<float>& g){
       x.get_grad().add_gather_back(g.get_grad());})
+  .def("add_gather_back_alt",[](Ptensors2b<float>& x, Ptensors1b<float>& g){
+      x.add_gather_back(g);})
   .def("add_gather_back",[](Ptensors2b<float>& x, Ptensors2b<float>& g){
       x.get_grad().add_gather_back(g.get_grad());})
 

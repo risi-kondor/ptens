@@ -163,6 +163,9 @@ pybind11::class_<BatchedPtensors0b<float> >(m,"batched_ptensors0b")
       x.get_grad().add_gather_back(g.get_grad());})
   .def("add_gather_back",[](BPtensors0& x, BatchedPtensors1b<float>& g){
       x.get_grad().add_gather_back(g.get_grad());})
+  .def("add_gather_back_alt",[](BPtensors0& x, BatchedPtensors1b<float>& g){
+      cnine::fnlog timer("BatchedPtensors0b::gather1_back()");
+      x.add_gather_back_alt(g);})
   .def("add_gather_back",[](BPtensors0& x, BatchedPtensors2b<float>& g){
       x.get_grad().add_gather_back(g.get_grad());})
 

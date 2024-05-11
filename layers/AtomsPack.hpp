@@ -187,8 +187,8 @@ namespace ptens{
     }
 
     // create map for messages from y
-    MessageList overlaps_mlist(const AtomsPack& y){
-      return obj->overlaps_mlist(*y.obj);
+    MessageList overlaps_mlist(const AtomsPack& y, const int min_overlaps=1){
+      return obj->overlaps_mlist(*y.obj,min_overlaps);
     }
 
 

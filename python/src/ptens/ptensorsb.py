@@ -399,17 +399,17 @@ class Ptensorsb_Gather0Fn(torch.autograd.Function):
 class Ptensorsb_Gather1Fn(torch.autograd.Function):
 
     @staticmethod
-    def forward(ctx,x,atoms):
+    def forward(ctx,x,atoms,min_overlaps):
         r=x.dummy()
-        r.obj=_ptensors1b.gather(x.obj,atoms)
+        r.obj=_ptensors1b.gather(x.obj,atoms,min_overlaps)
         ctx.x=x.obj
         ctx.r=r.obj
         return r
 
     @staticmethod
     def backward(ctx,g):
-        ctx.x.add_gather_back(ctx.r)
-        return ptensorsb.dummy(), None
+        ctx.x.add_gather_back_alt(ctx.r)
+        return ptensorsb.dummy(), None, None
 
 
 class Ptensorsb_Gather2Fn(torch.autograd.Function):

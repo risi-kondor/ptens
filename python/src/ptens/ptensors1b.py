@@ -148,8 +148,8 @@ class ptensors1b(torch.Tensor):
         return Ptensorsb_Linmaps1Fn.apply(x)
 
     @classmethod
-    def gather(self,x,S):
-        return Ptensorsb_Gather1Fn.apply(x,S)
+    def gather(self,x,S,min_overlaps=1):
+        return Ptensorsb_Gather1Fn.apply(x,S,min_overlaps)
 
 
 #     def linmaps0(self,normalized=False):

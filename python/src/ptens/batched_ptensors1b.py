@@ -152,8 +152,8 @@ class batched_ptensors1b(torch.Tensor):
         return BatchedPtensors1b_LinmapsFn.apply(x)
 
     @classmethod
-    def gather(self,x,S):
-        return BatchedPtensors1b_GatherFn.apply(x,S)
+    def gather(self,x,S,min_overlaps=1):
+        return BatchedPtensors1b_GatherFn.apply(x,S,min_overlaps)
 
 
     # ---- I/O ----------------------------------------------------------------------------------------------
@@ -251,16 +251,16 @@ class BatchedPtensors1b_LinmapsFn(torch.autograd.Function):
 class BatchedPtensors1b_GatherFn(torch.autograd.Function):
 
     @staticmethod
-    def forward(ctx,x,atoms):
+    def forward(ctx,x,atoms,min_overlaps):
         r=x.dummy()
-        r.obj=_batched_ptensors1b.gather(x.obj,atoms)
+        r.obj=_batched_ptensors1b.gather(x.obj,atoms,min_overlaps)
         ctx.x=x.obj
         ctx.r=r.obj
         return r
 
     @staticmethod
     def backward(ctx,g):
-        ctx.x.add_gather_back(ctx.r)
-        return ptensorsb.dummy(), None 
+        ctx.x.add_gather_back_alt(ctx.r)
+        return ptensorsb.dummy(), None, None 
 
 

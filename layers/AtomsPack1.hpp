@@ -54,8 +54,8 @@ namespace ptens{
     
     
     template<typename SOURCE>
-    MessageList overlaps_mlist(const SOURCE& x) const{
-      return obj->atoms->overlaps_mlist(*x.obj->atoms);
+    MessageList overlaps_mlist(const SOURCE& x, const int min_overlaps=1) const{
+      return obj->atoms->overlaps_mlist(*x.obj->atoms,min_overlaps);
     }
 
     template<typename SOURCE>
@@ -64,8 +64,8 @@ namespace ptens{
     }
 
     template<typename SOURCE>
-    MessageMap overlaps_mmap(const SOURCE& x) const{
-      return message_map(overlaps_mlist(x),x);
+    MessageMap overlaps_mmap(const SOURCE& x, const int min_overlaps=1) const{
+      return message_map(overlaps_mlist(x,min_overlaps),x);
     }
 
 
