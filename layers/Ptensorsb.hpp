@@ -41,6 +41,27 @@ namespace ptens{
     virtual const Ptensorsb& get_grad() const {CNINE_UNIMPL(); return *this;} // dummy
 
 
+  public: // ---- Constructors -------------------------------------------------------------------------------------
+
+
+    Ptensorsb(const BASE& x):
+      BASE(x){}
+
+    Ptensorsb(const cnine::Gdims& _dims, const int fcode, const int _dev):
+      BASE(BASE::vram_managed(ptens_session.managed_gmem,_dims,fcode,_dev)){
+    }
+
+    Ptensorsb copy(const Ptensorsb& x){
+      cnine::using_vram_manager vv(ptens_session.managed_gmem);
+      return BASE::copy(x); 
+    }
+
+    Ptensorsb zeros_like() const{
+      cnine::using_vram_manager vv(ptens_session.managed_gmem);
+      return BASE::zeros_like();
+    }
+
+
   public: // ---- Operations ---------------------------------------------------------------------------------
 
 
@@ -83,6 +104,7 @@ namespace ptens{
   template<typename OBJ>
   OBJ cat_channels(const OBJ& x, const OBJ& y){
     PTENS_ASSRT(x.dim(0)==y.dim(0));
+    cnine::using_vram_manager vv(ptens_session.managed_gmem);
     OBJ R(typename OBJ::TENSOR(cnine::Gdims(x.dim(0),x.dim(1)+y.dim(1)),0,x.get_dev()),x.atoms);
     R.block(0,0,x.dim(0),x.dim(1))+=x;
     R.block(0,x.dim(1),x.dim(0),y.dim(1))+=y;
@@ -91,16 +113,19 @@ namespace ptens{
 
   template<typename OBJ, typename TYPE>
   OBJ scale_channels(const OBJ& x, const cnine::Ltensor<TYPE>& s){
+    cnine::using_vram_manager vv(ptens_session.managed_gmem);
     return OBJ(x.scale_columns(s),x.atoms);
   }
 
   template<typename OBJ, typename TYPE>
   OBJ mprod(const OBJ& x, const cnine::Ltensor<TYPE>& y){
+    cnine::using_vram_manager vv(ptens_session.managed_gmem);
     return OBJ(x*y,x.atoms);
   }
 
   template<typename OBJ, typename TYPE>
   OBJ linear(const OBJ& x, const cnine::Ltensor<TYPE>& w, const cnine::Ltensor<TYPE>& b){
+    cnine::using_vram_manager vv(ptens_session.managed_gmem);
     OBJ R(x*w,x.atoms);
     R.view2().add_broadcast0(b.view1());
     return R;
@@ -108,6 +133,7 @@ namespace ptens{
 
   template<typename OBJ, typename TYPE>
   OBJ ReLU(const OBJ& x, TYPE alpha){
+    cnine::using_vram_manager vv(ptens_session.managed_gmem);
     return OBJ(x.ReLU(alpha),x.atoms);
   }
 

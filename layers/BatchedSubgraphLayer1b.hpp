@@ -208,6 +208,7 @@ namespace ptens{
 
     Ptensorsb<TYPE> reduce0() const{
       TimedFn T("BatchedSubgraphLayer1b","reduce0",*this);
+      cnine::using_vram_manager vv(ptens_session.managed_gmem);
       Ptensorsb<TYPE> R({dim(0)/S.getn(),get_nc()},0,get_dev());
       view3(S.getn()).sum1_into(R.view2());
       return R;
@@ -215,6 +216,7 @@ namespace ptens{
 
     Ptensorsb<TYPE> reduce0(const int offs, const int nc) const{
       TimedFn T("BatchedSubgraphLayer1b","reduce0",*this);
+      cnine::using_vram_manager vv(ptens_session.managed_gmem);
       Ptensorsb<TYPE> R({dim(0)/S.getn(),nc},0,get_dev());
       view3(S.getn(),offs,nc).sum1_into(R.view2());
       return R;
@@ -223,8 +225,6 @@ namespace ptens{
     void broadcast0(const Ptensorsb<TYPE>& x, const int offs=0){
       TimedFn T("SubgraphLayer1b","broadcast0",*this);
       PTENS_ASSRT(x.ndims()==2);
-      cout<<view3(S.getn(),offs,x.dim(1)).repr()<<endl;
-      cout<<cnine::repeat1(x.view2(),dim(1)).repr()<<endl;
       view3(S.getn(),offs,x.dim(1))+=cnine::repeat1(x.view2(),S.getn());
     }
 
