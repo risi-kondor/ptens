@@ -24,7 +24,8 @@ namespace ptens{
 
 
   template<typename TYPE> 
-  class BatchedSubgraphLayer1b: public BatchedPtensors1b<TYPE>{
+  class BatchedSubgraphLayer1b: public BatchedPtensors1b<TYPE>, 
+				public cnine::diff_class<BatchedSubgraphLayer1b<TYPE> >{
   public:
 
     typedef BatchedPtensors1b<TYPE> BASE;
