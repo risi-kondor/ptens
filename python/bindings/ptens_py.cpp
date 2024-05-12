@@ -73,6 +73,10 @@ PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
 #include "Hgraph_py.cpp"
 #include "Ggraph_py.cpp"
 #include "Subgraph_py.cpp"
+
+#include "MessageList_py.cpp"
+#include "AtomsPack0_py.cpp"
+#include "MessageMap_py.cpp"
   
 #include "Ptensor0_py.cpp"
 #include "Ptensor1_py.cpp"
