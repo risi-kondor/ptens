@@ -80,7 +80,7 @@ namespace ptens{
       return R;
     }
 
-    GgraphObj(int n, const cnine::Tensor<int>& M):
+    GgraphObj(int n, const cnine::Tensor<int>& M): // 
       GgraphObj(n){
       PTENS_ASSRT(M.ndims()==2);
       PTENS_ASSRT(M.dim(0)==2);

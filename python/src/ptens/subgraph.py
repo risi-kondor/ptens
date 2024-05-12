@@ -21,12 +21,15 @@ from ptens_base import subgraph as _subgraph
 class subgraph:
 
     @classmethod
-    def from_edge_index(self,M,n=-1,labels=None):
+    def from_edge_index(self,M,n=-1,labels=None,degrees=None):
         G=subgraph()
-        if labels is None:
-            G.obj=_subgraph.edge_index(M,n)
+        if degrees is None: 
+            if labels is None:
+                G.obj=_subgraph.edge_index(M,n)
+            else:
+                G.obj=_subgraph.edge_index(M,labels,n)
         else:
-            G.obj=_subgraph.edge_index(M,labels,n)
+            G.obj=_subgraph.edge_index_degrees(M,degrees,n)
         return G
 
     @classmethod
@@ -67,6 +70,10 @@ class subgraph:
         G=subgraph()
         G.obj=_subgraph.star(n)
         return G;
+
+    @classmethod
+    def cached(self):
+        return _subgraph.cached()
 
 
     # ---- Access -----------------------------------------------------------------------------------------------

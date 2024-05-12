@@ -40,7 +40,6 @@ int main(int argc, char** argv){
 
   auto V=M.subgraphs(Z);
   cout<<V<<endl;
-  exit(0);
 
   //Ggraph M=Ggraph::random(5,0.5);
   cout<<M<<endl;
@@ -50,4 +49,16 @@ int main(int argc, char** argv){
 
   auto U=M.subgraphs(S);
   cout<<U<<endl;
+
+
+  Ltensor<int> B({{0,1,2},{1,2,0}});
+  Ltensor<int> D(3);
+  D.set(0,2);
+  D.set(1,3);
+  D.set(2,2);
+  Subgraph P=Subgraph::edge_index_degrees(B,D);
+  cout<<P<<endl;
+
+  cout<<"-- Cache: --"<<endl;
+  cout<<Subgraph::cached()<<endl;
 }

@@ -12,7 +12,11 @@ pybind11::class_<Subgraph>(m,"subgraph")
       return Subgraph::edge_index(cnine::RtensorA(x),n);})
 
   .def_static("edge_index",[](const at::Tensor& x, const at::Tensor& l, const int n){
-      return Hgraph::edge_index(cnine::RtensorA(x),cnine::RtensorA(l),n);})
+      return Subgraph::edge_index(cnine::RtensorA(x),cnine::RtensorA(l),n);})
+
+  .def_static("edge_index_degrees",[](const at::Tensor& x, const at::Tensor& l, const int n){
+      return Subgraph::edge_index_degrees(cnine::Tensor<float>(cnine::RtensorA(x)),
+	cnine::Tensor<float>(cnine::RtensorA(l)),n);})
 
 //.def_static("matrix",[](const at::Tensor& x){return Subgraph(cnine::RtensorA(x));})
 //.def_static("matrix",[](const at::Tensor& x, const at::Tensor& L){
@@ -27,6 +31,7 @@ pybind11::class_<Subgraph>(m,"subgraph")
   .def("dense",[](const Subgraph& G){return G.dense().torch();})
 
   .def("str",&Subgraph::str,py::arg("indent")="")
-  .def("__str__",&Subgraph::str,py::arg("indent")="");
+  .def("__str__",&Subgraph::str,py::arg("indent")="")
 
+  .def("cached",&Subgraph::cached);
 
