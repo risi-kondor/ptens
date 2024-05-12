@@ -44,6 +44,7 @@ namespace ptens{
     using BASE::get_nc;
     using DIFF::get_grad;
     using BASE::cols;
+    using BASE::add;
     using BASE::view3;
 
     using TENSOR::get_arr;
