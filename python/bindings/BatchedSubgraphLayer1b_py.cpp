@@ -21,6 +21,8 @@ pybind11::class_<BSGlayer1b,BatchedPtensors1b<float> >(m,"batched_subgraphlayer1
   .def_static("n_gather_maps",[](const int k){
       return vector<int>({1,2,5})[k];})
 
+  .def("get_grad",[](BSGlayer1b& x){return x.get_grad();})
+
 
 // ---- Operations -------------------------------------------------------------------------------------------
 
