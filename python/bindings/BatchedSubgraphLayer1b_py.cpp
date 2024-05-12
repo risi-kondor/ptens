@@ -21,6 +21,8 @@ pybind11::class_<BSGlayer1b,BatchedPtensors1b<float> >(m,"batched_subgraphlayer1
   .def_static("n_gather_maps",[](const int k){
       return vector<int>({1,2,5})[k];})
 
+  .def("get_grad",[](BSGlayer1b& x){return x.get_grad();})
+
 
 // ---- Operations -------------------------------------------------------------------------------------------
 
@@ -39,7 +41,7 @@ pybind11::class_<BSGlayer1b,BatchedPtensors1b<float> >(m,"batched_subgraphlayer1
       return ReLU_sg(x,alpha);})
 
 
-// ---- Message passing --------------------------------------------------------------------------------------
+// ---- Linmaps -----------------------------------------------------------------------------------------------
 
 
   .def_static("linmaps",[](const BSGlayer0b& x){
@@ -48,6 +50,16 @@ pybind11::class_<BSGlayer1b,BatchedPtensors1b<float> >(m,"batched_subgraphlayer1
       return BSGlayer1b::linmaps(x);}) 
 //.def_static("linmaps",[](const BSGlayer2b& x){
 //    return BSGlayer1b::linmaps(x);}) 
+
+  .def("add_linmaps_back",[](BSGlayer1b& x, BSGlayer0b& g){
+      x.get_grad().add_linmaps_back(g.get_grad());})
+  .def("add_linmaps_back",[](BSGlayer1b& x, BSGlayer1b& g){
+      x.get_grad().add_linmaps_back(g.get_grad());})
+  .def("add_linmaps_back",[](BSGlayer1b& x, BSGlayer2b& g){
+      x.get_grad().add_linmaps_back(g.get_grad());})
+
+
+// ---- Message passing --------------------------------------------------------------------------------------
 
 
   .def(pybind11::init([](const BSGlayer0b& x, const Subgraph& S, const int min_overlaps){

@@ -27,7 +27,8 @@ namespace ptens{
   class BatchedSubgraphLayer0b;
 
   template<typename TYPE> 
-  class BatchedSubgraphLayer1b: public BatchedPtensors1b<TYPE>{
+  class BatchedSubgraphLayer1b: public BatchedPtensors1b<TYPE>, 
+				public cnine::diff_class<BatchedSubgraphLayer1b<TYPE> >{
   public:
 
     typedef BatchedPtensors1b<TYPE> BASE;
@@ -211,6 +212,7 @@ namespace ptens{
 
     Ptensorsb<TYPE> reduce0() const{
       TimedFn T("BatchedSubgraphLayer1b","reduce0",*this);
+      cnine::using_vram_manager vv(ptens_session.managed_gmem);
       Ptensorsb<TYPE> R({dim(0)/S.getn(),get_nc()},0,get_dev());
       view3(S.getn()).sum1_into(R.view2());
       return R;
@@ -218,13 +220,14 @@ namespace ptens{
 
     Ptensorsb<TYPE> reduce0(const int offs, const int nc) const{
       TimedFn T("BatchedSubgraphLayer1b","reduce0",*this);
+      cnine::using_vram_manager vv(ptens_session.managed_gmem);
       Ptensorsb<TYPE> R({dim(0)/S.getn(),nc},0,get_dev());
       view3(S.getn(),offs,nc).sum1_into(R.view2());
       return R;
     }
 
     void broadcast0(const Ptensorsb<TYPE>& x, const int offs=0){
-      TimedFn T("SubgraphLayer1b","broadcast0",*this);
+      TimedFn T("BatchedSubgraphLayer1b","broadcast0",*this);
       PTENS_ASSRT(x.ndims()==2);
       view3(S.getn(),offs,x.dim(1))+=cnine::repeat1(x.view2(),S.getn());
     }

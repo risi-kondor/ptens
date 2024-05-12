@@ -21,6 +21,7 @@
 #include "Tensor.hpp"
 #include "SymmEigendecomposition.hpp"
 #include "sparse_graph.hpp"
+#include "Ltensor.hpp"
 
 
 namespace ptens{
@@ -72,6 +73,14 @@ namespace ptens{
 
     // eliminate this eventually
     SubgraphObj(const int n, const cnine::RtensorA& M):
+      BASE(n){
+      PTENS_ASSRT(M.ndims()==2);
+      PTENS_ASSRT(M.dim(0)==2);
+      for(int i=0; i<M.dims(1); i++)
+	set(M(0,i),M(1,i),1.0);
+    }
+
+    SubgraphObj(const int n, const cnine::Ltensor<int>& M):
       BASE(n){
       PTENS_ASSRT(M.ndims()==2);
       PTENS_ASSRT(M.dim(0)==2);

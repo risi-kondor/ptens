@@ -17,6 +17,7 @@
 
 #include "PtensSession.hpp"
 #include "SubgraphObj.hpp"
+#include "Ltensor.hpp"
 
 
 namespace ptens{
@@ -70,9 +71,28 @@ namespace ptens{
       return ptens_session.subgraphs.emplace(_n,x).first;
     }
 
+    static Subgraph edge_index(const cnine::Ltensor<int>& x, int _n=-1){
+      if(_n==-1) _n=x.max()+1;
+      return ptens_session.subgraphs.emplace(_n,x).first;
+    }
+
     static Subgraph edge_index(const cnine::RtensorA& x, const cnine::RtensorA& L, int _n=-1){
       if(_n==-1) _n=x.max()+1;
       return ptens_session.subgraphs.emplace(_n,x,L).first;
+    }
+
+    static Subgraph edge_index_degrees(const cnine::Ltensor<int>& x, const cnine::Ltensor<int>& D, int _n=-1){
+      if(_n==-1) _n=x.max()+1;
+      SubgraphObj H(_n,x);
+      H.set_degrees(D);
+      return ptens_session.subgraphs.insert(H).first;
+    }
+
+    static Subgraph edge_index_degrees(const cnine::Tensor<int>& x, const cnine::Tensor<int>& D, int _n=-1){
+      if(_n==-1) _n=x.max()+1;
+      SubgraphObj H(_n,x);
+      H.set_degrees(D);
+      return ptens_session.subgraphs.insert(H).first;
     }
 
     static Subgraph edge_index(const cnine::RtensorA& _edges, const cnine::RtensorA& _evecs, const cnine::RtensorA& _evals){
@@ -156,9 +176,17 @@ namespace ptens{
     }
 
     string str(const string indent="") const{
+      return obj->str(indent);
+      //ostringstream oss;
+      //oss<<indent<<"Subgraph on "<<obj->getn()<<" vertices:"<<endl;
+      //oss<<obj->dense().str(indent+"  ")<<endl;
+      //return oss.str();
+    }
+
+    static string cached(){
       ostringstream oss;
-      oss<<indent<<"Subgraph on "<<obj->getn()<<" vertices:"<<endl;
-      oss<<obj->dense().str(indent+"  ")<<endl;
+      for(auto p: ptens_session.subgraphs)
+	oss<<p<<endl;
       return oss.str();
     }
 
