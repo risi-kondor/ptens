@@ -223,7 +223,7 @@ namespace ptens{
     }
 
     void broadcast0(const Ptensorsb<TYPE>& x, const int offs=0){
-      TimedFn T("SubgraphLayer1b","broadcast0",*this);
+      TimedFn T("BatchedSubgraphLayer1b","broadcast0",*this);
       PTENS_ASSRT(x.ndims()==2);
       view3(S.getn(),offs,x.dim(1))+=cnine::repeat1(x.view2(),S.getn());
     }
