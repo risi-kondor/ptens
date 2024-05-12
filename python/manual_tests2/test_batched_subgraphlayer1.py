@@ -18,7 +18,7 @@ A.requires_grad_()
 X=p.batched_ptensors0b.from_matrix(A,[5,5,5,5])
 #print(X)
 
-Y=p.batched_subgraphlayer1b.gather_from_ptensors(X,G,S,1)
+Y=p.batched_subgraphlayer1b.gather_from_ptensors(X,G,S)
 print(type(Y))
 print(Y)
 at=Y.get_atoms()
