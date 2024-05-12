@@ -44,19 +44,19 @@ pybind11::class_<BSGlayer1b,BatchedPtensors1b<float> >(m,"batched_subgraphlayer1
 // ---- Linmaps -----------------------------------------------------------------------------------------------
 
 
-  .def_static("linmaps",[](const BSGlayer0b& x){
-      return BSGlayer1b::linmaps(x);}) 
+//  .def_static("linmaps",[](const BSGlayer0b& x){
+//      return BSGlayer1b::linmaps(x);}) 
   .def_static("linmaps",[](const BSGlayer1b& x){
       return BSGlayer1b::linmaps(x);}) 
 //.def_static("linmaps",[](const BSGlayer2b& x){
 //    return BSGlayer1b::linmaps(x);}) 
 
-  .def("add_linmaps_back",[](BSGlayer1b& x, BSGlayer0b& g){
-      x.get_grad().add_linmaps_back(g.get_grad());})
+//  .def("add_linmaps_back",[](BSGlayer1b& x, BSGlayer0b& g){
+//      x.get_grad().add_linmaps_back(g.get_grad());})
   .def("add_linmaps_back",[](BSGlayer1b& x, BSGlayer1b& g){
       x.get_grad().add_linmaps_back(g.get_grad());})
-  .def("add_linmaps_back",[](BSGlayer1b& x, BSGlayer2b& g){
-      x.get_grad().add_linmaps_back(g.get_grad());})
+//  .def("add_linmaps_back",[](BSGlayer1b& x, BSGlayer2b& g){
+//      x.get_grad().add_linmaps_back(g.get_grad());})
 
 
 // ---- Message passing --------------------------------------------------------------------------------------

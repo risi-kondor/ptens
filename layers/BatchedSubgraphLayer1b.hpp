@@ -30,7 +30,7 @@ namespace ptens{
 
     typedef BatchedPtensors1b<TYPE> BASE;
     typedef cnine::Ltensor<TYPE> TENSOR;
-
+    typedef cnine::diff_class<BatchedSubgraphLayer1b<TYPE> > DIFF;
     typedef BatchedAtomsPackN<AtomsPack1obj<int> > BatchedAtomsPack1;
 
     using BASE::BASE;
@@ -39,8 +39,9 @@ namespace ptens{
     using BASE::dim;
     using BASE::get_dev;
     using BASE::get_nc;
-    using BASE::get_grad;
+    using DIFF::get_grad;
     using BASE::cols;
+    using BASE::add;
     using BASE::view3;
 
     using TENSOR::get_arr;
