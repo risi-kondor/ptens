@@ -75,8 +75,8 @@ from ptens.ptensorc_base import *
 from ptens.ptensor0c import ptensor0c
 from ptens.ptensor1c import ptensor1c
 
-from ptens.ptensorsc_base import *
-from ptens.ptensors0c import ptensors0c
-from ptens.ptensors1c import ptensors1c
+from ptens.ptensorlayerc import *
+from ptens.ptensorlayer0c import ptensorlayer0c
+from ptens.ptensorlayer1c import ptensorlayer1c
 
 from ptens.subgraphlayer0c import subgraphlayer0c

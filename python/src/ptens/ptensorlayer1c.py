@@ -15,17 +15,17 @@
 import torch
 
 import ptens_base as pb 
-import ptens.ptensorsc_base as ptensorsc_base
-import ptens.ptensor0c as ptensor0c
+import ptens.ptensorlayerc as ptensorlayerc
+import ptens.ptensor1c as ptensor1c
 
 
-class ptensors0c(ptensorsc_base):
+class ptensorlayer1c(ptensorlayerc):
 
     @classmethod
     def zeros(self,atoms,nc,device='cpu'):
         assert isinstance(atoms,pb.atomspack)
         assert isinstance(nc,int)
-        R=ptensors0c(torch.zeros([len(atoms),nc],device=device))
+        R=ptensorlayer1c(torch.zeros([atoms.nrows1(),nc],device=device))
         R.atoms=atoms
         return R
 
@@ -33,7 +33,7 @@ class ptensors0c(ptensorsc_base):
     def randn(self,atoms,nc,device='cpu'):
         assert isinstance(atoms,pb.atomspack)
         assert isinstance(nc,int)
-        R=ptensors0c(torch.randn([len(atoms),nc],device=device))
+        R=ptensorlayer1c(torch.randn([atoms.nrows1(),nc],device=device))
         R.atoms=atoms
         return R
 
@@ -42,13 +42,13 @@ class ptensors0c(ptensorsc_base):
         assert isinstance(atoms,pb.atomspack)
         assert isinstance(M,torch.Tensor)
         assert M.dim()==2
-        assert M.size(0)==atoms.tsize0()
-        R=ptensors0c(M)
+        assert M.size(0)==atoms.nrows1()
+        R=ptensorlayer1c(M)
         R.atoms=atoms
         return R
 
     def clone(self):
-        r=ptensors0c(super().clone())
+        r=ptensorlayer1c(super().clone())
         r.atoms=self.atoms
         return r
 
@@ -57,7 +57,7 @@ class ptensors0c(ptensorsc_base):
 
 
     def getk(self):
-        return 0
+        return 1
     
     def __len__(self):
         return len(self.atoms)
@@ -67,7 +67,9 @@ class ptensors0c(ptensorsc_base):
     
     def __getitem__(self,i):
         assert i<len(self)
-        return ptensor0c.from_matrix(self.atoms[i],torch.Tensor(self)[i])
+        offs=self.atoms.row_offset1(i)
+        n=self.atoms.nrows1(i)
+        return ptensor1c.from_matrix(self.atoms[i],torch.Tensor(self)[offs:offs+n])
 
 
     # ---- Message passing -----------------------------------------------------------------------------------
@@ -75,7 +77,7 @@ class ptensors0c(ptensorsc_base):
 
     @classmethod
     def linmaps(self,x):
-        if isinstance(x,ptensors0c):
+        if isinstance(x,ptensorlayer1c):
            return x
 
     @classmethod
@@ -87,7 +89,7 @@ class ptensors0c(ptensorsc_base):
 
 
     def __repr__(self):
-        return "ptensors0c(len="+str(self.size(0))+",nc="+str(self.size(1))+")"
+        return "ptensorlayer1c(len="+str(len(self.atoms))+",nc="+str(self.size(1))+")"
 
     def __str__(self):
         r=""
@@ -97,24 +99,5 @@ class ptensors0c(ptensorsc_base):
 
 
 
-
-
-
-
-
-
-
-
-
-
-    # ---- Operations ----------------------------------------------------------------------------------------
-
-
-#     def __add__(self,y):
-#         assert self.size==y.size
-#         assert self.atoms==y.atoms
-#         r=self.clone()
-#         r+=y
-#         return r
 
 

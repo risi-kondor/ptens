@@ -15,10 +15,10 @@
 import torch
 import ptens_base as pb 
 
-class ptensorsc_base(torch.Tensor):
+class ptensorlayerc(torch.Tensor):
 
     def clone(self):
-        r=ptensorsc_base(super().clone())
+        r=ptensorlayerc(super().clone())
         r.atoms=self.atoms
         return r
 
