@@ -21,6 +21,15 @@ import ptens.ptensor1c as ptensor1c
 
 class ptensorlayer1c(ptensorlayerc):
 
+    def __init__(self,atoms,M):
+        assert isinstance(atoms,pb.atomspack)
+        assert isinstance(M,torch.Tensor)
+        assert M.dim()==2
+        assert M.size(0)==atoms.nrows1()
+        R=ptensorlayer1c(M)
+        R.atoms=atoms
+        return R
+
     @classmethod
     def zeros(self,atoms,nc,device='cpu'):
         assert isinstance(atoms,pb.atomspack)
@@ -72,13 +81,41 @@ class ptensorlayer1c(ptensorlayerc):
         return ptensor1c.from_matrix(self.atoms[i],torch.Tensor(self)[offs:offs+n])
 
 
-    # ---- Message passing -----------------------------------------------------------------------------------
+    # ---- Linmaps -------------------------------------------------------------------------------------------
     
 
     @classmethod
     def linmaps(self,x):
+        if isinstance(x,ptensorlayer0c):
+            return broadcast0(x)
         if isinstance(x,ptensorlayer1c):
-           return x
+            nc=x.get_nc()
+            r=ptensorlayer0c.zeros(atoms,2*nc)
+            r[:,nc]=broadcast(x.reduce0())
+            r[:,nc:2*nc]=x
+            return r
+
+    def reduce0(self):
+        r=ptensorlayer0c.zero(atoms,get_nc())
+        if self.atoms.is_constk():
+            k=self.atoms.get_constk()
+            a=reshape(size(0)/k,k,size(1))
+            return ptensorlayer0c(atoms,a.sum(dim=1)) 
+        else:
+            raise RuntimeError("Unimplemented")
+
+    @classmethod
+    def broadcast(self,x):
+        if isinstance(x,ptensorlayer0c):
+            if x.atoms.is_constk():
+                a=x.unsqueeze(1).expand(x.size(0),get_constk(),x.size(1))
+                return ptensorlayer1c(atoms,a) 
+            else:
+                raise RuntimeError("Unimplemented")
+
+
+    # ---- Message passing -----------------------------------------------------------------------------------
+
 
     @classmethod
     def gather(self,x,S):

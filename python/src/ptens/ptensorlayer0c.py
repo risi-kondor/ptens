@@ -15,11 +15,20 @@
 import torch
 
 import ptens_base as pb 
-import ptens.ptensorsc as ptensorsc
+import ptens.ptensorlayerc as ptensorlayerc
 import ptens.ptensor0c as ptensor0c
 
 
 class ptensorlayer0c(ptensorlayerc):
+
+    def __init__(self,atoms,M):
+        assert isinstance(atoms,pb.atomspack)
+        assert isinstance(M,torch.Tensor)
+        assert M.dim()==2
+        assert M.size(0)==atoms.tsize0()
+        R=ptensorlayer0c(M)
+        R.atoms=atoms
+        return R
 
     @classmethod
     def zeros(self,atoms,nc,device='cpu'):
@@ -70,13 +79,19 @@ class ptensorlayer0c(ptensorlayerc):
         return ptensor0c.from_matrix(self.atoms[i],torch.Tensor(self)[i])
 
 
-    # ---- Message passing -----------------------------------------------------------------------------------
+    # ---- Linmaps -------------------------------------------------------------------------------------------
     
 
     @classmethod
     def linmaps(self,x):
         if isinstance(x,ptensorlayer0c):
-           return x
+            return x
+        if isinstance(x,ptensorlayer1c):
+            return x.reduce0()
+
+
+    # ---- Message passing -----------------------------------------------------------------------------------
+
 
     @classmethod
     def gather(self,x,S):

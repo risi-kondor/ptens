@@ -20,10 +20,10 @@ import ptens_base as pb
 
 #import ptens.ptensorsc_base as ptensorsc_base
 #import ptens.ptensor0c as ptensor0c
-import ptens.ptensors0c as ptensors0c
+import ptens.ptensorlayer0c as ptensorlayer0c
 
 
-class subgraphlayer0c(ptensors0c):
+class subgraphlayer0c(ptensorlayer0c):
 
     @classmethod
     def zeros(self,graph,subgraph,nc,device='cpu'):
