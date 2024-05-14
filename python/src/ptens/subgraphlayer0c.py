@@ -25,6 +25,14 @@ import ptens.ptensorlayer0c as ptensorlayer0c
 
 class subgraphlayer0c(ptensorlayer0c):
 
+    def __init__(self,graph,subgraph,x):
+       assert isinstance(graph,p.ggraph)
+       assert isinstance(subgraph,p.subgraph)
+       assert isinstance(x,p.ptensorlayer0c)
+       super(ptensorlayer0c,self).__init__(x)
+       graph=graph
+       subgraph=subgraph
+
     @classmethod
     def zeros(self,graph,subgraph,nc,device='cpu'):
         assert isinstance(graph,p.ggraph)
@@ -71,13 +79,13 @@ class subgraphlayer0c(ptensorlayer0c):
         return r
 
     
-    # ---- Message passing ----------------------------------------------------------------------------------
+    # ---- Linmaps ------------------------------------------------------------------------------------------
 
 
     @classmethod
     def linmaps(self,x):
-        if isinstance(x,subgraphlayer0c):
-           return x
+        assert isinstance(x,subgraphlayer0c) or isinstance(x,subgraphlayer1c)
+        return subgraphlayer0c(x.graph,x.subgraph,ptensorlayer0c.linmaps(x))
 
 
     # ---- I/O ----------------------------------------------------------------------------------------------

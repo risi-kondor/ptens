@@ -21,14 +21,14 @@ import ptens.ptensor1c as ptensor1c
 
 class ptensorlayer1c(ptensorlayerc):
 
-    def __init__(self,atoms,M):
-        assert isinstance(atoms,pb.atomspack)
-        assert isinstance(M,torch.Tensor)
-        assert M.dim()==2
-        assert M.size(0)==atoms.nrows1()
-        R=ptensorlayer1c(M)
-        R.atoms=atoms
-        return R
+#     def __init__(self,atoms,M):
+#         assert isinstance(atoms,pb.atomspack)
+#         assert isinstance(M,torch.Tensor)
+#         assert M.dim()==2
+#         assert M.size(0)==atoms.nrows1()
+#         R=ptensorlayer1c(M)
+#         R.atoms=atoms
+#         return R
 
     @classmethod
     def zeros(self,atoms,nc,device='cpu'):

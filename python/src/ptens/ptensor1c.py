@@ -19,16 +19,24 @@ import ptens.ptensorc_base as ptensorc_base
 
 class ptensor1c(ptensorc_base):
 
+#     @staticmethod
+#     def __new__(cls, *args, **kwargs):
+#         tensor = torch.Tensor.__new__(cls, *args, **kwargs)
+#         return tensor.view(cls)
+
+#     def __init__(self, *args, **kwargs):
+#         super().__init__(*args, **kwargs)
+   
     @classmethod
-    def zeros(self, _atoms, _nc, device='cpu'):
-        R=ptensor1c(torch.zeros([_nc],device=device))
-        R.atoms=_atoms
+    def zeros(self,atoms,_nc,device='cpu'):
+        R=ptensor1c(torch.zeros([len(atoms),_nc],device=device))
+        R.atoms=atoms
         return R
 
     @classmethod
-    def randn(self, _atoms, _nc, device='cpu'):
-        R=ptensor1c(torch.randn([_nc],device=device))
-        R.atoms=_atoms
+    def randn(self,atoms,_nc,device='cpu'):
+        R=ptensor1c(torch.randn([len(atoms),_nc],device=device))
+        R.atoms=atoms
         return R
 
     @classmethod
@@ -41,6 +49,14 @@ class ptensor1c(ptensorc_base):
         r=ptensor1c(super().clone())
         r.atoms=self.atoms
         return r
+
+#     def __copy__(self):
+#         print("copied")
+#         return self.__class__(self.clone())
+
+#     def __deepcopy__(self, memo):
+#         print("deep copied")
+#         return self.__class__(copy.deepcopy(self.data, memo))
 
 
     # ---- Operations ----------------------------------------------------------------------------------------

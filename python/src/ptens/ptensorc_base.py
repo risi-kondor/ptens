@@ -28,7 +28,7 @@ class ptensorc_base(torch.Tensor):
 
 
     def __add__(self,y):
-        assert self.size==y.size
+        assert self.size()==y.size()
         assert self.atoms==y.atoms
         r=self.clone()
         r+=y

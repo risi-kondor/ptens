@@ -21,14 +21,13 @@ import ptens.ptensor0c as ptensor0c
 
 class ptensorlayer0c(ptensorlayerc):
 
-    def __init__(self,atoms,M):
-        assert isinstance(atoms,pb.atomspack)
-        assert isinstance(M,torch.Tensor)
-        assert M.dim()==2
-        assert M.size(0)==atoms.tsize0()
-        R=ptensorlayer0c(M)
-        R.atoms=atoms
-        return R
+#     def __init__(self,atoms,M):
+#         assert isinstance(atoms,pb.atomspack)
+#         assert isinstance(M,torch.Tensor)
+#         assert M.dim()==2
+#         assert M.size(0)==atoms.tsize0()
+#         super(ptensorlayerc,self).__init__(x)
+#         atoms=atoms
 
     @classmethod
     def zeros(self,atoms,nc,device='cpu'):
@@ -94,9 +93,18 @@ class ptensorlayer0c(ptensorlayerc):
 
 
     @classmethod
-    def gather(self,x,S):
-        return Ptensorsb_Gather0Fn.apply(x,S)
+    def gather(self,atoms,x,mmap):
+        assert isinstance(x,p.ptensorlayer)
 
+    @classmethod
+    def gather_from_overlapping(self,atoms,x):
+        assert isinstance(x,p.ptensorlayer)
+
+    @classmethod
+    def gather_from_neighbors(self,atoms,x):
+        assert isinstance(x,p.ptensorlayer)
+
+        
 
     # ---- I/O ----------------------------------------------------------------------------------------------
 
