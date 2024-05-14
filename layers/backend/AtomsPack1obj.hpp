@@ -126,7 +126,9 @@ namespace ptens{
       for(int m=0; m<in_lists.size(); m++){
 	int in_tensor=in_lists.head(m);
 	int out_tensor=out_lists.head(m);
-	direct.push_back(index_of(out_tensor,out_lists(m,0)),y.index_of(in_tensor));
+	int k=out_lists.size_of(m);
+	for(int j=0; j<k; j++)
+	  direct.push_back(index_of(out_tensor,out_lists(m,k)),y.index_of(in_tensor));
       }
       
       return cnine::GatherMapProgram(tsize(),y.tsize(),new cnine::GatherMapB(direct));
