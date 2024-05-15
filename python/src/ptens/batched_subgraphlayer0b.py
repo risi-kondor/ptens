@@ -156,7 +156,7 @@ class batched_subgraphlayer0b(torch.Tensor):
         return BatchedPtensors0b_GatherFn.apply(x,S,min_overlaps=1)
 
     @classmethod
-    def gather_from_ptensors(self,x,G,S,min_overlaps1=1):
+    def gather_from_ptensors(self,x,G,S,min_overlaps=1):
         return Batched_subgraphlayer0b_GatherFromPtensorsbFn.apply(x,G,S,min_overlaps)
 
 
