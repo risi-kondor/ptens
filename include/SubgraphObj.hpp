@@ -91,6 +91,7 @@ namespace ptens{
     SubgraphObj(const int n, const cnine::RtensorA& _edges, const cnine::RtensorA& _labels):
       SubgraphObj(n,_edges){
       labels=cnine::Tensor<float>(_labels);
+      labeled=true;
     }
 
     SubgraphObj(const int n, const cnine::RtensorA& _edges, const cnine::RtensorA& _evecs, const cnine::RtensorA& evals):
