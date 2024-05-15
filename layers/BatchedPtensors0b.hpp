@@ -260,7 +260,6 @@ namespace ptens{
 	forward_program.obj.push_back(mmap.obj);
 	backward_program.obj.push_back(to_share(new cnine::GatherMapProgram(mmap.obj->inv()))); // eliminate the copy here 
       }
-      P(*this,x);
       forward_program(*this,x);
     }
 

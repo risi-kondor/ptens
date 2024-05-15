@@ -72,7 +72,7 @@ pybind11::class_<BSGlayer0b,BatchedPtensors0b<float> >(m,"batched_subgraphlayer0
   .def(pybind11::init([](const BatchedPtensors2b<float>& x, const BatchedGgraph& G, const Subgraph& S, const int min_overlaps){
 	cnine::fnlog timer("BatchedSubgraphLayer0b::init(BatchedPtensors2b)");
 	return BatchedSubgraphLayer0b<float>(x,G,S,min_overlaps);
-      }))
+      }));
 
 
 // ---- I/O --------------------------------------------------------------------------------------------------
