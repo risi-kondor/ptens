@@ -39,6 +39,7 @@ namespace ptens{
     using BASE::dim;
     using BASE::get_dev;
     using BASE::get_nc;
+    using DIFF::grad;
     using DIFF::get_grad;
     using BASE::cols;
     using BASE::add;
@@ -48,6 +49,12 @@ namespace ptens{
 
     const BatchedGgraph G;
     const Subgraph S;
+
+    ~BatchedSubgraphLayer1b(){
+#ifdef WITH_FAKE_GRAD
+      if(grad) delete grad;
+#endif 
+    }
 
 
   public: // ----- Constructors ------------------------------------------------------------------------------
