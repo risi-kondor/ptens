@@ -145,11 +145,11 @@ pybind11::class_<BatchedPtensors0b<float> >(m,"batched_ptensors0b")
   .def_static("linmaps",[](const BatchedPtensors2b<float>& x){
       return BPtensors0::linmaps(x);}) 
 
-  .def_static("gather",[](const BPtensors0& x, const BatchedAtomsPack& a){
-      return BPtensors0::gather(x,a);}) 
-  .def_static("gather",[](const BatchedPtensors1b<float>& x, const BatchedAtomsPack& a){
-      return BPtensors0::gather(x,a);}) 
-  .def_static("gather",[](const BatchedPtensors2b<float>& x, const BatchedAtomsPack& a){
+  .def_static("gather",[](const BPtensors0& x, const BatchedAtomsPack& a, const int min_overlaps){
+      return BPtensors0::gather(x,a,min_overlaps);}) 
+  .def_static("gather",[](const BatchedPtensors1b<float>& x, const BatchedAtomsPack& a, const int min_overlaps){
+      return BPtensors0::gather(x,a,min_overlaps);}) 
+  .def_static("gather",[](const BatchedPtensors2b<float>& x, const BatchedAtomsPack& a, const int min_overlaps){
       return BPtensors0::gather(x,a);}) 
 
   .def("add_linmaps_back",[](BPtensors0& x, BPtensors0& g){
@@ -161,10 +161,11 @@ pybind11::class_<BatchedPtensors0b<float> >(m,"batched_ptensors0b")
 
   .def("add_gather_back",[](BPtensors0& x, BPtensors0& g){
       x.get_grad().add_gather_back(g.get_grad());})
+  .def("add_gather_back_alt",[](BPtensors0& x, BPtensors0& g){
+      x.add_gather_back_alt(g);})
   .def("add_gather_back",[](BPtensors0& x, BatchedPtensors1b<float>& g){
       x.get_grad().add_gather_back(g.get_grad());})
   .def("add_gather_back_alt",[](BPtensors0& x, BatchedPtensors1b<float>& g){
-      cnine::fnlog timer("BatchedPtensors0b::gather1_back()");
       x.add_gather_back_alt(g);})
   .def("add_gather_back",[](BPtensors0& x, BatchedPtensors2b<float>& g){
       x.get_grad().add_gather_back(g.get_grad());})

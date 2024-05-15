@@ -152,12 +152,12 @@ class batched_subgraphlayer0b(torch.Tensor):
         return BatchedSubgraphlayer0b_LinmapsFn.apply(x)
 
     @classmethod
-    def gather(self,x,S):
-        return BatchedPtensors0b_GatherFn.apply(x,S)
+    def gather(self,x,S,min_overlaps=1):
+        return BatchedPtensors0b_GatherFn.apply(x,S,min_overlaps=1)
 
     @classmethod
-    def gather_from_ptensors(self,x,G,S):
-        return Batched_subgraphlayer0b_GatherFromPtensorsbFn.apply(x,G,S)
+    def gather_from_ptensors(self,x,G,S,min_overlaps1=1):
+        return Batched_subgraphlayer0b_GatherFromPtensorsbFn.apply(x,G,S,min_overlaps)
 
 
     # ---- I/O ----------------------------------------------------------------------------------------------
@@ -293,31 +293,31 @@ class BatchedSubgraphlayer0b_LinmapsFn(torch.autograd.Function):
 class Batched_subgraphlayer0b_GatherFromPtensorsbFn(torch.autograd.Function):
 
     @staticmethod
-    def forward(ctx,x,G,S):
+    def forward(ctx,x,G,S,min_overlaps):
         r=x.dummy()
-        r.obj=_batched_subgraphlayer0b(x.obj,G.obj,S.obj)
+        r.obj=_batched_subgraphlayer0b(x.obj,G.obj,S.obj,min_overlaps)
         ctx.x=x.obj
         ctx.r=r.obj
         return r
 
     @staticmethod
     def backward(ctx,g):
-        ctx.x.add_gather_back(ctx.r)
-        return ptensorsb.dummy(), None, None
+        ctx.x.add_gather_back_alt(ctx.r)
+        return ptensorsb.dummy(), None, None, None
 
 
 class BatchedSubgraphlayer0b_GatherFn(torch.autograd.Function):
 
     @staticmethod
-    def forward(ctx,x,S):
+    def forward(ctx,x,S,min_overlaps):
         r=x.dummy()
-        r.obj=_batched_subgraphlayer0b(x.obj,S)
+        r.obj=_batched_subgraphlayer0b(x.obj,S,min_overlaps)
         ctx.x=x.obj
         ctx.r=r.obj
         return r
 
     @staticmethod
     def backward(ctx,g):
-        ctx.x.add_gather_back(ctx.r)
-        return batched_subgraphlayer0b.dummy(), None 
+        ctx.x.add_gather_back_alt(ctx.r)
+        return batched_subgraphlayer0b.dummy(), None, None
 

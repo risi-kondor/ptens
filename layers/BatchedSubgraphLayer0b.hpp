@@ -126,15 +126,15 @@ namespace ptens{
     }
 
     template<typename SOURCE>
-    BatchedSubgraphLayer0b(const SOURCE& x, const Subgraph& _S):
+    BatchedSubgraphLayer0b(const SOURCE& x, const Subgraph& _S, const int min_overlaps=1):
       BatchedSubgraphLayer0b(x.G,_S,x.G.subgraphs(_S),x.get_nc()*vector<int>({1,1,2})[x.getk()],0,x.dev){
-      add_gather(x);
+      add_gather(x,min_overlaps);
     }
 
     template<typename SOURCE>
-    BatchedSubgraphLayer0b(const SOURCE& x, const BatchedGgraph& _G, const Subgraph& _S):
+    BatchedSubgraphLayer0b(const SOURCE& x, const BatchedGgraph& _G, const Subgraph& _S, const int min_overlaps=1):
       BatchedSubgraphLayer0b(_G,_S,_G.subgraphs(_S),x.get_nc()*vector<int>({1,1,2})[x.getk()],0,x.dev){
-      add_gather(x);
+      add_gather(x,min_overlaps);
     }
 
   };

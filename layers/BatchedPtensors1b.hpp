@@ -316,23 +316,18 @@ namespace ptens{
 
 
     template<typename SOURCE, typename = typename std::enable_if<std::is_base_of<BatchedPtensorsb<float>, SOURCE>::value, SOURCE>::type>
-    static BatchedPtensors1b<TYPE> gather(const SOURCE& x, const BatchedAtomsPack& a, const int min_overlap=1){
+    static BatchedPtensors1b<TYPE> gather(const SOURCE& x, const BatchedAtomsPack& a, const int min_overlaps=1){
       BatchedPtensors1b<TYPE> R(a,x.get_nc()*vector<int>({1,2,5})[x.getk()],x.get_dev());
-      R.add_gather(x,min_overlap);
+      R.add_gather(x,min_overlaps);
       return R;
     }
 
     template<typename SOURCE>
-    void add_gather(const SOURCE& x, const int min_overlap=1){
-      //(atoms.overlaps_mmap(x.atoms))(*this,x);
-      //for(int i=0; i<size(); i++)
-      //view_of(i).add_gather(x.view_of(i));
-      //cnine::MultiLoop(size(),[&](const int i){view_of(i).add_gather(x.view_of(i));});
+    void add_gather(const SOURCE& x, const int min_overlaps=1){
       int N=size();
       PTENS_ASSRT(N==x.size());
-      //cnine::GatherMapProgramPack P;
       for(int i=0; i<N; i++){
-	MessageList mlist=atoms.obj->obj[i]->atoms->overlaps_mlist(*x.atoms.obj->obj[i]->atoms,min_overlap);
+	MessageList mlist=atoms.obj->obj[i]->atoms->overlaps_mlist(*x.atoms.obj->obj[i]->atoms,min_overlaps);
 	MessageMap mmap=atoms.obj->obj[i]->message_map(*mlist.obj,*x.atoms.obj->obj[i]);
 	forward_program.obj.push_back(mmap.obj);
 	backward_program.obj.push_back(to_share(new cnine::GatherMapProgram(mmap.obj->inv()))); // eliminate the copy here 
@@ -359,18 +354,6 @@ namespace ptens{
 
     template<typename OUTPUT>
     void add_gather_back_alt(const OUTPUT& x){
-      //x.atoms.inverse_overlaps_mmap(atoms)(*this,x);
-      //for(int i=0; i<size(); i++)
-      //view_of(i).add_gather_back(x.view_of(i));
-      //cnine::MultiLoop(size(),[&](const int i){view_of(i).add_gather_back(x.view_of(i));});
-      int N=size();
-      PTENS_ASSRT(N==x.size());
-      //cnine::GatherMapProgramPack P;
-      //for(int i=0; i<N; i++){
-      //MessageList mlist=x.atoms.obj->obj[i]->atoms->overlaps_mlist(*atoms.obj->obj[i]->atoms);
-      //MessageMap mmap=x.atoms.obj->obj[i]->message_map(*mlist.obj,*atoms.obj->obj[i]);
-      //backward_program.obj.push_back(to_share(new cnine::GatherMapProgram(mmap.obj->inv()))); // eliminate the copy here 
-      //}
       x.backward_program(get_grad(),x.get_grad());
     }
 

@@ -44,6 +44,9 @@ namespace ptens{
 
     BatchedAtomsPackN<AtomsPack0obj<int> > atoms;
 
+    cnine::GatherMapProgramPack forward_program;
+    cnine::GatherMapProgramPack backward_program;
+
 
     ~BatchedPtensors0b(){
 #ifdef WITH_FAKE_GRAD
@@ -226,9 +229,9 @@ namespace ptens{
     }
 
     template<typename SOURCE, typename = typename std::enable_if<std::is_base_of<BatchedPtensorsb<float>, SOURCE>::value, SOURCE>::type>
-    static BatchedPtensors0b<TYPE> gather(const SOURCE& x, const BatchedAtomsPack& a){
+    static BatchedPtensors0b<TYPE> gather(const SOURCE& x, const BatchedAtomsPack& a, const int min_overlaps=1){
       BatchedPtensors0b<TYPE> R(a,x.get_nc()*vector<int>({1,1,2})[x.getk()],x.get_dev());
-      R.add_gather(x);
+      R.add_gather(x,min_overlaps);
       return R;
     }
 
@@ -248,28 +251,21 @@ namespace ptens{
     }
 
     template<typename SOURCE>
-    void add_gather(const SOURCE& x){
-      //(atoms.overlaps_mmap(x.atoms))(*this,x);
-      //for(int i=0; i<size(); i++)
-      //view_of(i).add_gather(x.view_of(i));
-      //cnine::MultiLoop(size(),[&](const int i){view_of(i).add_gather(x.view_of(i));});
+    void add_gather(const SOURCE& x,const int min_overlaps=1){
       int N=size();
       PTENS_ASSRT(N==x.size());
-      cnine::GatherMapProgramPack P;
       for(int i=0; i<N; i++){
-	MessageList mlist=atoms.obj->obj[i]->atoms->overlaps_mlist(*x.atoms.obj->obj[i]->atoms);
+	MessageList mlist=atoms.obj->obj[i]->atoms->overlaps_mlist(*x.atoms.obj->obj[i]->atoms,min_overlaps);
 	MessageMap mmap=atoms.obj->obj[i]->message_map(*mlist.obj,*x.atoms.obj->obj[i]);
-	P.obj.push_back(mmap.obj);
+	forward_program.obj.push_back(mmap.obj);
+	backward_program.obj.push_back(to_share(new cnine::GatherMapProgram(mmap.obj->inv()))); // eliminate the copy here 
       }
       P(*this,x);
+      forward_program(*this,x);
     }
 
     template<typename OUTPUT>
     void add_gather_back(const OUTPUT& x){
-      //x.atoms.inverse_overlaps_mmap(atoms)(*this,x);
-      //for(int i=0; i<size(); i++)
-      //view_of(i).add_gather_back(x.view_of(i));
-      //cnine::MultiLoop(size(),[&](const int i){view_of(i).add_gather_back(x.view_of(i));});
       int N=size();
       PTENS_ASSRT(N==x.size());
       cnine::GatherMapProgramPack P;
@@ -283,8 +279,6 @@ namespace ptens{
 
     template<typename OUTPUT>
     void add_gather_back_alt(const OUTPUT& x){
-      int N=size();
-      PTENS_ASSRT(N==x.size());
       x.backward_program(get_grad(),x.get_grad());
     }
 

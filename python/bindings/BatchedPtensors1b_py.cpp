@@ -151,7 +151,7 @@ pybind11::class_<BatchedPtensors1b<float> >(m,"batched_ptensors1b")
 
   .def_static("gather",[](const BatchedPtensors0b<float>& x, const BatchedAtomsPack& a, const int min_overlaps){
       cnine::fnlog timer("BatchedPtensors1b::gather0()");
-      return BPtensors1::gather(x,a);}) 
+      return BPtensors1::gather(x,a,min_overlaps);}) 
   .def_static("gather",[](const BatchedPtensors1b<float>& x, const BatchedAtomsPack& a, const int min_overlaps){
       cnine::fnlog timer("BatchedPtensors1b::gather1()");
       return BPtensors1::gather(x,a,min_overlaps);}) 
@@ -162,11 +162,14 @@ pybind11::class_<BatchedPtensors1b<float> >(m,"batched_ptensors1b")
   .def("add_gather_back",[](BPtensors1& x, BatchedPtensors0b<float>& g){
       cnine::fnlog timer("BatchedPtensors1b::gather0_back()");
       x.get_grad().add_gather_back(g.get_grad());})
+  .def("add_gather_back_alt",[](BPtensors1& x, BatchedPtensors0b<float>& g){
+      cnine::fnlog timer("BatchedPtensors1b::gather0_back_alt()");
+      x.add_gather_back_alt(g);})
   .def("add_gather_back",[](BPtensors1& x, BatchedPtensors1b<float>& g){
       cnine::fnlog timer("BatchedPtensors1b::gather1_back()");
       x.get_grad().add_gather_back(g.get_grad());})
   .def("add_gather_back_alt",[](BPtensors1& x, BatchedPtensors1b<float>& g){
-      cnine::fnlog timer("BatchedPtensors1b::gather1_back()");
+      cnine::fnlog timer("BatchedPtensors1b::gather1_back_alt()");
       x.add_gather_back_alt(g);})
   .def("add_gather_back",[](BPtensors1& x, BatchedPtensors2b<float>& g){
       cnine::fnlog timer("BatchedPtensors1b::gather2_back()");

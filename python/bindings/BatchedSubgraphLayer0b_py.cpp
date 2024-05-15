@@ -48,22 +48,31 @@ pybind11::class_<BSGlayer0b,BatchedPtensors0b<float> >(m,"batched_subgraphlayer0
   .def_static("linmaps",[](const BSGlayer2b& x){
       return BSGlayer0b::linmaps(x);}) 
 
-  .def(pybind11::init([](const BSGlayer0b& x, const Subgraph& S){
+  .def(pybind11::init([](const BSGlayer0b& x, const Subgraph& S, const int min_overlaps){
 	cnine::fnlog timer("BatchedSubgraphLayer0b::init(BatchedPtensors0b)");
 	//cnine::tracer fn_tracer("BatchedSubgraphLayer0b from BSGlayer0b");
-	return BatchedSubgraphLayer0b<float>(x,S);}))
-  .def(pybind11::init([](const BSGlayer1b& x, const Subgraph& S){
+	return BatchedSubgraphLayer0b<float>(x,S,min_overlaps);}))
+  .def(pybind11::init([](const BSGlayer1b& x, const Subgraph& S, const int min_overlaps){
 	cnine::fnlog timer("BatchedSubgraphLayer0b::init(BatchedPtensors1b)");
 	//cnine::tracer fn_tracer("BatchedSubgraphLayer0b from BSGlayer1b");
-	return BatchedSubgraphLayer0b<float>(x,S);}))
-  .def(pybind11::init([](const BSGlayer2b& x, const Subgraph& S){
+	return BatchedSubgraphLayer0b<float>(x,S,min_overlaps);}))
+  .def(pybind11::init([](const BSGlayer2b& x, const Subgraph& S, const int min_overlaps){
 	cnine::fnlog timer("BatchedSubgraphLayer0b::init(BatchedPtensors2b)");
 	//cnine::tracer fn_tracer("BatchedSubgraphLayer0b from BSGlayer2b");
 	return BatchedSubgraphLayer0b<float>(x,S);}))
 
-  .def(pybind11::init<const BatchedPtensors0b<float>&, const BatchedGgraph&, const Subgraph&>())
-  .def(pybind11::init<const BatchedPtensors1b<float>&, const BatchedGgraph&, const Subgraph&>())
-  .def(pybind11::init<const BatchedPtensors2b<float>&, const BatchedGgraph&, const Subgraph&>());
+  .def(pybind11::init([](const BatchedPtensors0b<float>& x, const BatchedGgraph& G, const Subgraph& S, const int min_overlaps){
+	cnine::fnlog timer("BatchedSubgraphLayer0b::init(BatchedPtensors0b)");
+	return BatchedSubgraphLayer0b<float>(x,G,S,min_overlaps);
+      }))
+  .def(pybind11::init([](const BatchedPtensors1b<float>& x, const BatchedGgraph& G, const Subgraph& S, const int min_overlaps){
+	cnine::fnlog timer("BatchedSubgraphLayer0b::init(BatchedPtensors1b)");
+	return BatchedSubgraphLayer0b<float>(x,G,S,min_overlaps);
+      }))
+  .def(pybind11::init([](const BatchedPtensors2b<float>& x, const BatchedGgraph& G, const Subgraph& S, const int min_overlaps){
+	cnine::fnlog timer("BatchedSubgraphLayer0b::init(BatchedPtensors2b)");
+	return BatchedSubgraphLayer0b<float>(x,G,S,min_overlaps);
+      }))
 
 
 // ---- I/O --------------------------------------------------------------------------------------------------
