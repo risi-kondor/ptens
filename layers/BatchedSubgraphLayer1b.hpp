@@ -24,13 +24,13 @@ namespace ptens{
 
 
   template<typename TYPE> 
-  class BatchedSubgraphLayer1b: public BatchedPtensors1b<TYPE>, 
-				public cnine::diff_class<BatchedSubgraphLayer1b<TYPE> >{
+  class BatchedSubgraphLayer1b: public BatchedPtensors1b<TYPE>{
+    //				public cnine::diff_class<BatchedSubgraphLayer1b<TYPE> >{
   public:
 
     typedef BatchedPtensors1b<TYPE> BASE;
     typedef cnine::Ltensor<TYPE> TENSOR;
-    typedef cnine::diff_class<BatchedSubgraphLayer1b<TYPE> > DIFF;
+    //typedef cnine::diff_class<BatchedSubgraphLayer1b<TYPE> > DIFF;
     typedef BatchedAtomsPackN<AtomsPack1obj<int> > BatchedAtomsPack1;
 
     using BASE::BASE;
@@ -39,8 +39,8 @@ namespace ptens{
     using BASE::dim;
     using BASE::get_dev;
     using BASE::get_nc;
-    using DIFF::grad;
-    using DIFF::get_grad;
+    //using DIFF::grad;
+    using BASE::get_grad;
     using BASE::cols;
     using BASE::add;
     using BASE::view3;
@@ -50,11 +50,11 @@ namespace ptens{
     const BatchedGgraph G;
     const Subgraph S;
 
-    ~BatchedSubgraphLayer1b(){
-#ifdef WITH_FAKE_GRAD
-      if(grad) delete grad;
-#endif 
-    }
+    //    ~BatchedSubgraphLayer1b(){
+    //#ifdef WITH_FAKE_GRAD
+    //if(grad) delete grad;
+    //#endif 
+    //}
 
 
   public: // ----- Constructors ------------------------------------------------------------------------------
@@ -195,7 +195,7 @@ namespace ptens{
 
     void add_linmaps(const BatchedSubgraphLayer1b<TYPE>& x){
       int nc=x.get_nc();
-      broadcast0(x.reduce0());
+      broadcast0(x.reduce0(),0);
       cols(nc,nc)+=x;
       //for(int i=0; i<size(); i++)
       //view_of(i).add_linmaps(x.view_of(i));
@@ -206,10 +206,19 @@ namespace ptens{
     //BASE::add_limnmaps(x);
     //}
 
+    /*
     void add_linmaps_back(const BatchedSubgraphLayer1b<TYPE>& x){
       int nc=get_nc();
-      broadcast0(x.reduce0(0,nc));
+      broadcast0(x.reduce0(0,nc),0);
       add(x.cols(nc,nc));
+    }
+    */
+
+    void add_linmaps_back_alt(const BatchedSubgraphLayer1b<TYPE>& x){
+      int K=S.getn();
+      int nc=get_nc();
+      get_grad().broadcast0(K,x.get_grad().reduce0(K,0,nc),0);
+      get_grad().add(x.get_grad().cols(nc,nc));
       //for(int i=0; i<size(); i++)
       //view_of(i).add_linmaps_back(x.view_of(i));
       //cnine::MultiLoop(size(),[&](const int i){view_of(i).add_linmaps_back(x.view_of(i));});
@@ -231,7 +240,7 @@ namespace ptens{
       return R;
     }
 
-    void broadcast0(const Ptensorsb<TYPE>& x, const int offs=0){
+    void broadcast0(const Ptensorsb<TYPE>& x, const int offs){
       TimedFn T("BatchedSubgraphLayer1b","broadcast0",*this);
       PTENS_ASSRT(x.ndims()==2);
       view3(S.getn(),offs,x.dim(1))+=cnine::repeat1(x.view2(),S.getn());

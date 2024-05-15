@@ -228,7 +228,7 @@ namespace ptens{
       return atoms.obj->get_atoms();
     }
 
-    BatchedPtensors1b& get_grad(){
+    BatchedPtensors1b& get_grad(){ // why do we need these?
       return cnine::diff_class<BatchedPtensors1b<TYPE> >::get_grad();
     }
 
@@ -282,6 +282,34 @@ namespace ptens{
     //static int nchannels(const SOURCE& x){
     //return x.get_nc()*vector<int>({1,2,5})[x.getk()];
     //}
+
+
+  public: // ---- Linmaps ------------------------------------------------------------------------------------
+
+    // these are hacks for the sake of BatchedSubgraphLayer1. todo: introduce constk
+
+
+    Ptensorsb<TYPE> reduce0(const int K) const{
+      TimedFn T("BatchedSubgraphLayer1b","reduce0",*this);
+      cnine::using_vram_manager vv(ptens_session.managed_gmem);
+      Ptensorsb<TYPE> R({dim(0)/K,get_nc()},0,get_dev());
+      view3(K).sum1_into(R.view2());
+      return R;
+    }
+
+    Ptensorsb<TYPE> reduce0(const int K, const int offs, const int nc) const{
+      TimedFn T("BatchedSubgraphLayer1b","reduce0",*this);
+      cnine::using_vram_manager vv(ptens_session.managed_gmem);
+      Ptensorsb<TYPE> R({dim(0)/K,nc},0,get_dev());
+      view3(K,offs,nc).sum1_into(R.view2());
+      return R;
+    }
+
+    void broadcast0(const int K, const Ptensorsb<TYPE>& x, const int offs){
+      TimedFn T("BatchedSubgraphLayer1b","broadcast0",*this);
+      PTENS_ASSRT(x.ndims()==2);
+      view3(K,offs,x.dim(1))+=cnine::repeat1(x.view2(),K);
+    }
 
 
   public: // ---- Message passing ----------------------------------------------------------------------------
