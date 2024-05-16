@@ -97,10 +97,10 @@ pybind11::class_<BSGlayer1b,BatchedPtensors1b<float> >(m,"batched_subgraphlayer1
       return x.autobahn(ATview<float>(W),ATview<float>(B));})
   .def("add_autobahn_back0",[](BSGlayer1b& x, BSGlayer1b& r, at::Tensor& W){
       cnine::fnlog timer("BatchedSubgraphLayer1b::autobahn_back0()");
-      x.add_autobahn_back0(r.get_grad(),ATview<float>(W));})
+      x.add_autobahn_back0(r/*.get_grad()*/,ATview<float>(W));})
   .def("autobahn_back1",[](BSGlayer1b& x, at::Tensor& W, at::Tensor& B, BSGlayer1b& r){
       cnine::fnlog timer("BatchedSubgraphLayer1b::autobahn_back1()");
-      x.add_autobahn_back1_to(ATview<float>(W), ATview<float>(B),r.get_grad());})
+      x.add_autobahn_back1_to(ATview<float>(W), ATview<float>(B),r/*.get_grad()*/);})
 
 
 // ---- I/O --------------------------------------------------------------------------------------------------
