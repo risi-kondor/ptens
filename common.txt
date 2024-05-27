@@ -15,6 +15,8 @@ CNINE_INCLUDES+=-I$(CNINE_ROOT)/objects/tensor_array/cell_maps -I$(CNINE_ROOT)/o
 CNINE_INCLUDES+=-I$(CNINE_ROOT)/objects/ntensor 
 CNINE_INCLUDES+=-I$(CNINE_ROOT)/objects/labeled2 
 CNINE_INCLUDES+=-I$(CNINE_ROOT)/objects/ntensor/functions 
+CNINE_INCLUDES+=-I$(CNINE_ROOT)/tensors 
+CNINE_INCLUDES+=-I$(CNINE_ROOT)/tensor_views
 
 CNINE_INCLUDEDIR=$(CNINE_ROOT)/include
 CNINE_CUDADIR=$(CNINE_ROOT)/cuda

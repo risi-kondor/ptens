@@ -2,7 +2,7 @@
  * This file is part of ptens, a C++/CUDA library for permutation 
  * equivariant message passing. 
  *  
- * Copyright (c) 2023, Imre Risi Kondor
+ * Copyright (c) 2023, Imre Kondor Risi
  *
  * This source code file is subject to the terms of the noncommercial 
  * license distributed with cnine in the file LICENSE.TXT. Commercial 
@@ -72,6 +72,7 @@ namespace ptens{
 
 
     // eliminate this eventually
+    /*
     SubgraphObj(const int n, const cnine::RtensorA& M):
       BASE(n){
       PTENS_ASSRT(M.ndims()==2);
@@ -79,6 +80,7 @@ namespace ptens{
       for(int i=0; i<M.dims(1); i++)
 	set(M(0,i),M(1,i),1.0);
     }
+    */
 
     SubgraphObj(const int n, const cnine::Ltensor<int>& M):
       BASE(n){
@@ -88,6 +90,7 @@ namespace ptens{
 	set(M(0,i),M(1,i),1.0);
     }
 
+    /*
     SubgraphObj(const int n, const cnine::RtensorA& _edges, const cnine::RtensorA& _labels):
       SubgraphObj(n,_edges){
       labels=cnine::Tensor<float>(_labels);
@@ -105,7 +108,7 @@ namespace ptens{
       evecs=_evecs;
       make_eblocks(evals);
     }
-
+    */
 
   public: 
 
