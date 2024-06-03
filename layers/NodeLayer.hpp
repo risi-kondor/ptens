@@ -103,17 +103,17 @@ namespace ptens{
   public: // ---- Conversions --------------------------------------------------------------------------------
 
 
-    NodeLayer(const Ggraph& _G, const cnine::TensorView<float>& x):
+    NodeLayer(const Ggraph& _G, const cnine::Tensor<float>& x):
       BASE(x), G(_G), nc(x.dim(1)){
       // check that it is regular!
       PTENS_ASSRT(x.ndims()==2);
       PTENS_ASSRT(_G.getn()==x.dim(0));
     }
 
-    #ifdef _WITH_ATEN
-    NodeLayer(const Ggraph& _G, const at::Tensor& T):
-      NodeLayer(_G,cnine::RtensorA::regular(T)){} // eliminate RtensorA
-    #endif 
+//     #ifdef _WITH_ATEN
+//     NodeLayer(const Ggraph& _G, const at::Tensor& T):
+//       NodeLayer(_G,cnine::RtensorA::regular(T)){} // eliminate RtensorA
+//     #endif 
 
 
   public: // ---- Transport ----------------------------------------------------------------------------------

@@ -1,14 +1,14 @@
 pybind11::class_<ptens::Ggraph>(m,"ggraph")
 
-  .def(pybind11::init([](const at::Tensor& x){return Ggraph(cnine::Ltensor<float>(x));}))
+  .def(pybind11::init([](const at::Tensor& x){return Ggraph(cnine::Tensor<float>(x));}))
 
   .def(pybind11::init<const int>())
 
   .def_static("edge_index",[](const at::Tensor& x, const int n=-1){
-      return Ggraph::from_edges(n,cnine::Tensor<float>(cnine::RtensorA(x)));})
+      return Ggraph::from_edges(n,cnine::Tensor<float>(x));})
 
   .def_static("edge_index_cached",[](const int key, const at::Tensor& x, const int n=-1){
-      return Ggraph::from_edges(n,cnine::Tensor<float>(cnine::RtensorA(x)),key);})
+      return Ggraph::from_edges(n,cnine::Tensor<float>(x),key);})
 
   .def_static("random",static_cast<Ggraph(*)(const int, const float)>(&ptens::Ggraph::random))
 

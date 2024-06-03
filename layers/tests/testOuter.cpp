@@ -12,19 +12,17 @@
  *
  */
 #include "Cnine_base.cpp"
-#include "CnineSession.hpp"
-
+#include "Ptens_base.cpp"
 #include "OuterLayers.hpp"
 
 using namespace ptens;
 using namespace cnine;
 
-PtensSession ptens_session;
 
 
 int main(int argc, char** argv){
 
-  cnine_session session;
+  PtensSession ptens_session;
 
   Ptensors0 x0=Ptensors0::sequential(3,2);
   Ptensors0 y0=Ptensors0::sequential(3,2);

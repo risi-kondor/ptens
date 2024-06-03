@@ -12,6 +12,7 @@
  *
  */
 
+#include "Ptens_base.cpp"
 #include "Cnine_base.cpp"
 #include "PtensSession.hpp"
 #include "AtomsPack2.hpp"

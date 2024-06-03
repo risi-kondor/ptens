@@ -11,20 +11,17 @@
  * must be accompanied by a verbatim copy of the license. 
  *
  */
+
 #include "Cnine_base.cpp"
-#include "CnineSession.hpp"
-#include "PtensSession.hpp"
-
-namespace ptens{ 
-  PtensSession ptens_session;
-}
-
+#include "Ptens_base.cpp"
 #include "BatchedPtensors0b.hpp"
 #include "BatchedPtensors1b.hpp"
 #include "BatchedPtensors2b.hpp"
 
 using namespace ptens;
 using namespace cnine;
+
+PtensSession ptens_session;
 
 
 int main(int argc, char** argv){

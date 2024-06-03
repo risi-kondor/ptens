@@ -28,13 +28,11 @@ namespace ptens{
 
   template<typename TYPE> 
   class BatchedSubgraphLayer1b: public BatchedPtensors1b<TYPE>{
-    //				public cnine::diff_class<BatchedSubgraphLayer1b<TYPE> >{
 
   public:
 
     typedef BatchedPtensors1b<TYPE> BASE;
     typedef cnine::Ltensor<TYPE> TENSOR;
-    //typedef cnine::diff_class<BatchedSubgraphLayer1b<TYPE> > DIFF;
     typedef BatchedAtomsPackN<AtomsPack1obj<int> > BatchedAtomsPack1;
 
     using BASE::BASE;
@@ -43,7 +41,6 @@ namespace ptens{
     using BASE::dim;
     using BASE::get_dev;
     using BASE::get_nc;
-    //using DIFF::grad;
     using BASE::get_grad;
     using BASE::cols;
     using BASE::add;
@@ -230,7 +227,7 @@ namespace ptens{
 
     Ptensorsb<TYPE> reduce0() const{
       TimedFn T("BatchedSubgraphLayer1b","reduce0",*this);
-      cnine::using_vram_manager vv(ptens_session.managed_gmem);
+      cnine::using_vram_manager vv(ptens_session->managed_gmem);
       Ptensorsb<TYPE> R({dim(0)/S.getn(),get_nc()},0,get_dev());
       view3(S.getn()).sum1_into(R.view2());
       return R;
@@ -238,7 +235,7 @@ namespace ptens{
 
     Ptensorsb<TYPE> reduce0(const int offs, const int nc) const{
       TimedFn T("BatchedSubgraphLayer1b","reduce0",*this);
-      cnine::using_vram_manager vv(ptens_session.managed_gmem);
+      cnine::using_vram_manager vv(ptens_session->managed_gmem);
       Ptensorsb<TYPE> R({dim(0)/S.getn(),nc},0,get_dev());
       view3(S.getn(),offs,nc).sum1_into(R.view2());
       return R;
@@ -311,7 +308,7 @@ namespace ptens{
     void for_each_eigenslice(const cnine::Rtensor3_view x, const cnine::Rtensor3_view y,
       std::function<void(cnine::Rtensor2_view xslice, cnine::Rtensor2_view yslice, const int b)> lambda,
 			     const bool inplace_add=false) const{
-      cnine::using_vram_manager vv(ptens_session.managed_gmem);
+      cnine::using_vram_manager vv(ptens_session->managed_gmem);
       S.make_eigenbasis();
       int N=x.n0;
       int K=x.n1;

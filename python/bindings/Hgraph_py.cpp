@@ -8,9 +8,9 @@ pybind11::class_<Hgraph>(m,"graph")
   .def_static("edge_index",[](const at::Tensor& x, const at::Tensor& l, const int n){
       return Hgraph::edge_index(cnine::RtensorA(x),cnine::RtensorA(l),n);})
 
-  .def_static("matrix",[](const at::Tensor& x){return Hgraph(cnine::RtensorA(x));})
+  .def_static("matrix",[](const at::Tensor& x){return Hgraph(cnine::Tensor<float>(x));})
   .def_static("matrix",[](const at::Tensor& x, const at::Tensor& l){
-      return Hgraph(cnine::RtensorA(x),cnine::RtensorA(l));})
+      return Hgraph(cnine::Tensor<float>(x),cnine::RtensorA(l));})
 
   .def_static("overlaps",[](const AtomsPack& x, const AtomsPack& y){return Hgraph::overlaps(x,y);})
   .def_static("random",static_cast<Hgraph(*)(const int, const float)>(&Hgraph::random))
@@ -22,11 +22,9 @@ pybind11::class_<Hgraph>(m,"graph")
 
   .def("dense",[](const Hgraph& G){return G.dense().torch();})
 
-  .def("subgraphs",[](const Hgraph& G, const Hgraph& H){
-      //FindPlantedSubgraphs planted(G,H); 
-      //return AtomsPack(planted.matches);
-      return AtomsPack(CachedPlantedSubgraphs()(G,H));
-    })
+//.def("subgraphs",[](const Hgraph& G, const Hgraph& H){
+//      return AtomsPack(CachedPlantedSubgraphs()(G,H));
+//    })
 
   .def("str",&Hgraph::str,py::arg("indent")="")
   .def("__str__",&Hgraph::str,py::arg("indent")="");

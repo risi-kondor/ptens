@@ -12,7 +12,7 @@
  *
  */
 #include "Cnine_base.cpp"
-#include "CnineSession.hpp"
+#include "Ptens_base.cpp"
 #include "LinmapFunctions.hpp"
 #include "MsgFunctions.hpp"
 
@@ -22,7 +22,7 @@ using namespace cnine;
 
 int main(int argc, char** argv){
 
-  cnine_session session;
+  PtensSession session;
 
   //auto A=Ptensor2::gaussian({0,1,2,3},3);
   auto A=Ptensor2::sequential({0,1,2,3},1);

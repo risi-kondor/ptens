@@ -18,15 +18,14 @@
 #include "Ptens_base.hpp"
 #include "cpermutation.hpp"
 #include "SparseRmatrix.hpp"
+#include "RtensorA.hpp"
 #include "Tensor.hpp"
-//#include "SparseRmatrixB.hpp"
 #include "AtomsPack.hpp"
 #include "AindexPack.hpp"
 #include "GatherMap.hpp"
 #include "labeled_tree.hpp"
 #include "map_of_lists.hpp"
 #include "flog.hpp"
-//#include "PtensLoggedTimer.hpp"
 
 extern cnine::CnineLog cnine::cnine_log;
 
@@ -126,8 +125,11 @@ namespace ptens{
 	set(_edges(0,i),_edges(1,i),1.0);
     }
 
-    Hgraph(const cnine::RtensorA& M, const cnine::RtensorA& L):
+    Hgraph(const cnine::Tensor<float>& M, const cnine::RtensorA& L):
       SparseRmatrix(M), labels(L), is_labeled(true){}
+
+    //Hgraph(const cnine::RtensorA& M, const cnine::RtensorA& L):
+    //SparseRmatrix(M), labels(L), is_labeled(true){}
 
 
   public: // ---- Named Constructors -------------------------------------------------------------------------
@@ -196,22 +198,6 @@ namespace ptens{
 	  }
 	}
       }else{
-	//cout<<"New overlaps"<<endl;
-	/*
-	map_of_lists<int,int> map;
-	for(int j=0; j<y.size(); j++){
-	  auto w=y(j);
-	  for(auto p:w)
-	    map.push_back(p,j);
-	}
-	for(int i=0; i<x.size(); i++){
-	  auto v=x(i);
-	  for(auto p:v)
-	    map.for_each_in_list(p,[&](const int q){
-		R.set(i,q,1.0);
-		});
-	}
-	*/
 	unordered_map<int,vector<int> > map;
 	for(int j=0; j<y.size(); j++){
 	  auto w=y(j);
@@ -231,8 +217,6 @@ namespace ptens{
 	  }
 	}
       }
-      //auto elapsed=chrono::duration<double,std::milli>(chrono::system_clock::now()-t0).count();
-      //cout<<"Overlaps between "<<x.size()<<" domains and "<<y.size()<<" domains in "<<to_string(elapsed)<<"ms."<<endl; 
       return R;
     }
 
@@ -534,12 +518,6 @@ namespace std{
     }
   };
 }
-
-//namespace ptens{
-//class HgraphSubgraphListCache: public unordered_map<Hgraph,AindexPack>{
-//public:
-//};
-//}
 
 
 #endif

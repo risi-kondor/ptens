@@ -11,9 +11,9 @@
  * must be accompanied by a verbatim copy of the license. 
  *
  */
-#include "Cnine_base.cpp"
-#include "CnineSession.hpp"
 
+#include "Cnine_base.cpp"
+#include "Ptens_base.cpp"
 #include "Ptensors0b.hpp"
 #include "Ptensors1b.hpp"
 #include "Ptensors2b.hpp"
@@ -27,6 +27,8 @@ PtensSession ptens_session;
 int main(int argc, char** argv){
 
   cnine_session session;
+
+  #ifdef _WITH_CUDA
 
   //cudaSetDevice(0);
   //cudaDeviceSynchronize();
@@ -67,6 +69,8 @@ int main(int argc, char** argv){
 
   //cudaDeviceSynchronize();
   //cudaDeviceReset();
+
+  #endif 
 
 }
 

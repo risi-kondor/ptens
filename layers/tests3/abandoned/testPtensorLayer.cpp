@@ -11,9 +11,9 @@
  * must be accompanied by a verbatim copy of the license. 
  *
  */
-#include "Cnine_base.cpp"
-#include "CnineSession.hpp"
 
+#include "Cnine_base.cpp"
+#include "Ptens_base.cpp"
 #include "LinmapLayers.hpp"
 #include "EMPlayers.hpp"
 #include "PtensorLayer.hpp"

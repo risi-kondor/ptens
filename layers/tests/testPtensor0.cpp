@@ -12,20 +12,17 @@
  *
  */
 #include "Cnine_base.cpp"
-#include "CnineSession.hpp"
-
+#include "Ptens_base.cpp"
 #include "LinmapFunctions.hpp"
 #include "MsgFunctions.hpp"
 
 using namespace ptens;
 using namespace cnine;
 
-PtensSession ptens_session;
-
 
 int main(int argc, char** argv){
 
-  cnine_session session;
+  PtensSession session;
 
   auto A=Ptensor0::gaussian({0,1,2,3},3);
   cout<<A<<endl;

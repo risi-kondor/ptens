@@ -3,28 +3,14 @@ typedef cnine::ATview<float> TVIEW;
 
 pybind11::class_<BatchedPtensors0b<float> >(m,"batched_ptensors0b")
 
-//  .def(py::init([](vector<at::Tensor>& M){
-//	vector<const Ltensor<float> > v;
-//	for(auto& p:M) v.push_back(Ltensor<float>(p));
-//	return BPtensors0(v);}))
-
-//  .def(py::init([](const BatchedAtomsPack& atoms, vector<at::Tensor>& M){
-//	vector<TVIEW> v;
-//	for(int i=0; i<M.size(); i++) v.push_back(TVIEW(M[i]));
-//	return BPtensors0(atoms,v);}))
-
   .def(py::init([](at::Tensor& M, const vector<int>& sizes){
-	return BPtensors0(Ltensor<float>(M),sizes);})) // revert to this!
+	return BPtensors0(Tensor<float>(M),sizes);}))
   
   .def_static("from_tensors",[](at::Tensor& M, const vector<int>& sizes){
-      return BPtensors0(Ltensor<float>(M),sizes);})
+      return BPtensors0(Tensor<float>(M),sizes);})
 
   .def(py::init([](const vector<vector<vector<int> > >& atoms, at::Tensor& M){
-	return BPtensors0(BatchedAtomsPack(atoms),Ltensor<float>(M));}))
-
-//  .def_static("create",[](const int n, const int _nc, const int fcode, const int _dev){
-//      return BPtensors0(n,_nc,fcode,_dev);}, 
-//    py::arg("atoms"),py::arg("nc"),py::arg("fcode")=0,py::arg("device")=0)
+	return BPtensors0(BatchedAtomsPack(atoms),Tensor<float>(M));}))
 
   .def_static("create",[](const vector<vector<vector<int> > >_atoms, const int _nc, const int fcode, const int _dev){
       return BPtensors0(BatchedAtomsPack(_atoms),_nc,fcode,_dev);}) 
@@ -45,8 +31,6 @@ pybind11::class_<BatchedPtensors0b<float> >(m,"batched_ptensors0b")
 
   .def("getk",[](const BPtensors0& x){return 0;})
   .def("__len__",&BPtensors0::size)
-//.def("add_to_grad",[](BPtensors0& x, at::Tensor& y){x.add_to_grad(ATview<float>(y));})
-//.def("add_to_grad",[](BPtensors0& x, const BPtensors0& y, const float c){x.add_to_grad(y,c);})
   .def("add_to_grad",[](BPtensors0& x, at::Tensor& y){x.get_grad().add(ATview<float>(y));})
   .def("add_to_grad",[](BPtensors0& x, const BPtensors0& y, const float c){x.get_grad().add(y,c);})
   .def("get_grad",[](BPtensors0& x){return x.get_grad();})
@@ -83,14 +67,6 @@ pybind11::class_<BatchedPtensors0b<float> >(m,"batched_ptensors0b")
       cnine::fnlog timer("BatchedSubgraphLayerb::cat_channels_back1()");
       return x.cat_channels_back1(r);})
 
-//  .def("cat",&BPtensors0::cat)
-//  .def("add_cat_back",[](BPtensors0& x, BPtensors0& r, const int offs){
-//      x.get_grad()+=r.get_grad().rows(offs,x.dim(0));})
-
-//.def("outer",&BatchedPtensors0b::outer)
-//.def("outer_back0",&BatchedPtensors0b::outer_back0)
-//.def("outer_back1",&BatchedPtensors0b::outer_back1)
-
   .def("scale_channels",[](BPtensors0& x, at::Tensor& y){
       return scale_channels(x,ATview<float>(y));})
   .def("add_scale_channels_back0",[](BPtensors0& r, const BPtensors0& g, at::Tensor& y){
@@ -118,10 +94,9 @@ pybind11::class_<BatchedPtensors0b<float> >(m,"batched_ptensors0b")
   .def("linear_back2",[](const BPtensors0& x, BPtensors0& g){
       cnine::fnlog timer("BatchedPtensors0b::linear_back2()");
       auto& p=g.get_grad();
-      Ltensor<float> xg({p.dim(1)},0,p.get_dev());
+      Tensor<float> xg({p.dim(1)},0,p.get_dev());
       p.view2().reduce0_destructively_into(xg.view1());
       return xg.torch();
-      //return g.get_grad().sum(0).torch();
     })
 
   .def("ReLU",[](const BPtensors0& x, const float alpha){

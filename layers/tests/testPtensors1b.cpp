@@ -11,9 +11,11 @@
  * must be accompanied by a verbatim copy of the license. 
  *
  */
-#include "Cnine_base.cpp"
-#include "CnineSession.hpp"
 
+#include "Cnine_base.cpp"
+#include "Ptens_base.cpp"
+#include "Ptensors0.hpp"
+#include "Ptensors0b.hpp"
 #include "Ptensors1.hpp"
 
 using namespace ptens;

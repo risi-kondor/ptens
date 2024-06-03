@@ -13,7 +13,7 @@
  */
 
 #include "Cnine_base.cpp"
-#include "PtensSession.hpp"
+#include "Ptens_base.cpp"
 #include "AtomsPack1.hpp"
 
 using namespace ptens;

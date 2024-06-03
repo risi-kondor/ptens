@@ -6,7 +6,7 @@ typedef SubgraphLayer2<Ptensors2> SGlayer2;
 pybind11::class_<NodeLayer>(m,"nodelayer")
 
 
-  .def(pybind11::init<ptens::Ggraph&, const at::Tensor&>())
+//.def(pybind11::init<ptens::Ggraph&, const at::Tensor&>())
 
   .def_static("raw",[](const Ggraph& G, const int _nc, const int _dev){
       return NodeLayer(G,_nc,cnine::fill_raw(),_dev);}, py::arg("graph"),py::arg("nc"),py::arg("device")=0)
@@ -36,7 +36,7 @@ pybind11::class_<NodeLayer>(m,"nodelayer")
 
   .def("torch",[](const NodeLayer& x) {return x.torch();})
   .def("torch_back",[](NodeLayer& x, const at::Tensor& g){
-      x.add_to_grad(NodeLayer(x.G,g));})
+      x.add_to_grad(NodeLayer(x.G,Tensor<float>(g)));})
 
   .def("to_device",[](NodeLayer& x, const int dev){return NodeLayer(x,dev);})
   .def("to_device_back",[](NodeLayer& x, NodeLayer& g, const int dev){

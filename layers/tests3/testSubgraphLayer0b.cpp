@@ -13,7 +13,7 @@
  */
 
 #include "Cnine_base.cpp"
-
+#include "Ptens_base.cpp"
 #include "SubgraphLayer0b.hpp"
 #include "SubgraphLayer1b.hpp"
 #include "BatchedGgraph.hpp"
@@ -21,7 +21,8 @@
 using namespace ptens;
 using namespace cnine;
 
-PtensSession ptens::ptens_session;
+PtensSession ptens_session;
+
 
 typedef Ptensors1b<float> Ptens1;
 

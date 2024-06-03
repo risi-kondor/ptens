@@ -1,7 +1,5 @@
 pybind11::class_<Subgraph>(m,"subgraph")
 
-//.def(pybind11::init<const vector<vector<int> >& >())
-
   .def_static("trivial",&Subgraph::trivial)
   .def_static("edge",&Subgraph::edge)
   .def_static("triangle",&Subgraph::triangle)
@@ -9,24 +7,23 @@ pybind11::class_<Subgraph>(m,"subgraph")
   .def_static("star",&Subgraph::star)
 
   .def_static("edge_index",[](const at::Tensor& x, int n=-1){
-      return Subgraph::edge_index(cnine::RtensorA(x),n);})
+      return Subgraph::edge_index(x,n);})
 
   .def_static("edge_index",[](const at::Tensor& x, const at::Tensor& l, const int n){
-      return Subgraph::edge_index(cnine::RtensorA(x),cnine::RtensorA(l),n);})
+      return Subgraph::edge_index(x,l,n);})
 
   .def_static("edge_index_degrees",[](const at::Tensor& x, const at::Tensor& l, const int n){
-      return Subgraph::edge_index_degrees(cnine::Tensor<float>(cnine::RtensorA(x)),
-	cnine::Tensor<float>(cnine::RtensorA(l)),n);})
+      return Subgraph::edge_index_degrees(x,l,n);})
 
-//.def_static("matrix",[](const at::Tensor& x){return Subgraph(cnine::RtensorA(x));})
-//.def_static("matrix",[](const at::Tensor& x, const at::Tensor& L){
-//    return Subgraph(cnine::RtensorA(x),cnine::RtensorA(L));})
+  .def_static("matrix",[](const at::Tensor& x){return Subgraph(x);})
+  .def_static("matrix",[](const at::Tensor& x, const at::Tensor& L){
+      return Subgraph(x,L);})
 
   .def("has_espaces",&Subgraph::has_espaces)
   .def("n_eblocks",&Subgraph::n_eblocks)
 
   .def("set_evecs",[](Subgraph& S, const at::Tensor& V, const at::Tensor& E){
-      S.set_evecs(RtensorA(V),RtensorA(E));})
+      S.set_evecs(V,E);})
 
   .def("dense",[](const Subgraph& G){return G.dense().torch();})
 

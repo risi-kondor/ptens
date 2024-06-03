@@ -3,14 +3,14 @@
 #include <pybind11/complex.h>
 
 #include "Cnine_base.cpp"
-#include "PtensSession.hpp"
+#include "Ptens_base.cpp"
 
 #include "SimpleMemoryManager.hpp"
 #include "Tensor.hpp"
 #include "ATview.hpp"
 
 #include "Hgraph.hpp"
-#include "PtensFindPlantedSubgraphs.hpp"
+//#include "PtensFindPlantedSubgraphs.hpp"
 #include "Ggraph.hpp"
 #include "Subgraph.hpp"
 
@@ -56,9 +56,8 @@
 #include "BatchedSubgraphLayer2b.hpp"
 
 
-namespace ptens{ 
-  PtensSession ptens_session(8);
-}
+ptens::PtensSession ptens_session(8);
+
 
 PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
 
@@ -99,7 +98,6 @@ PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
 #include "Ptensors1b_py.cpp"
 #include "Ptensors2b_py.cpp"
 
-    //#include "NodeLayerb_py.cpp"
 #include "SubgraphLayer0b_py.cpp"
 #include "SubgraphLayer1b_py.cpp"
 #include "SubgraphLayer2b_py.cpp"

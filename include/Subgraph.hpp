@@ -17,19 +17,17 @@
 
 #include "PtensSession.hpp"
 #include "SubgraphObj.hpp"
-#include "Ltensor.hpp"
 
 
 namespace ptens{
 
-  extern PtensSession ptens_session;
+  extern PtensSessionObj* ptens_session;
 
 
   class Subgraph{
   public:
 
     unordered_set<SubgraphObj>::iterator obj;
-    //shared_ptr<SubgraphObj> obj;
     
 
   public: // ---- Constructors -------------------------------------------------------------------------------
@@ -45,65 +43,39 @@ namespace ptens{
       obj(_obj){}
 
     Subgraph(const int _n):
-      obj(ptens_session.subgraphs.emplace(_n).first){}
+      obj(ptens_session->subgraphs.emplace(_n).first){}
 
     Subgraph(const vector<pair<int,int> >& list): 
-      obj(ptens_session.subgraphs.emplace(list).first){}
+      obj(ptens_session->subgraphs.emplace(list).first){}
 
     Subgraph(const int _n, const initializer_list<pair<int,int> >& list): 
-      obj(ptens_session.subgraphs.emplace(_n,list).first){}
+      obj(ptens_session->subgraphs.emplace(_n,list).first){}
 
-    //Subgraph(const int _n, const initializer_list<pair<int,int> >& list, const cnine::RtensorA& labels): 
-    //obj(ptens_session.subgraphs.emplace(_n,list,labels).first){}
+    Subgraph(const int _n, const initializer_list<pair<int,int> >& list, const cnine::Tensor<float>& labels): 
+      obj(ptens_session->subgraphs.emplace(_n,list,labels).first){}
 
+    Subgraph(const cnine::Tensor<float>& M):
+      obj(ptens_session->subgraphs.emplace(M).first){}
 
-    //Subgraph(const cnine::RtensorA& M):
-    //obj(ptens_session.subgraphs.emplace(M).first){}
-
-    //Subgraph(const cnine::RtensorA& M, const cnine::RtensorA& L):
-    //obj(ptens_session.subgraphs.emplace(M,L).first){}
-
+    Subgraph(const cnine::Tensor<float>& M, const cnine::Tensor<float>& L):
+      obj(ptens_session->subgraphs.emplace(M,L).first){}
 
 
-
-    static Subgraph edge_index(const cnine::RtensorA& x, int _n=-1){
+    static Subgraph edge_index(const cnine::Tensor<int>& x, int _n=-1){
       if(_n==-1) _n=x.max()+1;
-      return ptens_session.subgraphs.emplace(_n,x).first;
+      return ptens_session->subgraphs.emplace(_n,x).first;
     }
 
-    static Subgraph edge_index(const cnine::Ltensor<int>& x, int _n=-1){
+    static Subgraph edge_index(const cnine::Tensor<int>& x, const cnine::Tensor<int>& L, int _n=-1){
       if(_n==-1) _n=x.max()+1;
-      return ptens_session.subgraphs.emplace(_n,x).first;
-    }
-
-    static Subgraph edge_index(const cnine::RtensorA& x, const cnine::RtensorA& L, int _n=-1){
-      if(_n==-1) _n=x.max()+1;
-      return ptens_session.subgraphs.emplace(_n,x,L).first;
-    }
-
-    static Subgraph edge_index_degrees(const cnine::Ltensor<int>& x, const cnine::Ltensor<int>& D, int _n=-1){
-      if(_n==-1) _n=x.max()+1;
-      SubgraphObj H(_n,x);
-      H.set_degrees(D);
-      return ptens_session.subgraphs.insert(H).first;
+      return ptens_session->subgraphs.emplace(_n,x,L).first;
     }
 
     static Subgraph edge_index_degrees(const cnine::Tensor<int>& x, const cnine::Tensor<int>& D, int _n=-1){
       if(_n==-1) _n=x.max()+1;
       SubgraphObj H(_n,x);
       H.set_degrees(D);
-      return ptens_session.subgraphs.insert(H).first;
-    }
-
-    static Subgraph edge_index(const cnine::RtensorA& _edges, const cnine::RtensorA& _evecs, const cnine::RtensorA& _evals){
-      int _n=_edges.max()+1;
-      return ptens_session.subgraphs.emplace(_n,_edges,_evecs,_evals).first;
-    }
-
-    static Subgraph edge_index(const cnine::RtensorA& _edges, const cnine::RtensorA& L, 
-      const cnine::RtensorA& _evecs, const cnine::RtensorA& _evals){
-      int _n=_edges.max()+1;
-      return ptens_session.subgraphs.emplace(_n,_edges,L,_evecs,_evals).first;
+      return ptens_session->subgraphs.insert(H).first;
     }
 
 
@@ -159,8 +131,8 @@ namespace ptens{
       return &(*obj)==&(*x.obj);
     }
 
-    cnine::RtensorA dense() const{
-      return obj->dense().rtensor();
+    cnine::Tensor<float> dense() const{
+      return obj->dense();
     }
 
     void make_eigenbasis() const{
@@ -177,15 +149,11 @@ namespace ptens{
 
     string str(const string indent="") const{
       return obj->str(indent);
-      //ostringstream oss;
-      //oss<<indent<<"Subgraph on "<<obj->getn()<<" vertices:"<<endl;
-      //oss<<obj->dense().str(indent+"  ")<<endl;
-      //return oss.str();
     }
 
     static string cached(){
       ostringstream oss;
-      for(auto p: ptens_session.subgraphs)
+      for(auto p: ptens_session->subgraphs)
 	oss<<p<<endl;
       return oss.str();
     }

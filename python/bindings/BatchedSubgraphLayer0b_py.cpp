@@ -50,15 +50,12 @@ pybind11::class_<BSGlayer0b,BatchedPtensors0b<float> >(m,"batched_subgraphlayer0
 
   .def(pybind11::init([](const BSGlayer0b& x, const Subgraph& S, const int min_overlaps){
 	cnine::fnlog timer("BatchedSubgraphLayer0b::init(BatchedPtensors0b)");
-	//cnine::tracer fn_tracer("BatchedSubgraphLayer0b from BSGlayer0b");
 	return BatchedSubgraphLayer0b<float>(x,S,min_overlaps);}))
   .def(pybind11::init([](const BSGlayer1b& x, const Subgraph& S, const int min_overlaps){
 	cnine::fnlog timer("BatchedSubgraphLayer0b::init(BatchedPtensors1b)");
-	//cnine::tracer fn_tracer("BatchedSubgraphLayer0b from BSGlayer1b");
 	return BatchedSubgraphLayer0b<float>(x,S,min_overlaps);}))
   .def(pybind11::init([](const BSGlayer2b& x, const Subgraph& S, const int min_overlaps){
 	cnine::fnlog timer("BatchedSubgraphLayer0b::init(BatchedPtensors2b)");
-	//cnine::tracer fn_tracer("BatchedSubgraphLayer0b from BSGlayer2b");
 	return BatchedSubgraphLayer0b<float>(x,S);}))
 
   .def(pybind11::init([](const BatchedPtensors0b<float>& x, const BatchedGgraph& G, const Subgraph& S, const int min_overlaps){
@@ -72,38 +69,14 @@ pybind11::class_<BSGlayer0b,BatchedPtensors0b<float> >(m,"batched_subgraphlayer0
   .def(pybind11::init([](const BatchedPtensors2b<float>& x, const BatchedGgraph& G, const Subgraph& S, const int min_overlaps){
 	cnine::fnlog timer("BatchedSubgraphLayer0b::init(BatchedPtensors2b)");
 	return BatchedSubgraphLayer0b<float>(x,G,S,min_overlaps);
-      }));
+      }))
 
 
 // ---- I/O --------------------------------------------------------------------------------------------------
 
 
-//.def("str",&BSGlayer0b::str,py::arg("indent")="")
-//.def("__str__",&BSGlayer0b::str,py::arg("indent")="")
-//.def("__repr__",&BSGlayer0b::repr);
+  .def("str",&BSGlayer0b::str,py::arg("indent")="")
+  .def("__str__",&BSGlayer0b::str,py::arg("indent")="")
+  .def("__repr__",&BSGlayer0b::repr);
 
-//.def("get_dev",&BSGlayer0b::get_dev)
-//.def("get_nc",&BSGlayer0b::get_nc)
-//.def("get_atoms",[](const BSGlayer0b& x){return x.atoms.as_vecs();})
-//.def("linmaps0",[](const BSGlayer0b& x){return sglinmaps0(x);})
-//.def("linmaps1",[](const BSGlayer0b& x){return sglinmaps1(x);})
-//.def("linmaps2",[](const BSGlayer0b& x){return sglinmaps2(x);})
-
-//.def("gather",[](const BSGlayer0b& x, const Subgraph& a){return gather0(x,a);})
-//.def("gather",[](const BSGlayer1b& x, const Subgraph& a){return gather0(x,a);})
-//.def("gather",[](const BSGlayer2b& x, const Subgraph& a){return gather0(x,a);});
-//.def(pybind11::init<ptens::Ggraph&, const at::Tensor&>())
-
-//.def_static("create",[](const BatchedGgraph& G, const int _nc, const int fcode, const int _dev){
-//    return BSGlayer0b(G,_nc,fcode,_dev);}, 
-//  py::arg("graph"),py::arg("nc"),py::arg("fcode")=0,py::arg("device")=0)
-
-//.def("to",[](const BSGlayer0b& x, const int dev){return BSGlayer0b(x,dev);})
-//.def("to_device",[](BSGlayer0b& x, const int dev){return BSGlayer0b(x,dev);})
-//.def("cat",&BSGlayer0b::cat)
-//.def("scale_channels",[](BSGlayer0b& x, at::Tensor& y){
-//      return scale_channels_sg(x,ATview<float>(y));})
-//.def(pybind11::init<const BSGlayer0b&, const Subgraph&>())
-//.def(pybind11::init<const BSGlayer1b&, const Subgraph&>())
-//.def(pybind11::init<const BSGlayer2b&, const Subgraph&>())
 

@@ -19,28 +19,13 @@
 
 namespace ptens{
 
-  //template<typename OBJ>
-  //OBJ sg_add(const OBJ& x, const OBJ& y){
-  //return OBJ(x.G,x.S,x.add(y));
-  //}
-  extern PtensSession ptens_session;
+  extern PtensSessionObj* ptens_session;
 
 
   template<typename OBJ>
     OBJ cat_channels_sg(const OBJ& x, const OBJ& y){
-    //PTENS_ASSRT(x.atoms==y.atoms);
     PTENS_ASSRT(x.dim(0)==y.dim(0));
-
-    //if(ptens_session.managed_gmem && x.get_dev()==1){
-    //OBJ R(x.G,x.S,x.atoms,
-    //cnine::Ltensor<float>(*ptens_session.managed_gmem,{x.dim(0),x.dim(1)+y.dim(1)},0,x.get_dev()));
-    //R.block(0,0,x.dim(0),x.dim(1))+=x;
-    //R.block(0,x.dim(1),x.dim(0),y.dim(1))+=y;
-    //return R;
-    //}
-    //OBJ R(x.G,x.S,x.atoms,cnine::Ltensor<float>
-    //(x.get_dev()==1,ptens_session.managed_gmem,{x.dim(0),x.dim(1)+y.dim(1)},0,x.get_dev()));
-    cnine::using_vram_manager vv(ptens_session.managed_gmem);
+    cnine::using_vram_manager vv(ptens_session->managed_gmem);
     OBJ R(x.G,x.S,x.atoms,cnine::Ltensor<float>({x.dim(0),x.dim(1)+y.dim(1)},0,x.get_dev()));
     R.block(0,0,x.dim(0),x.dim(1))+=x;
     R.block(0,x.dim(1),x.dim(0),y.dim(1))+=y;
@@ -49,20 +34,19 @@ namespace ptens{
 
   template<typename OBJ, typename TYPE>
   OBJ scale_channels_sg(const OBJ& x, const cnine::Ltensor<TYPE>& s){
-    cnine::using_vram_manager vv(ptens_session.managed_gmem);
+    cnine::using_vram_manager vv(ptens_session->managed_gmem);
     return OBJ(x.G,x.S,x.atoms,x.scale_columns(s));
   }
 
   template<typename OBJ, typename TYPE>
   OBJ mprod_sg(const OBJ& x, const cnine::Ltensor<TYPE>& y){
-    cnine::using_vram_manager vv(ptens_session.managed_gmem);
+    cnine::using_vram_manager vv(ptens_session->managed_gmem);
     return OBJ(x.G,x.S,x.atoms,x*y);
-    //return OBJ(x.G,x.S,x.atoms,cnine::mult(x.get_dev()==1,ptens_session.managed_gmem,x,y));
   }
 
   template<typename OBJ, typename TYPE>
   OBJ linear_sg(const OBJ& x, const cnine::Ltensor<TYPE>& w, const cnine::Ltensor<TYPE>& b){
-    cnine::using_vram_manager vv(ptens_session.managed_gmem);
+    cnine::using_vram_manager vv(ptens_session->managed_gmem);
     OBJ R(x.G,x.S,x.atoms,x*w);
     R.view2().add_broadcast0(b.view1());
     return R;
@@ -70,7 +54,7 @@ namespace ptens{
 
   template<typename OBJ, typename TYPE>
   OBJ ReLU_sg(const OBJ& x, TYPE alpha){
-    cnine::using_vram_manager vv(ptens_session.managed_gmem);
+    cnine::using_vram_manager vv(ptens_session->managed_gmem);
     return OBJ(x.G,x.S,x.atoms,x.ReLU(alpha));
   }
 

@@ -18,7 +18,7 @@
 #include "Ggraph.hpp"
 #include "BatchedAtomsPack.hpp"
 
-extern ptens::PtensSession ptens_session;
+extern ptens::PtensSessionObj* ptens::ptens_session;
 
 
 namespace ptens{
@@ -34,7 +34,7 @@ namespace ptens{
 
     BatchedGgraphObj(const vector<int>& keys){
       for(auto p: keys)
-	obj.push_back(ptens_session.graph_cache(p));
+	obj.push_back(ptens_session->graph_cache(p));
     }
 
 

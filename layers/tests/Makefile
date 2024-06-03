@@ -24,7 +24,7 @@ $(TESTS): %: %.cpp $(DEPS)
 ifdef WITH_CUDA
 	$(NVCC) $(NVCCFLAGS) -o $@ $@.cpp $(CUDA_EXTERNS) $(CUDA_OBJECTS) $(OBJECTS) $(CFLAGS) $(MACROS) $(INCLUDE) $(LIBS) 
 else
-	$(CC) -o $@ $@.cpp $(CFLAGS) $(INCLUDE) $(LIBS) 
+	$(CC) -o $@ $@.cpp $(CFLAGS) $(MACROS) $(INCLUDE) $(LIBS) 
 endif
 
 

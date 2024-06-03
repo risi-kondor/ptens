@@ -20,11 +20,7 @@
 #include "RtensorPackB.hpp"
 #include "AtomsPack.hpp"
 #include "AindexPack.hpp"
-//#include "Ptensor0.hpp"
-//#include "loose_ptr.hpp"
 #include "diff_class.hpp"
-
-//#include "PtensLoggedTimer.hpp"
 
 
 namespace ptens{

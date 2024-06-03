@@ -13,14 +13,14 @@
  */
 
 #include "Cnine_base.cpp"
-#include "PtensSession.hpp"
+#include "Ptens_base.cpp"
 #include "Ggraph.hpp"
 #include "Subgraph.hpp"
 
 using namespace ptens;
 using namespace cnine;
 
-PtensSession ptens::ptens_session;
+PtensSession session;
 
 
 int main(int argc, char** argv){
@@ -28,10 +28,6 @@ int main(int argc, char** argv){
   Ggraph M=Ggraph::random(5,0.5);
   cout<<M<<endl;
   auto E=M.edge_list();
-
-  //cout<<cache.from_edge_list(E).second<<endl;
-  //cout<<cache.from_edge_list(E).second<<endl;
-  //cout<<cache.from_edge_list(E).second<<endl;
 
   cout<<Ggraph::cached_from_edge_list(E)<<endl;
   cout<<Ggraph::cached_from_edge_list(E)<<endl;

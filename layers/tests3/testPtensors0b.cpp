@@ -12,6 +12,7 @@
  *
  */
 #include "Cnine_base.cpp"
+#include "Ptens_base.cpp"
 #include "CnineSession.hpp"
 
 #include "LinmapLayers.hpp"

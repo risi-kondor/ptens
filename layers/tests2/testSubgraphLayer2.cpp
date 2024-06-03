@@ -13,7 +13,7 @@
  */
 
 #include "Cnine_base.cpp"
-
+#include "Ptens_base.cpp"
 #include "SubgraphLayer0.hpp"
 #include "SubgraphLayer1.hpp"
 #include "Ptensors2.hpp"
@@ -21,7 +21,7 @@
 using namespace ptens;
 using namespace cnine;
 
-PtensSession ptens::ptens_session;
+PtensSession ptens_session;
 
 
 int main(int argc, char** argv){

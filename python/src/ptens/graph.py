@@ -66,8 +66,8 @@ class graph:
     def edges(self):
         return self.obj.edges()
 
-    def subgraphs(self,H):
-        return self.obj.subgraphs(H.obj)
+    #def subgraphs(self,H):
+    #    return self.obj.subgraphs(H.obj)
 
     def __str__(self):
         return self.obj.__str__()

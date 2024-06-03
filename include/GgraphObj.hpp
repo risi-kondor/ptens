@@ -19,9 +19,8 @@
 #include "FindPlantedSubgraphs.hpp"
 #include "FindPlantedSubgraphs2.hpp"
 #include "SubgraphObj.hpp"
-#include "RtensorA.hpp"
 #include "AtomsPack.hpp"
-#include "Ltensor.hpp"
+#include "Tensor.hpp"
 
 
 namespace ptens{
@@ -80,7 +79,7 @@ namespace ptens{
       return R;
     }
 
-    GgraphObj(int n, const cnine::Tensor<int>& M): // 
+    GgraphObj(int n, const cnine::Tensor<int>& M): 
       GgraphObj(n){
       PTENS_ASSRT(M.ndims()==2);
       PTENS_ASSRT(M.dim(0)==2);
@@ -89,25 +88,14 @@ namespace ptens{
       original_edges=AtomsPack(M.transp());
     }
 
-    GgraphObj(int n, const cnine::Ltensor<int>& M):
-      GgraphObj(n){
-      PTENS_ASSRT(M.ndims()==2);
-      PTENS_ASSRT(M.dim(0)==2);
-      for(int i=0; i<M.dims(1); i++)
-	set(M(0,i),M(1,i),1.0);
-      original_edges=AtomsPack(M.transp());
-    }
-
-    // eliminate this eventually
-    GgraphObj(const int n, const cnine::RtensorA& M):
-      BASE(n){
-      PTENS_ASSRT(M.ndims()==2);
-      PTENS_ASSRT(M.dim(0)==2);
-      for(int i=0; i<M.dims(1); i++)
-	set(M(0,i),M(1,i),1.0);
-    }
-
-    //static GgraphObj cached(const )
+//     GgraphObj(int n, const cnine::Ltensor<int>& M):
+//       GgraphObj(n){
+//       PTENS_ASSRT(M.ndims()==2);
+//       PTENS_ASSRT(M.dim(0)==2);
+//       for(int i=0; i<M.dims(1); i++)
+// 	set(M(0,i),M(1,i),1.0);
+//       original_edges=AtomsPack(M.transp());
+//     }
 
 
   public: // ---- Conversions ---------------------------------------------------------------------------------
@@ -127,9 +115,9 @@ namespace ptens{
   public: // ---- Access --------------------------------------------------------------------------------------
 
 
-    cnine::Ltensor<int> edge_list() const{
+    cnine::Tensor<int> edge_list() const{
       int N=nedges()*2;
-      cnine::Ltensor<int> R({2,N},0);
+      cnine::Tensor<int> R({2,N},0,0);
       int t=0;
       for_each_edge([&](const int i, const int j, const float v){
 	  R.set(0,t,i);

@@ -5,8 +5,6 @@ typedef SubgraphLayer2<Ptensors2> SGlayer2;
 
 pybind11::class_<SGlayer1,Ptensors1>(m,"subgraph_layer1")
 
-//.def(pybind11::init<const SGlayer0&, const int>())
-
   .def_static("dummy",[]() {return SGlayer1();})
 
   .def_static("raw",[](const Ggraph& G, const Subgraph& S, const vector<vector<int> >& v, const int _nc, const int _dev){
@@ -158,34 +156,3 @@ pybind11::class_<SGlayer1,Ptensors1>(m,"subgraph_layer1")
   .def("__str__",&SGlayer1::str,py::arg("indent")="")
   .def("__repr__",&SGlayer1::repr);
 
-
-
-//pybind11::class_<loose_ptr<SGlayer1> >(m,"subgraph_layer1_lptr");
-/*
-  .def("add_scale",[](SGlayer1& r, const SGlayer1& x, at::Tensor& y){
-      RtensorA Y(y);
-      Y.move_to_device(0);
-      PTENS_ASSRT(Y.ndims()==1);
-      PTENS_ASSRT(Y.dims[0]==1);
-      r.add(x,Y(0));})
-  .def("add_scale_back0",[](SGlayer1& x, const cnine::loose_ptr<SGlayer1>& g, at::Tensor& y){
-      RtensorA Y(y);
-      Y.move_to_device(0);
-      PTENS_ASSRT(Y.ndims()==1);
-      PTENS_ASSRT(Y.dims[0]==1);
-      x.get_grad().add(g,Y(0));})
-  .def("scale_back1",[](SGlayer1&x, const cnine::loose_ptr<SGlayer1>& g){
-      RtensorA R(Gdims(1));
-      R.set(0,x.inp(*g));
-      return R.move_to_device(g->dev).torch();})
-  
-  .def("scale_channels",[](SGlayer1& x, at::Tensor& y){
-      return x.scale_channels(RtensorA::view(y).view1());})
-  .def("add_scale_channels",[](SGlayer1& r, const SGlayer1& x, at::Tensor& y){
-      r.add_scale_channels(x,RtensorA::view(y).view1());})
-  .def("add_scale_channels_back0",[](SGlayer1& r, const cnine::loose_ptr<SGlayer1>& g, at::Tensor& y){
-      r.get_grad().add_scale_channels(g,RtensorA::view(y).view1());}) // changed 
-*/
-
-//.def("add_ReLU",[](SGlayer1& r, const SGlayer1& x, const float alpha){
-//    r.add_ReLU(x,alpha);})

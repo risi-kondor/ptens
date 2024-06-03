@@ -67,7 +67,7 @@ namespace ptens{
       atoms=BatchedAtomsPackN<AtomsPack0obj<int> >(x);
     }
 
-    BatchedPtensors0b(const BatchedAtomsPack& _atoms, const TENSOR& M):
+    BatchedPtensors0b(const BatchedAtomsPack& _atoms, const cnine::Tensor<float>& M):
       BASE(M.copy()), atoms(BatchedAtomsPack0(_atoms)){}
 
     BatchedPtensors0b(const BatchedAtomsPack0& _atoms, const TENSOR& M):

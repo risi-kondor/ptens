@@ -13,21 +13,15 @@
  */
 
 #include "Cnine_base.cpp"
-#include "PtensSession.hpp"
-
-namespace ptens{
-  PtensSession ptens_session;
-}
-
+#include "Ptens_base.cpp"
 #include "BatchedPtensors0b.hpp"
 #include "BatchedPtensors1b.hpp"
 #include "BatchedSubgraphLayer2b.hpp"
-//#include "BatchedSubgraphLayer1b.hpp"
 
 using namespace ptens;
 using namespace cnine;
 
-//PtensSession ptens::ptens_session;
+PtensSession ptens_session;
 
 typedef BatchedPtensors0b<float> BPtens0;
 typedef BatchedPtensors1b<float> BPtens1;

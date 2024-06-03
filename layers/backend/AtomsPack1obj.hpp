@@ -112,8 +112,8 @@ namespace ptens{
 	return mmap(lists, dynamic_cast<const AtomsPack0obj<DUMMY>&>(y));
       if(dynamic_cast<const AtomsPack1obj<DUMMY>*>(&y)) 
 	return mmap(lists, dynamic_cast<const AtomsPack1obj<DUMMY>&>(y));
-      if(dynamic_cast<const AtomsPack2obj<DUMMY>*>(&y)) 
-	return mmap(lists, dynamic_cast<const AtomsPack2obj<DUMMY>&>(y));
+      //if(dynamic_cast<const AtomsPack2obj<DUMMY>*>(&y)) 
+      //return mmap(lists, dynamic_cast<const AtomsPack2obj<DUMMY>&>(y));
       CNINE_UNIMPL();
       return mmap(lists, dynamic_cast<const AtomsPack0obj<DUMMY>&>(y));
     }

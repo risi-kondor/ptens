@@ -61,6 +61,9 @@ namespace ptens{
     BatchedPtensors2b(const BatchedAtomsPack& _atoms, const TENSOR& M):
       BASE(M.copy()), atoms(BatchedAtomsPack2(_atoms)){}
 
+    BatchedPtensors2b(const BatchedAtomsPack& _atoms, const cnine::Tensor<float>& M):
+      BASE(cnine::Ltensor<float>(M).copy()), atoms(BatchedAtomsPack2(_atoms)){}
+
     BatchedPtensors2b(const BatchedAtomsPack2& _atoms, const TENSOR& M):
       BASE(M.copy()), atoms(_atoms){}
 

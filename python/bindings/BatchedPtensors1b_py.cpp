@@ -3,20 +3,8 @@ typedef cnine::ATview<float> TVIEW;
 
 pybind11::class_<BatchedPtensors1b<float> >(m,"batched_ptensors1b")
 
-//.def(py::init([](at::Tensor& M){
-//	return BPtensors1(Ltensor<float>(TVIEW(M)));}))
-
-//  .def(py::init([](const BatchedAtomsPack& atoms, vector<at::Tensor>& M){
-//	vector<TVIEW> v;
-//	for(int i=0; i<M.size(); i++) v.push_back(TVIEW(M[i]));
-//	return BPtensors1(atoms,v);}))
-
   .def(py::init([](const vector<vector<vector<int> > >& atoms, at::Tensor& M){
-	return BPtensors1(BatchedAtomsPack(atoms),Ltensor<float>(M));})) // maybe should remove ATview from other too?
-
-//  .def_static("create",[](const int n, const int _nc, const int fcode, const int _dev){
-//      return BPtensors1(n,_nc,fcode,_dev);}, 
-//    py::arg("atoms"),py::arg("nc"),py::arg("fcode")=0,py::arg("device")=0)
+	return BPtensors1(BatchedAtomsPack(atoms),Tensor<float>(M));})) 
 
   .def_static("create",[](const vector<vector<vector<int> > > _atoms, const int _nc, const int fcode, const int _dev){
       return BPtensors1(BatchedAtomsPack(_atoms),_nc,fcode,_dev);}, 
@@ -37,8 +25,6 @@ pybind11::class_<BatchedPtensors1b<float> >(m,"batched_ptensors1b")
 
   .def("getk",[](const BPtensors1& x){return 1;})
   .def("__len__",&BPtensors1::size)
-//.def("add_to_grad",[](BPtensors1& x, at::Tensor& y){x.add_to_grad(ATview<float>(y));})
-//.def("add_to_grad",[](BPtensors1& x, const BPtensors1& y, const float c){x.add_to_grad(y,c);})
   .def("add_to_grad",[](BPtensors1& x, at::Tensor& y){x.get_grad().add(ATview<float>(y));})
   .def("add_to_grad",[](BPtensors1& x, const BPtensors1& y, const float c){x.get_grad().add(y,c);})
   .def("get_grad",[](BPtensors1& x){return x.get_grad();})
@@ -110,10 +96,9 @@ pybind11::class_<BatchedPtensors1b<float> >(m,"batched_ptensors1b")
   .def("linear_back2",[](const BPtensors1& x, BPtensors1& g){
       cnine::fnlog timer("BatchedPtensors1b::add_linear_back2()");
       auto& p=g.get_grad();
-      Ltensor<float> xg({p.dim(1)},0,p.get_dev());
+      Tensor<float> xg({p.dim(1)},0,p.get_dev());
       p.view2().reduce0_destructively_into(xg.view1());
       return xg.torch();
-      //return g.get_grad().sum(0).torch();
     })
 
   .def("ReLU",[](const BPtensors1& x, const float alpha){

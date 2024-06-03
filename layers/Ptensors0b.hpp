@@ -131,17 +131,17 @@ namespace ptens{
 
 
     Ptensors0b copy() const{
-      cnine::using_vram_manager vv(ptens_session.managed_gmem);
+      cnine::using_vram_manager vv(ptens_session->managed_gmem);
       return Ptensors0b(TENSOR::copy(),atoms);
     }
 
     Ptensors0b copy(const int _dev) const{
-      cnine::using_vram_manager vv(ptens_session.managed_gmem);
+      cnine::using_vram_manager vv(ptens_session->managed_gmem);
       return Ptensors0b(TENSOR::copy(_dev),atoms);
     }
 
     Ptensors0b zeros_like() const{
-      cnine::using_vram_manager vv(ptens_session.managed_gmem);
+      cnine::using_vram_manager vv(ptens_session->managed_gmem);
       return Ptensors0b(TENSOR::zeros_like(),atoms);
     }
 
@@ -150,22 +150,22 @@ namespace ptens{
     }
 
     static Ptensors0b zeros_like(const Ptensors0b& x){
-      cnine::using_vram_manager vv(ptens_session.managed_gmem);
+      cnine::using_vram_manager vv(ptens_session->managed_gmem);
       return Ptensors0b(x.TENSOR::zeros_like(),x.atoms);
     }
 
     static Ptensors0b zeros_like(const Ptensors0b& x, const int nc){
-      cnine::using_vram_manager vv(ptens_session.managed_gmem);
+      cnine::using_vram_manager vv(ptens_session->managed_gmem);
       return Ptensors0b(TENSOR({x.dim(0),nc},0,x.get_dev()),x.atoms);
     }
 
     static Ptensors0b gaussian_like(const Ptensors0b& x){
-      cnine::using_vram_manager vv(ptens_session.managed_gmem);
+      cnine::using_vram_manager vv(ptens_session->managed_gmem);
       return Ptensors0b(x.TENSOR::gaussian_like(),x.atoms);
     }
 
     static Ptensors0b* new_zeros_like(const Ptensors0b& x){
-      cnine::using_vram_manager vv(ptens_session.managed_gmem);
+      cnine::using_vram_manager vv(ptens_session->managed_gmem);
       return new Ptensors0b(x.TENSOR::zeros_like(),x.atoms);
     }
     

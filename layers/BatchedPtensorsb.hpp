@@ -23,7 +23,7 @@
 
 namespace ptens{
 
-  extern PtensSession ptens_session;
+  extern PtensSessionObj* ptens_session;
 
 
   template<typename TYPE>
@@ -50,16 +50,16 @@ namespace ptens{
       BASE(x){}
 
     BatchedPtensorsb(const cnine::Gdims& _dims, const int fcode, const int _dev):
-      BASE(BASE::vram_managed(ptens_session.managed_gmem,_dims,fcode,_dev)){
+      BASE(BASE::vram_managed(ptens_session->managed_gmem,_dims,fcode,_dev)){
     }
 
     BatchedPtensorsb copy(const BatchedPtensorsb& x){
-      cnine::using_vram_manager vv(ptens_session.managed_gmem);
+      cnine::using_vram_manager vv(ptens_session->managed_gmem);
       return BASE::copy(x); 
     }
 
     BatchedPtensorsb zeros_like() const{
-      cnine::using_vram_manager vv(ptens_session.managed_gmem);
+      cnine::using_vram_manager vv(ptens_session->managed_gmem);
       return BASE::zeros_like();
     }
 

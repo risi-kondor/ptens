@@ -12,8 +12,7 @@
  *
  */
 #include "Cnine_base.cpp"
-#include "CnineSession.hpp"
-
+#include "Ptens_base.cpp"
 #include "LinmapLayers.hpp"
 #include "ConcatLayers.hpp"
 #include "EMPlayers.hpp"
@@ -21,12 +20,10 @@
 using namespace ptens;
 using namespace cnine;
 
-PtensSession ptens_session;
-
 
 int main(int argc, char** argv){
 
-  cnine_session session;
+  PtensSession session;
 
   int N=8;
   Hgraph G=Hgraph::random(N,0.3);

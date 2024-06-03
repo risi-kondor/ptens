@@ -5,11 +5,11 @@ typedef PtensorLayer<float> TLAYER;
 pybind11::class_<PtensorLayer<float> >(m,"ptensorlayer")
 
   .def(py::init([](const int k, at::Tensor& M){
-	return TLAYER(k,Ltensor<float>(TVIEW(M)));}))
+	return TLAYER(k,TVIEW(M));}))
   .def(py::init([](const int k, const AtomsPack& atoms, at::Tensor& M){
-	return TLAYER(k,atoms,Ltensor<float>(TVIEW(M)));}))
+	return TLAYER(k,atoms,TVIEW(M));}))
   .def(py::init([](const int k, const vector<vector<int> >& atoms, at::Tensor& M){
-	return TLAYER(k,AtomsPack(atoms),Ltensor<float>(TVIEW(M)));}))
+	return TLAYER(k,AtomsPack(atoms),TVIEW(M));}))
 
   .def_static("create",[](const int k, const int n, const int _nc, const int fcode, const int _dev){
       return PtensorLayer<float>(k,AtomsPack(n),_nc,fcode,_dev);}, 

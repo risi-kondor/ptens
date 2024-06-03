@@ -13,15 +13,14 @@
  */
 
 #include "Cnine_base.cpp"
-#include "PtensSession.hpp"
+#include "Ptens_base.cpp"
 #include "BatchedGgraph.hpp"
-
 #include "Subgraph.hpp"
 
 using namespace ptens;
 using namespace cnine;
 
-PtensSession ptens::ptens_session;
+PtensSession ptens_session;
 
 
 int main(int argc, char** argv){

@@ -3,20 +3,8 @@ typedef cnine::ATview<float> TVIEW;
 
 pybind11::class_<BatchedPtensors2b<float> >(m,"batched_ptensors2b")
 
-//.def(py::init([](at::Tensor& M){
-//	return BPtensors2(Ltensor<float>(TVIEW(M)));}))
-
-//  .def(py::init([](const BatchedAtomsPack& atoms, vector<at::Tensor>& M){
-//	vector<TVIEW> v;
-//	for(int i=0; i<M.size(); i++) v.push_back(TVIEW(M[i]));
-//	return BPtensors2(atoms,v);}))
-
   .def(py::init([](const vector<vector<vector<int> > >& atoms, at::Tensor& M){
-	return BPtensors2(BatchedAtomsPack(atoms),Ltensor<float>(M));}))
-
-//  .def_static("create",[](const int n, const int _nc, const int fcode, const int _dev){
-//      return BPtensors2(n,_nc,fcode,_dev);}, 
-//    py::arg("atoms"),py::arg("nc"),py::arg("fcode")=0,py::arg("device")=0)
+	return BPtensors2(BatchedAtomsPack(atoms),Tensor<float>(M));}))
 
   .def_static("create",[](const vector<vector<vector<int> > >_atoms, const int _nc, const int fcode, const int _dev){
       return BPtensors2(BatchedAtomsPack(_atoms),_nc,fcode,_dev);}, 
@@ -37,8 +25,6 @@ pybind11::class_<BatchedPtensors2b<float> >(m,"batched_ptensors2b")
 
 
   .def("__len__",&BPtensors2::size)
-//.def("add_to_grad",[](BPtensors2& x, at::Tensor& y){x.add_to_grad(ATview<float>(y));})
-//.def("add_to_grad",[](BPtensors2& x, const BPtensors2& y, const float c){x.add_to_grad(y,c);})
   .def("add_to_grad",[](BPtensors2& x, at::Tensor& y){x.get_grad().add(ATview<float>(y));})
   .def("add_to_grad",[](BPtensors2& x, const BPtensors2& y, const float c){x.get_grad().add(y,c);})
   .def("get_grad",[](BPtensors2& x){return x.get_grad();})

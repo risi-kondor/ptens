@@ -11,9 +11,9 @@
  * must be accompanied by a verbatim copy of the license. 
  *
  */
-#include "Cnine_base.cpp"
-#include "CnineSession.hpp"
 
+#include "Cnine_base.cpp"
+#include "Ptens_base.cpp"
 #include "LinmapLayers.hpp"
 #include "EMPlayers.hpp"
 
@@ -25,7 +25,6 @@ PtensSession ptens_session;
 
 int main(int argc, char** argv){
 
-  //cnine_session session;
 
   if(false){
     Ptensors1 A=Ptensors1::randn({{1,2,3},{3,5},{2}},2);

@@ -13,20 +13,19 @@
  */
 
 #include "Cnine_base.cpp"
-#include "PtensSession.hpp"
+#include "Ptens_base.cpp"
 #include "Ggraph.hpp"
-
 #include "Subgraph.hpp"
 
 using namespace ptens;
 using namespace cnine;
 
-PtensSession ptens::ptens_session;
+PtensSession ptens_session;
 
 
 int main(int argc, char** argv){
 
-  Ltensor<float> A({{0.0, 1, 1, 1, 0, 0},
+  Tensor<float> A({{0.0, 1, 1, 1, 0, 0},
         {1.0, 0, 0, 1, 1, 1},
 	  {1.0, 0, 0, 0, 1, 1},
 	    {1.0, 1, 0, 0, 0, 1},
@@ -51,8 +50,8 @@ int main(int argc, char** argv){
   cout<<U<<endl;
 
 
-  Ltensor<int> B({{0,1,2},{1,2,0}});
-  Ltensor<int> D(3);
+  Tensor<int> B({{0,1,2},{1,2,0}});
+  Tensor<int> D(3);
   D.set(0,2);
   D.set(1,3);
   D.set(2,2);

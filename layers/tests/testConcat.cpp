@@ -12,7 +12,7 @@
  *
  */
 #include "Cnine_base.cpp"
-#include "CnineSession.hpp"
+#include "Ptens_base.cpp"
 #include "Hgraph.hpp"
 
 //#include "ConcatLayers.hpp"
@@ -26,7 +26,7 @@ using namespace cnine;
 
 int main(int argc, char** argv){
 
-  cnine_session session;
+  PtensSession session;
 
   int N=8;
   Hgraph G=Hgraph::random(N,0.3);

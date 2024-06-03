@@ -98,10 +98,10 @@ namespace ptens{
       PTENS_ASSRT(x.dim(1)==2);
     }
 
-    #ifdef _WITH_ATEN
-    EdgeLayer1(const Ggraph& _G, const AtomsPack& _atoms, const at::Tensor& T):
-      NodeLayer(_G,_atoms,cnine::RtensorA::regular(T)){} // eliminate RtensorA
-    #endif 
+//     #ifdef _WITH_ATEN
+//     EdgeLayer1(const Ggraph& _G, const AtomsPack& _atoms, const at::Tensor& T):
+//       NodeLayer(_G,_atoms,cnine::RtensorA::regular(T)){} // eliminate RtensorA
+//     #endif 
 
 
   public: // ---- Transport ----------------------------------------------------------------------------------

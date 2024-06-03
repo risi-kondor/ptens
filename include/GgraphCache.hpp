@@ -24,7 +24,7 @@ namespace ptens{
 
     typedef std::unordered_map<int,shared_ptr<GgraphObj> > BASE;
     
-    unordered_map<cnine::Ltensor<int>,int> edge_list_map;
+    unordered_map<cnine::Tensor<int>,int> edge_list_map;
 
 
     int next_id=0;
@@ -47,7 +47,7 @@ namespace ptens{
       //return Ggraph(it->second);
     }
 
-    shared_ptr<GgraphObj> from_edge_list(const int key, const cnine::Ltensor<int>& edges){
+    shared_ptr<GgraphObj> from_edge_list(const int key, const cnine::Tensor<int>& edges){
       auto it=find(key);
       if(it!=BASE::end()) return it->second;
       shared_ptr<GgraphObj> r(new GgraphObj(GgraphObj::from_edges(edges)));
@@ -58,7 +58,7 @@ namespace ptens{
       //return Ggraph(r);
     }
 
-    std::pair<int,shared_ptr<GgraphObj> > from_edge_list(const cnine::Ltensor<int>& edges){
+    std::pair<int,shared_ptr<GgraphObj> > from_edge_list(const cnine::Tensor<int>& edges){
       auto it=edge_list_map.find(edges);
       if(it!=edge_list_map.end()){
 	cout<<"Found"<<endl;

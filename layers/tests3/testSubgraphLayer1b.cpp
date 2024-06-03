@@ -13,16 +13,16 @@
  */
 
 #include "Cnine_base.cpp"
-
+#include "Ptens_base.cpp"
 #include "SubgraphLayer0b.hpp"
 #include "SubgraphLayer1b.hpp"
 
 using namespace ptens;
 using namespace cnine;
 
-PtensSession ptens::ptens_session;
-
 typedef Ptensors1b<float> Ptens1;
+
+PtensSession ptens_session;
 
 
 int main(int argc, char** argv){
@@ -51,7 +51,7 @@ int main(int argc, char** argv){
   SubgraphLayer1b<float> f2=gather1(f1,Subgraph::star(99));
   //f2.get_grad()=f2;
 
-  f1.get_grad()add_gather_back(f2);
+  f1.get_grad().add_gather_back(f2);
   cout<<f1.get_grad()<<endl;
 
   /*

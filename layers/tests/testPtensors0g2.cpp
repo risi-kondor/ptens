@@ -11,9 +11,9 @@
  * must be accompanied by a verbatim copy of the license. 
  *
  */
-#include "Cnine_base.cpp"
-#include "CnineSession.hpp"
 
+#include "Cnine_base.cpp"
+#include "Ptens_base.cpp"
 #include "LinmapLayers.hpp"
 #include "EMPlayers.hpp"
 #include "GatherLayers.hpp"
@@ -42,7 +42,6 @@ Ptensors0 backward_unite(const Ptensors0& x, const TYPE& g, const Hgraph& G){
 
 int main(int argc, char** argv){
 
-  cnine_session session;
   #ifdef _WITH_CUDA
 
   Ptensors0 A=Ptensors0::randn(3,3);

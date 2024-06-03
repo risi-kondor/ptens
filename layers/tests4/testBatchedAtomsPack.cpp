@@ -12,9 +12,7 @@
  *
  */
 #include "Cnine_base.cpp"
-#include "CnineSession.hpp"
-#include "PtensSession.hpp"
-
+#include "Ptens_base.cpp"
 #include "BatchedAtomsPack.hpp"
 
 using namespace ptens;

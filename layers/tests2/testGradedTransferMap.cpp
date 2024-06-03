@@ -13,12 +13,10 @@
  */
 
 #include "Cnine_base.cpp"
-
+#include "Ptens_base.cpp"
 #include "LinmapLayers.hpp"
 #include "ConcatLayers.hpp"
 #include "EMPlayers.hpp"
-#include "PtensSession.hpp"
-
 #include "SubgraphLayer0.hpp"
 #include "SubgraphLayer1.hpp"
 #include "Ptensors2.hpp"
@@ -26,13 +24,10 @@
 using namespace ptens;
 using namespace cnine;
 
-//namespace ptens{
 PtensSession ptens_session;
-//}
+
 
 int main(int argc, char** argv){
-
-  //cnine_session session;
 
   int N=8;
   int nc=1;

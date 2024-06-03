@@ -9,7 +9,6 @@ pybind11::class_<BatchedAtomsPack>(m,"batched_atomspack")
 
   .def("str",&BatchedAtomsPack::str,py::arg("indent")="")
   .def("__str__",&BatchedAtomsPack::str,py::arg("indent")="");
-//.def("__repr__",&BatchedAtomsPack::str,py::arg("indent")="");
 
 
 
