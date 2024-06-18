@@ -43,7 +43,7 @@ m.def("add_msg_back",[](Ptensor2& r, const Ptensor2& x, int offs){return add_msg
   py::arg("r"), py::arg("x"), py::arg("offs")=0);
 
 
-
+/*
 m.def("add_msg",[](Ptensors0& r, const Ptensors0& x, const Hgraph& G, int offs){return add_msg(r,x,G,offs);}, 
   py::arg("r"), py::arg("x"), py::arg("G"), py::arg("offs")=0);
 m.def("add_msg",[](Ptensors1& r, const Ptensors0& x, const Hgraph& G, int offs){return add_msg(r,x,G,offs);}, 
@@ -149,7 +149,6 @@ m.def("add_msg_back_n",[](loose_ptr<Ptensors2>& r, const loose_ptr<Ptensors2>& x
     return add_msg_back_n(r,x,G.reverse());});
 
 
-// do we need these??
 m.def("msg_layer0",[](Ptensors0& x, const AtomsPack& atoms, const Hgraph& G){
     Ptensors0 R=Ptensors0::zero(atoms,x.nc,x.dev);
     add_msg(R,x,G); return R;});
@@ -218,3 +217,4 @@ m.def("unite2to2_back_n",[](loose_ptr<Ptensors2>& x, loose_ptr<Ptensors2>& r, co
 m.def("gather",[](const Ptensors0& x, const Hgraph& G) {return gather(x,G);});
 m.def("gather_back",[](loose_ptr<Ptensors0>& x, loose_ptr<Ptensors0>& r, const Hgraph& G){
     add_gather(x,r,G.reverse());});
+*/

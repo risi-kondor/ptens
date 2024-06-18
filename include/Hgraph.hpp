@@ -18,8 +18,9 @@
 #include "Ptens_base.hpp"
 #include "cpermutation.hpp"
 #include "SparseRmatrix.hpp"
-#include "RtensorA.hpp"
-#include "Tensor.hpp"
+//#include "RtensorA.hpp"
+//#include "Tensor.hpp"
+#include "Ltensor.hpp"
 #include "AtomsPack.hpp"
 #include "AindexPack.hpp"
 #include "GatherMap.hpp"
@@ -38,11 +39,12 @@ namespace ptens{
 
     typedef cnine::SparseRmatrix BaseMatrix;
     typedef cnine::labeled_tree<int> labeled_tree;
-    typedef cnine::RtensorA RtensorA;
+    //typedef cnine::RtensorA RtensorA;
+    typedef cnine::Ltensor<float> rtensor;
 
     using BaseMatrix::BaseMatrix;
 
-    RtensorA labels;
+    rtensor labels;
     bool is_labeled=false;
 
     mutable Hgraph* _reverse=nullptr;
@@ -51,7 +53,7 @@ namespace ptens{
     mutable vector<AtomsPack*> _nhoods; 
     mutable AtomsPack* _edges=nullptr;
     mutable unordered_map<BaseMatrix,cnine::array_pool<int>*> subgraphlist_cache;
-    mutable unordered_map<BaseMatrix,shared_ptr<cnine::Tensor<int> > > subgraphlistmx_cache;
+    mutable unordered_map<BaseMatrix,shared_ptr<cnine::Ltensor<int> > > subgraphlistmx_cache;
     //mutable HgraphSubgraphListCache* subgraphlist_cache=nullptr;
 
     ~Hgraph(){
@@ -75,11 +77,11 @@ namespace ptens{
     Hgraph(const int _n):
       Hgraph(_n,_n){}
 
-    Hgraph(const int _n, const RtensorA& _labels):
-      Hgraph(_n,_n){
+    Hgraph(const int _n, const rtensor& _labels):
+      BaseMatrix(_n,_n),
+      labels(_labels.copy()){
       PTENS_ASSRT(_labels.dims.size()==1);
       PTENS_ASSRT(_labels.dims[0]==n);
-      labels=_labels;
       is_labeled=true;
     }
 
@@ -91,11 +93,10 @@ namespace ptens{
       }
     }
 
-    Hgraph(const int _n, const initializer_list<pair<int,int> >& list, const RtensorA& _labels): 
-      Hgraph(_n){
+    Hgraph(const int _n, const initializer_list<pair<int,int> >& list, const rtensor& _labels): 
+      Hgraph(_n,_labels){
       PTENS_ASSRT(_labels.dims.size()==1);
       PTENS_ASSRT(_labels.dims[0]==n);
-      labels=_labels;
       is_labeled=true;
       for(auto p:list){
 	set(p.first,p.second,1.0);
@@ -103,7 +104,7 @@ namespace ptens{
       }
     }
 
-    Hgraph(const cnine::RtensorA& _edges, int n):
+    Hgraph(const rtensor& _edges, int n):
       Hgraph(n){
       PTENS_ASSRT(_edges.ndims()==2);
       PTENS_ASSRT(_edges.get_dim(0)==2);
@@ -114,7 +115,7 @@ namespace ptens{
 	set(_edges(0,i),_edges(1,i),1.0);
     }
 
-    Hgraph(const cnine::RtensorA& _edges, const cnine::RtensorA& L, int n):
+    Hgraph(const rtensor& _edges, const rtensor& L, int n):
       Hgraph(n,L){
       PTENS_ASSRT(_edges.ndims()==2);
       PTENS_ASSRT(_edges.get_dim(0)==2);
@@ -125,17 +126,14 @@ namespace ptens{
 	set(_edges(0,i),_edges(1,i),1.0);
     }
 
-    Hgraph(const cnine::Tensor<float>& M, const cnine::RtensorA& L):
+    Hgraph(const rtensor& M, const rtensor& L):
       SparseRmatrix(M), labels(L), is_labeled(true){}
-
-    //Hgraph(const cnine::RtensorA& M, const cnine::RtensorA& L):
-    //SparseRmatrix(M), labels(L), is_labeled(true){}
 
 
   public: // ---- Named Constructors -------------------------------------------------------------------------
 
 
-    static Hgraph edge_index(const cnine::RtensorA& M, int n=-1){
+    static Hgraph edge_index(const rtensor& M, int n=-1){
       PTENS_ASSRT(M.ndims()==2);
       PTENS_ASSRT(M.get_dim(0)==2);
       if(n==-1) n=M.max()+1;
@@ -147,7 +145,7 @@ namespace ptens{
       return R;
     }
 
-    static Hgraph edge_index(const cnine::RtensorA& M, const int n, const int m){
+    static Hgraph edge_index(const rtensor& M, const int n, const int m){
       PTENS_ASSRT(M.ndims()==2);
       PTENS_ASSRT(M.get_dim(0)==2);
       int nedges=M.get_dim(1);
@@ -157,7 +155,7 @@ namespace ptens{
       return R;
     }
 
-    static Hgraph edge_index(const cnine::RtensorA& M, const cnine::RtensorA& L, int n=-1){
+    static Hgraph edge_index(const rtensor& M, const rtensor& L, int n=-1){
       PTENS_ASSRT(M.ndims()==2);
       PTENS_ASSRT(M.get_dim(0)==2);
       if(n==-1) n=M.max()+1;
@@ -243,9 +241,9 @@ namespace ptens{
     Hgraph(const BaseMatrix& x):
       BaseMatrix(x){}
 
-    Hgraph(const BaseMatrix& x, const cnine::RtensorA& L):
+    Hgraph(const BaseMatrix& x, const rtensor& L):
       BaseMatrix(x),
-      labels(L),
+      labels(L.copy()),
       is_labeled(true){
       PTENS_ASSRT(labels.dims.size()==1);
       PTENS_ASSRT(labels.dims[0]==n);
@@ -371,7 +369,7 @@ namespace ptens{
 
 
     Hgraph permute(const cnine::permutation pi) const{
-      RtensorA A({2,nedges()},cnine::fill_zero());
+      rtensor A(cnine::dims(2,nedges()),cnine::fill_zero());
       int t=0;
       for_each_edge([&](const int i, const int j, const float v){
 	  A.set(0,t,(float)pi(i));
@@ -513,7 +511,7 @@ namespace std{
   struct hash<ptens::Hgraph>{
   public:
     size_t operator()(const ptens::Hgraph& x) const{
-      if(x.is_labeled) return (hash<cnine::SparseRmatrix>()(x)<<1)^hash<cnine::RtensorA>()(x.labels);
+      if(x.is_labeled) return (hash<cnine::SparseRmatrix>()(x)<<1)^hash<cnine::Ltensor<float> >()(x.labels);
       return hash<cnine::SparseRmatrix>()(x);
     }
   };

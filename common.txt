@@ -8,20 +8,24 @@ CNINE_INCLUDES+=-I$(CNINE_ROOT)/math
 CNINE_INCLUDES+=-I$(CNINE_ROOT)/utility
 CNINE_INCLUDES+=-I$(CNINE_ROOT)/hpc
 CNINE_INCLUDES+=-I$(CNINE_ROOT)/wrappers
-CNINE_INCLUDES+=-I$(CNINE_ROOT)/objects/scalar 
-#CNINE_INCLUDES+=-I$(CNINE_ROOT)/objects/matrix 
-CNINE_INCLUDES+=-I$(CNINE_ROOT)/objects/tensor 
-#CNINE_INCLUDES+=-I$(CNINE_ROOT)/objects/tensor_views -I$(CNINE_ROOT)/objects/tensor_array 
-CNINE_INCLUDES+=-I$(CNINE_ROOT)/objects/backendA 
-#CNINE_INCLUDES+=-I$(CNINE_ROOT)/objects/backendB 
-#CNINE_INCLUDES+=-I$(CNINE_ROOT)/objects/tensor_array/cell_maps -I$(CNINE_ROOT)/objects/tensor_array/cell_ops 
-#CNINE_INCLUDES+=-I$(CNINE_ROOT)/objects/ntensor 
-#CNINE_INCLUDES+=-I$(CNINE_ROOT)/objects/labeled2 
-#CNINE_INCLUDES+=-I$(CNINE_ROOT)/objects/ntensor/functions 
 CNINE_INCLUDES+=-I$(CNINE_ROOT)/matrices 
 CNINE_INCLUDES+=-I$(CNINE_ROOT)/tensors 
 CNINE_INCLUDES+=-I$(CNINE_ROOT)/tensors/functions  
 CNINE_INCLUDES+=-I$(CNINE_ROOT)/tensor_views
+
+CNINE_LEGACY=-I$(CNINE_ROOT)/legacy/scalar 
+CNINE_LEGACY+=-I$(CNINE_ROOT)/legacy/matrix 
+CNINE_LEGACY+=-I$(CNINE_ROOT)/legacy/tensor 
+CNINE_LEGACY+=-I$(CNINE_ROOT)/legacy/tensor_views 
+CNINE_LEGACY+=-I$(CNINE_ROOT)/legacy/tensor_array 
+CNINE_LEGACY+=-I$(CNINE_ROOT)/legacy/backendA 
+CNINE_LEGACY+=-I$(CNINE_ROOT)/legacy/backendB 
+CNINE_LEGACY+=-I$(CNINE_ROOT)/legacy/tensor_array/cell_maps 
+CNINE_LEGACY+=-I$(CNINE_ROOT)/legacy/tensor_array/cell_ops 
+CNINE_LEGACY+=-I$(CNINE_ROOT)/legacy/ntensor 
+CNINE_LEGACY+=-I$(CNINE_ROOT)/legacy/labeled2 
+CNINE_LEGACY+=-I$(CNINE_ROOT)/legacy/ntensor/functions 
+
 
 CNINE_INCLUDEDIR=$(CNINE_ROOT)/include
 CNINE_CUDADIR=$(CNINE_ROOT)/cuda
@@ -29,6 +33,7 @@ CNINE_CUDADIR=$(CNINE_ROOT)/cuda
 INCLUDEDIR=$(ROOTDIR)/include
 CUDADIR=$(ROOTDIR)/cuda
 TENSORSDIR=$(ROOTDIR)/tensors
+OLDLAYERSDIR=$(ROOTDIR)/old_layers
 LAYERSDIR=$(ROOTDIR)/layers
 LAYERSBACKENDDIR=$(ROOTDIR)/layers/backend
 
@@ -36,10 +41,11 @@ PTENS_INCLUDES=
 PTENS_INCLUDES+=-I$(INCLUDEDIR)
 PTENS_INCLUDES+=-I$(CUDADIR)
 PTENS_INCLUDES+=-I$(TENSORSDIR)
+PTENS_INCLUDES+=-I$(OLDLAYERSDIR)
 PTENS_INCLUDES+=-I$(LAYERSDIR)
 PTENS_INCLUDES+=-I$(LAYERSBACKENDDIR)
 
-CFLAGS= -std=c++17 -O3 #-ferror-limit=1  
+CFLAGS= -std=c++17 -O3 -ferror-limit=1  
 INCLUDE= -I $(ROOTDIR)/include 
 LIBS= -lstdc++ -lm -lpthread 
 

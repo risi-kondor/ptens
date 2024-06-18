@@ -2,7 +2,6 @@ ROOTDIR=../..
 include $(ROOTDIR)/common.txt
 
 INCLUDE= $(CNINE_INCLUDES) $(PTENS_INCLUDES) 
-#-I$(INCLUDEDIR) -I$(TENSORSDIR) -I$(LAYERSDIR)  
 
 TESTS=$(patsubst %.cpp,%,$(wildcard *.cpp))
 
@@ -15,9 +14,11 @@ INCLUDE+=-I$(CUDA_HOME)/include
 CUDA_EXTERNS+=$(CNINE_INCLUDEDIR)/Cnine_base.cu 
 CUDA_OBJECTS=
 CUDA_OBJECTS+=$(CNINE_CUDADIR)/RtensorUtils.o
+CUDA_OBJECTS+=$(CNINE_CUDADIR)/gatherRows.o
 CUDA_OBJECTS+=$(CUDADIR)/Ptensors0.o
 CUDA_OBJECTS+=$(CUDADIR)/Ptensors1.o
 CUDA_OBJECTS+=$(CUDADIR)/Ptensors2.o
+CUDA_OBJECTS+=$(CUDADIR)/NodeLayer.o
 endif 
 
 $(TESTS): %: %.cpp $(DEPS)

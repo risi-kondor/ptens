@@ -14,7 +14,7 @@
 #ifndef _Ptens_Graph
 #define _Ptens_Graph
 
-#include "Hgraph.hpp"
+//#include "Hgraph.hpp"
 #include "GgraphObj.hpp"
 #include "Subgraph.hpp"
 #include "PtensSessionObj.hpp"

@@ -20,8 +20,8 @@
 #include "Rtensor2_view.hpp"
 #include "Rtensor3_view.hpp"
 
+#include "Ptensor0.hpp"
 #include "AtomsPack0.hpp"
-#include "Ptensors0.hpp"
 #include "PtensLoggedTimer.hpp"
 #include "Ltensor.hpp"
 #include "Ptensorsb.hpp"
@@ -177,11 +177,11 @@ namespace ptens{
       BASE(x),
       atoms(_atoms){}
     
-    Ptensors0b(const Ptensors0& x):
-      BASE(cnine::Gdims({x.tail/x.nc,x.nc})),
-      atoms(x.atoms){
-      TENSOR::view2().set(x.view_as_matrix().view2());
-    }
+    //Ptensors0b(const Ptensors0& x):
+    //BASE(cnine::Gdims({x.tail/x.nc,x.nc})),
+    //atoms(x.atoms){
+    //TENSOR::view2().set(x.view_as_matrix().view2());
+    //}
 
 
   public: // ---- Transport ----------------------------------------------------------------------------------
@@ -244,7 +244,7 @@ namespace ptens{
     }
 
     Ptensor0 operator()(const int i) const{
-      return Ptensor0(cnine::RtensorA(tensor_of(i).view1()),atoms_of(i));
+      return Ptensor0(tensor_of(i).view1(),atoms_of(i));
     }
 
 
@@ -385,35 +385,3 @@ namespace ptens{
 
 #endif 
 
-
-    /*
-    Ptensors0b(const at::Tensor& T):
-      BASE(T){
-      atoms=AtomsPack0(dim(0));
-    }
-
-    Ptensors0b(const at::Tensor& T, const AtomsPack& _atoms):
-      BASE(T), atoms(_atoms){}
-
-    Ptensors0b(const at::Tensor& T, const vector<vector<int> >& v):
-      BASE(T), atoms(v){}
-    */
-    /*
-    static Ptensors0b<TYPE> gather(const Ptensors0b<TYPE>& x, const AtomsPack& a){
-      Ptensors0b<TYPE> R(a,x.nchannels(),x.get_dev());
-      R.gather(x);
-      return R;
-    }
-
-    static Ptensors0b<TYPE> gather(const Ptensors1b<TYPE>& x, const AtomsPack& a){
-      Ptensors0b<TYPE> R(a,x.nchannels(),x.get_dev());
-      R.gather(x);
-      return R;
-    }
-
-    static Ptensors0b<TYPE> gather(const Ptensors2b<TYPE>& x, const AtomsPack& a){
-      Ptensors0b<TYPE> R(a,2*x.nchannels(),x.get_dev());
-      R.gather(x);
-      return R;
-    }
-    */

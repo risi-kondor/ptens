@@ -11,12 +11,11 @@
  * must be accompanied by a verbatim copy of the license. 
  *
  */
-#include "Cnine_base.cpp"
-#include "CnineSession.hpp"
 
+#include "Cnine_base.cpp"
+#include "Ptens_base.cpp"
 #include "LinmapLayers.hpp"
 #include "EMPlayers.hpp"
-#include "PtensorLayer.hpp"
 
 using namespace ptens;
 using namespace cnine;
@@ -26,17 +25,21 @@ PtensSession ptens_session;
 
 int main(int argc, char** argv){
 
-  int k=1;
+  #ifdef _WITH_CUDA
 
-  AtomsPack xatoms=AtomsPack::random(8,0.5);
-  AtomsPack yatoms=AtomsPack::random(8,0.5);
-  AtomsPack zatoms=AtomsPack::random(8,0.5);
+  Ptensors1 A=Ptensors1::sequential({{1,2,3},{3,5},{2}},2);
+  Ptensors1 Ag(A,1);
+  cout<<A<<endl;
 
-  AtomsPackN xatomsk(k,xatoms); 
-  AtomsPackN yatomsk(k,yatoms); 
-  AtomsPackN zatomsk(k,zatoms); 
+  cout<<linmaps0(A)<<endl;
+  cout<<linmaps0(Ag)<<endl;
 
-  AtomsPackN u=AtomsPackN::cat({xatomsk,yatomsk,zatomsk});
-  cout<<u<<endl;
+  cout<<linmaps1(A)<<endl;
+  cout<<linmaps1(Ag)<<endl;
+
+  cout<<linmaps2(A)<<endl;
+  cout<<linmaps2(Ag)<<endl;
+
+  #endif
 
 }

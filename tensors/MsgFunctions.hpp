@@ -14,10 +14,9 @@
 #ifndef _MsgFunctions
 #define _MsgFunctions
 
-#include "Ptensors0.hpp"
-#include "Ptensors1.hpp"
-#include "Ptensors2.hpp"
-#include "Hgraph.hpp"
+#include "Ptensor0.hpp"
+#include "Ptensor1.hpp"
+#include "Ptensor2.hpp"
 
 
 // ---- Individual Ptensors ----------------------------------------------------------------------------------

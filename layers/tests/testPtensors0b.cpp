@@ -15,8 +15,8 @@
 #include "Ptens_base.cpp"
 #include "CnineSession.hpp"
 
-#include "LinmapLayers.hpp"
-#include "EMPlayers.hpp"
+//#include "LinmapLayers.hpp"
+//#include "EMPlayers.hpp"
 #include "Ptensors0b.hpp"
 #include "Ptensors1b.hpp"
 #include "Ptensors2b.hpp"

@@ -16,23 +16,22 @@
 
 #include "Ptens_base.hpp"
 #include "Atoms.hpp"
-#include "RtensorA.hpp"
-#include "RtensorObj.hpp"
+//#include "RtensorA.hpp"
+#include "Ltensor.hpp"
 #include "Ptensor0.hpp"
-
 #include "Ptensor1_xview.hpp"
 
 
 namespace ptens{
 
-  class Ptensor1: public cnine::RtensorA{
+  class Ptensor1: public cnine::Ltensor<float>{
   public:
 
     int k;
     int nc;
     Atoms atoms;
 
-    typedef cnine::RtensorA rtensor;
+    typedef cnine::Ltensor<float> BASE;
     typedef cnine::Gdims Gdims;
     typedef cnine::Rtensor1_view Rtensor1_view;
     typedef cnine::Rtensor2_view Rtensor2_view;
@@ -43,7 +42,7 @@ namespace ptens{
 
     template<typename FILLTYPE, typename = typename std::enable_if<std::is_base_of<cnine::fill_pattern, FILLTYPE>::value, FILLTYPE>::type>
     Ptensor1(const Atoms& _atoms, const int _nc, const FILLTYPE& dummy, const int _dev=0):
-      rtensor(cnine::Gdims(_atoms.size(),_nc),dummy,_dev),
+      BASE(cnine::Gdims(_atoms.size(),_nc),dummy,_dev),
       atoms(_atoms),
       k(_atoms.size()), 
       nc(_nc){
@@ -73,13 +72,13 @@ namespace ptens{
 
 
     Ptensor1(const Ptensor1& x):
-      RtensorA(x), atoms(x.atoms){
+      BASE(x.copy()), atoms(x.atoms){
       k=x.k;
       nc=x.nc;
     }
 
     Ptensor1(Ptensor1&& x):
-      RtensorA(std::move(x)), atoms(std::move(x.atoms)){
+      BASE(x), atoms(std::move(x.atoms)){
       k=x.k;
       nc=x.nc;
     }
@@ -90,10 +89,10 @@ namespace ptens{
     // ---- Conversions --------------------------------------------------------------------------------------
 
 
-    Ptensor1(RtensorA&& x, Atoms&& _atoms):
-      RtensorA(std::move(x)),
+    Ptensor1(BASE&& x, Atoms&& _atoms):
+      BASE(x),
       atoms(std::move(_atoms)){
-      assert(x.getk()==2);
+      assert(x.ndims()==2);
       k=dims(0);
       nc=dims.back();
      }
@@ -101,7 +100,7 @@ namespace ptens{
 
     #ifdef _WITH_ATEN
     static Ptensor1 view(at::Tensor& x, Atoms&& _atoms){
-      return Ptensor1(RtensorA::view(x),std::move(_atoms));
+      return Ptensor1(BASE::view(x),std::move(_atoms));
     }
     #endif 
  
@@ -136,11 +135,11 @@ namespace ptens{
     }
 
     Ptensor1_xview view(const vector<int>& ix) const{
-      return Ptensor1_xview(arr,nc,strides[0],strides[1],ix,dev);
+      return Ptensor1_xview(const_cast<float*>(arr.get_arr()),nc,strides[0],strides[1],ix,dev);
     }
 
     Ptensor1_xview view(const vector<int>& ix, const int offs, const int n) const{
-      return Ptensor1_xview(arr+strides[1]*offs,n,strides[0],strides[1],ix,dev);
+      return Ptensor1_xview(const_cast<float*>(arr.get_arr())+strides[1]*offs,n,strides[0],strides[1],ix,dev);
     }
 
 
@@ -171,7 +170,7 @@ namespace ptens{
     void add_linmaps_back(const Ptensor1& x, int offs=0){ // 2 
       PTENS_K_SAME(x)
       PTENS_CHANNELS(offs+2*nc<=x.nc);
-      broadcast0(x.reduce0(offs,nc).view2());
+      broadcast0(x.reduce0(offs,nc).view1()); // corrected!!
       broadcast1(x.view(offs+nc,nc));
     }
     
@@ -193,51 +192,51 @@ namespace ptens{
   public: // ---- Reductions ---------------------------------------------------------------------------------
 
 
-    rtensor reduce0() const{
-      auto R=rtensor::zero(nc);
+    BASE reduce0() const{
+      auto R=BASE::zero(nc);
       view().sum0_into(R.view1());
       return R;
     }
 
-    rtensor reduce0(const int offs, const int n) const{
-      auto R=rtensor::zero(n);
+    BASE reduce0(const int offs, const int n) const{
+      auto R=BASE::zero(n);
       view(offs,n).sum0_into(R.view1());
       return R;
     }
 
-    rtensor reduce0(const vector<int>& ix) const{
-      auto R=rtensor::zero(Gdims(nc));
+    BASE reduce0(const vector<int>& ix) const{
+      auto R=BASE::zero(Gdims(nc));
       view(ix).sum0_into(R.view1());
       return R;
     }
 
-    rtensor reduce0(const vector<int>& ix, const int offs, const int n) const{
-      auto R=rtensor::zero(Gdims(n));
+    BASE reduce0(const vector<int>& ix, const int offs, const int n) const{
+      auto R=BASE::zero(Gdims(n));
       view(ix,offs,n).sum0_into(R.view1());
       return R;
     }
 
 
-    rtensor reduce1() const{
-      auto R=rtensor::zero({k,nc});
+    BASE reduce1() const{
+      auto R=BASE::zero({k,nc});
       R.view2().add(view());
       return R;
     }
 
-    rtensor reduce1(const int offs, const int n) const{
-      auto R=rtensor::zero({k,n});
+    BASE reduce1(const int offs, const int n) const{
+      auto R=BASE::zero({k,n});
       R.view2().add(view(offs,n));
       return R;
     }
 
-    rtensor reduce1(const vector<int>& ix) const{
-      auto R=rtensor::zero({(int)ix.size(),nc});
+    BASE reduce1(const vector<int>& ix) const{
+      auto R=BASE::zero({(int)ix.size(),nc});
       R.view2().add(view(ix));
       return R;
     }
 
-    rtensor reduce1(const vector<int>& ix, const int offs, const int n) const{
-      auto R=rtensor::zero({(int)ix.size(),n});
+    BASE reduce1(const vector<int>& ix, const int offs, const int n) const{
+      auto R=BASE::zero({(int)ix.size(),n});
       R.view2().add(view(ix,offs,n));
       return R;
     }
@@ -246,39 +245,39 @@ namespace ptens{
   public: // ---- Broadcasting -------------------------------------------------------------------------------
 
 
-    void broadcast0(const rtensor& x){
+    void broadcast0(const BASE& x){
       view()+=repeat0(x.view1(),k);
     }
 
-    int broadcast0(const rtensor& x, const int offs){
+    int broadcast0(const BASE& x, const int offs){
       view(offs,x.dim(0))+=repeat0(x.view1(),k);
       return x.dim(0);
     }
 
-    void broadcast0(const rtensor& x, const vector<int>& ix){
+    void broadcast0(const BASE& x, const vector<int>& ix){
       view(ix)+=repeat0(x.view1(),ix.size());
     }
 
-    int broadcast0(const rtensor& x, const vector<int>& ix, const int offs){
+    int broadcast0(const BASE& x, const vector<int>& ix, const int offs){
       view(ix,offs,x.dim(0))+=repeat0(x.view1(),ix.size());
       return x.dim(0);
     }
 
 
-    void broadcast1(const rtensor& x){
-      add(x.view2());
+    void broadcast1(const BASE& x){
+      view2().add(x.view2());
     }
 
-    int broadcast1(const rtensor& x, const int offs){
+    int broadcast1(const BASE& x, const int offs){
       view(offs,x.dim(1))+=x.view2();
       return x.dim(1);
     }
 
-    void broadcast1(const rtensor& x, const vector<int>& ix){
+    void broadcast1(const BASE& x, const vector<int>& ix){
       view(ix)+=x.view2();
     }
 
-    int broadcast1(const rtensor& x, const vector<int>& ix, const int offs){
+    int broadcast1(const BASE& x, const vector<int>& ix, const int offs){
       view(ix,offs,x.dim(1))+=x.view2();
       return x.dim(1);
     }
@@ -286,6 +285,7 @@ namespace ptens{
 
   private: // ---- Broadcasting -------------------------------------------------------------------------------
     // These methods are deprectated / on hold 
+
 
     void broadcast0(const Rtensor1_view& x){
       view()+=repeat0(x,k);
@@ -296,18 +296,18 @@ namespace ptens{
       return x.n0;
     }
 
-    void broadcast0(const Rtensor1_view& x, vector<int>& ix){
+    void broadcast0(const Rtensor1_view& x, const vector<int>& ix){
       view(ix)+=repeat0(x,ix.size());
     }
 
-    int broadcast0(const Rtensor1_view& x, vector<int>& ix, const int offs){
+    int broadcast0(const Rtensor1_view& x, const vector<int>& ix, const int offs){
       view(ix,offs,x.n0)+=repeat0(x,ix.size());
       return x.n0;
     }
 
 
     void broadcast1(const Rtensor2_view& x){
-      add(x);
+      view2().add(x);
     }
 
     int broadcast1(const Rtensor2_view& x, const int offs){

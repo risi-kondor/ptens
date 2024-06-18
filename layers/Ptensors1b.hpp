@@ -21,7 +21,7 @@
 #include "Rtensor3_view.hpp"
 
 #include "AtomsPack1.hpp"
-#include "Ptensors1.hpp"
+#include "Ptensor1.hpp"
 #include "PtensLoggedTimer.hpp"
 #include "Ltensor.hpp"
 #include "Ptensorsb.hpp"
@@ -178,11 +178,11 @@ namespace ptens{
       BASE(x),
       atoms(_atoms){}
 
-    Ptensors1b(const Ptensors1& x):
-      BASE(cnine::Gdims({x.tail/x.nc,x.nc})),
-      atoms(x.atoms){
-      BASE::view2().set(x.view_as_matrix().view2());
-    }
+    //Ptensors1b(const Ptensors1& x):
+    //BASE(cnine::Gdims({x.tail/x.nc,x.nc})),
+    //atoms(x.atoms){
+    //BASE::view2().set(x.view_as_matrix().view2());
+    //}
 
 
   public: // ---- Transport ----------------------------------------------------------------------------------
@@ -254,7 +254,7 @@ namespace ptens{
     }
 
     Ptensor1 operator()(const int i) const{
-      return Ptensor1(cnine::RtensorA(tensor_of(i).view2()),atoms_of(i));
+      return Ptensor1(tensor_of(i),atoms_of(i));
     }
 
     const cnine::Rtensor3_view view3(const int K) const{
@@ -435,7 +435,7 @@ namespace ptens{
       }
       ostringstream oss;
       for(int i=0; i<size(); i++){
-	oss<<(*this)(i).str(indent)<<endl;
+	//oss<<(*this)(i).str(indent)<<endl;
       }
       return oss.str();
     }

@@ -21,7 +21,7 @@
 #include "Rtensor3_view.hpp"
 
 #include "AtomsPack2.hpp"
-#include "Ptensors2.hpp"
+#include "Ptensor2.hpp"
 #include "PtensLoggedTimer.hpp"
 #include "Ltensor.hpp"
 #include "Ptensorsb.hpp"
@@ -164,11 +164,11 @@ namespace ptens{
       BASE(x),
       atoms(_atoms){}
 
-    Ptensors2b(const Ptensors2& x):
-      BASE(cnine::Gdims({x.tail/x.nc,x.nc})),
-      atoms(x.atoms){
-      BASE::view2().set(x.view_as_matrix().view2());
-    }
+    //Ptensors2b(const Ptensors2& x):
+    //BASE(cnine::Gdims({x.tail/x.nc,x.nc})),
+    //atoms(x.atoms){
+    //BASE::view2().set(x.view_as_matrix().view2());
+    //}
 
 
   public: // ---- Transport ----------------------------------------------------------------------------------
@@ -236,7 +236,7 @@ namespace ptens{
     }
 
     Ptensor2 operator()(const int i) const{
-      return Ptensor2(cnine::RtensorA(tensor_of(i).view3()),atoms_of(i));
+      return Ptensor2(tensor_of(i).view3(),atoms_of(i));
     }
 
     Rtensor3_view view3_of(const int i) const{

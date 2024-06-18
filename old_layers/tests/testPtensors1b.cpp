@@ -11,13 +11,26 @@
  * must be accompanied by a verbatim copy of the license. 
  *
  */
-#ifndef _LinearMsg
-#define _LinearMsg
 
-namsepace ptens{
+#include "Cnine_base.cpp"
+#include "Ptens_base.cpp"
+#include "Ptensors0.hpp"
+#include "Ptensors0b.hpp"
+#include "Ptensors1.hpp"
 
+using namespace ptens;
+using namespace cnine;
+
+PtensSession ptens_session;
+
+
+int main(int argc, char** argv){
+
+  Ptensors0 A=Ptensors0::sequential(2,3);
+  cout<<A<<endl;
+
+  Ptensors0b<float> Ab(A);
+  cout<<Ab<<endl;
 
 }
 
-
-#endif 

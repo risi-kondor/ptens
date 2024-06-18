@@ -23,7 +23,6 @@ namespace ptens{
   class Ptensor2_xview: public cnine::Rtensor3_view{
   public:
 
-    typedef cnine::RtensorA rtensor;
     typedef cnine::Gdims Gdims;
     typedef cnine::Rtensor1_view Rtensor1_view;
     typedef cnine::Rtensor2_view Rtensor2_view;

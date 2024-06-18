@@ -15,10 +15,8 @@
 #define _ptens_Ptensor2
 
 #include "Atoms.hpp"
-#include "RtensorObj.hpp"
 #include "Ptensor2.hpp"
 
-// #define PTENSOR_PTENSOR_IMPL cnine::RtensorObj
 
 
 namespace ptens{
@@ -28,7 +26,7 @@ namespace ptens{
 
     Atoms atoms;
 
-    typedef cnine::RtensorObj rtensor;
+    typedef cnine::Ltensor<float> BASE;
 
 
     // ---- Constructors -------------------------------------------------------------------------------------
