@@ -30,12 +30,12 @@ int main(int argc, char** argv){
   typedef Ptensors1b<float> Ptens1;
   typedef Ptensors2b<float> Ptens2;
 
-  AtomsPack xatoms=AtomsPack::random(8,0.5);
+  AtomsPack xatoms=AtomsPack::random(8,8,0.5);
   Ptens0 X0=Ptens0(xatoms,channels=1,filltype=4);
   Ptens1 X1=Ptens1(xatoms,channels=1,filltype=4);
   Ptens2 X2=Ptens2(xatoms,channels=1,filltype=4);
 
-  AtomsPack yatoms=AtomsPack::random(8,0.5);
+  AtomsPack yatoms=AtomsPack::random(8,8,0.5);
   auto Y0=Ptens2::gather(X0,yatoms);
   cout<<Y0<<endl;
 

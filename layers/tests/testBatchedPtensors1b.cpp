@@ -30,7 +30,7 @@ int main(int argc, char** argv){
   typedef BatchedPtensors1b<float> BPtens1;
   typedef BatchedPtensors2b<float> BPtens2;
 
-  AtomsPack xatoms=AtomsPack::random(4,0.5);
+  AtomsPack xatoms=AtomsPack::random(4,4,0.5);
   BatchedAtomsPack bxatoms({xatoms,xatoms,xatoms});
 
   BPtens0 X0=BPtens0(bxatoms,channels=3,filltype=3);
@@ -55,7 +55,7 @@ int main(int argc, char** argv){
   cout<<X2ga<<endl;
 
 
-  AtomsPack yatoms=AtomsPack::random(4,0.5);
+  AtomsPack yatoms=AtomsPack::random(4,4,0.5);
   BatchedAtomsPack byatoms({xatoms,xatoms,xatoms});
 
   auto Y0=BPtens1::gather(X0,byatoms);

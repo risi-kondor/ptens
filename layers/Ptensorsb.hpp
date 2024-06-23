@@ -16,7 +16,6 @@
 #define _ptens_Ptensorsb
 
 #include "diff_class.hpp"
-#include "AtomsPack0.hpp"
 #include "Ptensorsb.hpp"
 #include "PtensLoggedTimer.hpp"
 #include "Ltensor.hpp"

@@ -40,8 +40,8 @@ int main(int argc, char** argv){
   typedef Ptensors1b<float> Ptens1;
   typedef Ptensors2b<float> Ptens2;
 
-  AtomsPack xatoms=AtomsPack::random(N,0.5);
-  AtomsPack yatoms=AtomsPack::random(N,0.5);
+  AtomsPack xatoms=AtomsPack::random(N,N,0.5);
+  AtomsPack yatoms=AtomsPack::random(N,N,0.5);
 
   Ptens0 X0=Ptens0(xatoms,channels=nc,filltype=3);
   Ptens1 X1=Ptens1(xatoms,channels=nc,filltype=3);

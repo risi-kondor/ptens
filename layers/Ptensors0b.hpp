@@ -21,16 +21,31 @@
 #include "Rtensor3_view.hpp"
 
 #include "Ptensor0.hpp"
-#include "AtomsPack0.hpp"
 #include "PtensLoggedTimer.hpp"
 #include "Ltensor.hpp"
 #include "Ptensorsb.hpp"
+#include "PtensorsJig0.hpp"
 
 
 namespace ptens{
 
-  template<typename TYPE> class Ptensors1b;
-  template<typename TYPE> class Ptensors2b;
+
+  class Jig0ptr: public shared_ptr<PtensorsJig0<int> >{
+  public:
+
+    typedef shared_ptr<PtensorsJig0<int> > BASE;
+
+    Jig0ptr(const BASE& x):
+      BASE(x){}
+
+    Jig0ptr(const AtomsPack& _atoms):
+      BASE(PtensorsJig0<int>::make_or_cached(_atoms)){}
+
+    Jig0ptr(const shared_ptr<AtomsPackObj>& _atoms):
+      BASE(PtensorsJig0<int>::make_or_cached(_atoms)){}
+
+  };
+
 
 
   template<typename TYPE>
@@ -48,7 +63,8 @@ namespace ptens{
     using TENSOR::add;
 
 
-    AtomsPack0 atoms;
+    AtomsPack atoms;
+    Jig0ptr jig;
 
 
     ~Ptensors0b(){
@@ -63,35 +79,27 @@ namespace ptens{
 
     Ptensors0b(){}
 
-    Ptensors0b(const TENSOR& M): 
-      BASE(M.copy()),
-      atoms(AtomsPack0(M.dim(0))){}
-
-    Ptensors0b(const AtomsPack0& _atoms, const TENSOR& M):
-      BASE(M.copy()),
-      atoms(_atoms){}
-
-    Ptensors0b(const AtomsPack& _atoms, const TENSOR& M):
-      BASE(M.copy()),
-      atoms(_atoms){}
+    Ptensors0b(const TENSOR& M, const Jig0ptr& _jig):
+      BASE(M),
+      atoms(_jig->atoms),
+      jig(_jig){}
 
     Ptensors0b(const AtomsPack& _atoms, const int nc, const int _dev=0):
       BASE(cnine::Gdims(_atoms.size(),nc),0,_dev),
-      atoms(_atoms){}
+      atoms(_atoms),
+      jig(_atoms){}
 
     Ptensors0b(const AtomsPack& _atoms, const int nc, const int fcode, const int _dev):
       BASE(cnine::Gdims(_atoms.size(),nc),fcode,_dev),
-      atoms(_atoms){}
+      atoms(_atoms),
+      jig(_atoms){}
 
-    Ptensors0b(const int n, const int nc, const int fcode=0, const int _dev=0):
-      BASE(cnine::Gdims(n,nc),fcode,_dev),
-      atoms(n){}
 
     static Ptensors0b cat(const vector<Ptensors0b>& list){
-      vector<AtomsPack0> v;
+      vector<PtensorsJig0<int>*> v;
       for(auto& p:list)
-	v.push_back(p.atoms);
-      return Ptensors0b(AtomsPack0::cat(v),cnine::Ltensor<TYPE>::stack(0,list));
+	v.push_back(p.jig.get());
+      return Ptensors0b(cnine::Ltensor<TYPE>::stack(0,list),PtensorsJig0<int>::cat(v));
     }
 
 
@@ -106,7 +114,8 @@ namespace ptens{
 
     template<typename... Args>
     Ptensors0b(const AtomsPack& _atoms, const Args&... args):
-      atoms(_atoms){
+      atoms(_atoms),
+      jig(_atoms){
       vparams v;
       unroller(v,args...);
       TENSOR::reset(TENSOR({atoms.size(),v.nc},v.fcode,v.dev));
@@ -132,12 +141,12 @@ namespace ptens{
 
     Ptensors0b copy() const{
       cnine::using_vram_manager vv(ptens_session->managed_gmem);
-      return Ptensors0b(TENSOR::copy(),atoms);
+      return Ptensors0b(TENSOR::copy(),jig);
     }
 
     Ptensors0b copy(const int _dev) const{
       cnine::using_vram_manager vv(ptens_session->managed_gmem);
-      return Ptensors0b(TENSOR::copy(_dev),atoms);
+      return Ptensors0b(TENSOR::copy(_dev),jig);
     }
 
     Ptensors0b zeros_like() const{
@@ -173,9 +182,9 @@ namespace ptens{
   public: // ----- Conversions -------------------------------------------------------------------------------
 
 
-    Ptensors0b(const TENSOR& x, const AtomsPack0& _atoms):
-      BASE(x),
-      atoms(_atoms){}
+    //Ptensors0b(const TENSOR& x, const AtomsPack& _atoms):
+    //BASE(x),
+    //atoms(_atoms){}
     
     //Ptensors0b(const Ptensors0& x):
     //BASE(cnine::Gdims({x.tail/x.nc,x.nc})),
@@ -189,7 +198,8 @@ namespace ptens{
 
     Ptensors0b(const Ptensors0b& x, const int _dev):
       BASE(x.copy(_dev)), 
-      atoms(x.atoms){}
+      atoms(x.atoms),
+      jig(x.jig){}
 
 
   public: // ----- Virtual functions --------------------------------------------------------------------------
@@ -224,11 +234,19 @@ namespace ptens{
     }
 
     AtomsPack get_atoms() const{
-      return atoms.obj->atoms;
+      return atoms;
     }
 
     int offset(const int i) const{
+      return atoms.row_offset0(i);
+    }
+
+    int index_of(const int i) const{
       return i;
+    }
+
+    int tsize() const{
+      return atoms.tsize0();
     }
 
     //int nrows(const int i) const{
@@ -243,7 +261,7 @@ namespace ptens{
       return TENSOR::row(offset(i));
     }
 
-    Ptensor0 operator()(const int i) const{
+    Ptensor0<TYPE> operator()(const int i) const{
       return Ptensor0(tensor_of(i).view1(),atoms_of(i));
     }
 
@@ -251,21 +269,13 @@ namespace ptens{
   public: // ---- Operations ---------------------------------------------------------------------------------
 
 
-  public: // ---- Message passing ----------------------------------------------------------------------------
+  public: // ---- Linmaps ------------------------------------------------------------------------------------
 
 
     template<typename SOURCE, typename = typename std::enable_if<std::is_base_of<Ptensorsb<float>, SOURCE>::value, SOURCE>::type>
     static Ptensors0b<float> linmaps(const SOURCE& x){
       Ptensors0b<float> R(x.get_atoms(),x.get_nc()*vector<int>({1,1,2})[x.getk()],x.get_dev());
       R.add_linmaps(x);
-      return R;
-    }
-
-    template<typename SOURCE, typename = typename std::enable_if<std::is_base_of<Ptensorsb<float>, SOURCE>::value, SOURCE>::type>
-    static Ptensors0b<TYPE> gather(const SOURCE& x, const AtomsPack& a){
-      int nc=x.get_nc()*vector<int>({1,1,2})[x.getk()];
-      Ptensors0b<TYPE> R(a,nc,x.get_dev());
-      R.add_gather(x);
       return R;
     }
 
@@ -294,19 +304,32 @@ namespace ptens{
       add(r.reduce0_shrink(0,nc));
     }
 
+
+  public: // ---- Message passing ----------------------------------------------------------------------------
+
+
+    template<typename SOURCE, typename = typename std::enable_if<std::is_base_of<Ptensorsb<float>, SOURCE>::value, SOURCE>::type>
+    static Ptensors0b<TYPE> gather(const SOURCE& x, const AtomsPack& a){
+      int nc=x.get_nc()*vector<int>({1,1,2})[x.getk()];
+      Ptensors0b<TYPE> R(a,nc,x.get_dev());
+      R.add_gather(x);
+      return R;
+    }
+
     template<typename SOURCE>
     void add_gather(const SOURCE& x){
-      (atoms.overlaps_mmap(x.atoms))(*this,x);
+      (jig->rmap(x,atoms.overlaps_mlist(x.atoms)))(*this,x);
+      //(atoms.overlaps_mmap(x.atoms))(*this,x);
     }
 
     template<typename OUTPUT>
     void add_gather_back(const OUTPUT& x){
-      x.atoms.overlaps_mmap(atoms).inv()(*this,x);
+      //x.atoms.overlaps_mmap(atoms).inv()(*this,x);
     }
 
     template<typename OUTPUT>
     void add_gather_back_alt(const OUTPUT& x){ // TODO
-      x.atoms.overlaps_mmap(atoms).inv()(this->get_grad(),x.get_grad());
+      //x.atoms.overlaps_mmap(atoms).inv()(this->get_grad(),x.get_grad());
     }
 
     //template<typename OUTPUT>
@@ -330,6 +353,56 @@ namespace ptens{
       TimedFn T("Ptensors0b","broadcast0",*this);
       int nc=X.dim(1);
       BASE::view2().cols(offs,nc)+=X.view2();
+    }
+
+
+  public: // ---- Transfer maps -----------------------------------------------------------------------------
+
+
+    // 0 <- 0
+    MessageMap mmap(const MessageListObj& lists, const Ptensors0b<TYPE>& y){
+      auto[in,out]=lists.lists();
+      cnine::map_of_lists<int,int> direct;
+      for(int m=0; m<in.size(); m++){
+	int in_tensor=in.head(m);
+	int out_tensor=out.head(m);
+	direct.push_back(index_of(out_tensor),y.index_of(in_tensor));
+      }
+      return cnine::GatherMapProgram(tsize(),y.tsize(),new cnine::GatherMapB(direct));
+    };
+  
+
+    // 0 <- 1
+    MessageMap mmap(const MessageListObj& lists, const Ptensors1b<TYPE>& y){
+      auto[in_lists,out_lists]=lists.lists();
+      cnine::map_of_lists<int,int> direct;
+      for(int m=0; m<in_lists.size(); m++){
+	int in_tensor=in_lists.head(m);
+	int out_tensor=out_lists.head(m);
+	int k=in_lists.size_of(m);
+	for(int j=0; j<k; j++)
+	  direct.push_back(index_of(out_tensor),y.index_of(in_tensor,in_lists(m,j)));
+      }
+      return cnine::GatherMapProgram(tsize(),y.tsize(),new cnine::GatherMapB(direct));
+    }
+
+
+    // 0 <- 2
+    MessageMap mmap(const MessageListObj& lists, const Ptensors2b<TYPE>& y){
+      auto[in_lists,out_lists]=lists.lists();
+      cnine::map_of_lists<int,int> direct;
+      for(int m=0; m<in_lists.size(); m++){
+	int in_tensor=in_lists.head(m);
+	int out_tensor=out_lists.head(m);
+	vector<int> in=in_lists(m);
+	vector<int> out=out_lists(m);
+	for(int i0=0; i0<in.size(); i0++)
+	  direct.push_back(2*index_of(out_tensor)+1,y.index_of(in_tensor,in[i0],in[i0]));
+	for(int i0=0; i0<in.size(); i0++)
+	  for(int i1=0; i1<in.size(); i1++)
+	    direct.push_back(2*index_of(out_tensor),y.index_of(in_tensor,in[i0],in[i1]));
+      }
+      return cnine::GatherMapProgram(new cnine::GatherMapB(direct,2));
     }
 
 

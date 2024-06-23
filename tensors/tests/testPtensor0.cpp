@@ -24,7 +24,7 @@ int main(int argc, char** argv){
 
   PtensSession session;
 
-  auto A=Ptensor0::gaussian({0,1,2,3},3);
+  auto A=Ptensor0<float>::gaussian({0,1,2,3},3);
   cout<<A<<endl;
   cout<<linmaps0(A)<<endl;
   cout<<linmaps1(A)<<endl;

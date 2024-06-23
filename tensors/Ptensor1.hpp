@@ -24,17 +24,24 @@
 
 namespace ptens{
 
-  class Ptensor1: public cnine::Ltensor<float>{
+  template<typename TYPE=float>
+  class Ptensor1: public cnine::Ltensor<TYPE>{
   public:
 
     int k;
     int nc;
     Atoms atoms;
 
-    typedef cnine::Ltensor<float> BASE;
+    typedef cnine::Ltensor<TYPE> BASE;
     typedef cnine::Gdims Gdims;
     typedef cnine::Rtensor1_view Rtensor1_view;
     typedef cnine::Rtensor2_view Rtensor2_view;
+
+    using BASE::arr;
+    using BASE::dev;
+    using BASE::dims;
+    using BASE::strides;
+    using BASE::view2;
 
 
     // ---- Constructors -------------------------------------------------------------------------------------
@@ -89,6 +96,14 @@ namespace ptens{
     // ---- Conversions --------------------------------------------------------------------------------------
 
 
+    Ptensor1(const BASE& x, const Atoms& _atoms):
+      BASE(x.copy()),
+      atoms(_atoms){
+      assert(x.ndims()==2);
+      k=dims(0);
+      nc=dims.back();
+     }
+
     Ptensor1(BASE&& x, Atoms&& _atoms):
       BASE(x),
       atoms(std::move(_atoms)){
@@ -116,11 +131,11 @@ namespace ptens{
       return dims.back();
     }
 
-    float at_(const int i, const int c) const{
+    TYPE at_(const int i, const int c) const{
       return (*this)(atoms(i),c);
     }
 
-    void inc_(const int i, const int c, float x){
+    void inc_(const int i, const int c, TYPE x){
       inc(atoms(i),c,x);
     }
 
@@ -135,11 +150,11 @@ namespace ptens{
     }
 
     Ptensor1_xview view(const vector<int>& ix) const{
-      return Ptensor1_xview(const_cast<float*>(arr.get_arr()),nc,strides[0],strides[1],ix,dev);
+      return Ptensor1_xview(const_cast<TYPE*>(arr.get_arr()),nc,strides[0],strides[1],ix,dev);
     }
 
     Ptensor1_xview view(const vector<int>& ix, const int offs, const int n) const{
-      return Ptensor1_xview(const_cast<float*>(arr.get_arr())+strides[1]*offs,n,strides[0],strides[1],ix,dev);
+      return Ptensor1_xview(const_cast<TYPE*>(arr.get_arr())+strides[1]*offs,n,strides[0],strides[1],ix,dev);
     }
 
 
@@ -147,13 +162,13 @@ namespace ptens{
 
 
     // 0 -> 1 
-    void add_linmaps(const Ptensor0& x, int offs=0){ // 1
+    void add_linmaps(const Ptensor0<TYPE>& x, int offs=0){ // 1
       PTENS_K_SAME(x);
       PTENS_CHANNELS(offs+1*x.nc<=nc);
       offs+=broadcast0(x.view1(),offs); // 1*1
     }
     
-    void add_linmaps_back_to(Ptensor0& x, int offs=0) const{ // 1
+    void add_linmaps_back_to(Ptensor0<TYPE>& x, int offs=0) const{ // 1
       PTENS_K_SAME(x)
       view(offs,x.nc).sum0_into(x.view1());
     }
@@ -176,13 +191,13 @@ namespace ptens{
     
 
     // 1 -> 0
-    void add_linmaps_to(Ptensor0& x, int offs=0) const{ // 1 
+    void add_linmaps_to(Ptensor0<TYPE>& x, int offs=0) const{ // 1 
       PTENS_K_SAME(x)
       PTENS_CHANNELS(offs+1*nc<=x.nc);
       offs+=x.broadcast0(reduce0(),offs); // 1*1
     }
     
-    void add_linmaps_back(const Ptensor0& x, int offs=0){ // 1 
+    void add_linmaps_back(const Ptensor0<TYPE>& x, int offs=0){ // 1 
       PTENS_K_SAME(x)
       PTENS_CHANNELS(offs+1*nc<=x.nc);
       view()+=repeat0(x.view(offs,nc),k);
@@ -330,8 +345,8 @@ namespace ptens{
 
     string str(const string indent="")const{
       ostringstream oss;
-      oss<<indent<<"Ptensor1 "<<atoms<<":"<<endl;
-      oss<<view2().str(indent);
+      oss<<cnine::base_indent<<indent<<"Ptensor1 "<<atoms<<":"<<endl;
+      oss<<view2().str(indent+"  ");
       return oss.str();
     }
 

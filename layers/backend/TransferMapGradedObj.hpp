@@ -48,16 +48,6 @@ namespace ptens{
       k(_k),
       SparseRmatrix(_n,_m){}
 
-    /*
-    TransferMapGradedObj(const int _k, const ATOMSPACK& in_atoms, const ATOMSPACK& out_atoms, const SparseRmatrix& _map):
-      SparseRmatrix(_map),
-      k(_k),
-      in(cnine::Gdims(_map.size(),k+1),cnine::fill_raw()),
-      out(cnine::Gdims(_map.size(),k+1),cnine::fill_raw()){
-      make_intersects(in_atoms,out_atoms);
-    }
-    */
-
 
   public: // ---- Access -------------------------------------------------------------------------------------
 

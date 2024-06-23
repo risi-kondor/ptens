@@ -56,8 +56,8 @@ namespace ptens{
   public: // ---- Static Constructors ------------------------------------------------------------------------
 
 
-    static AtomsPack random(const int n, const float p=0.5){
-      return AtomsPack(new AtomsPackObj(AtomsPackObj::random(n,p)));
+    static AtomsPack random(const int n, const int m, const float p=0.5){
+      return AtomsPack(new AtomsPackObj(AtomsPackObj::random(n,m,p)));
     }
 
     static AtomsPack random0(const int n){

@@ -21,13 +21,20 @@
 
 namespace ptens{
 
-  class Ptensor0: public cnine::Ltensor<float>{
+  template<class TYPE=float>
+  class Ptensor0: public cnine::Ltensor<TYPE>{
   public:
 
 
     typedef cnine::Gdims Gdims;
-    typedef cnine::Ltensor<float> BASE;
+    typedef cnine::Ltensor<TYPE> BASE;
     typedef cnine::Rtensor1_view Rtensor1_view;
+
+    using BASE::arr;
+    using BASE::dev;
+    using BASE::dims;
+    using BASE::strides;
+    using BASE::view1;
 
     int k;
     int nc;
@@ -136,11 +143,11 @@ namespace ptens{
       return atoms;
     }
 
-    float at_(const int i, const int c) const{
+    TYPE at_(const int i, const int c) const{
       return (*this)(atoms(i),c);
     }
 
-    void inc_(const int i, const int c, float x){
+    void inc_(const int i, const int c, TYPE x){
       inc(atoms(i),c,x);
     }
 
@@ -244,8 +251,8 @@ namespace ptens{
 
     string str(const string indent="")const{
       ostringstream oss;
-      oss<<indent<<"Ptensor0 "<<atoms<<":"<<endl;
-      oss<<BASE::str(indent);
+      oss<<cnine::base_indent<<indent<<"Ptensor0 "<<atoms<<":"<<endl;
+      oss<<view1().str(indent+"  ");
       return oss.str();
     }
 

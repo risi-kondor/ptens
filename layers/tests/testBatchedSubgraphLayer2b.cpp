@@ -35,7 +35,7 @@ int main(int argc, char** argv){
 
   Subgraph trivial=Subgraph::trivial();
 
-  AtomsPack xatoms0=AtomsPack::random(10,0.5);
+  AtomsPack xatoms0=AtomsPack::random(10,10,0.5);
   BatchedAtomsPack xatoms({xatoms0,xatoms0,xatoms0});
 
   BPtens1 X1=BPtens1(xatoms,channels=3,filltype=3);

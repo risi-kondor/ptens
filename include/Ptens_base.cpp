@@ -1,3 +1,4 @@
+#include "Cnine_base.cpp"
 #include "PtensSessionObj.hpp"
 
 #ifndef _Ptens_base_cpp

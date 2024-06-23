@@ -27,7 +27,7 @@ int main(int argc, char** argv){
   //typedef BatchedPtensors1b<float> Ptens1;
   //typedef BatchedPtensors2b<float> Ptens22;
 
-  AtomsPack xatoms=AtomsPack::random(8,0.5);
+  AtomsPack xatoms=AtomsPack::random(8,8,0.5);
   Ptensors0b<float> x0=Ptensors0b<float>(xatoms,channels=3,filltype=4);
 
   Ptens0 X0({x0,x0,x0});

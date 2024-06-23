@@ -34,10 +34,6 @@
 
 namespace ptens{
 
-  template<typename DUMMY> class AtomsPack0obj;
-  template<typename DUMMY> class AtomsPack1obj;
-  template<typename DUMMY> class AtomsPack2obj;
-
 
   class AtomsPackObj: public cnine::array_pool<int>, public cnine::observable<AtomsPackObj>{
   public:
@@ -55,10 +51,6 @@ namespace ptens{
     ([this](const AtomsPackObj& x, const int min_overlap){
       return MessageList::overlaps(x,*this,min_overlap);},1);
 
-    //cnine::ptr_indexed_object_bank<AtomsPackObj,MessageList> overlaps2_mlist=
-    //cnine::ptr_indexed_object_bank<AtomsPackObj,MessageList>([this](const AtomsPackObj& x)
-    //{return MessageList::overlaps(x,*this,2);});
-
     cnine::plist_indexed_object_bank<AtomsPackObj,shared_ptr<AtomsPackObj>> cat_maps=
       cnine::plist_indexed_object_bank<AtomsPackObj,shared_ptr<AtomsPackObj>>([this](const vector<AtomsPackObj*>& v)
 	{return shared_ptr<AtomsPackObj>(new AtomsPackObj(cat_with(v)));});
@@ -68,9 +60,9 @@ namespace ptens{
     mutable vector<int> offsets2;
 
     bool cache_packs=false;
-    mutable shared_ptr<AtomsPack0obj<int> > cached_pack0;
-    mutable shared_ptr<AtomsPack1obj<int> > cached_pack1;
-    mutable shared_ptr<AtomsPack2obj<int> > cached_pack2;
+    mutable shared_ptr<PtensorsJig0<int> > cached_pack0;
+    mutable shared_ptr<PtensorsJig1<int> > cached_pack1;
+    mutable shared_ptr<PtensorsJig2<int> > cached_pack2;
 
 
     ~AtomsPackObj(){
@@ -136,12 +128,12 @@ namespace ptens{
   public: // ---- Static Constructors ------------------------------------------------------------------------
 
 
-    static AtomsPackObj random(const int n, const float p=0.5){
+    static AtomsPackObj random(const int n, const int m, const float p=0.5){
       AtomsPackObj R;
       uniform_real_distribution<double> distr(0,1);
       for(int i=0; i<n; i++){
 	vector<int> v;
-	for(int j=0; j<n; j++)
+	for(int j=0; j<m; j++)
 	  if(distr(rndGen)<p)
 	    v.push_back(j);
 	R.push_back(v);
@@ -243,10 +235,10 @@ namespace ptens{
     }
 
     void release_cached_packs(){
-      cached_pack0.reset();
-      cached_pack1.reset();
-      cached_pack2.reset();
-      cache_packs=false;
+    //cached_pack0.reset();
+    //cached_pack1.reset();
+    //cached_pack2.reset();
+    //cache_packs=false;
     }
 
 
@@ -271,6 +263,17 @@ namespace ptens{
       return _tsize2;
     }
 
+    int nrows0() const{
+      return tsize0();
+    }
+
+    int nrows1() const{
+      return tsize1();
+    }
+
+    int nrows2() const{
+      return tsize2();
+    }
 
     int nrows0(const int i) const{
       PTENS_ASSRT(i<size());
@@ -449,4 +452,8 @@ namespace ptens{
     //return R;
     //});
 
+
+    //cnine::ptr_indexed_object_bank<AtomsPackObj,MessageList> overlaps2_mlist=
+    //cnine::ptr_indexed_object_bank<AtomsPackObj,MessageList>([this](const AtomsPackObj& x)
+    //{return MessageList::overlaps(x,*this,2);});
 

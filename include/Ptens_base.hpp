@@ -61,6 +61,20 @@
 #define PTENS_CPUONLY() if(dev!=0) {throw std::runtime_error("Ptens error: no CUDA code for "+string(__PRETTY_FUNCTION__)+".\n");}
 
 
+// ---- Template decalarations -------------------------------------------------------------------------------
+
+namespace ptens{
+
+  template<typename DUMMY> class PtensorsJig0;
+  template<typename DUMMY> class PtensorsJig1;
+  template<typename DUMMY> class PtensorsJig2;
+
+  template<typename TYPE> class Ptensors0b;
+  template<typename TYPE> class Ptensors1b;
+  template<typename TYPE> class Ptensors2b;
+
+}
+
 #endif 
 
 

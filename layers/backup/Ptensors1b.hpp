@@ -20,7 +20,7 @@
 #include "Rtensor2_view.hpp"
 #include "Rtensor3_view.hpp"
 
-#include "PtensorsJig1.hpp"
+#include "AtomsPack1.hpp"
 #include "Ptensor1.hpp"
 #include "PtensLoggedTimer.hpp"
 #include "Ltensor.hpp"
@@ -53,8 +53,7 @@ namespace ptens{
     using TENSOR::cols;
 
 
-    AtomsPack atoms;
-    shared_ptr<PtensorsJig1<int> > jig;
+    AtomsPack1 atoms;
 
 
     ~Ptensors1b(){
@@ -72,16 +71,6 @@ namespace ptens{
     Ptensors1b(const TENSOR& M):
       BASE(M.copy()){} // for diff_class, unsafe!!
 
-    Ptensors1b(const TENSOR& x, const AtomsPack& _atoms):
-      BASE(x),
-      atoms(_atoms){}
-
-    Ptensors1b(const TENSOR& x, const shared_ptr<PtensorsJig1<int> >& _jig):
-      BASE(x),
-      atoms(_jig->atoms),
-      jig(_jig){}
-
-    /*
     Ptensors1b(const AtomsPack1& _atoms, const TENSOR& M):
       BASE(M.copy()),
       atoms(_atoms){}
@@ -89,7 +78,6 @@ namespace ptens{
     Ptensors1b(const AtomsPack& _atoms, const TENSOR& M):
       BASE(M.copy()),
       atoms(_atoms){}
-    */
 
     Ptensors1b(const AtomsPack& _atoms, const int nc, const int _dev=0):
       BASE(cnine::Gdims(_atoms.tsize1(),nc),0,_dev),
@@ -99,12 +87,12 @@ namespace ptens{
       BASE(cnine::Gdims(_atoms.tsize1(),nc),fcode,_dev),
       atoms(_atoms){}
 
-    //static Ptensors1b cat(const vector<Ptensors1b>& list){
-    //vector<AtomsPack1> v;
-    //for(auto& p:list)
-    //v.push_back(p.atoms);
-    //return Ptensors1b(cnine::Ltensor<TYPE>::stack(0,list),AtomsPack1::cat(v));
-    //}
+    static Ptensors1b cat(const vector<Ptensors1b>& list){
+      vector<AtomsPack1> v;
+      for(auto& p:list)
+	v.push_back(p.atoms);
+      return Ptensors1b(cnine::Ltensor<TYPE>::stack(0,list),AtomsPack1::cat(v));
+    }
 
 
   public: // ---- Named parameter constructors ---------------------------------------------------------------
@@ -121,7 +109,7 @@ namespace ptens{
       atoms(_atoms){
       vparams v;
       unroller(v,args...);
-      BASE::reset(BASE({atoms.nrows1(),v.nc},v.fcode,v.dev));
+      BASE::reset(BASE({atoms.size1(),v.nc},v.fcode,v.dev));
     }
 
     template<typename... Args>
@@ -205,6 +193,10 @@ namespace ptens{
   public: // ----- Conversions -------------------------------------------------------------------------------
 
 
+    Ptensors1b(const TENSOR& x, const AtomsPack1& _atoms):
+      BASE(x),
+      atoms(_atoms){}
+
     //Ptensors1b(const Ptensors1& x):
     //BASE(cnine::Gdims({x.tail/x.nc,x.nc})),
     //atoms(x.atoms){
@@ -252,7 +244,7 @@ namespace ptens{
     }
 
     AtomsPack get_atoms() const{
-      return atoms;
+      return atoms.obj->atoms;
     }
 
     int size_of(const int i) const{
@@ -260,7 +252,7 @@ namespace ptens{
     }
 
     int offset(const int i) const{
-      return atoms.row_offset1(i);
+      return atoms.offset(i);
     }
 
     Atoms atoms_of(const int i) const{
@@ -350,7 +342,6 @@ namespace ptens{
       add(r.reduce1_shrink(2*nc,nc));
     }
 
-
   public: // ---- Message passing ----------------------------------------------------------------------------
 
     
@@ -364,8 +355,7 @@ namespace ptens{
 
     template<typename SOURCE>
     void add_gather(const SOURCE& x, const int min_overlaps=1){
-      (jig->rmap(x,atoms.overlaps_mlist(x.atoms)))(*this,x);
-      //(atoms.overlaps_mmap(x.atoms,min_overlaps))(*this,x);
+      (atoms.overlaps_mmap(x.atoms,min_overlaps))(*this,x);
     }
 
     template<typename OUTPUT>

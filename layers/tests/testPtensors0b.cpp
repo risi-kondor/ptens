@@ -24,40 +24,57 @@
 using namespace ptens;
 using namespace cnine;
 
+typedef Ptensors0b<float> Ptens0;
+typedef Ptensors1b<float> Ptens1;
+typedef Ptensors2b<float> Ptens2;
+
 PtensSession ptens_session;
 
 
 int main(int argc, char** argv){
 
-  typedef Ptensors0b<float> Ptens0;
-  typedef Ptensors1b<float> Ptens1;
-  typedef Ptensors2b<float> Ptens2;
+  int N=6;
 
-  AtomsPack xatoms=AtomsPack::random(8,0.5);
+  
+
+  AtomsPack xatoms=AtomsPack::random(N,N,0.5);
+  cout<<xatoms<<endl;
+
   Ptens0 X0=Ptens0(xatoms,channels=3,filltype=4);
   Ptens1 X1=Ptens1(xatoms,channels=3,filltype=4);
   Ptens2 X2=Ptens2(xatoms,channels=3,filltype=4);
+  {indenter zz("  ");
+  cout<<X0<<endl;
+  //cout<<X1<<endl;
+  //cout<<X2<<endl;
+  }
+l
+  Ptens0 XX=Ptens0::cat({X0,X0});
+  cout<<XX<<endl;
+
+  exit(0);
 
   auto Z0=Ptens0::linmaps(X0);
   auto Z1=Ptens0::linmaps(X1);
   auto Z2=Ptens0::linmaps(X2);
+  //cout<<"Linmaps:"<<endl<<endl;
+  //cout<<Z0<<endl;
+  //cout<<Z1<<endl;
+  //cout<<Z2<<endl;
+
 
   Ptens0 X0ga=Ptens0::zeros_like(X0);
   Ptens1 X1ga=Ptens1::zeros_like(X1);
-  Ptens2 X2ga=Ptens2::zeros_like(X2); // make sure that Ptens0 cannot be assigned to Ptens1 or Ptens2
-
+  Ptens2 X2ga=Ptens2::zeros_like(X2);
   X0ga.add_linmaps_back(Z0);
-  cout<<X0ga<<endl;
-
   X1ga.add_linmaps_back(Z1);
-  cout<<X1ga<<endl;
-
   X2ga.add_linmaps_back(Z2);
-  cout<<X2ga<<endl;
+  //cout<<"Linmaps_back:"<<endl<<endl;
+  //cout<<X0ga<<endl;
+  //cout<<X1ga<<endl;
+  //cout<<X2ga<<endl;
 
-  exit(0);
-
-  AtomsPack yatoms=AtomsPack::random(8,0.5);
+  AtomsPack yatoms=AtomsPack::random(N,N,0.5);
   cout<<Ptens0::gather(X0,yatoms)<<endl;
   cout<<Ptens0::gather(X1,yatoms)<<endl;
   cout<<Ptens0::gather(X2,yatoms)<<endl;

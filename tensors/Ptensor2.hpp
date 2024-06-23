@@ -22,7 +22,8 @@
 
 namespace ptens{
 
-  class Ptensor2: public cnine::Ltensor<float>{
+  template<typename TYPE=float>
+  class Ptensor2: public cnine::Ltensor<TYPE>{
   public:
 
     int k;
@@ -30,10 +31,16 @@ namespace ptens{
     Atoms atoms;
 
     typedef cnine::Gdims Gdims;
-    typedef cnine::Ltensor<float> BASE;
+    typedef cnine::Ltensor<TYPE> BASE;
     typedef cnine::Rtensor1_view Rtensor1_view;
     typedef cnine::Rtensor2_view Rtensor2_view;
     typedef cnine::Rtensor3_view Rtensor3_view;
+
+    using BASE::arr;
+    using BASE::dev;
+    using BASE::dims;
+    using BASE::strides;
+    using BASE::view3;
 
 
     // ---- Constructors -------------------------------------------------------------------------------------
@@ -122,11 +129,11 @@ namespace ptens{
       //      return dims.back();
     }
 
-    float at_(const int i, const int j, const int c) const{
+    TYPE at_(const int i, const int j, const int c) const{
       return (*this)(atoms(i),atoms(j),c);
     }
 
-    void inc_(const int i, const int j, const int c, float x){
+    void inc_(const int i, const int j, const int c, TYPE x){
       inc(atoms(i),atoms(j),c,x);
     }
 
@@ -141,11 +148,11 @@ namespace ptens{
     }
     
     Ptensor2_xview view(const vector<int>& ix) const{
-      return Ptensor2_xview(const_cast<float*>(arr.get_arr()),nc,strides[0],strides[1],strides[2],ix,dev);
+      return Ptensor2_xview(const_cast<TYPE*>(arr.get_arr()),nc,strides[0],strides[1],strides[2],ix,dev);
     }
 
     Ptensor2_xview view(const vector<int>& ix, const int offs, const int n) const{
-      return Ptensor2_xview(const_cast<float*>(arr.get_arr())+strides[2]*offs,n,strides[0],strides[1],strides[2],ix,dev);
+      return Ptensor2_xview(const_cast<TYPE*>(arr.get_arr())+strides[2]*offs,n,strides[0],strides[1],strides[2],ix,dev);
     }
 
 
@@ -153,26 +160,26 @@ namespace ptens{
 
 
     // 0 -> 2
-    void add_linmaps(const Ptensor0& x, int offs=0){ // 2
+    void add_linmaps(const Ptensor0<TYPE>& x, int offs=0){ // 2
       assert(offs+2*x.nc<=nc);
       offs+=broadcast0(x,offs); // 2*1
     }
 
-    void add_linmaps_back_to(Ptensor0& x, int offs=0) const{ // 2
+    void add_linmaps_back_to(Ptensor0<TYPE>& x, int offs=0) const{ // 2
       assert(offs+2*x.nc<=nc);
       x.add(reduce0(offs,x.nc));
     }
 
 
     // 1 -> 2
-    void add_linmaps(const Ptensor1& x, int offs=0){ // 5 
+    void add_linmaps(const Ptensor1<TYPE>& x, int offs=0){ // 5 
       assert(x.k==k);
       assert(offs+5*x.nc<=nc);
       offs+=broadcast0(x.reduce0(),offs); // 2*1
       offs+=broadcast1(x,offs); // 3*1
     }
 
-    void add_linmaps_back_to(Ptensor1& x, int offs=0) const{ // 5 
+    void add_linmaps_back_to(Ptensor1<TYPE>& x, int offs=0) const{ // 5 
       assert(x.k==k);
       assert(offs+5*x.nc<=nc);
       x.broadcast0(reduce0(offs,x.nc));
@@ -200,26 +207,26 @@ namespace ptens{
     
 
     // 2 -> 0 
-    void add_linmaps_to(Ptensor0& x, int offs=0) const{ // 2
+    void add_linmaps_to(Ptensor0<TYPE>& x, int offs=0) const{ // 2
       assert(offs+2*nc<=x.nc);
       offs+=x.broadcast0(reduce0(),offs); // 1*2
     }
     
-    void add_linmaps_back(const Ptensor0& x, int offs=0){ // 2
+    void add_linmaps_back(const Ptensor0<TYPE>& x, int offs=0){ // 2
       assert(offs+2*nc<=x.nc);
       //offs+=x.broadcast(reduce0().view1(),offs); // 1*2
     }
     
 
     // 2 -> 1
-    void add_linmaps_to(Ptensor1& x, int offs=0) const{ // 5 
+    void add_linmaps_to(Ptensor1<TYPE>& x, int offs=0) const{ // 5 
       assert(x.k==k);
       assert(offs+5*nc<=x.nc);
       offs+=x.broadcast0(reduce0(),offs); // 1*2
       offs+=x.broadcast1(reduce1(),offs); // 1*3
     }
     
-    void add_linmaps_back(const Ptensor1& x, int offs=0){ // 5 
+    void add_linmaps_back(const Ptensor1<TYPE>& x, int offs=0){ // 5 
       assert(x.k==k);
       assert(offs+5*nc<=x.nc);
       //offs+=x.broadcast(reduce0().view1(),offs); // 1*2

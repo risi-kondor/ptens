@@ -16,7 +16,6 @@
 #define _ptens_TransferMap
 
 #include "TransferMapObj.hpp"
-//#include "AtomsPack.hpp"
 
 
 namespace ptens{

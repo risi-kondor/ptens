@@ -21,58 +21,67 @@
 
 namespace ptens{
   
-  inline Ptensor0 linmaps0(const Ptensor0& x){
-    Ptensor0 R=Ptensor0::zero(x.atoms,x.nc,x.dev);
+  template<typename TYPE>
+  inline Ptensor0<TYPE> linmaps0(const Ptensor0<TYPE>& x){
+    Ptensor0<TYPE> R=Ptensor0<TYPE>::zero(x.atoms,x.nc,x.dev);
     R.add_linmaps(x);
     return R;
   }
 
-  inline Ptensor0 linmaps0(const Ptensor1& x){
-    Ptensor0 R=Ptensor0::zero(x.atoms,x.nc,x.dev);
+  template<typename TYPE>
+  inline Ptensor0<TYPE> linmaps0(const Ptensor1<TYPE>& x){
+    Ptensor0<TYPE> R=Ptensor0<TYPE>::zero(x.atoms,x.nc,x.dev);
     x.add_linmaps_to(R);
     return R;
   }
 
-  inline Ptensor0 linmaps0(const Ptensor2& x){
-    Ptensor0 R=Ptensor0::zero(x.atoms,2*x.nc,x.dev);
-    x.add_linmaps_to(R);
-    return R;
-  }
-
-
-  inline Ptensor1 linmaps1(const Ptensor0& x){
-    Ptensor1 R=Ptensor1::zero(x.atoms,x.nc,x.dev);
-    R.add_linmaps(x);
-    return R;
-  }
-
-  inline Ptensor1 linmaps1(const Ptensor1& x){
-    Ptensor1 R=Ptensor1::zero(x.atoms,2*x.nc,x.dev);
-    R.add_linmaps(x);
-    return R;
-  }
-
-  inline Ptensor1 linmaps1(const Ptensor2& x){
-    Ptensor1 R=Ptensor1::zero(x.atoms,5*x.nc,x.dev);
+  template<typename TYPE>
+  inline Ptensor0<TYPE> linmaps0(const Ptensor2<TYPE>& x){
+    Ptensor0<TYPE> R=Ptensor0<TYPE>::zero(x.atoms,2*x.nc,x.dev);
     x.add_linmaps_to(R);
     return R;
   }
 
 
-  inline Ptensor2 linmaps2(const Ptensor0& x){
-    Ptensor2 R=Ptensor2::zero(x.atoms,2*x.nc,x.dev);
+  template<typename TYPE>
+  inline Ptensor1<TYPE> linmaps1(const Ptensor0<TYPE>& x){
+    Ptensor1<TYPE> R=Ptensor1<TYPE>::zero(x.atoms,x.nc,x.dev);
     R.add_linmaps(x);
     return R;
   }
 
-  inline Ptensor2 linmaps2(const Ptensor1& x){
-    Ptensor2 R=Ptensor2::zero(x.atoms,5*x.nc,x.dev);
+  template<typename TYPE>
+  inline Ptensor1<TYPE> linmaps1(const Ptensor1<TYPE>& x){
+    Ptensor1<TYPE> R=Ptensor1<TYPE>::zero(x.atoms,2*x.nc,x.dev);
     R.add_linmaps(x);
     return R;
   }
 
-  inline Ptensor2 linmaps2(const Ptensor2& x){
-    Ptensor2 R=Ptensor2::zero(x.atoms,15*x.nc,x.dev);
+  template<typename TYPE>
+  inline Ptensor1<TYPE> linmaps1(const Ptensor2<TYPE>& x){
+    Ptensor1<TYPE> R=Ptensor1<TYPE>::zero(x.atoms,5*x.nc,x.dev);
+    x.add_linmaps_to(R);
+    return R;
+  }
+
+
+  template<typename TYPE>
+  inline Ptensor2<TYPE> linmaps2(const Ptensor0<TYPE>& x){
+    Ptensor2<TYPE> R=Ptensor2<TYPE>::zero(x.atoms,2*x.nc,x.dev);
+    R.add_linmaps(x);
+    return R;
+  }
+
+  template<typename TYPE>
+  inline Ptensor2<TYPE> linmaps2(const Ptensor1<TYPE>& x){
+    Ptensor2<TYPE> R=Ptensor2<TYPE>::zero(x.atoms,5*x.nc,x.dev);
+    R.add_linmaps(x);
+    return R;
+  }
+
+  template<typename TYPE>
+  inline Ptensor2<TYPE> linmaps2(const Ptensor2<TYPE>& x){
+    Ptensor2<TYPE> R=Ptensor2<TYPE>::zero(x.atoms,15*x.nc,x.dev);
     R.add_linmaps(x);
     return R;
   }

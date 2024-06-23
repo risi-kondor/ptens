@@ -74,52 +74,24 @@ namespace ptens{
     int tix(const int i) const{
       assert(i<size());
       return head(i);
-      //return arr[lookup[i].first];
-      //return get_arr()[dir(i,0)];
     }
 
     int tens(const int i) const{
       assert(i<size());
       return head(i);
-      //return get_arr()[dir(i,0)];
-      //return arr[lookup[i].first];
     }
 
     vector<int> ix(const int i) const{
       return BASE::operator()(i); 
-      //assert(i<size());
-      //int addr=dir(i,0);
-      //int len=dir(i,1)-1;
-      //PTENS_ASSRT(len>=0);
-      //vector<int> R(len);
-      //for(int i=0; i<len; i++){
-      //R[i]=get_arr()[addr+i+1];
-      //}
-      //return R;
     }
 
     int ix(const int i, const int j) const{
       return BASE::operator()(i,j);
-      //assert(i<size());
-      //int addr=dir(i,0);
-      //int len=dir(i,1);
-      //assert(len>=0);
-      //return get_arr()[addr+j+1]; // changed!!
     }
 
     int nix(const int i) const{
       return BASE::size_of(i);
-      //assert(i<size());
-      //return dir(i,1)-1;
     }
-
-    /*
-    int nindices(const int i) const{
-      assert(i<size());
-      //return lookup[i].second-1;
-      return dir(i,1)-1;
-    }
-    */
 
     const cnine::GatherMap& get_bmap() const{
       assert(bmap);
@@ -128,7 +100,6 @@ namespace ptens{
 
     int* get_barr(const int _dev=0) const{
       assert(bmap);
-      //const_cast<cnine::GatherMap*>(bmap)->to_device(_dev);
       bmap->to_device(_dev);
       if(_dev==0) return bmap->arr;
       return bmap->arrg;
@@ -136,16 +107,7 @@ namespace ptens{
 
     void push_back(const int tix, vector<int> indices){
       BASE::push_back(tix,indices);
-      //int len=indices.size()+1;
-      //if(tail+len>memsize)
-      //reserve(std::max(2*memsize,tail+len));
-      //arr[tail]=tix;
-      //for(int i=0; i<len-1; i++)
-      //get_arr()[tail+1+i]=indices[i];
-      //dir.push_back(tail,len);
-      //lookup.push_back(pair<int,int>(tail,len));
-      //tail+=len;
-      _max_nix=std::max(_max_nix,(int)indices.size());
+       _max_nix=std::max(_max_nix,(int)indices.size());
     }
 
     
@@ -167,31 +129,4 @@ namespace ptens{
 
 
 #endif 
-    /*
-    vector<int> indices(const int i) const{ // ????
-      assert(i<size());
-      //auto& p=lookup[i];
-      //int addr=p.first+1;
-      //int len=p.second-1;
-      int addr=dir(i,0);
-      int len=dir(i,1);
-      assert(len>=0);
-      vector<int> R(len);
-      for(int i=0; i<len; i++)
-	R[i]=arr[addr+i];
-      return R;
-    }
-    */
-
-    /*
-    string str(const string indent="") const{
-      ostringstream oss;
-      oss<<"(";
-      for(int i=0; i<size()-1; i++)
-	oss<<(*this)[i]<<",";
-      if(size()>0) oss<<(*this)[size()-1];
-      oss<<")";
-      return oss.str();
-    }
-    */
-
+ 

@@ -25,7 +25,7 @@ int main(int argc, char** argv){
 
   int n=5;
 
-  AtomsPack a=AtomsPack::random(n,0.5);
+  AtomsPack a=AtomsPack::random(n,n,0.5);
   cout<<a<<endl;
 
   cout<<1<<endl;

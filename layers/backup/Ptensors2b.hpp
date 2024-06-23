@@ -20,7 +20,7 @@
 #include "Rtensor2_view.hpp"
 #include "Rtensor3_view.hpp"
 
-#include "PtensorsJig2.hpp"
+#include "AtomsPack2.hpp"
 #include "Ptensor2.hpp"
 #include "PtensLoggedTimer.hpp"
 #include "Ltensor.hpp"
@@ -53,8 +53,7 @@ namespace ptens{
     using TENSOR::add;
 
 
-    AtomsPack atoms;
-    shared_ptr<PtensorsJig2<int> > jig;
+    AtomsPack2 atoms;
 
 
     ~Ptensors2b(){
@@ -70,7 +69,6 @@ namespace ptens{
     Ptensors2b(const TENSOR& M):
       BASE(M.copy()){} // for diff_class
 
-    /*
     Ptensors2b(const AtomsPack2& _atoms, const TENSOR& M):
       BASE(M.copy()),
       atoms(_atoms){}
@@ -78,7 +76,6 @@ namespace ptens{
     Ptensors2b(const AtomsPack& _atoms, const TENSOR& M):
       BASE(M.copy()),
       atoms(_atoms){}
-    */
 
     Ptensors2b(const AtomsPack& _atoms, const int nc, const int _dev=0):
       BASE(cnine::Gdims(_atoms.tsize2(),nc),0,_dev),
@@ -88,12 +85,12 @@ namespace ptens{
       BASE(cnine::Gdims(_atoms.tsize2(),nc),fcode,_dev),
       atoms(_atoms){}
 
-    //static Ptensors2b cat(const vector<Ptensors2b>& list){
-    //vector<AtomsPack2> v;
-    //for(auto& p:list)
-    //v.push_back(p.atoms);
-    //return Ptensors2b(AtomsPack2::cat(v),cnine::Ltensor<TYPE>::stack(0,list));
-    //}
+    static Ptensors2b cat(const vector<Ptensors2b>& list){
+      vector<AtomsPack2> v;
+      for(auto& p:list)
+	v.push_back(p.atoms);
+      return Ptensors2b(AtomsPack2::cat(v),cnine::Ltensor<TYPE>::stack(0,list));
+    }
 
 
   public: // ---- Named parameter constructors ---------------------------------------------------------------
@@ -110,7 +107,7 @@ namespace ptens{
       atoms(_atoms){
       vparams v;
       unroller(v,args...);
-      BASE::reset(BASE({atoms.nrows2(),v.nc},v.fcode,v.dev));
+      BASE::reset(BASE({atoms.size2(),v.nc},v.fcode,v.dev));
     }
 
     template<typename... Args>
@@ -163,7 +160,7 @@ namespace ptens{
   public: // ----- Conversions -------------------------------------------------------------------------------
 
 
-    Ptensors2b(const TENSOR& x, const AtomsPack& _atoms):
+    Ptensors2b(const TENSOR& x, const AtomsPack2& _atoms):
       BASE(x),
       atoms(_atoms){}
 
@@ -218,15 +215,15 @@ namespace ptens{
     }
 
     AtomsPack get_atoms() const{
-      return atoms;
+      return atoms.obj->atoms;
     }
 
     int offset(const int i) const{
-      return atoms.row_offset2(i);
+      return atoms.offset(i);
     }
 
     int offset1(const int i) const{
-      return atoms.row_offset2(i);
+      return atoms.offset1(i);
     }
 
     Atoms atoms_of(const int i) const{
@@ -254,13 +251,21 @@ namespace ptens{
     }
 
 
-  public: // ---- Linmaps ------------------------------------------------------------------------------------
+  public: // ---- Message passing ----------------------------------------------------------------------------
 
 
     template<typename SOURCE>
     static Ptensors2b<float> linmaps(const SOURCE& x){
       Ptensors2b<float> R(x.get_atoms(),x.get_nc()*vector<int>({2,5,15})[x.getk()],x.get_dev());
       R.add_linmaps(x);
+      return R;
+    }
+
+    template<typename SOURCE>
+    static Ptensors2b<TYPE> gather(const SOURCE& x, const AtomsPack& a){
+      int nc=x.get_nc()*vector<int>({2,5,15})[x.getk()];
+      Ptensors2b<TYPE> R(a,nc,x.get_dev());
+      R.add_gather(x);
       return R;
     }
 
@@ -300,31 +305,25 @@ namespace ptens{
     }
 
 
-  public: // ---- Message passing ---------------------------------------------------------------------------
-
-
-    template<typename SOURCE>
-    static Ptensors2b<TYPE> gather(const SOURCE& x, const AtomsPack& a){
-      int nc=x.get_nc()*vector<int>({2,5,15})[x.getk()];
-      Ptensors2b<TYPE> R(a,nc,x.get_dev());
-      R.add_gather(x);
-      return R;
-    }
-
     template<typename SOURCE>
     void add_gather(const SOURCE& x){
-      (jig->rmap(x,atoms.overlaps_mlist(x.atoms)))(*this,x);
+      (atoms.overlaps_mmap(x.atoms))(*this,x);
     }
 
     template<typename OUTPUT>
     void add_gather_back(const OUTPUT& x){
-      //x.atoms.overlaps_mmap(atoms).inv()(*this,x);
+      x.atoms.overlaps_mmap(atoms).inv()(*this,x);
     }
 
     template<typename OUTPUT>
     void add_gather_back_alt(const OUTPUT& x){ // TODO
-      //x.atoms.overlaps_mmap(atoms).inv()(this->get_grad(),x.get_grad());
+      x.atoms.overlaps_mmap(atoms).inv()(this->get_grad(),x.get_grad());
     }
+
+    //template<typename OUTPUT>
+    //void gather_backprop(const OUTPUT& x){
+    //get_grad().gather_back(x.get_grad());
+    //}
 
 
   public: // ---- Reductions ---------------------------------------------------------------------------------
@@ -373,7 +372,7 @@ namespace ptens{
       int nc=get_nc();
       int dev=get_dev();
 
-      BASE R({atoms.nrows1(),3*nc},0,dev);
+      BASE R({atoms.size1(),3*nc},0,dev);
       Rtensor2_view r=R.view2();
       if(dev==0){
 	for(int i=0; i<N; i++){
@@ -393,7 +392,7 @@ namespace ptens{
       int N=size();
       int dev=get_dev();
 
-      BASE R({atoms.nrows1(),nc},0,dev);
+      BASE R({atoms.size1(),nc},0,dev);
       Rtensor2_view r=R.view2();
       if(dev==0){
 	for(int i=0; i<N; i++){
