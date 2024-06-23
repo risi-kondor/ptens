@@ -42,6 +42,8 @@ namespace ptens{
 
     cnine::cnine_session* cnine_session=nullptr;
 
+    bool row_gathers=false;
+
     ofstream logfile;
     std::unordered_set<SubgraphObj> subgraphs;
     GgraphCache graph_cache;
@@ -52,12 +54,7 @@ namespace ptens{
 
       cnine_session=new cnine::cnine_session(_nthreads);
 
-#ifdef _WITH_CUDA
-      cout<<"Initializing ptens with GPU support."<<endl;
-#else
-      cout<<"Initializing ptens without GPU support."<<endl;
-#endif
-
+      cout<<boilerplate()<<endl;
 
       logfile.open("ptens.log");
       auto time = std::chrono::system_clock::now();
@@ -99,24 +96,35 @@ namespace ptens{
       strftime(os,30,"%H:%M:%S ",std::localtime(&timet));
       logfile<<os<<msg<<obj.repr()<<endl;
     }
+
+  public: // ---- I/O ---------------------------------------------------------------------------------------
+
+
+    string on_off(const bool b) const{
+      if(b) return " ON";
+      return "OFF";
+    }
+
+    string boilerplate() const{
+      bool with_cuda=0;
+#ifdef _WITH_CUDA
+      with_cuda=1;
+#endif
+
+
+
+      ostringstream oss;
+      oss<<"-----------------------------------"<<endl;
+      oss<<"Ptens 0.0 "<<endl;
+      cout<<endl;
+      oss<<"CUDA support:                   "<<on_off(with_cuda)<<endl;
+      oss<<"Row level gather operations     "<<on_off(row_gathers)<<endl;
+      oss<<"-----------------------------------"<<endl;
+      return oss.str();
+    }
     
   };
 
-
-  /*  class PtensSession{
-  public:
-
-    PtensSession(){
-      assert(!ptens_session);
-      ptens_session=new PtensSessionObj();
-    }
-
-    ~PtensSession(){
-      delete ptens_session;
-    }
-
-  };
-  */
 
 }
 

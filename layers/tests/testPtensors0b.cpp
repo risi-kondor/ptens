@@ -43,16 +43,12 @@ int main(int argc, char** argv){
   Ptens0 X0=Ptens0(xatoms,channels=3,filltype=4);
   Ptens1 X1=Ptens1(xatoms,channels=3,filltype=4);
   Ptens2 X2=Ptens2(xatoms,channels=3,filltype=4);
-  {indenter zz("  ");
   cout<<X0<<endl;
   //cout<<X1<<endl;
   //cout<<X2<<endl;
-  }
-l
+
   Ptens0 XX=Ptens0::cat({X0,X0});
   cout<<XX<<endl;
-
-  exit(0);
 
   auto Z0=Ptens0::linmaps(X0);
   auto Z1=Ptens0::linmaps(X1);

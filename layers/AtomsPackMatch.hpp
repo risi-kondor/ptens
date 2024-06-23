@@ -12,44 +12,40 @@
  *
  */
 
-#ifndef _ptens_MessageList
-#define _ptens_MessageList
+#ifndef _ptens_AtomsPackMatch
+#define _ptens_AtomsPackMatch
 
 #include "AtomsPackObj.hpp"
-#include "MessageListObj.hpp"
+#include "AtomsPackMatchObj.hpp"
 #include "observable.hpp"
 
 namespace ptens{
 
-  //template<typename DUMMY> class AtomsPack0obj;
-  //template<typename DUMMY> class AtomsPack1obj;
-  //template<typename DUMMY> class AtomsPack2obj;
 
-
-  class MessageList{
+  class AtomsPackMatch{
   public:
 
-    shared_ptr<const MessageListObj> obj;
+    shared_ptr<const AtomsPackMatchObj> obj;
 
-    ~MessageList(){}
+    ~AtomsPackMatch(){}
 
-    MessageList(){}
+    AtomsPackMatch(){}
     
-    MessageList(const MessageListObj* _obj):
+    AtomsPackMatch(const AtomsPackMatchObj* _obj):
       obj(_obj){}
 
 
   public: // ---- Named constructors ------------------------------------------------------------------------
 
 
-    static MessageList overlaps(const cnine::array_pool<int>& in_atoms, 
+    static AtomsPackMatch overlaps(const cnine::array_pool<int>& in_atoms, 
       const cnine::array_pool<int>& out_atoms){
-      return MessageList(new MessageListObj(in_atoms,out_atoms));
+      return AtomsPackMatch(new AtomsPackMatchObj(in_atoms,out_atoms));
     }
 
-    static MessageList overlaps(const cnine::array_pool<int>& in_atoms, 
+    static AtomsPackMatch overlaps(const cnine::array_pool<int>& in_atoms, 
       const cnine::array_pool<int>& out_atoms, const int min_overlaps){
-      return MessageList(new MessageListObj(in_atoms,out_atoms,min_overlaps));
+      return AtomsPackMatch(new AtomsPackMatchObj(in_atoms,out_atoms,min_overlaps));
     }
 
     pair<const cnine::hlists<int>&, const cnine::hlists<int>&> lists() const{
@@ -64,18 +60,18 @@ namespace ptens{
 
 
     string classname() const{
-      return "MessageList";
+      return "AtomsPackMatch";
     }
 
     string repr() const{
-      return "MessageList";
+      return "AtomsPackMatch";
     }
 
     string str(const string indent="") const{
       return obj->str();
     }
 
-    friend ostream& operator<<(ostream& stream, const MessageList& v){
+    friend ostream& operator<<(ostream& stream, const AtomsPackMatch& v){
       stream<<v.str(); return stream;}
 
   };

@@ -209,9 +209,9 @@ namespace ptens{
       return BASE::dim(1);
     }
 
-    int nchannels() const{
-      return BASE::dim(1);
-    }
+    //int nchannels() const{
+    //return BASE::dim(1);
+    //}
 
     int size_of(const int i) const{
       return atoms.size_of(i);
@@ -235,7 +235,7 @@ namespace ptens{
     
     TENSOR tensor_of(const int i) const{
       int k=size_of(i);
-      return TENSOR::rows(offset(i),k*k).reshape({k,k,nchannels()});
+      return TENSOR::rows(offset(i),k*k).reshape({k,k,get_nc()});
     }
 
     Ptensor2<TYPE> operator()(const int i) const{
@@ -318,12 +318,12 @@ namespace ptens{
 
     template<typename OUTPUT>
     void add_gather_back(const OUTPUT& x){
-      //x.atoms.overlaps_mmap(atoms).inv()(*this,x);
+      x.jig->rmap(*this,x.atoms.overlaps_mlist(atoms)).inv()(*this,x);
     }
 
     template<typename OUTPUT>
-    void add_gather_back_alt(const OUTPUT& x){ // TODO
-      //x.atoms.overlaps_mmap(atoms).inv()(this->get_grad(),x.get_grad());
+    void add_gather_back_alt(const OUTPUT& x){
+      x.jig->rmap(*this,x.atoms.overlaps_mlist(atoms)).inv()(this->get_grad(),x.get_grad());
     }
 
 
@@ -580,22 +580,3 @@ namespace ptens{
 
 #endif 
 
-    /*
-    static Ptensors2b<TYPE> gather(const Ptensors0b<TYPE>& x, const AtomsPack& a){
-      Ptensors2b<TYPE> R(a,2*x.nchannels(),x.get_dev());
-      R.gather(x);
-      return R;
-    }
-
-    static Ptensors2b<TYPE> gather(const Ptensors1b<TYPE>& x, const AtomsPack& a){
-      Ptensors2b<TYPE> R(a,5*x.nchannels(),x.get_dev());
-      R.gather(x);
-      return R;
-    }
-
-    static Ptensors2b<TYPE> gather(const Ptensors2b<TYPE>& x, const AtomsPack& a){
-      Ptensors2b<TYPE> R(a,15*x.nchannels(),x.get_dev());
-      R.gather(x);
-      return R;
-    }
-    */

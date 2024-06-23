@@ -29,9 +29,6 @@
 
 namespace ptens{
 
-  template<typename TYPE> class Ptensors0b;
-  template<typename TYPE> class Ptensors2b;
-
 
   template<typename TYPE>
   class Ptensors1b: public Ptensorsb<TYPE>, public cnine::diff_class<Ptensors1b<TYPE> >{
@@ -99,12 +96,12 @@ namespace ptens{
       BASE(cnine::Gdims(_atoms.tsize1(),nc),fcode,_dev),
       atoms(_atoms){}
 
-    //static Ptensors1b cat(const vector<Ptensors1b>& list){
-    //vector<AtomsPack1> v;
-    //for(auto& p:list)
-    //v.push_back(p.atoms);
-    //return Ptensors1b(cnine::Ltensor<TYPE>::stack(0,list),AtomsPack1::cat(v));
-    //}
+    static Ptensors1b cat(const vector<Ptensors1b>& list){
+      vector<PtensorsJig1<int>*> v;
+      for(auto& p:list)
+	v.push_back(p.jig.get());
+      return Ptensors1b(cnine::Ltensor<TYPE>::stack(0,list),PtensorsJig1<int>::cat(v));
+    }
 
 
   public: // ---- Named parameter constructors ---------------------------------------------------------------
@@ -247,9 +244,9 @@ namespace ptens{
       return BASE::dim(1);
     }
 
-    int nchannels() const{
-      return BASE::dim(1);
-    }
+    //int nchannels() const{
+    //return BASE::dim(1);
+    //}
 
     AtomsPack get_atoms() const{
       return atoms;
@@ -365,23 +362,17 @@ namespace ptens{
     template<typename SOURCE>
     void add_gather(const SOURCE& x, const int min_overlaps=1){
       (jig->rmap(x,atoms.overlaps_mlist(x.atoms)))(*this,x);
-      //(atoms.overlaps_mmap(x.atoms,min_overlaps))(*this,x);
     }
 
     template<typename OUTPUT>
     void add_gather_back(const OUTPUT& x){
-      x.atoms.overlaps_mmap(atoms).inv()(*this,x);
+      x.jig->rmap(*this,x.atoms.overlaps_mlist(atoms)).inv()(*this,x);
     }
 
     template<typename OUTPUT>
-    void add_gather_back_alt(const OUTPUT& x){ // TODO
-      x.atoms.overlaps_mmap(atoms).inv()(this->get_grad(),x.get_grad());
+    void add_gather_back_alt(const OUTPUT& x){
+      x.jig->rmap(*this,x.atoms.overlap_mlist(atoms)).inv()(this->get_grad(),x.get_grad());
     }
-
-    //template<typename OUTPUT>
-    //void gather_backprop(const OUTPUT& x){
-    //get_grad().gather_back(x.get_grad());
-    //}
 
 
   public: // ---- Reductions ---------------------------------------------------------------------------------

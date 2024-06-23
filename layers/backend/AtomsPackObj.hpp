@@ -29,7 +29,7 @@
 
 #include "Atoms.hpp"
 #include "TransferMap.hpp"
-#include "MessageList.hpp"
+#include "AtomsPackMatch.hpp"
 
 
 namespace ptens{
@@ -46,10 +46,10 @@ namespace ptens{
       cnine::ptr_indexed_object_bank<AtomsPackObj,TransferMap>([this](const AtomsPackObj& x)
 	{return TransferMap(new TransferMapObj<AtomsPackObj>(x,*this));});
 
-    cnine::ptr_arg_indexed_object_bank<AtomsPackObj,int,MessageList> overlaps_mlist=
-      cnine::ptr_arg_indexed_object_bank<AtomsPackObj,int,MessageList>
+    cnine::ptr_arg_indexed_object_bank<AtomsPackObj,int,AtomsPackMatch> overlaps_mlist=
+      cnine::ptr_arg_indexed_object_bank<AtomsPackObj,int,AtomsPackMatch>
     ([this](const AtomsPackObj& x, const int min_overlap){
-      return MessageList::overlaps(x,*this,min_overlap);},1);
+      return AtomsPackMatch::overlaps(x,*this,min_overlap);},1);
 
     cnine::plist_indexed_object_bank<AtomsPackObj,shared_ptr<AtomsPackObj>> cat_maps=
       cnine::plist_indexed_object_bank<AtomsPackObj,shared_ptr<AtomsPackObj>>([this](const vector<AtomsPackObj*>& v)
@@ -453,7 +453,7 @@ namespace ptens{
     //});
 
 
-    //cnine::ptr_indexed_object_bank<AtomsPackObj,MessageList> overlaps2_mlist=
-    //cnine::ptr_indexed_object_bank<AtomsPackObj,MessageList>([this](const AtomsPackObj& x)
-    //{return MessageList::overlaps(x,*this,2);});
+    //cnine::ptr_indexed_object_bank<AtomsPackObj,AtomsPackMatch> overlaps2_mlist=
+    //cnine::ptr_indexed_object_bank<AtomsPackObj,AtomsPackMatch>([this](const AtomsPackObj& x)
+    //{return AtomsPackMatch::overlaps(x,*this,2);});
 

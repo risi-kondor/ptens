@@ -30,23 +30,6 @@
 namespace ptens{
 
 
-  class Jig0ptr: public shared_ptr<PtensorsJig0<int> >{
-  public:
-
-    typedef shared_ptr<PtensorsJig0<int> > BASE;
-
-    Jig0ptr(const BASE& x):
-      BASE(x){}
-
-    Jig0ptr(const AtomsPack& _atoms):
-      BASE(PtensorsJig0<int>::make_or_cached(_atoms)){}
-
-    Jig0ptr(const shared_ptr<AtomsPackObj>& _atoms):
-      BASE(PtensorsJig0<int>::make_or_cached(_atoms)){}
-
-  };
-
-
 
   template<typename TYPE>
   class Ptensors0b: public Ptensorsb<TYPE>, public cnine::diff_class<Ptensors0b<TYPE> >{
@@ -229,9 +212,9 @@ namespace ptens{
       return TENSOR::dim(1);
     }
 
-    int nchannels() const{
-      return TENSOR::dim(1);
-    }
+    //int nchannels() const{
+    //return TENSOR::dim(1);
+    //}
 
     AtomsPack get_atoms() const{
       return atoms;
@@ -245,9 +228,13 @@ namespace ptens{
       return i;
     }
 
-    int tsize() const{
-      return atoms.tsize0();
-    }
+    //int tsize() const{
+    //return atoms.tsize0();
+    //}
+
+    //int nrows() const{
+    //return atoms.nrows0();
+    //}
 
     //int nrows(const int i) const{
     //return 1;
@@ -319,23 +306,17 @@ namespace ptens{
     template<typename SOURCE>
     void add_gather(const SOURCE& x){
       (jig->rmap(x,atoms.overlaps_mlist(x.atoms)))(*this,x);
-      //(atoms.overlaps_mmap(x.atoms))(*this,x);
     }
 
     template<typename OUTPUT>
     void add_gather_back(const OUTPUT& x){
-      //x.atoms.overlaps_mmap(atoms).inv()(*this,x);
+      x.jig->rmap(*this,x.atoms.overlaps_mlist(atoms)).inv()(*this,x);
     }
 
     template<typename OUTPUT>
     void add_gather_back_alt(const OUTPUT& x){ // TODO
-      //x.atoms.overlaps_mmap(atoms).inv()(this->get_grad(),x.get_grad());
+      x.jig->rmap(*this,x.atoms.overlaps_mlist(atoms)).inv()(this->get_grad(),x.get_grad());
     }
-
-    //template<typename OUTPUT>
-    //void gather_backprop(const OUTPUT& x){
-    //x.atoms.overlaps_mmap(atoms).inv()(get_grad(),x.get_grad());
-    //}
 
 
   public: // ---- Reductions ---------------------------------------------------------------------------------
@@ -359,51 +340,6 @@ namespace ptens{
   public: // ---- Transfer maps -----------------------------------------------------------------------------
 
 
-    // 0 <- 0
-    MessageMap mmap(const MessageListObj& lists, const Ptensors0b<TYPE>& y){
-      auto[in,out]=lists.lists();
-      cnine::map_of_lists<int,int> direct;
-      for(int m=0; m<in.size(); m++){
-	int in_tensor=in.head(m);
-	int out_tensor=out.head(m);
-	direct.push_back(index_of(out_tensor),y.index_of(in_tensor));
-      }
-      return cnine::GatherMapProgram(tsize(),y.tsize(),new cnine::GatherMapB(direct));
-    };
-  
-
-    // 0 <- 1
-    MessageMap mmap(const MessageListObj& lists, const Ptensors1b<TYPE>& y){
-      auto[in_lists,out_lists]=lists.lists();
-      cnine::map_of_lists<int,int> direct;
-      for(int m=0; m<in_lists.size(); m++){
-	int in_tensor=in_lists.head(m);
-	int out_tensor=out_lists.head(m);
-	int k=in_lists.size_of(m);
-	for(int j=0; j<k; j++)
-	  direct.push_back(index_of(out_tensor),y.index_of(in_tensor,in_lists(m,j)));
-      }
-      return cnine::GatherMapProgram(tsize(),y.tsize(),new cnine::GatherMapB(direct));
-    }
-
-
-    // 0 <- 2
-    MessageMap mmap(const MessageListObj& lists, const Ptensors2b<TYPE>& y){
-      auto[in_lists,out_lists]=lists.lists();
-      cnine::map_of_lists<int,int> direct;
-      for(int m=0; m<in_lists.size(); m++){
-	int in_tensor=in_lists.head(m);
-	int out_tensor=out_lists.head(m);
-	vector<int> in=in_lists(m);
-	vector<int> out=out_lists(m);
-	for(int i0=0; i0<in.size(); i0++)
-	  direct.push_back(2*index_of(out_tensor)+1,y.index_of(in_tensor,in[i0],in[i0]));
-	for(int i0=0; i0<in.size(); i0++)
-	  for(int i1=0; i1<in.size(); i1++)
-	    direct.push_back(2*index_of(out_tensor),y.index_of(in_tensor,in[i0],in[i1]));
-      }
-      return cnine::GatherMapProgram(new cnine::GatherMapB(direct,2));
-    }
 
 
   public: // ---- I/O ----------------------------------------------------------------------------------------

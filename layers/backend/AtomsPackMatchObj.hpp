@@ -12,8 +12,8 @@
  *
  */
 
-#ifndef _ptens_MessageListObj
-#define _ptens_MessageListObj
+#ifndef _ptens_AtomsPackMatchObj
+#define _ptens_AtomsPackMatchObj
 
 #include "Tensor.hpp"
 #include "array_pool.hpp"
@@ -33,20 +33,20 @@ namespace ptens{
   template<typename DUMMY> class AtomsPack2obj;
 
 
-  class MessageListObj: public cnine::observable<MessageListObj>{
+  class AtomsPackMatchObj: public cnine::observable<AtomsPackMatchObj>{
   public:
 
 
     cnine::hlists<int> in;
     cnine::hlists<int> out;
 
-    ~MessageListObj(){}
+    ~AtomsPackMatchObj(){}
 
       
-    MessageListObj():
+    AtomsPackMatchObj():
       observable(this){}
 
-    MessageListObj(const MessageListObj& x)=delete;
+    AtomsPackMatchObj(const AtomsPackMatchObj& x)=delete;
 
 
   public: // ---- Access -------------------------------------------------------------------------------------
@@ -61,10 +61,10 @@ namespace ptens{
 
 
     // overlaps 
-    MessageListObj(const cnine::array_pool<int>& in_atoms, const cnine::array_pool<int>& out_atoms, 
+    AtomsPackMatchObj(const cnine::array_pool<int>& in_atoms, const cnine::array_pool<int>& out_atoms, 
       const int min_overlap=1):
       observable(this){
-      cnine::fnlog timer("MessageListObj::[overlaps]");
+      cnine::fnlog timer("AtomsPackMatchObj::[overlaps]");
 
       if(in_atoms.size()<10){
 	for(int i=0; i<in_atoms.size(); i++){
@@ -121,11 +121,11 @@ namespace ptens{
 
 
     string classname() const{
-      return "MessageListObj";
+      return "AtomsPackMatchObj";
     }
 
     string repr() const{
-      return "MessageListObj";
+      return "AtomsPackMatchObj";
     }
 
     string str(const string indent="") const{
@@ -146,7 +146,7 @@ namespace ptens{
       return oss.str();
     }
 
-    friend ostream& operator<<(ostream& stream, const MessageListObj& v){
+    friend ostream& operator<<(ostream& stream, const AtomsPackMatchObj& v){
       stream<<v.str(); return stream;}
 
   };

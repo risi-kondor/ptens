@@ -101,17 +101,17 @@ namespace ptens{
 
 
     template<typename TYPE>
-    MessageMap rmap(const Ptensors0b<TYPE>& y, const MessageList& lists){
+    MessageMap rmap(const Ptensors0b<TYPE>& y, const AtomsPackMatch& lists){
       return rmap0(*lists.obj,*y.jig);
     }
 
     template<typename TYPE>
-    MessageMap rmap(const Ptensors1b<TYPE>& y, const MessageList& lists){
+    MessageMap rmap(const Ptensors1b<TYPE>& y, const AtomsPackMatch& lists){
       return rmap1(*lists.obj,*y.jig);
     }
 
     template<typename TYPE>
-    MessageMap rmap(const Ptensors2b<TYPE>& y, const MessageList& lists){
+    MessageMap rmap(const Ptensors2b<TYPE>& y, const AtomsPackMatch& lists){
       return rmap2(*lists.obj,*y.jig);
     }
 
@@ -119,21 +119,21 @@ namespace ptens{
   private: // ---- Row maps ---------------------------------------------------------------------------------
 
 
-    typedef cnine::ptr_pair_indexed_object_bank<MessageListObj,Jig0,MessageMap> MMBank0;
-    MMBank0 rmap0=MMBank0([&](const MessageListObj& lists, const Jig0& y){
+    typedef cnine::ptr_pair_indexed_object_bank<AtomsPackMatchObj,Jig0,MessageMap> MMBank0;
+    MMBank0 rmap0=MMBank0([&](const AtomsPackMatchObj& lists, const Jig0& y){
       return mmap(lists,y);});
 
-    typedef cnine::ptr_pair_indexed_object_bank<MessageListObj,Jig1,MessageMap> MMBank1;
-    MMBank1 rmap1=MMBank1([&](const MessageListObj& lists, const Jig1& y){
+    typedef cnine::ptr_pair_indexed_object_bank<AtomsPackMatchObj,Jig1,MessageMap> MMBank1;
+    MMBank1 rmap1=MMBank1([&](const AtomsPackMatchObj& lists, const Jig1& y){
       return mmap(lists,y);});
 
-    typedef cnine::ptr_pair_indexed_object_bank<MessageListObj,Jig2,MessageMap> MMBank2;
-    MMBank2 rmap2=MMBank2([&](const MessageListObj& lists, const Jig2& y){
+    typedef cnine::ptr_pair_indexed_object_bank<AtomsPackMatchObj,Jig2,MessageMap> MMBank2;
+    MMBank2 rmap2=MMBank2([&](const AtomsPackMatchObj& lists, const Jig2& y){
       return mmap(lists,y);});
 
 
     // 0 <- 0
-    MessageMap mmap(const MessageListObj& lists, const Jig0& y){
+    MessageMap mmap(const AtomsPackMatchObj& lists, const Jig0& y){
       auto[in,out]=lists.lists();
       cnine::map_of_lists<int,int> direct;
       for(int m=0; m<in.size(); m++){
@@ -146,7 +146,7 @@ namespace ptens{
   
 
     // 0 <- 1
-    MessageMap mmap(const MessageListObj& lists, const Jig1& y){
+    MessageMap mmap(const AtomsPackMatchObj& lists, const Jig1& y){
       auto[in_lists,out_lists]=lists.lists();
       cnine::map_of_lists<int,int> direct;
       for(int m=0; m<in_lists.size(); m++){
@@ -161,7 +161,7 @@ namespace ptens{
 
 
     // 0 <- 2
-    MessageMap mmap(const MessageListObj& lists, const Jig2& y){
+    MessageMap mmap(const AtomsPackMatchObj& lists, const Jig2& y){
       auto[in_lists,out_lists]=lists.lists();
       cnine::map_of_lists<int,int> direct;
       for(int m=0; m<in_lists.size(); m++){
@@ -198,6 +198,24 @@ namespace ptens{
       stream<<v.str(); return stream;}
 
   };
+
+
+  class Jig0ptr: public shared_ptr<PtensorsJig0<int> >{
+  public:
+
+    typedef shared_ptr<PtensorsJig0<int> > BASE;
+
+    Jig0ptr(const BASE& x):
+      BASE(x){}
+
+    Jig0ptr(const AtomsPack& _atoms):
+      BASE(PtensorsJig0<int>::make_or_cached(_atoms)){}
+
+    Jig0ptr(const shared_ptr<AtomsPackObj>& _atoms):
+      BASE(PtensorsJig0<int>::make_or_cached(_atoms)){}
+
+  };
+
 
 }
 

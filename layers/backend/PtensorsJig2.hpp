@@ -16,8 +16,6 @@
 #define _ptens_PtensorsJig2
 
 #include "map_of_lists.hpp"
-//#include "PtensorsJig0.hpp"
-//#include "PtensorsJig1.hpp"
 #include "GatherMapProgram.hpp"
 #include "MessageMap.hpp"
 
@@ -33,7 +31,7 @@ namespace ptens{
     typedef PtensorsJig0<DUMMY> Jig0;
     typedef PtensorsJig1<DUMMY> Jig1;
     typedef PtensorsJig2<DUMMY> Jig2;
-    typedef cnine::observable<Jig0> observable;
+    typedef cnine::observable<Jig2> observable;
 
     shared_ptr<AtomsPackObj> atoms;
     vector<int> offsets;
@@ -76,7 +74,7 @@ namespace ptens{
     }
 
     int offset1(const int i) const{
-      return atoms->offset(i);
+      return atoms->row_offset1(i); // changed
     }
 
     int size_of(const int i) const{
@@ -112,39 +110,39 @@ namespace ptens{
 
 
     template<typename TYPE>
-    MessageMap rmap(const Ptensors0b<TYPE>& y, const MessageList& lists){
+    MessageMap rmap(const Ptensors0b<TYPE>& y, const AtomsPackMatch& lists){
       return rmap0(*lists.obj,*y.jig);
     }
 
     template<typename TYPE>
-    MessageMap rmap(const Ptensors1b<TYPE>& y, const MessageList& lists){
+    MessageMap rmap(const Ptensors1b<TYPE>& y, const AtomsPackMatch& lists){
       return rmap1(*lists.obj,*y.jig);
     }
 
     template<typename TYPE>
-    MessageMap rmap(const Ptensors2b<TYPE>& y, const MessageList& lists){
+    MessageMap rmap(const Ptensors2b<TYPE>& y, const AtomsPackMatch& lists){
       return rmap2(*lists.obj,*y.jig);
     }
 
 
-  private: 
+  private: // ---- Row maps ---------------------------------------------------------------------------------
 
     
-   typedef cnine::ptr_pair_indexed_object_bank<MessageListObj,PtensorsJig0<DUMMY>,MessageMap> MMBank0;
-    MMBank0 rmap0=MMBank([&](const MessageListObj& lists, const PtensorsJig0<DUMMY>& y){
+   typedef cnine::ptr_pair_indexed_object_bank<AtomsPackMatchObj,Jig0,MessageMap> MMBank0;
+    MMBank0 rmap0=MMBank0([&](const AtomsPackMatchObj& lists, const Jig0& y){
       return mmap(lists,y);});
 
-    typedef cnine::ptr_pair_indexed_object_bank<MessageListObj,PtensorsJig1<DUMMY>,MessageMap> MMBank1;
-    MMBank1 rmap1=MMBank([&](const MessageListObj& lists, const PtensorsJig1<DUMMY>& y){
+    typedef cnine::ptr_pair_indexed_object_bank<AtomsPackMatchObj,Jig1,MessageMap> MMBank1;
+    MMBank1 rmap1=MMBank1([&](const AtomsPackMatchObj& lists, const Jig1& y){
       return mmap(lists,y);});
 
-    typedef cnine::ptr_pair_indexed_object_bank<MessageListObj,PtensorsJig2<DUMMY>,MessageMap> MMBank2;
-    MMBank2 rmap2=MMBank([&](const MessageListObj& lists, const PtensorsJig2<DUMMY>& y){
+    typedef cnine::ptr_pair_indexed_object_bank<AtomsPackMatchObj,Jig2,MessageMap> MMBank2;
+    MMBank2 rmap2=MMBank2([&](const AtomsPackMatchObj& lists, const Jig2& y){
       return mmap(lists,y);});
 
 
     // 2 <- 0 
-    MessageMap mmap(const MessageListObj& lists, const AtomsPack0obj<DUMMY>& y){
+    MessageMap mmap(const AtomsPackMatchObj& lists, const Jig0& y){
       auto[in_lists,out_lists]=lists.lists();
       cnine::map_of_lists<int,int> direct;
       for(int m=0; m<in_lists.size(); m++){
@@ -163,7 +161,7 @@ namespace ptens{
   
       
     // 2 <- 1
-    MessageMap mmap(const MessageListObj& lists, const AtomsPack1obj<DUMMY>& y){
+    MessageMap mmap(const AtomsPackMatchObj& lists, const Jig1& y){
       auto[in_lists,out_lists]=lists.lists();
 
       cnine::map_of_lists<int,int> direct;
@@ -192,7 +190,7 @@ namespace ptens{
 
 
     // 2 <- 2
-    MessageMap mmap(const MessageListObj& lists, const PtensorsJig2<DUMMY>& y){
+    MessageMap mmap(const AtomsPackMatchObj& lists, const Jig2& y){
       auto[in_lists,out_lists]=lists.lists();
 	
       cnine::map_of_lists<int,int> direct;
@@ -348,11 +346,29 @@ namespace ptens{
       return atoms->str(indent);
     }
 
-    friend ostream& operator<<(ostream& stream, const PtensorsJig2<DUMMY>& v){
+    friend ostream& operator<<(ostream& stream, const Jig2& v){
       stream<<v.str(); return stream;}
 
 
   };
+
+
+  class Jig2ptr: public shared_ptr<PtensorsJig2<int> >{
+  public:
+
+    typedef shared_ptr<PtensorsJig2<int> > BASE;
+
+    Jig2ptr(const BASE& x):
+      BASE(x){}
+
+    Jig2ptr(const AtomsPack& _atoms):
+      BASE(PtensorsJig2<int>::make_or_cached(_atoms)){}
+
+    Jig2ptr(const shared_ptr<AtomsPackObj>& _atoms):
+      BASE(PtensorsJig2<int>::make_or_cached(_atoms)){}
+
+  };
+
 
 }
 

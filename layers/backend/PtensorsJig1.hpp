@@ -25,7 +25,6 @@ namespace ptens{
 
   template<typename DUMMY>
   class PtensorsJig1: public cnine::observable<PtensorsJig1<DUMMY> >{
-
   public:
 
     typedef cnine::Gdims Gdims;
@@ -79,57 +78,62 @@ namespace ptens{
 
   public: // ---- Concatenation -----------------------------------------------------------------------------
 
-  /*
-    typedef cnine::plist_indexed_object_bank<PtensorsJig1,shared_ptr<PtensorsJig1<int> > > CAT_MAPS; 
-    CAT_MAPS cat_maps=CAT_MAPS([this](const vector<PtensorsJig1*>& v)
-      {return shared_ptr<PtensorsJig1<int> >(cat_with(v));});
 
-    PtensorsJig1<int>* cat_with(const vector<PtensorsJig1*>& list){
-      cnine::plist<PtensorsJig*> v;
-      for(auto p:list) v.push_back(p->atoms.get());
-      return new PtensorsJig1<int>(atoms->cat_maps(v));
+    static shared_ptr<Jig1> cat(const vector<Jig1*>& v){
+      vector<Jig1*> w;
+      for(int i=1; i<v.size(); i++)
+	w.push_back(v[i]);
+      return v[0]->cat_maps(w);
     }
-    */
+
+    typedef cnine::plist_indexed_object_bank<Jig1,shared_ptr<Jig1> > CAT_MAPS; 
+    CAT_MAPS cat_maps=CAT_MAPS([this](const vector<Jig1*>& v){
+	return shared_ptr<Jig1>(cat_with(v));});
+
+    Jig1* cat_with(const vector<Jig1*>& list){
+      cnine::plist<AtomsPackObj*> v;
+      for(auto p:list) v.push_back(p->atoms.get());
+      return new Jig1(atoms->cat_maps(v));
+    }
+
 
   public: // ---- Row maps ----------------------------------------------------------------------------------
 
 
     template<typename TYPE>
-    MessageMap rmap(const Ptensors0b<TYPE>& y, const MessageList& lists){
+    MessageMap rmap(const Ptensors0b<TYPE>& y, const AtomsPackMatch& lists){
       return rmap0(*lists.obj,*y.jig);
     }
 
     template<typename TYPE>
-    MessageMap rmap(const Ptensors1b<TYPE>& y, const MessageList& lists){
+    MessageMap rmap(const Ptensors1b<TYPE>& y, const AtomsPackMatch& lists){
       return rmap1(*lists.obj,*y.jig);
     }
 
     template<typename TYPE>
-    MessageMap rmap(const Ptensors2b<TYPE>& y, const MessageList& lists){
+    MessageMap rmap(const Ptensors2b<TYPE>& y, const AtomsPackMatch& lists){
       return rmap2(*lists.obj,*y.jig);
     }
 
 
-  private: 
+  private: // ---- Row maps ----------------------------------------------------------------------------------
 
     
-   typedef cnine::ptr_pair_indexed_object_bank<MessageListObj,Jig0,MessageMap> MMBank0;
-    MMBank0 rmap0=MMBank([&](const MessageListObj& lists, const Jig0& y){
+   typedef cnine::ptr_pair_indexed_object_bank<AtomsPackMatchObj,Jig0,MessageMap> MMBank0;
+    MMBank0 rmap0=MMBank0([&](const AtomsPackMatchObj& lists, const Jig0& y){
       return mmap(lists,y);});
 
-    typedef cnine::ptr_pair_indexed_object_bank<MessageListObj,Jig1,MessageMap> MMBank1;
-    MMBank1 rmap1=MMBank([&](const MessageListObj& lists, const Jig1& y){
+    typedef cnine::ptr_pair_indexed_object_bank<AtomsPackMatchObj,Jig1,MessageMap> MMBank1;
+    MMBank1 rmap1=MMBank1([&](const AtomsPackMatchObj& lists, const Jig1& y){
       return mmap(lists,y);});
 
-    typedef cnine::ptr_pair_indexed_object_bank<MessageListObj,Jig2,MessageMap> MMBank2;
-    MMBank2 rmap2=MMBank([&](const MessageListObj& lists, const Jig2& y){
+    typedef cnine::ptr_pair_indexed_object_bank<AtomsPackMatchObj,Jig2,MessageMap> MMBank2;
+    MMBank2 rmap2=MMBank2([&](const AtomsPackMatchObj& lists, const Jig2& y){
       return mmap(lists,y);});
 
-
-  private:
 
     // 1 <- 0
-    MessageMap mmap(const MessageListObj& lists, const Jig0& y){
+    MessageMap mmap(const AtomsPackMatchObj& lists, const Jig0& y){
       auto[in_lists,out_lists]=lists.lists();
       cnine::map_of_lists<int,int> direct;
       for(int m=0; m<in_lists.size(); m++){
@@ -145,7 +149,7 @@ namespace ptens{
   
 
     // 1 <- 1
-    MessageMap mmap(const MessageListObj& lists, const Jig1& y){
+    MessageMap mmap(const AtomsPackMatchObj& lists, const Jig1& y){
       auto[in_lists,out_lists]=lists.lists();
       cnine::flog timer("PtensorsJig1::[1<-1]");
 
@@ -169,7 +173,7 @@ namespace ptens{
 
 
     // 1 <- 2
-    MessageMap mmap(const MessageListObj& lists, const Jig2& y){
+    MessageMap mmap(const AtomsPackMatchObj& lists, const Jig2& y){
       auto[in_lists,out_lists]=lists.lists();
 
       cnine::map_of_lists<int,int> direct;
@@ -244,6 +248,24 @@ namespace ptens{
 
 
   };
+
+
+  class Jig1ptr: public shared_ptr<PtensorsJig1<int> >{
+  public:
+
+    typedef shared_ptr<PtensorsJig1<int> > BASE;
+
+    Jig1ptr(const BASE& x):
+      BASE(x){}
+
+    Jig1ptr(const AtomsPack& _atoms):
+      BASE(PtensorsJig1<int>::make_or_cached(_atoms)){}
+
+    Jig1ptr(const shared_ptr<AtomsPackObj>& _atoms):
+      BASE(PtensorsJig1<int>::make_or_cached(_atoms)){}
+
+  };
+
 
 }
 
