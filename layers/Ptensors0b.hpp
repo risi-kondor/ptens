@@ -305,17 +305,17 @@ namespace ptens{
 
     template<typename SOURCE>
     void add_gather(const SOURCE& x){
-      (jig->rmap(x,atoms.overlaps_mlist(x.atoms)))(*this,x);
+      //(jig->rmap(x,atoms.overlaps_mlist(x.atoms)))(*this,x);
     }
 
     template<typename OUTPUT>
     void add_gather_back(const OUTPUT& x){
-      x.jig->rmap(*this,x.atoms.overlaps_mlist(atoms)).inv()(*this,x);
+      //x.jig->rmap(*this,x.atoms.overlaps_mlist(atoms)).inv()(*this,x);
     }
 
     template<typename OUTPUT>
     void add_gather_back_alt(const OUTPUT& x){ // TODO
-      x.jig->rmap(*this,x.atoms.overlaps_mlist(atoms)).inv()(this->get_grad(),x.get_grad());
+      //x.jig->rmap(*this,x.atoms.overlaps_mlist(atoms)).inv()(this->get_grad(),x.get_grad());
     }
 
 

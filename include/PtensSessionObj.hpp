@@ -26,6 +26,7 @@
 #include "Ptens_base.hpp"
 #include "SubgraphObj.hpp"
 #include "GgraphCache.hpp"
+#include "OverlapsMessageMapBank.hpp"
 
 //namespace ptens{
 //class PtensSessionObj;
@@ -35,6 +36,8 @@
 
 
 namespace ptens{
+
+  extern OverlapsMessageMapBank* overlaps_bank;
 
 
   class PtensSessionObj{
@@ -49,12 +52,16 @@ namespace ptens{
     GgraphCache graph_cache;
     cnine::MemoryManager* managed_gmem=nullptr;
 
+    //bool cache_overlap_maps=false;
+
 
     PtensSessionObj(const int _nthreads=1){
 
       cnine_session=new cnine::cnine_session(_nthreads);
 
-      cout<<boilerplate()<<endl;
+      ptens::overlaps_bank=new OverlapsMessageMapBank();
+
+      cout<<banner()<<endl;
 
       logfile.open("ptens.log");
       auto time = std::chrono::system_clock::now();
@@ -79,8 +86,16 @@ namespace ptens{
       delete cnine_session;
     }
 
+  public: // ---- Access ----------------------------------------------------------------------------------------
 
-  public: // Logging 
+
+    //void set_cache_overlap_maps(const bool x){
+    //cache_overlap_maps=x;
+    //}
+
+
+  public: // ---- Logging ---------------------------------------------------------------------------------------
+
 
     void log(const string msg){
       std::time_t timet = std::time(nullptr);
@@ -97,6 +112,7 @@ namespace ptens{
       logfile<<os<<msg<<obj.repr()<<endl;
     }
 
+
   public: // ---- I/O ---------------------------------------------------------------------------------------
 
 
@@ -105,21 +121,26 @@ namespace ptens{
       return "OFF";
     }
 
-    string boilerplate() const{
+    string size_or_off(const bool b, const int x) const{
+      if(!b) return "OFF";
+      return to_string(x);
+    }
+
+    string banner() const{
       bool with_cuda=0;
 #ifdef _WITH_CUDA
       with_cuda=1;
 #endif
 
-
-
       ostringstream oss;
-      oss<<"-----------------------------------"<<endl;
+      oss<<"-------------------------------------"<<endl;
       oss<<"Ptens 0.0 "<<endl;
       cout<<endl;
-      oss<<"CUDA support:                   "<<on_off(with_cuda)<<endl;
-      oss<<"Row level gather operations     "<<on_off(row_gathers)<<endl;
-      oss<<"-----------------------------------"<<endl;
+      oss<<"CUDA support:                     "<<on_off(with_cuda)<<endl;
+      oss<<"Row level gather operations:      "<<on_off(row_gathers)<<endl;
+      oss<<endl;
+      oss<<"Overlap maps cache:               "<<size_or_off(cache_overlap_maps,overlaps_bank->rmemsize())<<endl;
+      oss<<"-------------------------------------"<<endl;
       return oss.str();
     }
     

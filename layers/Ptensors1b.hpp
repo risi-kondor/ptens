@@ -89,11 +89,11 @@ namespace ptens{
     */
 
     Ptensors1b(const AtomsPack& _atoms, const int nc, const int _dev=0):
-      BASE(cnine::Gdims(_atoms.tsize1(),nc),0,_dev),
+      BASE(cnine::Gdims(_atoms.nrows1(),nc),0,_dev),
       atoms(_atoms){}
 
     Ptensors1b(const AtomsPack& _atoms, const int nc, const int fcode, const int _dev):
-      BASE(cnine::Gdims(_atoms.tsize1(),nc),fcode,_dev),
+      BASE(cnine::Gdims(_atoms.nrows1(),nc),fcode,_dev),
       atoms(_atoms){}
 
     static Ptensors1b cat(const vector<Ptensors1b>& list){
@@ -361,17 +361,17 @@ namespace ptens{
 
     template<typename SOURCE>
     void add_gather(const SOURCE& x, const int min_overlaps=1){
-      (jig->rmap(x,atoms.overlaps_mlist(x.atoms)))(*this,x);
+      //(jig->rmap(x,atoms.overlaps_mlist(x.atoms)))(*this,x);
     }
 
     template<typename OUTPUT>
     void add_gather_back(const OUTPUT& x){
-      x.jig->rmap(*this,x.atoms.overlaps_mlist(atoms)).inv()(*this,x);
+      //x.jig->rmap(*this,x.atoms.overlaps_mlist(atoms)).inv()(*this,x);
     }
 
     template<typename OUTPUT>
     void add_gather_back_alt(const OUTPUT& x){
-      x.jig->rmap(*this,x.atoms.overlap_mlist(atoms)).inv()(this->get_grad(),x.get_grad());
+      //x.jig->rmap(*this,x.atoms.overlap_mlist(atoms)).inv()(this->get_grad(),x.get_grad());
     }
 
 

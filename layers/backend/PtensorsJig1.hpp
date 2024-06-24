@@ -16,8 +16,10 @@
 #define _ptens_PtensorsJig1
 
 #include "map_of_lists.hpp"
+#include "AtomsPackObj.hpp"
 #include "GatherMapProgram.hpp"
 #include "MessageMap.hpp"
+#include "PtensorsJig.hpp"
 
 
 namespace ptens{

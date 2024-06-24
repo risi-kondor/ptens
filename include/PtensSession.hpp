@@ -35,6 +35,28 @@ namespace ptens{
       delete ptens_session;
     }
 
+  public: // ---- Access -----------------------------------------------------------------------------------------
+
+
+    void cache_overlap_maps(const bool x){
+      ptens::cache_overlap_maps=x;
+    }
+
+
+  public: // ---- I/O --------------------------------------------------------------------------------------------
+
+
+    string banner() const{
+      return ptens_session->banner();
+    }
+
+    string str() const{
+      return ptens_session->banner();
+    }
+
+    friend ostream& operator<<(ostream& stream, const PtensSession& x){
+      stream<<x.str(); return stream;}
+
   };
 
 }

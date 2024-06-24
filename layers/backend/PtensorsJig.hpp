@@ -29,7 +29,7 @@ namespace ptens{
   class PtensorsJig{
   public:
 
-    shared_ptr<AtomsPackObj> atoms;
+    //shared_ptr<AtomsPackObj> atoms;
 
     virtual ~PtensorsJig(){}
 
@@ -37,8 +37,8 @@ namespace ptens{
   public: // ---- Constructors ------------------------------------------------------------------------------
 
 
-    PtensorsJig(const shared_ptr<AtomsPackObj>& _atoms):
-      atoms(new AtomsPackObj(*_atoms)){} // this copy is to break the circular dependency 
+    //PtensorsJig(const shared_ptr<AtomsPackObj>& _atoms):
+    //atoms(new AtomsPackObj(*_atoms)){} // this copy is to break the circular dependency 
 
 
   public: // ---- Access ------------------------------------------------------------------------------------
@@ -59,7 +59,7 @@ namespace ptens{
   public: // ---- I/O ----------------------------------------------------------------------------------------
 
 
-    virtual string str(const string indent="") const=0;
+    //virtual string str(const string indent="") const=0;
 
 
   };

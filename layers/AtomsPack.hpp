@@ -154,10 +154,6 @@ namespace ptens{
   public: // ---- Layout of corresponding matrix --------------------------------------------------------------
 
 
-    int tsize0() const {return obj->tsize0();}
-    int tsize1() const {return obj->tsize1();}
-    int tsize2() const{return obj->tsize2();}
-
     int nrows0() const {return obj->tsize0();}
     int nrows1() const {return obj->tsize1();}
     int nrows2() const {return obj->tsize2();}

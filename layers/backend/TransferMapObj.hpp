@@ -101,7 +101,10 @@ namespace ptens{
       }
     }
 
-    
+    size_t rmemsize() const{
+      return BASE::rmemsize();
+    }
+
 
   public: // ---- Overlaps -----------------------------------------------------------------------------------
 
