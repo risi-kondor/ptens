@@ -1,21 +1,30 @@
 #include "Cnine_base.cpp"
-#include "PtensSessionObj.hpp"
+#include "Ptens_base.hpp"
+#include "OverlapsMmapCache.hpp"
+
+//#include "PtensSessionObj.hpp"
 
 #ifndef _Ptens_base_cpp
 #define _Ptens_base_cpp
 
 namespace ptens{
 
-  class OverlapsMessageMapBank;
 
+  namespace ptens_global{
 
-  PtensSessionObj* ptens_session=nullptr;
+    bool row_level_operations=false; 
 
-  bool cache_overlap_maps=false;
-  OverlapsMessageMapBank* overlaps_bank;
+    bool cache_overlap_maps=false;
+    OverlapsMmapCache overlaps_cache;
+
+  }
+
 
 }
 
-#include "PtensSession.hpp"
 
 #endif 
+
+
+  //PtensSessionObj* ptens_session=nullptr;
+//#include "PtensSession.hpp"

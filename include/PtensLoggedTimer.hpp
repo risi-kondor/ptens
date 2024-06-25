@@ -19,10 +19,10 @@
 #include <chrono>
 #include <ctime>
 
-#include "PtensSessionObj.hpp"
+//#include "PtensSessionObj.hpp"
 
 //extern ptens::PtensLog* ptens_log;
-extern ptens::PtensSessionObj* ptens::ptens_session;
+//extern ptens::PtensSessionObj* ptens::ptens_session;
 
 
 namespace ptens{
@@ -36,8 +36,8 @@ namespace ptens{
 
     ~LoggedTimer(){
       auto elapsed=chrono::duration<double,std::milli>(chrono::system_clock::now()-t0).count();
-      if(n_ops>0) ptens_session->log(task+" "+to_string(elapsed)+" ms"+" ["+to_string((int)(((float)n_ops)/elapsed/1000.0))+" Mflops]");
-      else ptens_session->log(task+" "+to_string(elapsed)+" ms");
+      //if(n_ops>0) ptens_session->log(task+" "+to_string(elapsed)+" ms"+" ["+to_string((int)(((float)n_ops)/elapsed/1000.0))+" Mflops]");
+      //else ptens_session->log(task+" "+to_string(elapsed)+" ms");
     }
 
 

@@ -19,7 +19,6 @@
 #include "array_pool.hpp"
 #include "AindexPack.hpp"
 #include "GatherMap.hpp"
-#include "TransferMapGradedObj.hpp"
 #include "fnlog.hpp"
 #include "map_of_lists.hpp"
 #include "map_of_maps.hpp"

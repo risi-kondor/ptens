@@ -11,8 +11,8 @@
  * must be accompanied by a verbatim copy of the license. 
  */
 
-#ifndef _ptens_MessageMap
-#define _ptens_MessageMap
+#ifndef _ptens_RowLevelMap
+#define _ptens_RowLevelMap
 
 #include "AtomsPackObj.hpp"
 #include "GatherMapProgram.hpp"
@@ -21,19 +21,19 @@
 namespace ptens{
 
 
-  class MessageMap{
+  class RowLevelMap{
   public:
 
     shared_ptr<cnine::GatherMapProgram> obj;
 
-    ~MessageMap(){}
+    ~RowLevelMap(){}
 
-    MessageMap(const cnine::GatherMapProgram&& _obj):
+    RowLevelMap(const cnine::GatherMapProgram&& _obj):
       obj(new cnine::GatherMapProgram(_obj)){}
 
 
-    MessageMap inv() const{
-      return MessageMap(obj->inv());
+    RowLevelMap inv() const{
+      return RowLevelMap(obj->inv());
     }
 
     template<typename TYPE>
@@ -46,18 +46,18 @@ namespace ptens{
 
 
     string classname() const{
-      return "MessageMap";
+      return "RowLevelMap";
     }
 
     string repr() const{
-      return "MessageMap";
+      return "RowLevelMap";
     }
 
     string str(const string indent="") const{
       return obj->str(indent);
     }
 
-    friend ostream& operator<<(ostream& stream, const MessageMap& v){
+    friend ostream& operator<<(ostream& stream, const RowLevelMap& v){
       stream<<v.str(); return stream;}
 
 

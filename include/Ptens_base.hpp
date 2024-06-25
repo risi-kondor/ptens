@@ -32,6 +32,8 @@
 #define PTENS_ASSRT(condition) \
   if(!(condition)) throw std::runtime_error("Ptens error in "+string(__PRETTY_FUNCTION__)+": failed assertion "+#condition+".");
 
+#define PTENS_UNIMPL() printf("Ptens error: function \"%s\" not implemented.\n",__PRETTY_FUNCTION__);
+
 
 // ---- Copy, assign and convert warnings --------------------------------------------------------------------
 
@@ -72,6 +74,12 @@ namespace ptens{
   template<typename TYPE> class Ptensors0b;
   template<typename TYPE> class Ptensors1b;
   template<typename TYPE> class Ptensors2b;
+
+  class AtomsPackTag0;
+  class AtomsPackTag1;
+  class AtomsPackTag2;
+
+  namespace ptens_global{};
 
 }
 

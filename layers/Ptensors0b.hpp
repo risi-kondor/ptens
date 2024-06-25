@@ -21,7 +21,7 @@
 #include "Rtensor3_view.hpp"
 
 #include "Ptensor0.hpp"
-#include "PtensLoggedTimer.hpp"
+//#include "PtensLoggedTimer.hpp"
 #include "Ltensor.hpp"
 #include "Ptensorsb.hpp"
 #include "PtensorsJig0.hpp"
@@ -123,17 +123,17 @@ namespace ptens{
 
 
     Ptensors0b copy() const{
-      cnine::using_vram_manager vv(ptens_session->managed_gmem);
+      //cnine::using_vram_manager vv(ptens_session->managed_gmem);
       return Ptensors0b(TENSOR::copy(),jig);
     }
 
     Ptensors0b copy(const int _dev) const{
-      cnine::using_vram_manager vv(ptens_session->managed_gmem);
+      //cnine::using_vram_manager vv(ptens_session->managed_gmem);
       return Ptensors0b(TENSOR::copy(_dev),jig);
     }
 
     Ptensors0b zeros_like() const{
-      cnine::using_vram_manager vv(ptens_session->managed_gmem);
+      //cnine::using_vram_manager vv(ptens_session->managed_gmem);
       return Ptensors0b(TENSOR::zeros_like(),atoms);
     }
 
@@ -142,22 +142,22 @@ namespace ptens{
     }
 
     static Ptensors0b zeros_like(const Ptensors0b& x){
-      cnine::using_vram_manager vv(ptens_session->managed_gmem);
+      //cnine::using_vram_manager vv(ptens_session->managed_gmem);
       return Ptensors0b(x.TENSOR::zeros_like(),x.atoms);
     }
 
     static Ptensors0b zeros_like(const Ptensors0b& x, const int nc){
-      cnine::using_vram_manager vv(ptens_session->managed_gmem);
+      //cnine::using_vram_manager vv(ptens_session->managed_gmem);
       return Ptensors0b(TENSOR({x.dim(0),nc},0,x.get_dev()),x.atoms);
     }
 
     static Ptensors0b gaussian_like(const Ptensors0b& x){
-      cnine::using_vram_manager vv(ptens_session->managed_gmem);
+      //cnine::using_vram_manager vv(ptens_session->managed_gmem);
       return Ptensors0b(x.TENSOR::gaussian_like(),x.atoms);
     }
 
     static Ptensors0b* new_zeros_like(const Ptensors0b& x){
-      cnine::using_vram_manager vv(ptens_session->managed_gmem);
+      //cnine::using_vram_manager vv(ptens_session->managed_gmem);
       return new Ptensors0b(x.TENSOR::zeros_like(),x.atoms);
     }
     
@@ -212,11 +212,7 @@ namespace ptens{
       return TENSOR::dim(1);
     }
 
-    //int nchannels() const{
-    //return TENSOR::dim(1);
-    //}
-
-    AtomsPack get_atoms() const{
+    const AtomsPack& get_atoms() const{
       return atoms;
     }
 
@@ -227,18 +223,6 @@ namespace ptens{
     int index_of(const int i) const{
       return i;
     }
-
-    //int tsize() const{
-    //return atoms.tsize0();
-    //}
-
-    //int nrows() const{
-    //return atoms.nrows0();
-    //}
-
-    //int nrows(const int i) const{
-    //return 1;
-    //}
 
     Atoms atoms_of(const int i) const{
       return atoms(i);
@@ -305,16 +289,22 @@ namespace ptens{
 
     template<typename SOURCE>
     void add_gather(const SOURCE& x){
-      //(jig->rmap(x,atoms.overlaps_mlist(x.atoms)))(*this,x);
+      auto overlaps=ptens_global::overlaps_cache(atoms,x.atoms);
+      if(ptens_global::row_level_operations){
+	
+      }else{
+      }
     }
 
     template<typename OUTPUT>
     void add_gather_back(const OUTPUT& x){
+      auto overlaps=ptens_global::overlaps_cache(x.atoms,atoms);
       //x.jig->rmap(*this,x.atoms.overlaps_mlist(atoms)).inv()(*this,x);
     }
 
     template<typename OUTPUT>
-    void add_gather_back_alt(const OUTPUT& x){ // TODO
+    void add_gather_back_alt(const OUTPUT& x){
+      auto overlaps=ptens_global::overlaps_cache(x.atoms,atoms);
       //x.jig->rmap(*this,x.atoms.overlaps_mlist(atoms)).inv()(this->get_grad(),x.get_grad());
     }
 
@@ -331,7 +321,7 @@ namespace ptens{
 
 
     void broadcast0(const BASE& X, const int offs=0){
-      TimedFn T("Ptensors0b","broadcast0",*this);
+      //TimedFn T("Ptensors0b","broadcast0",*this);
       int nc=X.dim(1);
       BASE::view2().cols(offs,nc)+=X.view2();
     }

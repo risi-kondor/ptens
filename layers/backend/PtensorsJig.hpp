@@ -18,9 +18,9 @@
 #include "map_of_lists.hpp"
 #include "AtomsPackObj.hpp"
 #include "GatherMapProgram.hpp"
-#include "MessageMap.hpp"
 #include "ptr_pair_indexed_object_bank.hpp"
 #include "observable.hpp"
+#include "AtomsPackMatch.hpp"
 
 
 namespace ptens{

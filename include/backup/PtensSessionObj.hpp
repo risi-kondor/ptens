@@ -26,7 +26,7 @@
 #include "Ptens_base.hpp"
 #include "SubgraphObj.hpp"
 #include "GgraphCache.hpp"
-#include "OverlapsMessageMapBank.hpp"
+#include "OverlapsMmapCache.hpp"
 
 //namespace ptens{
 //class PtensSessionObj;
@@ -37,7 +37,7 @@
 
 namespace ptens{
 
-  extern OverlapsMessageMapBank* overlaps_bank;
+  //extern OverlapsMessageMapBank* overlaps_bank;
 
 
   class PtensSessionObj{
@@ -59,7 +59,7 @@ namespace ptens{
 
       cnine_session=new cnine::cnine_session(_nthreads);
 
-      ptens::overlaps_bank=new OverlapsMessageMapBank();
+      //ptens::overlaps_bank=new OverlapsMessageMapBank();
 
       cout<<banner()<<endl;
 
@@ -139,7 +139,7 @@ namespace ptens{
       oss<<"CUDA support:                     "<<on_off(with_cuda)<<endl;
       oss<<"Row level gather operations:      "<<on_off(row_gathers)<<endl;
       oss<<endl;
-      oss<<"Overlap maps cache:               "<<size_or_off(cache_overlap_maps,overlaps_bank->rmemsize())<<endl;
+      oss<<"Overlap maps cache:               "<<size_or_off(cache_overlap_maps,overlaps_cache.rmemsize())<<endl;
       oss<<"-------------------------------------"<<endl;
       return oss.str();
     }

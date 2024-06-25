@@ -16,8 +16,9 @@
 #define _ptens_PtensorsJig0
 
 #include "map_of_lists.hpp"
+#include "AtomsPack.hpp"
 #include "AtomsPackObj.hpp"
-#include "MessageMap.hpp"
+#include "RowLevelMap.hpp"
 #include "PtensorsJig.hpp"
 
 
@@ -100,40 +101,16 @@ namespace ptens{
   public: // ---- Row maps ----------------------------------------------------------------------------------
 
 
-    template<typename TYPE>
-    MessageMap rmap(const Ptensors0b<TYPE>& y, const AtomsPackMatch& lists){
-      return rmap0(*lists.obj,*y.jig);
+    RowLevelMap mmap(const AtomsPackMatchObj& lists, const PtensorsJig& y){
+      if(dynamic_cast<const Jig0&>(y)) return mmap(lists, dynamic_cast<const Jig0&>(y));
+      if(dynamic_cast<const Jig1&>(y)) return mmap(lists, dynamic_cast<const Jig1&>(y));
+      if(dynamic_cast<const Jig2&>(y)) return mmap(lists, dynamic_cast<const Jig2&>(y));
+      PTENS_UNIMPL();
+      return mmap(lists, dynamic_cast<const Jig0&>(y));
     }
-
-    template<typename TYPE>
-    MessageMap rmap(const Ptensors1b<TYPE>& y, const AtomsPackMatch& lists){
-      return rmap1(*lists.obj,*y.jig);
-    }
-
-    template<typename TYPE>
-    MessageMap rmap(const Ptensors2b<TYPE>& y, const AtomsPackMatch& lists){
-      return rmap2(*lists.obj,*y.jig);
-    }
-
-
-  private: // ---- Row maps ---------------------------------------------------------------------------------
-
-
-    typedef cnine::ptr_pair_indexed_object_bank<AtomsPackMatchObj,Jig0,MessageMap> MMBank0;
-    MMBank0 rmap0=MMBank0([&](const AtomsPackMatchObj& lists, const Jig0& y){
-      return mmap(lists,y);});
-
-    typedef cnine::ptr_pair_indexed_object_bank<AtomsPackMatchObj,Jig1,MessageMap> MMBank1;
-    MMBank1 rmap1=MMBank1([&](const AtomsPackMatchObj& lists, const Jig1& y){
-      return mmap(lists,y);});
-
-    typedef cnine::ptr_pair_indexed_object_bank<AtomsPackMatchObj,Jig2,MessageMap> MMBank2;
-    MMBank2 rmap2=MMBank2([&](const AtomsPackMatchObj& lists, const Jig2& y){
-      return mmap(lists,y);});
-
 
     // 0 <- 0
-    MessageMap mmap(const AtomsPackMatchObj& lists, const Jig0& y){
+    RowLevelMap mmap(const AtomsPackMatchObj& lists, const Jig0& y){
       auto[in,out]=lists.lists();
       cnine::map_of_lists<int,int> direct;
       for(int m=0; m<in.size(); m++){
@@ -146,7 +123,7 @@ namespace ptens{
   
 
     // 0 <- 1
-    MessageMap mmap(const AtomsPackMatchObj& lists, const Jig1& y){
+    RowLevelMap mmap(const AtomsPackMatchObj& lists, const Jig1& y){
       auto[in_lists,out_lists]=lists.lists();
       cnine::map_of_lists<int,int> direct;
       for(int m=0; m<in_lists.size(); m++){
@@ -161,7 +138,7 @@ namespace ptens{
 
 
     // 0 <- 2
-    MessageMap mmap(const AtomsPackMatchObj& lists, const Jig2& y){
+    RowLevelMap mmap(const AtomsPackMatchObj& lists, const Jig2& y){
       auto[in_lists,out_lists]=lists.lists();
       cnine::map_of_lists<int,int> direct;
       for(int m=0; m<in_lists.size(); m++){
@@ -221,3 +198,33 @@ namespace ptens{
 
 #endif 
 
+    /*
+    template<typename TYPE>
+    RowLevelMap rmap(const Ptensors0b<TYPE>& y, const AtomsPackMatch& lists){
+      return rmap0(*lists.obj,*y.jig);
+    }
+
+    template<typename TYPE>
+    RowLevelMap rmap(const Ptensors1b<TYPE>& y, const AtomsPackMatch& lists){
+      return rmap1(*lists.obj,*y.jig);
+    }
+
+    template<typename TYPE>
+    RowLevelMap rmap(const Ptensors2b<TYPE>& y, const AtomsPackMatch& lists){
+      return rmap2(*lists.obj,*y.jig);
+    }
+    */
+
+    /*
+    typedef cnine::ptr_pair_indexed_object_bank<AtomsPackMatchObj,Jig0,RowLevelMap> MMBank0;
+    MMBank0 rmap0=MMBank0([&](const AtomsPackMatchObj& lists, const Jig0& y){
+      return mmap(lists,y);});
+
+    typedef cnine::ptr_pair_indexed_object_bank<AtomsPackMatchObj,Jig1,RowLevelMap> MMBank1;
+    MMBank1 rmap1=MMBank1([&](const AtomsPackMatchObj& lists, const Jig1& y){
+      return mmap(lists,y);});
+
+    typedef cnine::ptr_pair_indexed_object_bank<AtomsPackMatchObj,Jig2,RowLevelMap> MMBank2;
+    MMBank2 rmap2=MMBank2([&](const AtomsPackMatchObj& lists, const Jig2& y){
+      return mmap(lists,y);});
+    */

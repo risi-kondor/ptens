@@ -26,10 +26,14 @@
 #include "cpermutation.hpp"
 #include "map_of_lists.hpp"
 #include "once.hpp"
+#include "GatherMap.hpp"
 
 #include "Atoms.hpp"
-#include "TransferMap.hpp"
-#include "AtomsPackMatch.hpp"
+//#include "PtensorsJig0.hpp"
+//#include "PtensorsJig1.hpp"
+//#include "PtensorsJig2.hpp"
+//#include "TensorLevelMap.hpp"
+//#include "AtomsPackMatch.hpp"
 
 
 namespace ptens{
@@ -41,15 +45,6 @@ namespace ptens{
     typedef cnine::array_pool<int> BASE;
     using  BASE::BASE;
 
-
-    cnine::ptr_indexed_object_bank<AtomsPackObj,TransferMap> overlap_maps=
-      cnine::ptr_indexed_object_bank<AtomsPackObj,TransferMap>([this](const AtomsPackObj& x)
-	{return TransferMap(new TransferMapObj<AtomsPackObj>(x,*this));});
-
-    cnine::ptr_arg_indexed_object_bank<AtomsPackObj,int,AtomsPackMatch> overlaps_mlist=
-      cnine::ptr_arg_indexed_object_bank<AtomsPackObj,int,AtomsPackMatch>
-    ([this](const AtomsPackObj& x, const int min_overlap){
-      return AtomsPackMatch::overlaps(x,*this,min_overlap);},1);
 
     cnine::plist_indexed_object_bank<AtomsPackObj,shared_ptr<AtomsPackObj>> cat_maps=
       cnine::plist_indexed_object_bank<AtomsPackObj,shared_ptr<AtomsPackObj>>([this](const vector<AtomsPackObj*>& v)
@@ -63,6 +58,13 @@ namespace ptens{
     mutable shared_ptr<PtensorsJig0<int> > cached_pack0;
     mutable shared_ptr<PtensorsJig1<int> > cached_pack1;
     mutable shared_ptr<PtensorsJig2<int> > cached_pack2;
+
+    mutable shared_ptr<AtomsPackTag0> cached_tag0;
+    mutable shared_ptr<AtomsPackTag1> cached_tag1;
+    mutable shared_ptr<AtomsPackTag2> cached_tag2;
+
+    //operator shared_ptr<AtomsPackTag0>() const{
+    //if(!cached_tag0) cached_tag0=make_shared<AtomsPackTag0>()
 
 
     ~AtomsPackObj(){
@@ -404,9 +406,9 @@ namespace ptens{
 
     
     // create map for messages from y
-    TransferMap overlaps(const AtomsPackObj& y){
-      return overlap_maps(y);
-    }
+    //TensorLevelMap overlaps(const AtomsPackObj& y){
+    //return overlap_maps(y);
+    //}
 
 
   public: // ---- I/O ----------------------------------------------------------------------------------------
@@ -428,15 +430,15 @@ namespace ptens{
 
 
     //overlap_maps([this](const AtomsPackObj& x)
-    //{return TransferMap(new TransferMapObj<AtomsPackObj>(x,*this));}),
+    //{return TensorLevelMap(new TensorLevelMapObj<AtomsPackObj>(x,*this));}),
     //cat_maps([this](const vector<AtomsPackObj*>& v)
     //{return shared_ptr<AtomsPackObj>(new AtomsPackObj(cat_with(v)));})
 		//overlap_maps([this](const AtomsPackObj& x)
-		//{return TransferMap(new TransferMapObj<AtomsPackObj>(x,*this));}),
+		//{return TensorLevelMap(new TensorLevelMapObj<AtomsPackObj>(x,*this));}),
 		//cat_maps([this](const vector<AtomsPackObj*>& v)
 		//{return shared_ptr<AtomsPackObj>(new AtomsPackObj(cat_with(v)));})
 		//overlap_maps([this](const AtomsPackObj& x)
-		//{return TransferMap(new TransferMapObj<AtomsPackObj>(x,*this));}),
+		//{return TensorLevelMap(new TensorLevelMapObj<AtomsPackObj>(x,*this));}),
 		//cat_maps([this](const vector<AtomsPackObj*>& v)
 		//{return shared_ptr<AtomsPackObj>(new AtomsPackObj(cat_with(v)));})
     //cnine::once<BASE> gpack=cnine::once<BASE>([&](){
@@ -456,4 +458,13 @@ namespace ptens{
     //cnine::ptr_indexed_object_bank<AtomsPackObj,AtomsPackMatch> overlaps2_mlist=
     //cnine::ptr_indexed_object_bank<AtomsPackObj,AtomsPackMatch>([this](const AtomsPackObj& x)
     //{return AtomsPackMatch::overlaps(x,*this,2);});
+
+    //cnine::ptr_indexed_object_bank<AtomsPackObj,TensorLevelMap> overlap_maps=
+    //cnine::ptr_indexed_object_bank<AtomsPackObj,TensorLevelMap>([this](const AtomsPackObj& x)
+    //{return TensorLevelMap(new TensorLevelMapObj<AtomsPackObj>(x,*this));});
+
+    //cnine::ptr_arg_indexed_object_bank<AtomsPackObj,int,AtomsPackMatch> overlaps_mlist=
+    //cnine::ptr_arg_indexed_object_bank<AtomsPackObj,int,AtomsPackMatch>
+    //([this](const AtomsPackObj& x, const int min_overlap){
+      //return AtomsPackMatch::overlaps(x,*this,min_overlap);},1);
 

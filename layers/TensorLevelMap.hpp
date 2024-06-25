@@ -12,10 +12,10 @@
  *
  */
 
-#ifndef _ptens_TransferMap
-#define _ptens_TransferMap
+#ifndef _ptens_TensorLevelMap
+#define _ptens_TensorLevelMap
 
-#include "TransferMapObj.hpp"
+#include "TensorLevelMapObj.hpp"
 
 
 namespace ptens{
@@ -23,22 +23,22 @@ namespace ptens{
   class AtomsPackObj;
 
 
-  class TransferMap{
+  class TensorLevelMap{
   public:
     
-    shared_ptr<TransferMapObj<AtomsPackObj> > obj;
+    shared_ptr<TensorLevelMapObj<AtomsPackObj> > obj;
 
-    TransferMap(){
+    TensorLevelMap(){
       PTENS_ASSRT(false);}
 
-    TransferMap(const shared_ptr<TransferMapObj<AtomsPackObj> >& x):
+    TensorLevelMap(const shared_ptr<TensorLevelMapObj<AtomsPackObj> >& x):
       obj(x){}
 
-    TransferMap(TransferMapObj<AtomsPackObj>* x):
+    TensorLevelMap(TensorLevelMapObj<AtomsPackObj>* x):
       obj(x){}
 
-    //TransferMap(const AtomsPack& _in_atoms, const AtomsPack& _out_atoms):
-    //obj(new TransferMapObj(*_in_atoms.obj,*_out_atoms.obj)){}
+    //TensorLevelMap(const AtomsPack& _in_atoms, const AtomsPack& _out_atoms):
+    //obj(new TensorLevelMapObj(*_in_atoms.obj,*_out_atoms.obj)){}
 
 
   public: // ---- Access -------------------------------------------------------------------------------------
@@ -75,14 +75,14 @@ namespace ptens{
     }
 
     string repr() const{
-      return "TransferMap";
+      return "TensorLevelMap";
     }
 
     string str(const string indent="") const{
       return obj->str();
     }
 
-    friend ostream& operator<<(ostream& stream, const TransferMap& v){
+    friend ostream& operator<<(ostream& stream, const TensorLevelMap& v){
       stream<<v.str(); return stream;}
 
 

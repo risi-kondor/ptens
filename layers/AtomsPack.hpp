@@ -126,10 +126,6 @@ namespace ptens{
       return obj->as_vecs();
     }
 
-    bool operator==(const AtomsPack& x) const{
-      return (*obj)==(*x.obj);
-    }
-
     cnine::array_pool<int> dims1(const int nc) const{
       return obj->dims1(nc);
     }
@@ -148,6 +144,11 @@ namespace ptens{
 
     int gather_to_nodes_map_size(const int dev) const{
       return obj->gather_to_nodes_map()->n;
+    }
+
+    bool operator==(const AtomsPack& x) const{
+      if(obj.get()==x.obj.get()) return true;
+      return (*obj)==(*x.obj);
     }
 
 
@@ -186,14 +187,14 @@ namespace ptens{
     } 
     
     // create map for messages from y
-    TransferMap overlaps(const AtomsPack& y){
-      return obj->overlaps(*y.obj);
-    }
+    //TensorLevelMap overlaps(const AtomsPack& y){
+    //return obj->overlaps(*y.obj);
+    //}
 
     // create map for messages from y
-    AtomsPackMatch overlaps_mlist(const AtomsPack& y, const int min_overlaps=1) const{
-      return obj->overlaps_mlist(*y.obj,min_overlaps);
-    }
+    //AtomsPackMatch overlaps_mlist(const AtomsPack& y, const int min_overlaps=1) const{
+    //return obj->overlaps_mlist(*y.obj,min_overlaps);
+    //}
 
 
   public: // ---- I/O ----------------------------------------------------------------------------------------
