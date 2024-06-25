@@ -1,6 +1,7 @@
 #include "Cnine_base.cpp"
 #include "Ptens_base.hpp"
 #include "OverlapsMmapCache.hpp"
+#include "RowLevelMapCache.hpp"
 
 //#include "PtensSessionObj.hpp"
 
@@ -16,6 +17,9 @@ namespace ptens{
 
     bool cache_overlap_maps=false;
     OverlapsMmapCache overlaps_cache;
+
+    bool cache_rmaps=false;
+    RowLevelMapCache rmap_cache;
 
   }
 

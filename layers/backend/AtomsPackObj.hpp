@@ -59,9 +59,9 @@ namespace ptens{
     mutable shared_ptr<PtensorsJig1<int> > cached_pack1;
     mutable shared_ptr<PtensorsJig2<int> > cached_pack2;
 
-    mutable shared_ptr<AtomsPackTag0> cached_tag0;
-    mutable shared_ptr<AtomsPackTag1> cached_tag1;
-    mutable shared_ptr<AtomsPackTag2> cached_tag2;
+    mutable shared_ptr<AtomsPackTagObj0> cached_tag0;
+    mutable shared_ptr<AtomsPackTagObj1> cached_tag1;
+    mutable shared_ptr<AtomsPackTagObj2> cached_tag2;
 
     //operator shared_ptr<AtomsPackTag0>() const{
     //if(!cached_tag0) cached_tag0=make_shared<AtomsPackTag0>()
@@ -203,6 +203,11 @@ namespace ptens{
   public: // ---- Access -------------------------------------------------------------------------------------
 
 
+    // inherited 
+    //int size_of(const int i) const{
+    //return size_of(i);
+    //}
+
     Atoms operator[](const int i) const{
       return Atoms(cnine::array_pool<int>::operator()(i));
     }
@@ -244,16 +249,72 @@ namespace ptens{
     }
 
 
-  public: // ---- Layout of corresponding matrix -------------------------------------------------------------
+  public: // ---- 0th order layout -----------------------------------------------------------------------------------
+
+
+
+
+  public: // ---- 0th order layout -----------------------------------------------------------------------------------
 
 
     int tsize0() const{
       return size();
     }
 
+    int nrows0() const{
+      return tsize0();
+    }
+
+    int nrows0(const int i) const{
+      PTENS_ASSRT(i<size());
+      return 1;
+    }
+
+    int row_offset0(const int i) const{
+      PTENS_ASSRT(i<size());
+      return i;
+    }
+
+    int offset0(const int i) const{
+      return i;
+    }
+
+    int index_of0(const int i) const{
+      return i;
+    }
+
+  public: // ---- 1st order layout -----------------------------------------------------------------------------------
+
+
     int tsize1() const{
       return BASE::get_tail(); 
     }
+
+    int nrows1() const{
+      return tsize1();
+    }
+
+    int nrows1(const int i) const{
+      PTENS_ASSRT(i<size());
+      return BASE::size_of(i);
+    }
+
+    int row_offset1(const int i) const{
+      PTENS_ASSRT(i<size());
+      return BASE::offset(i);
+    }
+
+    int offset1(const int i) const{
+      return BASE::offset(i);
+    }
+
+    int index_of1(const int i, const int j0) const{
+      return BASE::offset(i)+j0;
+    }
+
+
+  public: // ---- 2nd order layout -----------------------------------------------------------------------------------
+
 
     int tsize2() const{
       if(_tsize2==-1){
@@ -265,42 +326,13 @@ namespace ptens{
       return _tsize2;
     }
 
-    int nrows0() const{
-      return tsize0();
-    }
-
-    int nrows1() const{
-      return tsize1();
-    }
-
     int nrows2() const{
       return tsize2();
     }
-
-    int nrows0(const int i) const{
-      PTENS_ASSRT(i<size());
-      return 1;
-    }
-
-    int nrows1(const int i) const{
-      PTENS_ASSRT(i<size());
-      return BASE::size_of(i);
-    }
-
+    
     int nrows2(const int i) const{
       PTENS_ASSRT(i<size());
       return pow(BASE::size_of(i),2);
-    }
-
-
-    int row_offset0(const int i) const{
-      PTENS_ASSRT(i<size());
-      return i;
-    }
-
-    int row_offset1(const int i) const{
-      PTENS_ASSRT(i<size());
-      return BASE::offset(i);
     }
 
     int row_offset2(const int i) const{
@@ -314,6 +346,14 @@ namespace ptens{
 	}
       }
       return offsets2[i];
+    }
+
+    int offset2(const int i) const{
+      return row_offset2(i);
+    }
+
+    int index_of(const int i, const int j0, const int j1) const{
+      return row_offset2(i)+j0*size_of(i)+j1;
     }
 
 

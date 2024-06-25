@@ -28,6 +28,7 @@ int main(int argc, char** argv){
   AtomsPack B({{1,2,3},{4,5}});
   cout<<A<<endl;
 
+  /*
   auto tag0=AtomsPackTag0::make(A.obj);
   auto tag1=AtomsPackTag0::make(A.obj);
   auto tag2=AtomsPackTag0::make(B.obj);
@@ -40,6 +41,19 @@ int main(int argc, char** argv){
   cout<<&(**tag0)<<endl;
   cout<<&(**tag1)<<endl;
   cout<<&(**tag2)<<endl;
+  */
+
+  auto tag0=AtomsPackTag0(A.obj);
+  auto tag1=AtomsPackTag0(A.obj);
+  auto tag2=AtomsPackTag0(B.obj);
+
+  cout<<*tag0<<endl;
+  cout<<*tag1<<endl;
+  cout<<*tag2<<endl;
+
+  cout<<tag0.obj.get()<<endl;
+  cout<<tag1.obj.get()<<endl;
+  cout<<tag2.obj.get()<<endl;
 
 }
 

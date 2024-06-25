@@ -79,6 +79,10 @@ namespace ptens{
   class AtomsPackTag1;
   class AtomsPackTag2;
 
+  class AtomsPackTagObj0;
+  class AtomsPackTagObj1;
+  class AtomsPackTagObj2;
+
   namespace ptens_global{};
 
 }

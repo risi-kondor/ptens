@@ -25,6 +25,7 @@
 #include "PtensLoggedTimer.hpp"
 #include "Ltensor.hpp"
 #include "Ptensorsb.hpp"
+#include "AtomsPackTag.hpp"
 
 
 namespace ptens{
@@ -54,7 +55,8 @@ namespace ptens{
 
 
     AtomsPack atoms;
-    shared_ptr<PtensorsJig2<int> > jig;
+    //shared_ptr<PtensorsJig2<int> > jig;
+    AtomsPackTag2 tag;
 
 
     ~Ptensors2b(){
@@ -80,13 +82,20 @@ namespace ptens{
       atoms(_atoms){}
     */
 
+    Ptensors2b(const TENSOR& M, const AtomsPackTag2& _tag):
+      BASE(M),
+      atoms(_tag.obj->atoms.lock()),
+      tag(_tag){}
+
     Ptensors2b(const AtomsPack& _atoms, const int nc, const int _dev=0):
       BASE(cnine::Gdims(_atoms.nrows2(),nc),0,_dev),
-      atoms(_atoms){}
+      atoms(_atoms),
+      tag(_atoms){}
 
     Ptensors2b(const AtomsPack& _atoms, const int nc, const int fcode, const int _dev):
       BASE(cnine::Gdims(_atoms.nrows2(),nc),fcode,_dev),
-      atoms(_atoms){}
+      atoms(_atoms),
+      tag(_atoms){}
 
     //static Ptensors2b cat(const vector<Ptensors2b>& list){
     //vector<AtomsPack2> v;
@@ -107,7 +116,8 @@ namespace ptens{
 
     template<typename... Args>
     Ptensors2b(const AtomsPack& _atoms, const Args&... args):
-      atoms(_atoms){
+      atoms(_atoms),
+      tag(_atoms){
       vparams v;
       unroller(v,args...);
       BASE::reset(BASE({atoms.nrows2(),v.nc},v.fcode,v.dev));
@@ -165,7 +175,8 @@ namespace ptens{
 
     Ptensors2b(const TENSOR& x, const AtomsPack& _atoms):
       BASE(x),
-      atoms(_atoms){}
+      atoms(_atoms),
+      tag(_atoms){}
 
     //Ptensors2b(const Ptensors2& x):
     //BASE(cnine::Gdims({x.tail/x.nc,x.nc})),
@@ -179,7 +190,8 @@ namespace ptens{
 
     Ptensors2b(const Ptensors2b& x, const int _dev):
       BASE(x.copy(_dev)), 
-      atoms(x.atoms){}
+      atoms(x.atoms),
+      tag(x.tag){}
 
 
   public: // ----- Virtual functions --------------------------------------------------------------------------

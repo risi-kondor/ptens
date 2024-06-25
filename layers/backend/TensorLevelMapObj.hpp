@@ -15,6 +15,7 @@
 #ifndef _ptens_TensorLevelMapObj
 #define _ptens_TensorLevelMapObj
 
+#include "observable.hpp"
 #include "SparseRmatrix.hpp"
 #include "Tensor.hpp"
 #include "array_pool.hpp"
@@ -27,7 +28,7 @@
 namespace ptens{
 
 
-  class TensorLevelMapObj: public cnine::SparseRmatrix{
+  class TensorLevelMapObj: public cnine::SparseRmatrix, public cnine::observable<TensorLevelMapObj>{
   public:
     
     typedef cnine::SparseRmatrix SparseRmatrix;
@@ -50,6 +51,7 @@ namespace ptens{
 
     TensorLevelMapObj(const AtomsPackObj& _in_atoms, const AtomsPackObj& _out_atoms, const bool graded=false):
       SparseRmatrix(_out_atoms.size(),_in_atoms.size()),
+      observable(this),
       in(new AindexPack()),
       out(new AindexPack()){
       //cout<<"Creating new TensorLevelMapObj...";//<<endl;
@@ -81,6 +83,14 @@ namespace ptens{
     int ntotal() const{
       return BASE::size();
     }
+
+    pair<const AindexPack&, const AindexPack&> ipacks() const{
+      return pair<const AindexPack&, const AindexPack&>(*in,*out);
+    }
+
+    //pair<const cnine::hlists<int>&, const cnine::hlists<int>&> ipacks() const{
+    //return pair<const cnine::hlists<int>&, const cnine::hlists<int>&>(in,out);
+    //}
 
     void for_each_row(std::function<void(const int, const vector<int>)> lambda) const{
       for(auto& p: lists){

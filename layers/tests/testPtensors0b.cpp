@@ -46,8 +46,8 @@ int main(int argc, char** argv){
   //cout<<X1<<endl;
   //cout<<X2<<endl;
 
-  Ptens0 XX=Ptens0::cat({X0,X0});
-  cout<<XX<<endl;
+  //Ptens0 XX=Ptens0::cat({X0,X0});
+  //cout<<XX<<endl;
 
   auto Z0=Ptens0::linmaps(X0);
   auto Z1=Ptens0::linmaps(X1);

@@ -25,6 +25,7 @@
 #include "PtensLoggedTimer.hpp"
 #include "Ltensor.hpp"
 #include "Ptensorsb.hpp"
+#include "AtomsPackTag.hpp"
 
 
 namespace ptens{
@@ -51,7 +52,8 @@ namespace ptens{
 
 
     AtomsPack atoms;
-    shared_ptr<PtensorsJig1<int> > jig;
+    //shared_ptr<PtensorsJig1<int> > jig;
+    AtomsPackTag1 tag;
 
 
     ~Ptensors1b(){
@@ -66,17 +68,22 @@ namespace ptens{
 
     Ptensors1b(){}
 
-    Ptensors1b(const TENSOR& M):
-      BASE(M.copy()){} // for diff_class, unsafe!!
+    //Ptensors1b(const TENSOR& M):
+    //BASE(M.copy()){} // for diff_class, unsafe!!
 
-    Ptensors1b(const TENSOR& x, const AtomsPack& _atoms):
-      BASE(x),
-      atoms(_atoms){}
+    //Ptensors1b(const TENSOR& x, const AtomsPack& _atoms):
+    //BASE(x),
+    //atoms(_atoms){}
 
-    Ptensors1b(const TENSOR& x, const shared_ptr<PtensorsJig1<int> >& _jig):
-      BASE(x),
-      atoms(_jig->atoms),
-      jig(_jig){}
+    Ptensors1b(const TENSOR& M, const AtomsPackTag1& _tag):
+      BASE(M),
+      atoms(_tag.obj->atoms.lock()),
+      tag(_tag){}
+
+    //Ptensors1b(const TENSOR& x, const shared_ptr<PtensorsJig1<int> >& _jig):
+    //BASE(x),
+    //atoms(_jig->atoms),
+    //jig(_jig){}
 
     /*
     Ptensors1b(const AtomsPack1& _atoms, const TENSOR& M):
@@ -90,18 +97,20 @@ namespace ptens{
 
     Ptensors1b(const AtomsPack& _atoms, const int nc, const int _dev=0):
       BASE(cnine::Gdims(_atoms.nrows1(),nc),0,_dev),
-      atoms(_atoms){}
+      atoms(_atoms),
+      tag(_atoms){}
 
     Ptensors1b(const AtomsPack& _atoms, const int nc, const int fcode, const int _dev):
       BASE(cnine::Gdims(_atoms.nrows1(),nc),fcode,_dev),
-      atoms(_atoms){}
+      atoms(_atoms),
+      tag(_atoms){}
 
-    static Ptensors1b cat(const vector<Ptensors1b>& list){
-      vector<PtensorsJig1<int>*> v;
-      for(auto& p:list)
-	v.push_back(p.jig.get());
-      return Ptensors1b(cnine::Ltensor<TYPE>::stack(0,list),PtensorsJig1<int>::cat(v));
-    }
+    //static Ptensors1b cat(const vector<Ptensors1b>& list){
+    //vector<PtensorsJig1<int>*> v;
+    //for(auto& p:list)
+    //v.push_back(p.jig.get());
+    //return Ptensors1b(cnine::Ltensor<TYPE>::stack(0,list),PtensorsJig1<int>::cat(v));
+    //}
 
 
   public: // ---- Named parameter constructors ---------------------------------------------------------------
@@ -115,7 +124,8 @@ namespace ptens{
 
     template<typename... Args>
     Ptensors1b(const AtomsPack& _atoms, const Args&... args):
-      atoms(_atoms){
+      atoms(_atoms),
+      tag(_atoms){
       vparams v;
       unroller(v,args...);
       BASE::reset(BASE({atoms.nrows1(),v.nc},v.fcode,v.dev));
@@ -214,7 +224,8 @@ namespace ptens{
 
     Ptensors1b(const Ptensors1b& x, const int _dev):
       BASE(x.copy(_dev)), 
-      atoms(x.atoms){}
+      atoms(x.atoms),
+      tag(x.tag){}
 
 
   public: // ----- Virtual functions --------------------------------------------------------------------------

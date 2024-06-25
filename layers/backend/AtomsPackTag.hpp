@@ -20,47 +20,117 @@
 
 namespace ptens{
 
-  class AtomsPackTag: public cnine::observable<AtomsPackTag>{
+
+  class AtomsPackTagObj: public cnine::observable<AtomsPackTagObj>{
   public:
 
-    weak_ptr<AtomsPackObj> _atoms;
+    friend class AtomsPackTag0; 
+    friend class AtomsPackTag1; 
+    friend class AtomsPackTag2; 
 
-    //operator shared_ptr<AtomsPackObj>(){
-    //return _atoms.lock();
+    weak_ptr<AtomsPackObj> atoms;
+
+    const AtomsPackObj& get_atoms() const{
+      return *atoms.lock();
+    }
+
+    //AtomsPackObj& operator*() const{
+    //return *_atoms.lock();
     //}
 
-    shared_ptr<AtomsPackObj> atoms() const{
-      return _atoms.lock();
-    }
-
-    AtomsPackObj& operator*() const{
-      return *_atoms.lock();
-    }
-
-    AtomsPackObj* operator->() const{
-      return _atoms.lock().get();
-    }
+    //AtomsPackObj* operator->() const{
+    //return _atoms.lock().get();
+    //}
 
   protected:
 
-    AtomsPackTag(const shared_ptr<AtomsPackObj>& x):
+    AtomsPackTagObj(const shared_ptr<AtomsPackObj>& x):
       observable(this),
-      _atoms(x){}
+      atoms(x){}
       
   };
 
 
-  class AtomsPackTag0: public AtomsPackTag{
+  class AtomsPackTagObj0: public AtomsPackTagObj{
+  public:
+    using AtomsPackTagObj::AtomsPackTagObj;
+  };
+
+
+  class AtomsPackTagObj1: public AtomsPackTagObj{
+  public:
+    using AtomsPackTagObj::AtomsPackTagObj;
+  };
+
+  class AtomsPackTagObj2: public AtomsPackTagObj{
+  public:
+    using AtomsPackTagObj::AtomsPackTagObj;
+  };
+
+
+  // ---- Tags ------------------------------------------------------------------------------------------------------
+  
+
+  class AtomsPackTag0{
   public:
 
-    using AtomsPackTag::AtomsPackTag;
+    shared_ptr<AtomsPackTagObj0> obj;
 
-    static shared_ptr<AtomsPackTag0> make(const shared_ptr<AtomsPackObj>& x){
-      if(!x->cached_tag0) x->cached_tag0=shared_ptr<AtomsPackTag0>(new AtomsPackTag0(x));
-      return x->cached_tag0;
+    AtomsPackTag0(const AtomsPack& x):
+      AtomsPackTag0(x.obj){}
+
+    AtomsPackTag0(const shared_ptr<AtomsPackObj>& x){
+      if(!x->cached_tag0) x->cached_tag0=shared_ptr<AtomsPackTagObj0>(new AtomsPackTagObj0(x));
+      obj=x->cached_tag0;
+    }
+    
+    //AtomsPackObj& operator*() const{
+    //return *(obj->atoms.lock());
+    //}
+
+    //AtomsPackObj* operator->() const{
+    //return obj->atoms.lock().get();
+    //}
+    
+  };
+
+
+  class AtomsPackTag1{
+  public:
+
+    shared_ptr<AtomsPackTagObj1> obj;
+
+    AtomsPackTag1(const AtomsPack& x):
+      AtomsPackTag1(x.obj){}
+
+    AtomsPackTag1(const shared_ptr<AtomsPackObj>& x){
+      if(!x->cached_tag1) x->cached_tag1=shared_ptr<AtomsPackTagObj1>(new AtomsPackTagObj1(x));
+      obj=x->cached_tag1;
     }
 
   };
+
+
+  class AtomsPackTag2{
+  public:
+
+    shared_ptr<AtomsPackTagObj2> obj;
+
+    AtomsPackTag2(const AtomsPack& x):
+      AtomsPackTag2(x.obj){}
+
+    AtomsPackTag2(const shared_ptr<AtomsPackObj>& x){
+      if(!x->cached_tag2) x->cached_tag2=shared_ptr<AtomsPackTagObj2>(new AtomsPackTagObj2(x));
+      obj=x->cached_tag2;
+    }
+
+  };
+
 }
 
 #endif 
+    //static shared_ptr<AtomsPackTagObj0> make(const shared_ptr<AtomsPackObj>& x){
+    //if(!x->cached_tag0) x->cached_tag0=shared_ptr<AtomsPackTagObj0>(new AtomsPackTagObj0(x));
+    //return x->cached_tag0;
+    //}
+

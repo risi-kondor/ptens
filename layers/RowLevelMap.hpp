@@ -28,6 +28,8 @@ namespace ptens{
 
     ~RowLevelMap(){}
 
+    RowLevelMap(){};
+
     RowLevelMap(const cnine::GatherMapProgram&& _obj):
       obj(new cnine::GatherMapProgram(_obj)){}
 

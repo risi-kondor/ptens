@@ -25,6 +25,8 @@
 #include "Ltensor.hpp"
 #include "Ptensorsb.hpp"
 #include "PtensorsJig0.hpp"
+#include "AtomsPackTag.hpp"
+//#include "RowLevelMapCache.hpp"
 
 
 namespace ptens{
@@ -47,7 +49,8 @@ namespace ptens{
 
 
     AtomsPack atoms;
-    Jig0ptr jig;
+    //Jig0ptr jig;
+    AtomsPackTag0 tag;
 
 
     ~Ptensors0b(){
@@ -62,28 +65,35 @@ namespace ptens{
 
     Ptensors0b(){}
 
-    Ptensors0b(const TENSOR& M, const Jig0ptr& _jig):
+    //Ptensors0b(const TENSOR& M, const Jig0ptr& _jig):
+    //BASE(M),
+    //atoms(_jig->atoms),
+    //jig(_jig){}
+
+    Ptensors0b(const TENSOR& M, const AtomsPackTag0& _tag):
       BASE(M),
-      atoms(_jig->atoms),
-      jig(_jig){}
+      atoms(_tag.obj->atoms.lock()),
+      tag(_tag){}
 
     Ptensors0b(const AtomsPack& _atoms, const int nc, const int _dev=0):
       BASE(cnine::Gdims(_atoms.size(),nc),0,_dev),
       atoms(_atoms),
-      jig(_atoms){}
+      tag(_atoms){}
 
     Ptensors0b(const AtomsPack& _atoms, const int nc, const int fcode, const int _dev):
       BASE(cnine::Gdims(_atoms.size(),nc),fcode,_dev),
       atoms(_atoms),
-      jig(_atoms){}
+      tag(_atoms){}
 
 
+    /*
     static Ptensors0b cat(const vector<Ptensors0b>& list){
       vector<PtensorsJig0<int>*> v;
       for(auto& p:list)
 	v.push_back(p.jig.get());
       return Ptensors0b(cnine::Ltensor<TYPE>::stack(0,list),PtensorsJig0<int>::cat(v));
     }
+    */
 
 
   public: // ---- Named parameter constructors ---------------------------------------------------------------
@@ -98,7 +108,8 @@ namespace ptens{
     template<typename... Args>
     Ptensors0b(const AtomsPack& _atoms, const Args&... args):
       atoms(_atoms),
-      jig(_atoms){
+      //jig(_atoms),
+      tag(_atoms){
       vparams v;
       unroller(v,args...);
       TENSOR::reset(TENSOR({atoms.size(),v.nc},v.fcode,v.dev));
@@ -124,12 +135,14 @@ namespace ptens{
 
     Ptensors0b copy() const{
       //cnine::using_vram_manager vv(ptens_session->managed_gmem);
-      return Ptensors0b(TENSOR::copy(),jig);
+      //return Ptensors0b(TENSOR::copy(),jig);
+      return Ptensors0b(TENSOR::copy(),tag);
     }
 
     Ptensors0b copy(const int _dev) const{
       //cnine::using_vram_manager vv(ptens_session->managed_gmem);
-      return Ptensors0b(TENSOR::copy(_dev),jig);
+      //return Ptensors0b(TENSOR::copy(_dev),jig);
+      return Ptensors0b(TENSOR::copy(_dev),tag);
     }
 
     Ptensors0b zeros_like() const{
@@ -182,7 +195,8 @@ namespace ptens{
     Ptensors0b(const Ptensors0b& x, const int _dev):
       BASE(x.copy(_dev)), 
       atoms(x.atoms),
-      jig(x.jig){}
+      //jig(x.jig)
+      tag(x.tag){}
 
 
   public: // ----- Virtual functions --------------------------------------------------------------------------
@@ -291,7 +305,7 @@ namespace ptens{
     void add_gather(const SOURCE& x){
       auto overlaps=ptens_global::overlaps_cache(atoms,x.atoms);
       if(ptens_global::row_level_operations){
-	
+	(*ptens_global::rmap_cache(tag,x.tag,overlaps))(*this,x);
       }else{
       }
     }
