@@ -12,11 +12,11 @@
  *
  */
 
-#include "Cnine_base.cpp"
 #include "Ptens_base.cpp"
 #include "Ptensors0b.hpp"
 #include "Ptensors1b.hpp"
 #include "Ptensors2b.hpp"
+#include "PtensSession.hpp"
 
 using namespace ptens;
 using namespace cnine;

@@ -30,18 +30,6 @@ namespace ptens{
 
     weak_ptr<AtomsPackObj> atoms;
 
-    const AtomsPackObj& get_atoms() const{
-      return *atoms.lock();
-    }
-
-    //AtomsPackObj& operator*() const{
-    //return *_atoms.lock();
-    //}
-
-    //AtomsPackObj* operator->() const{
-    //return _atoms.lock().get();
-    //}
-
   protected:
 
     AtomsPackTagObj(const shared_ptr<AtomsPackObj>& x):
@@ -53,18 +41,37 @@ namespace ptens{
 
   class AtomsPackTagObj0: public AtomsPackTagObj{
   public:
+
     using AtomsPackTagObj::AtomsPackTagObj;
+
+    const AtomsPackObj0& get_atoms() const{
+      return static_cast<AtomsPackObj0&>(*atoms.lock());
+    }
+
   };
 
 
   class AtomsPackTagObj1: public AtomsPackTagObj{
   public:
+
     using AtomsPackTagObj::AtomsPackTagObj;
+
+    const AtomsPackObj1& get_atoms() const{
+      return static_cast<AtomsPackObj1&>(*atoms.lock());
+    }
+
   };
+
 
   class AtomsPackTagObj2: public AtomsPackTagObj{
   public:
+
     using AtomsPackTagObj::AtomsPackTagObj;
+
+    const AtomsPackObj2& get_atoms() const{
+      return static_cast<AtomsPackObj2&>(*atoms.lock());
+    }
+
   };
 
 
@@ -83,14 +90,6 @@ namespace ptens{
       if(!x->cached_tag0) x->cached_tag0=shared_ptr<AtomsPackTagObj0>(new AtomsPackTagObj0(x));
       obj=x->cached_tag0;
     }
-    
-    //AtomsPackObj& operator*() const{
-    //return *(obj->atoms.lock());
-    //}
-
-    //AtomsPackObj* operator->() const{
-    //return obj->atoms.lock().get();
-    //}
     
   };
 
@@ -132,5 +131,25 @@ namespace ptens{
     //static shared_ptr<AtomsPackTagObj0> make(const shared_ptr<AtomsPackObj>& x){
     //if(!x->cached_tag0) x->cached_tag0=shared_ptr<AtomsPackTagObj0>(new AtomsPackTagObj0(x));
     //return x->cached_tag0;
+    //}
+
+    //AtomsPackObj& operator*() const{
+    //return *(obj->atoms.lock());
+    //}
+
+    //AtomsPackObj* operator->() const{
+    //return obj->atoms.lock().get();
+    //}
+    
+    //const AtomsPackObj& get_atoms() const{
+    //return *atoms.lock();
+    //}
+
+    //AtomsPackObj& operator*() const{
+    //return *_atoms.lock();
+    //}
+
+    //AtomsPackObj* operator->() const{
+    //return _atoms.lock().get();
     //}
 

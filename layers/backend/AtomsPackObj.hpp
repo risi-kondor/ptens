@@ -463,6 +463,90 @@ namespace ptens{
 
   };
 
+  
+
+  class AtomsPackObj0: public AtomsPackObj{
+  public:
+
+    int nrows() const{
+      return tsize0();
+    }
+
+    int nrows(const int i) const{
+      return 1;
+    }
+
+    int row_offset(const int i) const{
+      return i;
+    }
+
+    int offset(const int i) const{
+      return i;
+    }
+
+    int index_of(const int i) const{
+      return i;
+    }
+
+  };
+
+
+  class AtomsPackObj1: public AtomsPackObj{
+  public:
+
+    typedef cnine::array_pool<int> BASE;
+
+    int nrows() const{
+      return tsize1();
+    }
+
+    int nrows(const int i) const{
+      return BASE::size_of(i);
+    }
+
+    int row_offset(const int i) const{
+      return BASE::offset(i);
+    }
+
+    int offset(const int i) const{
+      return BASE::offset(i);
+    }
+
+    int index_of(const int i, const int j0) const{
+      return BASE::offset(i)+j0;
+    }
+
+  };
+
+
+  class AtomsPackObj2: public AtomsPackObj{
+  public:
+
+    typedef cnine::array_pool<int> BASE;
+
+    int nrows() const{
+      return tsize2();
+    }
+    
+    int nrows(const int i) const{
+      return pow(BASE::size_of(i),2);
+    }
+
+    int row_offset(const int i) const{
+      return row_offset2(i);
+    }
+
+    int offset(const int i) const{
+      return row_offset2(i);
+    }
+
+    int index_of(const int i, const int j0, const int j1) const{
+      return row_offset2(i)+j0*size_of(i)+j1;
+    }
+
+  };
+
+
 }
 
 

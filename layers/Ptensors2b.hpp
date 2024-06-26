@@ -325,7 +325,11 @@ namespace ptens{
 
     template<typename SOURCE>
     void add_gather(const SOURCE& x){
-      //(jig->rmap(x,atoms.overlaps_mlist(x.atoms)))(*this,x);
+      auto overlaps=ptens_global::overlaps_cache(atoms,x.atoms);
+      if(ptens_global::row_level_operations){
+	(*ptens_global::rmap_cache(tag,x.tag,overlaps))(*this,x);
+      }else{
+      }
     }
 
     template<typename OUTPUT>

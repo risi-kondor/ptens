@@ -12,11 +12,11 @@
  *
  */
 
-#include "Cnine_base.cpp"
 #include "Ptens_base.cpp"
 #include "Ptensors0b.hpp"
 #include "Ptensors1b.hpp"
 #include "Ptensors2b.hpp"
+#include "PtensSession.hpp"
 
 using namespace ptens;
 using namespace cnine;
@@ -81,8 +81,8 @@ int main(int argc, char** argv){
   cout<<X2g<<endl;
 
   exit(0);
-  Ptens1 C=Ptens1::cat({X1,X1,X1});
-  cout<<C<<endl;
+  //Ptens1 C=Ptens1::cat({X1,X1,X1});
+  //cout<<C<<endl;
 
   //Ptensors1b<float> Ab(A);
   //cout<<Ab<<endl;
