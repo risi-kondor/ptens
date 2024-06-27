@@ -29,11 +29,6 @@
 #include "GatherMap.hpp"
 
 #include "Atoms.hpp"
-//#include "PtensorsJig0.hpp"
-//#include "PtensorsJig1.hpp"
-//#include "PtensorsJig2.hpp"
-//#include "TensorLevelMap.hpp"
-//#include "AtomsPackMatch.hpp"
 
 
 namespace ptens{
@@ -45,26 +40,13 @@ namespace ptens{
     typedef cnine::array_pool<int> BASE;
     using  BASE::BASE;
 
-
-    cnine::plist_indexed_object_bank<AtomsPackObj,shared_ptr<AtomsPackObj>> cat_maps=
-      cnine::plist_indexed_object_bank<AtomsPackObj,shared_ptr<AtomsPackObj>>([this](const vector<AtomsPackObj*>& v)
-	{return shared_ptr<AtomsPackObj>(new AtomsPackObj(cat_with(v)));});
-
     int constk=0;
     mutable int _tsize2=-1;
     mutable vector<int> offsets2;
 
-    bool cache_packs=false;
-    mutable shared_ptr<PtensorsJig0<int> > cached_pack0;
-    mutable shared_ptr<PtensorsJig1<int> > cached_pack1;
-    mutable shared_ptr<PtensorsJig2<int> > cached_pack2;
-
     mutable shared_ptr<AtomsPackTagObj0> cached_tag0;
     mutable shared_ptr<AtomsPackTagObj1> cached_tag1;
     mutable shared_ptr<AtomsPackTagObj2> cached_tag2;
-
-    //operator shared_ptr<AtomsPackTag0>() const{
-    //if(!cached_tag0) cached_tag0=make_shared<AtomsPackTag0>()
 
 
     ~AtomsPackObj(){
@@ -158,17 +140,25 @@ namespace ptens{
 
     AtomsPackObj(const AtomsPackObj& x):
       array_pool(x),
-      observable(this){
-      //cout<<"AtomsPackCopied!"<<endl;
+      observable(this),
+      _tsize2(x._tsize2),
+      offsets2(x.offsets2),
+      cached_tag0(x.cached_tag0),
+      cached_tag1(x.cached_tag1),
+      cached_tag2(x.cached_tag2){
       PTENS_COPY_WARNING();
       constk=x.constk;
     }
 
-    AtomsPackObj(AtomsPackObj&& x):
+    AtomsPackObj(AtomsPackObj&& x): 
       array_pool(std::move(x)),
-      observable(this){
+      observable(this),
+      _tsize2(x._tsize2),
+      offsets2(std::move(x.offsets2)),
+      cached_tag0(x.cached_tag0),
+      cached_tag1(x.cached_tag1),
+      cached_tag2(x.cached_tag2){
       PTENS_MOVE_WARNING();
-      //cout<<"AtomsPackMoved!"<<endl;
       constk=x.constk;
     }
 
@@ -241,12 +231,12 @@ namespace ptens{
       return R;
     }
 
-    void release_cached_packs(){
+    //void release_cached_packs(){
     //cached_pack0.reset();
     //cached_pack1.reset();
     //cached_pack2.reset();
     //cache_packs=false;
-    }
+    //}
 
 
   public: // ---- 0th order layout -----------------------------------------------------------------------------------
@@ -360,6 +350,7 @@ namespace ptens{
   public: // ---- Concatenation ------------------------------------------------------------------------------
 
 
+    /*
     static shared_ptr<AtomsPackObj> cat(const vector<shared_ptr<AtomsPackObj> >& list){
       PTENS_ASSRT(list.size()>0);
       vector<AtomsPackObj*> v;
@@ -387,6 +378,15 @@ namespace ptens{
 	v.push_back(*p);
       return AtomsPackObj(cnine::array_pool<int>::cat(v));
     }
+    */
+
+    static AtomsPackObj cat(const vector<AtomsPackObj*> list){
+      vector<reference_wrapper<cnine::array_pool<int> > > v;
+      for(auto p:list)
+	v.push_back(*p);
+      return AtomsPackObj(cnine::array_pool<int>::cat(v));
+    }
+
 
 
   public: // ---- to_nodes_map -------------------------------------------------------------------------------

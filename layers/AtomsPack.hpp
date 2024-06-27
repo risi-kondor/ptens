@@ -15,6 +15,7 @@
 #define _ptens_AtomsPack
 
 #include "AtomsPackObj.hpp"
+//#include "AtomsPackCatCache.hpp"
 
 
 namespace ptens{
@@ -170,13 +171,23 @@ namespace ptens{
 
   public: // ---- Concatenation ------------------------------------------------------------------------------
 
-    
-    static AtomsPack cat(const vector<reference_wrapper<AtomsPack> >& list){
-      return AtomsPackObj::cat
-	(cnine::mapcar<reference_wrapper<AtomsPack>,reference_wrapper<AtomsPackObj> >
-	  (list,[](const reference_wrapper<AtomsPack>& x){
-	    return reference_wrapper<AtomsPackObj>(*x.get().obj);}));
+
+    static AtomsPack cat(const vector<AtomsPack>& x){
+      vector<AtomsPackObj*> v;
+      for(auto& p:x)
+	v.push_back(p.obj.get());
+      //if(ptens_global::cache_atomspack_cats) 
+      //return (*ptens_global::atomspack_cat_cache) (v);
+      //else 
+      return AtomsPack(new AtomsPackObj(AtomsPackObj::cat(v)));
     }
+
+    //static AtomsPack cat(const vector<reference_wrapper<AtomsPack> >& list){
+    //return AtomsPackObj::cat
+    //(cnine::mapcar<reference_wrapper<AtomsPack>,reference_wrapper<AtomsPackObj> >
+    //  (list,[](const reference_wrapper<AtomsPack>& x){
+    //    return reference_wrapper<AtomsPackObj>(*x.get().obj);}));
+    //}
     
 
   public: // ---- Operations ---------------------------------------------------------------------------------
@@ -186,16 +197,6 @@ namespace ptens{
       return AtomsPack(new AtomsPackObj(obj->permute(pi)));
     } 
     
-    // create map for messages from y
-    //TensorLevelMap overlaps(const AtomsPack& y){
-    //return obj->overlaps(*y.obj);
-    //}
-
-    // create map for messages from y
-    //AtomsPackMatch overlaps_mlist(const AtomsPack& y, const int min_overlaps=1) const{
-    //return obj->overlaps_mlist(*y.obj,min_overlaps);
-    //}
-
 
   public: // ---- I/O ----------------------------------------------------------------------------------------
 
@@ -217,3 +218,16 @@ namespace ptens{
 
 
 #endif 
+
+
+    // create map for messages from y
+    //TensorLevelMap overlaps(const AtomsPack& y){
+    //return obj->overlaps(*y.obj);
+    //}
+
+    // create map for messages from y
+    //AtomsPackMatch overlaps_mlist(const AtomsPack& y, const int min_overlaps=1) const{
+    //return obj->overlaps_mlist(*y.obj,min_overlaps);
+    //}
+
+

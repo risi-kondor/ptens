@@ -13,9 +13,9 @@
  */
 
 #include "Ptens_base.cpp"
-#include "Ptensors0b.hpp"
-#include "Ptensors1b.hpp"
-#include "Ptensors2b.hpp"
+#include "Ptensors0.hpp"
+#include "Ptensors1.hpp"
+#include "Ptensors2.hpp"
 
 #include "PtensSession.hpp"
 
@@ -23,17 +23,21 @@
 using namespace ptens;
 using namespace cnine;
 
-typedef Ptensors0b<float> Ptens0;
-typedef Ptensors1b<float> Ptens1;
-typedef Ptensors2b<float> Ptens2;
+typedef Ptensors0<float> Ptens0;
+typedef Ptensors1<float> Ptens1;
+typedef Ptensors2<float> Ptens2;
 
-PtensSession ptens_session;
+PtensSession session;
 
 
 int main(int argc, char** argv){
 
   int N=6;
 
+  session.row_level_operations(true);
+  session.cache_overlap_maps(true);
+  session.cache_rmaps(true);
+  cout<<session<<endl;
   
 
   AtomsPack xatoms=AtomsPack::random(N,N,0.5);
@@ -46,16 +50,18 @@ int main(int argc, char** argv){
   //cout<<X1<<endl;
   //cout<<X2<<endl;
 
-  //Ptens0 XX=Ptens0::cat({X0,X0});
-  //cout<<XX<<endl;
+  
+  Ptens0 XX=Ptens0::cat({X0,X0});
+  cout<<"Cat:"<<endl;
+  cout<<XX<<endl;
 
   auto Z0=Ptens0::linmaps(X0);
   auto Z1=Ptens0::linmaps(X1);
   auto Z2=Ptens0::linmaps(X2);
-  //cout<<"Linmaps:"<<endl<<endl;
-  //cout<<Z0<<endl;
-  //cout<<Z1<<endl;
-  //cout<<Z2<<endl;
+  cout<<"Linmaps:"<<endl<<endl;
+  cout<<Z0<<endl;
+  cout<<Z1<<endl;
+  cout<<Z2<<endl;
 
 
   Ptens0 X0ga=Ptens0::zeros_like(X0);
@@ -64,16 +70,18 @@ int main(int argc, char** argv){
   X0ga.add_linmaps_back(Z0);
   X1ga.add_linmaps_back(Z1);
   X2ga.add_linmaps_back(Z2);
-  //cout<<"Linmaps_back:"<<endl<<endl;
-  //cout<<X0ga<<endl;
-  //cout<<X1ga<<endl;
-  //cout<<X2ga<<endl;
+  cout<<"Linmaps_back:"<<endl<<endl;
+  cout<<X0ga<<endl;
+  cout<<X1ga<<endl;
+  cout<<X2ga<<endl;
 
   AtomsPack yatoms=AtomsPack::random(N,N,0.5);
+  cout<<"Gather:"<<endl;
   cout<<Ptens0::gather(X0,yatoms)<<endl;
   cout<<Ptens0::gather(X1,yatoms)<<endl;
   cout<<Ptens0::gather(X2,yatoms)<<endl;
 
+  cout<<session<<endl;
 
 
 

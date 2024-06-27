@@ -12,15 +12,14 @@
  *
  */
 
-#ifndef _ptens_Ptensors1b
-#define _ptens_Ptensors1b
+#ifndef _ptens_Ptensors1
+#define _ptens_Ptensors1
 
 #include "diff_class.hpp"
 #include "Rtensor1_view.hpp"
 #include "Rtensor2_view.hpp"
 #include "Rtensor3_view.hpp"
 
-#include "PtensorsJig1.hpp"
 #include "Ptensor1.hpp"
 #include "PtensLoggedTimer.hpp"
 #include "Ltensor.hpp"
@@ -32,14 +31,17 @@ namespace ptens{
 
 
   template<typename TYPE>
-  class Ptensors1b: public Ptensorsb<TYPE>, public cnine::diff_class<Ptensors1b<TYPE> >{
+  class Ptensors1: public Ptensorsb<TYPE>, public cnine::diff_class<Ptensors1<TYPE> >{
   public:
+
+    friend class Ptensors0<TYPE>;
+    friend class Ptensors2<TYPE>;
 
     typedef Ptensorsb<TYPE> BASE;
     typedef cnine::Ltensor<TYPE> TENSOR;
     typedef cnine::Rtensor2_view Rtensor2_view;
 
-    using cnine::diff_class<Ptensors1b<TYPE> >::grad;
+    using cnine::diff_class<Ptensors1<TYPE> >::grad;
 
     using BASE::get_dev;
     using TENSOR::dim;
@@ -52,11 +54,10 @@ namespace ptens{
 
 
     AtomsPack atoms;
-    //shared_ptr<PtensorsJig1<int> > jig;
     AtomsPackTag1 tag;
 
 
-    ~Ptensors1b(){
+    ~Ptensors1(){
 #ifdef WITH_FAKE_GRAD
       if(grad) delete grad;
 #endif 
@@ -66,51 +67,40 @@ namespace ptens{
   public: // ----- Constructors ------------------------------------------------------------------------------
 
 
-    Ptensors1b(){}
+    Ptensors1(){}
 
-    //Ptensors1b(const TENSOR& M):
+    //Ptensors1(const TENSOR& M):
     //BASE(M.copy()){} // for diff_class, unsafe!!
 
-    //Ptensors1b(const TENSOR& x, const AtomsPack& _atoms):
-    //BASE(x),
-    //atoms(_atoms){}
+    Ptensors1(const TENSOR& M, const AtomsPack& _atoms):
+      BASE(M),
+      atoms(_atoms),
+      tag(_atoms){}
 
-    Ptensors1b(const TENSOR& M, const AtomsPackTag1& _tag):
+    Ptensors1(const TENSOR& M, const AtomsPackTag1& _tag):
       BASE(M),
       atoms(_tag.obj->atoms.lock()),
       tag(_tag){}
 
-    //Ptensors1b(const TENSOR& x, const shared_ptr<PtensorsJig1<int> >& _jig):
-    //BASE(x),
-    //atoms(_jig->atoms),
-    //jig(_jig){}
-
-    /*
-    Ptensors1b(const AtomsPack1& _atoms, const TENSOR& M):
-      BASE(M.copy()),
-      atoms(_atoms){}
-
-    Ptensors1b(const AtomsPack& _atoms, const TENSOR& M):
-      BASE(M.copy()),
-      atoms(_atoms){}
-    */
-
-    Ptensors1b(const AtomsPack& _atoms, const int nc, const int _dev=0):
+    Ptensors1(const AtomsPack& _atoms, const int nc, const int _dev=0):
       BASE(cnine::Gdims(_atoms.nrows1(),nc),0,_dev),
       atoms(_atoms),
       tag(_atoms){}
 
-    Ptensors1b(const AtomsPack& _atoms, const int nc, const int fcode, const int _dev):
+    Ptensors1(const AtomsPack& _atoms, const int nc, const int fcode, const int _dev):
       BASE(cnine::Gdims(_atoms.nrows1(),nc),fcode,_dev),
       atoms(_atoms),
       tag(_atoms){}
 
-    //static Ptensors1b cat(const vector<Ptensors1b>& list){
-    //vector<PtensorsJig1<int>*> v;
-    //for(auto& p:list)
-    //v.push_back(p.jig.get());
-    //return Ptensors1b(cnine::Ltensor<TYPE>::stack(0,list),PtensorsJig1<int>::cat(v));
-    //}
+
+    static Ptensors1 cat(const vector<Ptensors1>& list){
+      vector<AtomsPack> v;
+      for(auto& p:list)
+	v.push_back(p.atoms);
+      if(ptens_global::cache_atomspack_cats) 
+	return Ptensors1(cnine::Ltensor<TYPE>::stack(0,list),ptens_global::atomspack_cat_cache(v));
+      return Ptensors1(cnine::Ltensor<TYPE>::stack(0,list),AtomsPack::cat(v));
+    }
 
 
   public: // ---- Named parameter constructors ---------------------------------------------------------------
@@ -123,7 +113,7 @@ namespace ptens{
     };      
 
     template<typename... Args>
-    Ptensors1b(const AtomsPack& _atoms, const Args&... args):
+    Ptensors1(const AtomsPack& _atoms, const Args&... args):
       atoms(_atoms),
       tag(_atoms){
       vparams v;
@@ -149,70 +139,70 @@ namespace ptens{
   public: // ---- Old style constructors ---------------------------------------------------------------------
     
 
-    static Ptensors1b zero(const AtomsPack& _atoms, const int nc, const int _dev=0){
-      return Ptensors1b(_atoms,nc,0,_dev);}
+    static Ptensors1 zero(const AtomsPack& _atoms, const int nc, const int _dev=0){
+      return Ptensors1(_atoms,nc,0,_dev);}
 
-    static Ptensors1b raw(const AtomsPack& _atoms, const int nc, const int _dev=0){
-      return Ptensors1b(_atoms,nc,1,_dev);}
+    static Ptensors1 raw(const AtomsPack& _atoms, const int nc, const int _dev=0){
+      return Ptensors1(_atoms,nc,1,_dev);}
 
-    static Ptensors1b ones(const AtomsPack& _atoms, const int nc, const int _dev=0){
-      return Ptensors1b(_atoms,nc,2,_dev);}
+    static Ptensors1 ones(const AtomsPack& _atoms, const int nc, const int _dev=0){
+      return Ptensors1(_atoms,nc,2,_dev);}
 
-    static Ptensors1b sequential(const AtomsPack& _atoms, const int nc, const int _dev=0){
-      return Ptensors1b(_atoms,nc,3,_dev);}
+    static Ptensors1 sequential(const AtomsPack& _atoms, const int nc, const int _dev=0){
+      return Ptensors1(_atoms,nc,3,_dev);}
 
-    static Ptensors1b gaussian(const AtomsPack& _atoms, const int nc, const int _dev=0){
-      return Ptensors1b(_atoms,nc,4,_dev);}
+    static Ptensors1 gaussian(const AtomsPack& _atoms, const int nc, const int _dev=0){
+      return Ptensors1(_atoms,nc,4,_dev);}
 
 
   public: // ----- Spawning ----------------------------------------------------------------------------------
 
     
-    Ptensors1b copy() const{
+    Ptensors1 copy() const{
       //cnine::using_vram_manager vv(ptens_session->managed_gmem);
-      return Ptensors1b(TENSOR::copy(),atoms);
+      return Ptensors1(TENSOR::copy(),atoms);
     }
 
-    Ptensors1b copy(const int _dev) const{
+    Ptensors1 copy(const int _dev) const{
       //cnine::using_vram_manager vv(ptens_session->managed_gmem);
-      return Ptensors1b(TENSOR::copy(_dev),atoms);
+      return Ptensors1(TENSOR::copy(_dev),atoms);
     }
 
-    Ptensors1b zeros_like() const{
+    Ptensors1 zeros_like() const{
       //cnine::using_vram_manager vv(ptens_session->managed_gmem);
-      return Ptensors1b(TENSOR::zeros_like(),atoms);
+      return Ptensors1(TENSOR::zeros_like(),atoms);
     }
 
-    Ptensors1b zeros_like(const int nc) const{
+    Ptensors1 zeros_like(const int nc) const{
       //cnine::using_vram_manager vv(ptens_session->managed_gmem);
-      return Ptensors1b(TENSOR({dim(0),nc},0,get_dev()),atoms);
+      return Ptensors1(TENSOR({dim(0),nc},0,get_dev()),atoms);
     }
 
-    Ptensors1b gaussian_like() const{
+    Ptensors1 gaussian_like() const{
       //cnine::using_vram_manager vv(ptens_session->managed_gmem);
-      return Ptensors1b(BASE::gaussian_like(),atoms);
+      return Ptensors1(BASE::gaussian_like(),atoms);
     }
 
-    static Ptensors1b zeros_like(const Ptensors1b& x){
+    static Ptensors1 zeros_like(const Ptensors1& x){
       //cnine::using_vram_manager vv(ptens_session->managed_gmem);
-      return Ptensors1b(x.TENSOR::zeros_like(),x.atoms);
+      return Ptensors1(x.TENSOR::zeros_like(),x.atoms);
     }
 
-    static Ptensors1b gaussian_like(const Ptensors1b& x){
+    static Ptensors1 gaussian_like(const Ptensors1& x){
       //cnine::using_vram_manager vv(ptens_session->managed_gmem);
-      return Ptensors1b(x.TENSOR::gaussian_like(),x.atoms);
+      return Ptensors1(x.TENSOR::gaussian_like(),x.atoms);
     }
 
-    static Ptensors1b* new_zeros_like(const Ptensors1b& x){
+    static Ptensors1* new_zeros_like(const Ptensors1& x){
       //cnine::using_vram_manager vv(ptens_session->managed_gmem);
-      return new Ptensors1b(x.BASE::zeros_like(),x.atoms);
+      return new Ptensors1(x.BASE::zeros_like(),x.atoms);
     }
     
 
   public: // ----- Conversions -------------------------------------------------------------------------------
 
 
-    //Ptensors1b(const Ptensors1& x):
+    //Ptensors1(const Ptensors1& x):
     //BASE(cnine::Gdims({x.tail/x.nc,x.nc})),
     //atoms(x.atoms){
     //BASE::view2().set(x.view_as_matrix().view2());
@@ -222,7 +212,7 @@ namespace ptens{
   public: // ---- Transport ----------------------------------------------------------------------------------
 
 
-    Ptensors1b(const Ptensors1b& x, const int _dev):
+    Ptensors1(const Ptensors1& x, const int _dev):
       BASE(x.copy(_dev)), 
       atoms(x.atoms),
       tag(x.tag){}
@@ -231,12 +221,12 @@ namespace ptens{
   public: // ----- Virtual functions --------------------------------------------------------------------------
 
 
-    Ptensors1b& get_grad(){
-      return cnine::diff_class<Ptensors1b<TYPE> >::get_grad();
+    Ptensors1& get_grad(){
+      return cnine::diff_class<Ptensors1<TYPE> >::get_grad();
     }
 
-    const Ptensors1b& get_grad() const{
-      return cnine::diff_class<Ptensors1b<TYPE> >::get_grad();
+    const Ptensors1& get_grad() const{
+      return cnine::diff_class<Ptensors1<TYPE> >::get_grad();
     }
 
 
@@ -254,10 +244,6 @@ namespace ptens{
     int get_nc() const{
       return BASE::dim(1);
     }
-
-    //int nchannels() const{
-    //return BASE::dim(1);
-    //}
 
     AtomsPack get_atoms() const{
       return atoms;
@@ -320,39 +306,39 @@ namespace ptens{
 
 
     template<typename SOURCE>
-    static Ptensors1b<float> linmaps(const SOURCE& x){
-      Ptensors1b<float> R(x.get_atoms(),x.get_nc()*vector<int>({1,2,5})[x.getk()],x.get_dev());
+    static Ptensors1<float> linmaps(const SOURCE& x){
+      Ptensors1<float> R(x.get_atoms(),x.get_nc()*vector<int>({1,2,5})[x.getk()],x.get_dev());
       R.add_linmaps(x);
       return R;
     }
 
-    void add_linmaps(const Ptensors0b<TYPE>& x){
+    void add_linmaps(const Ptensors0<TYPE>& x){
       broadcast0(x);
     }
 
-    void add_linmaps(const Ptensors1b<TYPE>& x){
+    void add_linmaps(const Ptensors1<TYPE>& x){
       int nc=x.get_nc();
       broadcast0(x.reduce0());
       cols(nc,nc)+=x;
     }
 
-    void add_linmaps(const Ptensors2b<TYPE>& x){
+    void add_linmaps(const Ptensors2<TYPE>& x){
       int nc=x.get_nc();
       broadcast0(x.reduce0());
       cols(2*nc,3*nc)+=x.reduce1();
     }
 
-    void add_linmaps_back(const Ptensors0b<TYPE>& r){
+    void add_linmaps_back(const Ptensors0<TYPE>& r){
       broadcast0(r);
     }
 
-    void add_linmaps_back(const Ptensors1b<TYPE>& r){
+    void add_linmaps_back(const Ptensors1<TYPE>& r){
       int nc=get_nc();
       broadcast0(r.reduce0(0,nc));
       add(r.cols(nc,nc));
     }
 
-    void add_linmaps_back(const Ptensors2b<TYPE>& r){
+    void add_linmaps_back(const Ptensors2<TYPE>& r){
       int nc=get_nc();
       broadcast0(r.reduce0_shrink(0,nc));
       add(r.reduce1_shrink(2*nc,nc));
@@ -363,9 +349,9 @@ namespace ptens{
 
     
     template<typename SOURCE>
-    static Ptensors1b<TYPE> gather(const SOURCE& x, const AtomsPack& a, const int min_overlaps=1){
+    static Ptensors1<TYPE> gather(const SOURCE& x, const AtomsPack& a, const int min_overlaps=1){
       int nc=x.get_nc()*vector<int>({1,2,5})[x.getk()];
-      Ptensors1b<TYPE> R(a,nc,x.get_dev());
+      Ptensors1<TYPE> R(a,nc,x.get_dev());
       R.add_gather(x,min_overlaps);
       return R;
     }
@@ -374,19 +360,35 @@ namespace ptens{
     void add_gather(const SOURCE& x, const int min_overlaps=1){
       auto overlaps=ptens_global::overlaps_cache(atoms,x.atoms);
       if(ptens_global::row_level_operations){
-	(*ptens_global::rmap_cache(tag,x.tag,overlaps))(*this,x);
+	rmap(x,overlaps)(*this,x);
       }else{
       }
     }
 
     template<typename OUTPUT>
     void add_gather_back(const OUTPUT& x){
-      //x.jig->rmap(*this,x.atoms.overlaps_mlist(atoms)).inv()(*this,x);
+      auto overlaps=ptens_global::overlaps_cache(x.atoms,atoms);
+      if(ptens_global::row_level_operations){
+	x.rmap(*this,overlaps).inv()(*this,x);
+      }else{
+      }
     }
 
     template<typename OUTPUT>
     void add_gather_back_alt(const OUTPUT& x){
-      //x.jig->rmap(*this,x.atoms.overlap_mlist(atoms)).inv()(this->get_grad(),x.get_grad());
+      auto overlaps=ptens_global::overlaps_cache(x.atoms,atoms);
+      if(ptens_global::row_level_operations){
+	x.rmap(*this,overlaps).inv()(get_grad(),x.get_grad());
+      }else{
+      }
+    }
+
+
+  private:
+
+    template<typename SOURCE>
+    RowLevelMap& rmap(const SOURCE& x, const shared_ptr<TensorLevelMapObj>& tmap) const{
+      return *ptens_global::rmap_cache(tag,x.tag,tmap);
     }
 
 
@@ -394,7 +396,7 @@ namespace ptens{
 
 
     BASE reduce0() const{
-      TimedFn T("Ptensors1b","reduce0",*this);
+      TimedFn T("Ptensors1","reduce0",*this);
       int N=size();
       int dev=get_dev();
       BASE R({N,get_nc()},0,dev);
@@ -405,7 +407,7 @@ namespace ptens{
     }
 
     BASE reduce0(const int offs, const int nc) const{
-      TimedFn T("Ptensors1b","reduce0",*this);
+      TimedFn T("Ptensors1","reduce0",*this);
       int N=size();
       int dev=get_dev();
       BASE R({N,nc},0,dev);
@@ -424,7 +426,7 @@ namespace ptens{
 
 
     void broadcast0(const BASE& X, const int offs=0){
-      TimedFn T("Ptensors1b","broadcast0",*this);
+      TimedFn T("Ptensors1","broadcast0",*this);
       int N=size();
       int nc=X.dim(1);
       PTENS_ASSRT(X.dim(0)==N);
@@ -435,7 +437,7 @@ namespace ptens{
     }
 
     void broadcast1(const BASE& X, const int offs=0){
-      TimedFn T("Ptensors1b","broadcast1",*this);
+      TimedFn T("Ptensors1","broadcast1",*this);
       int nc=X.dim(1);
       BASE::view2().block(0,offs,dim(0),nc)+=X.view2();
     }
@@ -450,16 +452,16 @@ namespace ptens{
 
 
     string classname() const{
-      return "Ptensors1b";
+      return "Ptensors1";
     }
 
     string repr() const{
-      return "<Ptensors1b[N="+to_string(size())+"]>";
+      return "<Ptensors1[N="+to_string(size())+"]>";
     }
 
     string str(const string indent="") const{
       if(get_dev()>0){
-	Ptensors1b y(*this,0);
+	Ptensors1 y(*this,0);
 	return y.str();
       }
       ostringstream oss;
@@ -469,7 +471,7 @@ namespace ptens{
       return oss.str();
     }
 
-    friend ostream& operator<<(ostream& stream, const Ptensors1b& x){
+    friend ostream& operator<<(ostream& stream, const Ptensors1& x){
       stream<<x.str(); return stream;}
 
 
@@ -478,16 +480,16 @@ namespace ptens{
 
 
   template<typename SOURCE>
-  inline Ptensors1b<float> linmaps1(const SOURCE& x){
-    Ptensors1b<float> R(x.get_atoms(),x.get_nc()*vector<int>({1,2,5})[x.getk()],x.get_dev());
+  inline Ptensors1<float> linmaps1(const SOURCE& x){
+    Ptensors1<float> R(x.get_atoms(),x.get_nc()*vector<int>({1,2,5})[x.getk()],x.get_dev());
     R.add_linmaps(x);
     return R;
   }
 
   template<typename SOURCE>
-  Ptensors1b<float> gather1(const SOURCE& x, const AtomsPack& a){
+  Ptensors1<float> gather1(const SOURCE& x, const AtomsPack& a){
     int nc=x.get_nc()*vector<int>({1,2,5})[x.getk()];
-    Ptensors1b<float> R(a,nc,x.get_dev());
+    Ptensors1<float> R(a,nc,x.get_dev());
     R.add_gather(x);
     return R;
   }
@@ -497,4 +499,19 @@ namespace ptens{
 
 
 #endif 
+
+    //Ptensors1(const TENSOR& x, const shared_ptr<PtensorsJig1<int> >& _jig):
+    //BASE(x),
+    //atoms(_jig->atoms),
+    //jig(_jig){}
+
+    /*
+    Ptensors1(const AtomsPack1& _atoms, const TENSOR& M):
+      BASE(M.copy()),
+      atoms(_atoms){}
+
+    Ptensors1(const AtomsPack& _atoms, const TENSOR& M):
+      BASE(M.copy()),
+      atoms(_atoms){}
+    */
 
