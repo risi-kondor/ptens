@@ -32,6 +32,9 @@ namespace ptens{
 
   protected:
 
+    //AtomsPackTagObj():
+    //observable(this){}
+
     AtomsPackTagObj(const shared_ptr<AtomsPackObj>& x):
       observable(this),
       atoms(x){}
@@ -83,6 +86,8 @@ namespace ptens{
 
     shared_ptr<AtomsPackTagObj0> obj;
 
+    AtomsPackTag0(){}
+
     AtomsPackTag0(const AtomsPack& x):
       AtomsPackTag0(x.obj){}
 
@@ -99,6 +104,8 @@ namespace ptens{
 
     shared_ptr<AtomsPackTagObj1> obj;
 
+    AtomsPackTag1(){}
+
     AtomsPackTag1(const AtomsPack& x):
       AtomsPackTag1(x.obj){}
 
@@ -114,6 +121,8 @@ namespace ptens{
   public:
 
     shared_ptr<AtomsPackTagObj2> obj;
+
+    AtomsPackTag2(){}
 
     AtomsPackTag2(const AtomsPack& x):
       AtomsPackTag2(x.obj){}

@@ -359,7 +359,7 @@ namespace ptens{
     RtensorPackB reduce0(const AindexPack& list) const{
       TimedFn T("Ptensors0","reduce0",*this,list,list.size()*nc);
       int N=list.size();
-      cnine::array_pool<int> dims;
+      //cnine::array_pool<int> dims;
       RtensorPackB R(N,Gdims(nc),cnine::fill_zero(),dev);
       if(dev==0){
 	for(int i=0; i<N; i++){

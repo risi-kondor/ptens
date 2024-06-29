@@ -71,9 +71,9 @@ namespace ptens{
   template<typename DUMMY> class PtensorsJig1;
   template<typename DUMMY> class PtensorsJig2;
 
-  template<typename TYPE> class Ptensors0b;
-  template<typename TYPE> class Ptensors1b;
-  template<typename TYPE> class Ptensors2b;
+  template<typename TYPE> class Ptensors0;
+  template<typename TYPE> class Ptensors1;
+  template<typename TYPE> class Ptensors2;
 
   class AtomsPackTag0;
   class AtomsPackTag1;

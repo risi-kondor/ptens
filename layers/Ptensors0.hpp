@@ -40,12 +40,14 @@ namespace ptens{
 
     typedef Ptensorsb<TYPE> BASE;
     typedef cnine::Ltensor<TYPE> TENSOR;
+    typedef cnine::Rtensor1_view Rtensor1_view;
 
     using cnine::diff_class<Ptensors0<TYPE> >::grad;
     using TENSOR::get_dev;
     using TENSOR::dim;
     using TENSOR::move_to_device;
     using TENSOR::add;
+    using TENSOR::get_arr;
 
 
     AtomsPack atoms;
@@ -83,6 +85,9 @@ namespace ptens{
       BASE(cnine::Gdims(_atoms.size(),nc),fcode,_dev),
       atoms(_atoms),
       tag(_atoms){}
+
+    Ptensors0(const int N, const int nc, const int fcode, const int _dev):
+      BASE(cnine::Gdims(N,nc),fcode,_dev){}
 
 
     static Ptensors0 cat(const vector<Ptensors0>& list){
@@ -220,7 +225,7 @@ namespace ptens{
     }
 
     int offset(const int i) const{
-      return atoms.row_offset0(i);
+      return i; 
     }
 
     int index_of(const int i) const{
@@ -233,6 +238,14 @@ namespace ptens{
     
     TENSOR tensor_of(const int i) const{
       return TENSOR::row(offset(i));
+    }
+
+    Rtensor1_view view_of(const int i) const{
+      return Rtensor1_view(const_cast<float*>(get_arr())+get_nc()*i,get_nc(),1,get_dev());
+    }
+
+    Rtensor1_view view_of(const int i, const int offs, const int n) const{
+      return Rtensor1_view(const_cast<float*>(get_arr())+get_nc()*i+offs,n,1,get_dev());
     }
 
     Ptensor0<TYPE> operator()(const int i) const{
@@ -296,6 +309,7 @@ namespace ptens{
       if(ptens_global::row_level_operations){
 	rmap(x,overlaps)(*this,x);
       }else{
+	broadcast0(x.reduce0(*overlaps->in),*overlaps->out,0);
       }
     }
 
@@ -305,6 +319,7 @@ namespace ptens{
       if(ptens_global::row_level_operations){
 	x.rmap(*this,overlaps).inv()(*this,x);
       }else{
+	
       }
     }
 
@@ -333,6 +348,31 @@ namespace ptens{
       return *this;
     }
 
+    Ptensors0 reduce0(const AindexPack& list) const{
+      //TimedFn T("Ptensors0","reduce0",*this,list,list.size()*nc);
+      int N=list.size();
+      Ptensors0 R(N,get_nc(),0,get_dev());
+      if(get_dev()==0){
+	for(int i=0; i<N; i++){
+	  if(list.nix(i)==0) continue;
+	  R.view_of(i)=view_of(list.tix(i));
+	}
+      }
+      GPUCODE(CUDA_STREAM(Ptensors0_reduce0_cu(R,*this,list,0,nc,stream)));
+      return R;
+    }
+
+    void reduce0_back(const Ptensors0& x, const AindexPack& list){
+      //TimedFn T("Ptensors0","reduce0_back",*this,x,list,list.size()*nc);
+      if(get_dev()==0){
+	int N=list.size();
+	for(int i=0; i<N; i++){
+	  view_of(list.tix(i))+=x.view_of(i);
+	}
+      }
+      GPUCODE(CUDA_STREAM(Ptensors0_broadcast0_cu(*this,x,list,0,stream)));
+    }
+
 
   public: // ---- Broadcasting -------------------------------------------------------------------------------
 
@@ -340,6 +380,17 @@ namespace ptens{
     void broadcast0(const BASE& X, const int offs=0){
       int nc=X.dim(1);
       BASE::view2().cols(offs,nc)+=X.view2();
+    }
+
+    void broadcast0(const Ptensors0& x, const AindexPack& list, const int offs){
+      //TimedFn T("Ptensors0","brcast0",*this,x,list,list.size()*nc);
+      if(get_dev()==0){
+	int N=list.size();
+	const int n=x.get_nc();
+	for(int i=0; i<N; i++)
+	  view_of(list.tix(i),offs,n)+=x.view_of(i);
+      }
+      GPUCODE(CUDA_STREAM(Ptensors0_broadcast0_cu(*this,x,list,offs,stream)));
     }
 
 
