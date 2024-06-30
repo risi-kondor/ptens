@@ -21,8 +21,6 @@
 #include "Rtensor3_view.hpp"
 
 #include "Ptensor0.hpp"
-//#include "PtensLoggedTimer.hpp"
-#include "Ltensor.hpp"
 #include "Ptensorsb.hpp"
 #include "AtomsPackTag.hpp"
 
@@ -86,8 +84,8 @@ namespace ptens{
       atoms(_atoms),
       tag(_atoms){}
 
-    Ptensors0(const int N, const int nc, const int fcode, const int _dev):
-      BASE(cnine::Gdims(N,nc),fcode,_dev){}
+    //Ptensors0(const int N, const int nc, const int fcode, const int _dev):
+    //BASE(cnine::Gdims(N,nc),fcode,_dev){}
 
 
     static Ptensors0 cat(const vector<Ptensors0>& list){
@@ -236,6 +234,10 @@ namespace ptens{
       return atoms(i);
     }
     
+    int size_of(const int i) const{
+      return 1;
+    }
+
     TENSOR tensor_of(const int i) const{
       return TENSOR::row(offset(i));
     }
@@ -305,30 +307,39 @@ namespace ptens{
 
     template<typename SOURCE>
     void add_gather(const SOURCE& x){
-      auto overlaps=ptens_global::overlaps_cache(atoms,x.atoms);
-      if(ptens_global::row_level_operations){
-	rmap(x,overlaps)(*this,x);
-      }else{
-	broadcast0(x.reduce0(*overlaps->in),*overlaps->out,0);
-      }
+      add_gather(x,ptens_global::overlaps_cache(atoms,x.atoms));
     }
-
+    
     template<typename OUTPUT>
     void add_gather_back(const OUTPUT& x){
-      auto overlaps=ptens_global::overlaps_cache(x.atoms,atoms);
+      add_gather_back(x,ptens_global::overlaps_cache(x.atoms,atoms));
+    }
+
+    template<typename SOURCE>
+      void add_gather(const SOURCE& x, const TensorLevelMap& map){
       if(ptens_global::row_level_operations){
-	x.rmap(*this,overlaps).inv()(*this,x);
+	rmap(x,map)(*this,x);
       }else{
-	
+	if constexpr(std::is_same<SOURCE,Ptensors0<TYPE> >::value)
+	  broadcast0(x.reduce0(map.atoms(),map.in()),map.out(),0);
+	if constexpr(std::is_same<SOURCE,Ptensors1<TYPE> >::value)
+	  broadcast0(x.reduce0(map.atoms(),map.in()),map.out(),0);
+	if constexpr(std::is_same<SOURCE,Ptensors2<TYPE> >::value)
+	  broadcast0(x.reduce0(map.atoms(),map.in()),map.out(),0);
       }
     }
 
     template<typename OUTPUT>
-    void add_gather_back_alt(const OUTPUT& x){
-      auto overlaps=ptens_global::overlaps_cache(x.atoms,atoms);
+    void add_gather_back(const OUTPUT& x, const TensorLevelMap& map){
       if(ptens_global::row_level_operations){
-	x.rmap(*this,overlaps).inv()(get_grad(),x.get_grad());
+	x.rmap(*this,map).inv()(*this,x);
       }else{
+	if constexpr(std::is_same<OUTPUT,Ptensors0<TYPE> >::value)
+	  broadcast0(x.reduce0(map.atoms(),map.out()),map.in());
+	if constexpr(std::is_same<OUTPUT,Ptensors1<TYPE> >::value)
+	  broadcast0(x.reduce0(map.atoms(),map.out()),map.in());
+	if constexpr(std::is_same<OUTPUT,Ptensors2<TYPE> >::value)
+	  broadcast0(x.reduce0_shrink(map.atoms(),map.out()),map.in());
       }
     }
 
@@ -336,8 +347,8 @@ namespace ptens{
   private:
 
     template<typename SOURCE>
-    RowLevelMap& rmap(const SOURCE& x, const shared_ptr<TensorLevelMapObj>& tmap) const{
-      return *ptens_global::rmap_cache(tag,x.tag,tmap);
+    RowLevelMap& rmap(const SOURCE& x, const TensorLevelMap& tmap) const{
+      return *ptens_global::rmap_cache(tag,x.tag,tmap.obj);
     }
 
 
@@ -348,11 +359,11 @@ namespace ptens{
       return *this;
     }
 
-    Ptensors0 reduce0(const AindexPack& list) const{
-      //TimedFn T("Ptensors0","reduce0",*this,list,list.size()*nc);
-      int N=list.size();
-      Ptensors0 R(N,get_nc(),0,get_dev());
+    Ptensors0 reduce0(const AtomsPack& _atoms, const AindexPack& list) const{
+      TimedFn T("Ptensors0","reduce0",*this,list,list.size()*get_nc());
+      Ptensors0 R(_atoms,get_nc(),0,get_dev());
       if(get_dev()==0){
+	int N=list.size();
 	for(int i=0; i<N; i++){
 	  if(list.nix(i)==0) continue;
 	  R.view_of(i)=view_of(list.tix(i));
@@ -360,17 +371,6 @@ namespace ptens{
       }
       GPUCODE(CUDA_STREAM(Ptensors0_reduce0_cu(R,*this,list,0,nc,stream)));
       return R;
-    }
-
-    void reduce0_back(const Ptensors0& x, const AindexPack& list){
-      //TimedFn T("Ptensors0","reduce0_back",*this,x,list,list.size()*nc);
-      if(get_dev()==0){
-	int N=list.size();
-	for(int i=0; i<N; i++){
-	  view_of(list.tix(i))+=x.view_of(i);
-	}
-      }
-      GPUCODE(CUDA_STREAM(Ptensors0_broadcast0_cu(*this,x,list,0,stream)));
     }
 
 
@@ -382,8 +382,8 @@ namespace ptens{
       BASE::view2().cols(offs,nc)+=X.view2();
     }
 
-    void broadcast0(const Ptensors0& x, const AindexPack& list, const int offs){
-      //TimedFn T("Ptensors0","brcast0",*this,x,list,list.size()*nc);
+    void broadcast0(const Ptensors0& x, const AindexPack& list, const int offs=0){
+      TimedFn T("Ptensors0","broadcast0",*this,x,list,list.size()*get_nc());
       if(get_dev()==0){
 	int N=list.size();
 	const int n=x.get_nc();
@@ -444,4 +444,3 @@ namespace ptens{
 
 
 #endif 
-

@@ -19,7 +19,7 @@
 //#include "RtensorA.hpp"
 #include "Ltensor.hpp"
 #include "Ptensor0.hpp"
-#include "Ptensor1_xview.hpp"
+//#include "Ptensor1_xview.hpp"
 
 
 namespace ptens{
@@ -149,13 +149,13 @@ namespace ptens{
       return view2().block(0,offs,k,n);
     }
 
-    Ptensor1_xview view(const vector<int>& ix) const{
-      return Ptensor1_xview(const_cast<TYPE*>(arr.get_arr()),nc,strides[0],strides[1],ix,dev);
-    }
+    //Ptensor1_xview view(const vector<int>& ix) const{
+    //return Ptensor1_xview(const_cast<TYPE*>(arr.get_arr()),nc,strides[0],strides[1],ix,dev);
+    //}
 
-    Ptensor1_xview view(const vector<int>& ix, const int offs, const int n) const{
-      return Ptensor1_xview(const_cast<TYPE*>(arr.get_arr())+strides[1]*offs,n,strides[0],strides[1],ix,dev);
-    }
+    //Ptensor1_xview view(const vector<int>& ix, const int offs, const int n) const{
+    //return Ptensor1_xview(const_cast<TYPE*>(arr.get_arr())+strides[1]*offs,n,strides[0],strides[1],ix,dev);
+    //}
 
 
     // ---- Linmaps ------------------------------------------------------------------------------------------

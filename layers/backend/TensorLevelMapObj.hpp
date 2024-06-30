@@ -37,6 +37,7 @@ namespace ptens{
 
     using SparseRmatrix::SparseRmatrix;
 
+    shared_ptr<AtomsPackObj> atoms;
     shared_ptr<AindexPack> in;
     shared_ptr<AindexPack> out;
 
@@ -52,6 +53,7 @@ namespace ptens{
     TensorLevelMapObj(const AtomsPackObj& _in_atoms, const AtomsPackObj& _out_atoms, const bool graded=false):
       SparseRmatrix(_out_atoms.size(),_in_atoms.size()),
       observable(this),
+      atoms(new AtomsPackObj()),
       in(new AindexPack()),
       out(new AindexPack()){
       //cout<<"Creating new TensorLevelMapObj...";//<<endl;
@@ -168,6 +170,7 @@ namespace ptens{
 	  Atoms common=out_i.intersect(in_j);
 	  auto _in=in_j(common);
 	  auto _out=out_i(common);
+	  atoms->push_back(common);
 	  in->push_back(j,_in);
 	  out->push_back(i,_out);
 	  in->count1+=_in.size();

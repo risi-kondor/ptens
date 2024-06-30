@@ -26,15 +26,15 @@ namespace ptens{
   class TensorLevelMap{
   public:
     
-    shared_ptr<TensorLevelMapObj<AtomsPackObj> > obj;
+    shared_ptr<TensorLevelMapObj> obj;
 
     TensorLevelMap(){
       PTENS_ASSRT(false);}
 
-    TensorLevelMap(const shared_ptr<TensorLevelMapObj<AtomsPackObj> >& x):
+    TensorLevelMap(const shared_ptr<TensorLevelMapObj>& x):
       obj(x){}
 
-    TensorLevelMap(TensorLevelMapObj<AtomsPackObj>* x):
+    TensorLevelMap(TensorLevelMapObj* x):
       obj(x){}
 
     //TensorLevelMap(const AtomsPack& _in_atoms, const AtomsPack& _out_atoms):
@@ -52,6 +52,10 @@ namespace ptens{
       return obj->is_graded();
     }
 
+    const AtomsPack atoms() const{
+      return obj->atoms;
+    }
+
     const AindexPack& in() const{
       return *obj->in;
     }
@@ -64,9 +68,7 @@ namespace ptens{
       return obj->get_bmap();
     }
     
-    //void for_each_edge(std::function<void(const int, const int, const float)> lambda, const bool self=0) const{
-    //obj->for_each_edge(lambda,self);
-    //}
+
   public: // ---- I/O ----------------------------------------------------------------------------------------
 
 
