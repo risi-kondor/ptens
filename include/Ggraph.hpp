@@ -17,9 +17,9 @@
 //#include "Hgraph.hpp"
 #include "GgraphObj.hpp"
 #include "Subgraph.hpp"
-#include "PtensSessionObj.hpp"
+//#include "PtensSessionObj.hpp"
 
-extern ptens::PtensSessionObj* ptens::ptens_session;
+//extern ptens::PtensSessionObj* ptens::ptens_session;
 
 
 namespace ptens{
@@ -40,7 +40,7 @@ namespace ptens{
 
     Ggraph(shared_ptr<OBJ>& x):
       obj(x){}
-
+    
     Ggraph(const shared_ptr<OBJ>& x):
       obj(x){}
 
@@ -54,7 +54,7 @@ namespace ptens{
     //obj(new OBJ(M)){}
 
     Ggraph(const int key):
-      Ggraph(ptens_session->graph_cache(key)){}
+      Ggraph(ptens_global::graph_cache(key)){}
 
 
   public: //  ---- Named constructors -------------------------------------------------------------------------
@@ -72,23 +72,23 @@ namespace ptens{
     static Ggraph from_edges(const cnine::Tensor<int>& M, const bool cached=false){
       int n=M.max()+1;
       if(!cached) return new OBJ(n,M);
-      return ptens_session->graph_cache.from_edge_list(M).second;
+      return ptens_global::graph_cache.from_edge_list(M).second;
     }
 
     static Ggraph from_edges(int n, const cnine::Tensor<int>& M, const bool cached=false){
       if(n==-1) n=M.max()+1;
       if(!cached) return new OBJ(n,M);
-      return ptens_session->graph_cache.from_edge_list(M).second;
+      return ptens_global::graph_cache.from_edge_list(M).second;
     }
 
     static Ggraph from_edges(const cnine::Tensor<int>& M, const int key){
       int n=M.max()+1;
-      return ptens_session->graph_cache.from_edge_list(key,M);
+      return ptens_global::graph_cache.from_edge_list(key,M);
     }
 
     static Ggraph from_edges(int n, const cnine::Tensor<int>& M, const int key){
       if(n==-1) n=M.max()+1;
-      return ptens_session->graph_cache.from_edge_list(key,M);
+      return ptens_global::graph_cache.from_edge_list(key,M);
     }
 
     static Ggraph from_edge_list(int n, const cnine::Tensor<int>& M){
@@ -97,12 +97,12 @@ namespace ptens{
     }
 
     static Ggraph cached_from_edge_list(const cnine::Tensor<int>& M){
-      auto r=ptens_session->graph_cache.from_edge_list(M);
+      auto r=ptens_global::graph_cache.from_edge_list(M);
       return Ggraph(r.second);
     }
 
     static Ggraph cached_from_edge_list(int n, const cnine::Tensor<int>& M){
-      auto r=ptens_session->graph_cache.from_edge_list(M);
+      auto r=ptens_global::graph_cache.from_edge_list(M);
       return Ggraph(r.second);
     }
 
@@ -136,7 +136,7 @@ namespace ptens{
 
 
     void cache(const int key) const{
-      ptens_session->graph_cache.cache(key,obj);
+      ptens_global::graph_cache.cache(key,obj);
     }
 
     bool operator==(const Ggraph& x) const{

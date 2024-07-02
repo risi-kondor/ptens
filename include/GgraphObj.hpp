@@ -40,8 +40,8 @@ namespace ptens{
     AtomsPack original_edges;
 
     ~GgraphObj(){
-      for(auto& p:subgraphpack_cache)
-	p.second.obj->release_cached_packs();
+      //for(auto& p:subgraphpack_cache)
+      //p.second.obj->release_cached_packs();
     }
 
 
@@ -154,7 +154,7 @@ namespace ptens{
 
 	if(H.getn()==1 && H.labeled==false && H.nedges()==0){
 	  AtomsPack r(getn());
-	  if(is_cached) r.obj->cache_packs=true; 
+	  //if(is_cached) r.obj->cache_packs=true; 
 	  subgraphpack_cache[H]=r;
 	  return r;
 	}
@@ -163,13 +163,13 @@ namespace ptens{
 	  AtomsPack r;
 	  for_each_edge([&](const int i, const int j, const float v){
 	      if(i<j) r.push_back({i,j});});
-	  if(is_cached) r.obj->cache_packs=true; 
+	  //if(is_cached) r.obj->cache_packs=true; 
 	  subgraphpack_cache[H]=r;
 	  return r;
 	}
 
 	AtomsPack r(new AtomsPackObj(cnine::Tensor<int>(cnine::FindPlantedSubgraphs<float>(*this,H))));
-	if(is_cached) r.obj->cache_packs=true; 
+	//if(is_cached) r.obj->cache_packs=true; 
 	subgraphpack_cache[H]=r;
 	return r;
       }

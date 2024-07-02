@@ -14,13 +14,13 @@
 
 #include "Cnine_base.cpp"
 #include "Ptens_base.cpp"
-#include "SubgraphLayer0b.hpp"
-#include "SubgraphLayer1b.hpp"
+#include "SubgraphLayer0.hpp"
+#include "SubgraphLayer1.hpp"
 
 using namespace ptens;
 using namespace cnine;
 
-typedef Ptensors1b<float> Ptens1;
+typedef Ptensors1<float> Ptens1;
 
 PtensSession ptens_session;
 
@@ -41,14 +41,14 @@ int main(int argc, char** argv){
   Subgraph triangle=Subgraph::triangle();
   cout<<triangle<<endl;
 
-  SubgraphLayer0b<float> f0(G,5,4,1);
+  SubgraphLayer0<float> f0(G,5,4,1);
   cout<<f0<<endl;
 
-  SubgraphLayer1b<float> f1=gather1(f0,Subgraph::star(99));
+  SubgraphLayer1<float> f1=gather1(f0,Subgraph::star(99));
   cout<<"-------"<<endl;
   cout<<f1.str()<<endl;
 
-  SubgraphLayer1b<float> f2=gather1(f1,Subgraph::star(99));
+  SubgraphLayer1<float> f2=gather1(f1,Subgraph::star(99));
   //f2.get_grad()=f2;
 
   f1.get_grad().add_gather_back(f2);
@@ -63,7 +63,7 @@ int main(int argc, char** argv){
 
   AtomsPack xatoms=AtomsPack::random(10,0.5);
   Ptens1 X1=Ptens1(xatoms,channels=3,filltype=3);
-  SubgraphLayer1b<float> U(X1,G,trivial);
+  SubgraphLayer1<float> U(X1,G,trivial);
   cout<<U<<endl;
   */
 

@@ -34,7 +34,9 @@ namespace ptens{
     }
 
     ~PtensSession(){
+      cout<<banner()<<endl;
     }
+
 
   public: // ---- Access -----------------------------------------------------------------------------------------
 
@@ -70,6 +72,11 @@ namespace ptens{
       return string('\b',s.length())+s;
     }
 
+    string print_size(const int x) const{
+      auto s=to_string(x);
+      return string('\b',s.length())+s;
+    }
+
     string banner() const{
       bool with_cuda=0;
       #ifdef _WITH_CUDA
@@ -89,6 +96,12 @@ namespace ptens{
 	size_or_off(ptens_global::cache_overlap_maps, ptens_global::overlaps_cache.size())<<endl;
       oss<<" Row level map cache:                "<<
 	size_or_off(ptens_global::cache_rmaps, ptens_global::rmap_cache.size())<<endl;
+      oss<<" Graph cache:                        "<<
+	print_size(ptens_global::graph_cache.size())<<endl;
+      oss<<" Graph elist cache:                  "<<
+	print_size(ptens_global::graph_cache.edge_list_map.size())<<endl;
+      oss<<" Subgraph cache:                     "<<
+	print_size(ptens_global::subgraph_cache.size())<<endl;
       oss<<"---------------------------------------"<<endl;
       return oss.str();
     }

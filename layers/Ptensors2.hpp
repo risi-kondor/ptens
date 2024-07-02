@@ -21,7 +21,7 @@
 #include "Rtensor3_view.hpp"
 
 #include "Ptensor2.hpp"
-#include "Ptensorsb.hpp"
+#include "Ptensors.hpp"
 #include "AtomsPackTag.hpp"
 #include "Ptensor2view.hpp"
 
@@ -33,13 +33,13 @@ namespace ptens{
 
 
   template<typename TYPE>
-  class Ptensors2: public Ptensorsb<TYPE>, public cnine::diff_class<Ptensors2<TYPE> >{
+  class Ptensors2: public Ptensors<TYPE>, public cnine::diff_class<Ptensors2<TYPE> >{
   public:
 
     friend class Ptensors0<TYPE>;
     friend class Ptensors1<TYPE>;
 
-    typedef Ptensorsb<TYPE> BASE;
+    typedef Ptensors<TYPE> BASE;
     typedef cnine::Ltensor<TYPE> TENSOR;
     typedef cnine::Rtensor2_view Rtensor2_view;
     typedef cnine::Rtensor3_view Rtensor3_view;
@@ -54,8 +54,13 @@ namespace ptens{
     using TENSOR::cols;
     using TENSOR::add;
 
+    using BASE::nc;
+    using BASE::atoms;
+    using BASE::size;
+    using BASE::atoms_of;
+    using BASE::get_nc;
 
-    AtomsPack atoms;
+    //AtomsPack atoms;
     //shared_ptr<PtensorsJig2<int> > jig;
     AtomsPackTag2 tag;
 
@@ -70,27 +75,27 @@ namespace ptens{
   public: // ----- Constructors ------------------------------------------------------------------------------
 
 
-    Ptensors2(const TENSOR& M):
-      BASE(M.copy()){} // for diff_class
+    //Ptensors2(const TENSOR& M):
+    //BASE(M.copy()){} // for diff_class
 
     Ptensors2(const TENSOR& M, const AtomsPack& _atoms):
-      BASE(M),
-      atoms(_atoms),
+      BASE(_atoms,M),
+      //atoms(_atoms),
       tag(_atoms){}
 
     Ptensors2(const TENSOR& M, const AtomsPackTag2& _tag):
-      BASE(M),
-      atoms(_tag.obj->atoms.lock()),
+      BASE(_tag.obj->atoms.lock(),M),
+      //atoms(_tag.obj->atoms.lock()),
       tag(_tag){}
 
     Ptensors2(const AtomsPack& _atoms, const int nc, const int _dev=0):
-      BASE(cnine::Gdims(_atoms.nrows2(),nc),0,_dev),
-      atoms(_atoms),
+      BASE(_atoms,cnine::Gdims(_atoms.nrows2(),nc),0,_dev),
+      //atoms(_atoms),
       tag(_atoms){}
 
     Ptensors2(const AtomsPack& _atoms, const int nc, const int fcode, const int _dev):
-      BASE(cnine::Gdims(_atoms.nrows2(),nc),fcode,_dev),
-      atoms(_atoms),
+      BASE(_atoms,cnine::Gdims(_atoms.nrows2(),nc),fcode,_dev),
+      //atoms(_atoms),
       tag(_atoms){}
 
 
@@ -115,10 +120,11 @@ namespace ptens{
 
     template<typename... Args>
     Ptensors2(const AtomsPack& _atoms, const Args&... args):
-      atoms(_atoms),
+      BASE(_atoms),
       tag(_atoms){
       vparams v;
       unroller(v,args...);
+      nc=v.nc;
       BASE::reset(BASE({atoms.nrows2(),v.nc},v.fcode,v.dev));
     }
 
@@ -183,8 +189,8 @@ namespace ptens{
 
 
     Ptensors2(const Ptensors2& x, const int _dev):
-      BASE(x.copy(_dev)), 
-      atoms(x.atoms),
+      BASE(x.atoms,x.copy(_dev)), 
+      //atoms(x.atoms),
       tag(x.tag){}
 
 
@@ -207,13 +213,13 @@ namespace ptens{
       return 2;
     }
 
-    int size() const{
-      return atoms.size();
-    }
+    //int size() const{
+    //return atoms.size();
+    //}
 
-    int get_nc() const{
-      return BASE::dim(1);
-    }
+    //int get_nc() const{
+    //return BASE::dim(1);
+    //}
 
     //int nchannels() const{
     //return BASE::dim(1);
@@ -223,9 +229,9 @@ namespace ptens{
       return atoms.size_of(i);
     }
 
-    AtomsPack get_atoms() const{
-      return atoms;
-    }
+    //AtomsPack get_atoms() const{
+    //return atoms;
+    //}
 
     int offset(const int i) const{
       return atoms.row_offset2(i);
@@ -235,9 +241,9 @@ namespace ptens{
       return atoms.row_offset2(i);
     }
 
-    Atoms atoms_of(const int i) const{
-      return atoms(i);
-    }
+    //Atoms atoms_of(const int i) const{
+    //return atoms(i);
+    //}
     
     TENSOR tensor_of(const int i) const{
       int k=size_of(i);

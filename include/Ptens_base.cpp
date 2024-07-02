@@ -4,6 +4,9 @@
 #include "Cnine_base.cpp"
 #include "Ptens_base.hpp"
 
+#include <unordered_set>
+
+
 namespace ptens{
 
   //class AtomsPackCatCache;
@@ -20,7 +23,9 @@ namespace ptens{
 #include "OverlapsMmapCache.hpp"
 #include "RowLevelMapCache.hpp"
 
-//#include "PtensSessionObj.hpp"
+#include "GgraphCache.hpp"
+#include "SubgraphObj.hpp"
+
 
 namespace ptens{
 
@@ -38,6 +43,10 @@ namespace ptens{
 
     bool cache_rmaps=false;
     RowLevelMapCache rmap_cache;
+
+    GgraphCache graph_cache;
+
+    std::unordered_set<SubgraphObj> subgraph_cache;
 
   }
 

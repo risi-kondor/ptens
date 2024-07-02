@@ -12,43 +12,40 @@
  *
  */
 
-#ifndef _ptens_BatchedPtensors0b
-#define _ptens_BatchedPtensors0b
+#ifndef _ptens_BatchedPtensors0
+#define _ptens_BatchedPtensors0
 
 #include "diff_class.hpp"
 #include "object_pack.hpp"
 
 #include "BatchedAtomsPack.hpp"
-#include "BatchedAtomsPackN.hpp"
-#include "Ptensors0b.hpp"
-#include "BatchedPtensorsb.hpp"
+#include "Ptensors0.hpp"
+#include "BatchedPtensors.hpp"
 #include "MultiLoop.hpp"
+
 
 namespace ptens{
 
-  template<typename TYPE> class Ptensors1bBatch;
-  template<typename TYPE> class Ptensors2bBatch;
-
 
   template<typename TYPE>
-  class BatchedPtensors0b: public BatchedPtensorsb<TYPE>,
-			   public cnine::diff_class<BatchedPtensors0b<TYPE> >{
+  class BatchedPtensors0: public BatchedPtensors<TYPE>,
+			   public cnine::diff_class<BatchedPtensors0<TYPE> >{
   public:
 
-    typedef BatchedPtensorsb<TYPE> BASE;
+    typedef BatchedPtensors<TYPE> BASE;
     typedef cnine::Ltensor<TYPE> TENSOR;
-    typedef BatchedAtomsPackN<AtomsPack0obj<int> > BatchedAtomsPack0;
+    //typedef BatchedAtomsPackN<AtomsPack0obj<int> > BatchedAtomsPack0;
     
-    using cnine::diff_class<BatchedPtensors0b<TYPE> >::grad;
+    using cnine::diff_class<BatchedPtensors0<TYPE> >::grad;
     using BASE::get_dev;
 
-    BatchedAtomsPackN<AtomsPack0obj<int> > atoms;
+    BatchedAtomsPack atoms;
 
     cnine::GatherMapProgramPack forward_program;
     cnine::GatherMapProgramPack backward_program;
 
 
-    ~BatchedPtensors0b(){
+    ~BatchedPtensors0(){
 #ifdef WITH_FAKE_GRAD
       if(grad) delete grad;
 #endif 
@@ -58,35 +55,32 @@ namespace ptens{
   public: // ----- Constructors ------------------------------------------------------------------------------
 
 
-    //BatchedPtensors0b(){}
+    //BatchedPtensors0(){}
 
-    BatchedPtensors0b(const TENSOR& M, const vector<int> sizes):
-      BASE(M.copy()){
-	  vector<shared_ptr<AtomsPack0obj<int> > > x;
-      for(auto p:sizes) x.push_back(to_share(new AtomsPack0obj<int>(p)));
-      atoms=BatchedAtomsPackN<AtomsPack0obj<int> >(x);
-    }
+    //BatchedPtensors0(const TENSOR& M, const vector<int> sizes):
+    //BASE(M.copy()){
+    //vector<shared_ptr<AtomsPack0obj<int> > > x;
+    //for(auto p:sizes) x.push_back(to_share(new AtomsPack0obj<int>(p)));
+    //atoms=BatchedAtomsPackN<AtomsPack0obj<int> >(x);
+    //}
 
-    BatchedPtensors0b(const BatchedAtomsPack& _atoms, const cnine::Tensor<float>& M):
-      BASE(M.copy()), atoms(BatchedAtomsPack0(_atoms)){}
-
-    BatchedPtensors0b(const BatchedAtomsPack0& _atoms, const TENSOR& M):
+    BatchedPtensors0(const BatchedAtomsPack& _atoms, const TENSOR& M):
       BASE(M.copy()), atoms(_atoms){}
 
-    BatchedPtensors0b(const BatchedAtomsPack0& _atoms, const int _nc, const int _dev):
-      BatchedPtensors0b(_atoms,_nc,0,_dev){}
+    BatchedPtensors0(const BatchedAtomsPack& _atoms, const int _nc, const int _dev):
+      BatchedPtensors0(_atoms,_nc,0,_dev){}
 
-    BatchedPtensors0b(const BatchedAtomsPack0& _atoms, const int _nc, const int fcode, const int _dev):
+    BatchedPtensors0(const BatchedAtomsPack& _atoms, const int _nc, const int fcode, const int _dev):
       BASE({_atoms.tsize(),_nc},fcode,_dev), atoms(_atoms){}
 
-    BatchedPtensors0b(const BatchedAtomsPack& _atoms, const int _nc, const int _dev):
-      BatchedPtensors0b(BatchedAtomsPack0(_atoms),_nc,0,_dev){}
+    BatchedPtensors0(const BatchedAtomsPack& _atoms, const int _nc, const int _dev):
+      BatchedPtensors0(BatchedAtomsPack0(_atoms),_nc,0,_dev){}
 
-    BatchedPtensors0b(const BatchedAtomsPack& _atoms, const int _nc, const int fcode, const int _dev):
-      BatchedPtensors0b(BatchedAtomsPack0(_atoms),_nc,fcode,_dev){}
+    BatchedPtensors0(const BatchedAtomsPack& _atoms, const int _nc, const int fcode, const int _dev):
+      BatchedPtensors0(BatchedAtomsPack0(_atoms),_nc,fcode,_dev){}
 
 
-    BatchedPtensors0b(const initializer_list<Ptensors0b<TYPE> >& list):
+    BatchedPtensors0(const initializer_list<Ptensors0<TYPE> >& list):
       BASE(cnine::Ltensor<TYPE>::stack(0,list)){
       vector<shared_ptr<AtomsPack0obj<int> > > x;
       for(auto& p:list) x.push_back(p.atoms.obj);
@@ -94,7 +88,7 @@ namespace ptens{
     }
 	
     /*
-    BatchedPtensors0b(const vector<const TENSOR&> M):
+    BatchedPtensors0(const vector<const TENSOR&> M):
       BASE(cnine::Ltensor<TYPE>::stack(0,M)){
       vector<shared_ptr<AtomsPack0obj<int> > > x;
       for(auto& p:M) x.push_back(to_share(new AtomsPack0obj<int>(p.dim(0))));
@@ -112,7 +106,7 @@ namespace ptens{
     };      
 
     template<typename... Args>
-    BatchedPtensors0b(const BatchedAtomsPack& _atoms, const Args&... args):
+    BatchedPtensors0(const BatchedAtomsPack& _atoms, const Args&... args):
       atoms(_atoms){
       vparams v;
       unroller(v,args...);
@@ -137,43 +131,43 @@ namespace ptens{
   public: // ----- Spawning ----------------------------------------------------------------------------------
 
 
-    BatchedPtensors0b copy() const{
-      return BatchedPtensors0b(atoms,TENSOR::copy());
+    BatchedPtensors0 copy() const{
+      return BatchedPtensors0(atoms,TENSOR::copy());
     }
 
-    BatchedPtensors0b copy(const int _dev) const{
-      return BatchedPtensors0b(atoms,TENSOR::copy(_dev));
+    BatchedPtensors0 copy(const int _dev) const{
+      return BatchedPtensors0(atoms,TENSOR::copy(_dev));
     }
 
-    BatchedPtensors0b zeros_like() const{
-      return BatchedPtensors0b(atoms,TENSOR::zeros_like());
+    BatchedPtensors0 zeros_like() const{
+      return BatchedPtensors0(atoms,TENSOR::zeros_like());
     }
 
-    BatchedPtensors0b gaussian_like() const{
-      return BatchedPtensors0b(atoms,TENSOR::gaussian_like());
+    BatchedPtensors0 gaussian_like() const{
+      return BatchedPtensors0(atoms,TENSOR::gaussian_like());
     }
 
-    static BatchedPtensors0b zeros_like(const BatchedPtensors0b& x){
-      return BatchedPtensors0b(x.TENSOR::zeros_like(),x.atoms);
+    static BatchedPtensors0 zeros_like(const BatchedPtensors0& x){
+      return BatchedPtensors0(x.TENSOR::zeros_like(),x.atoms);
     }
 
-    static BatchedPtensors0b zeros_like(const BatchedPtensors0b& x, const int nc){
-      return BatchedPtensors0b(TENSOR({x.dim(0),nc},0,get_dev()),x.atoms);
+    static BatchedPtensors0 zeros_like(const BatchedPtensors0& x, const int nc){
+      return BatchedPtensors0(TENSOR({x.dim(0),nc},0,get_dev()),x.atoms);
     }
 
-    static BatchedPtensors0b gaussian_like(const BatchedPtensors0b& x){
-      return BatchedPtensors0b(x.atoms,x.TENSOR::gaussian_like());
+    static BatchedPtensors0 gaussian_like(const BatchedPtensors0& x){
+      return BatchedPtensors0(x.atoms,x.TENSOR::gaussian_like());
     }
 
-    static BatchedPtensors0b* new_zeros_like(const BatchedPtensors0b& x){
-      return new BatchedPtensors0b(x.atoms,x.TENSOR::zeros_like());
+    static BatchedPtensors0* new_zeros_like(const BatchedPtensors0& x){
+      return new BatchedPtensors0(x.atoms,x.TENSOR::zeros_like());
     }
     
 
   public: // ----- Conversions -------------------------------------------------------------------------------
 
 
-    BatchedPtensors0b(const TENSOR& x, const BatchedAtomsPack0& _atoms):
+    BatchedPtensors0(const TENSOR& x, const BatchedAtomsPack0& _atoms):
       BASE(x),
       atoms(_atoms){}
 
@@ -197,53 +191,53 @@ namespace ptens{
       return atoms.obj->get_atoms();
     }
 
-    BatchedPtensors0b& get_grad(){
-      return cnine::diff_class<BatchedPtensors0b<TYPE> >::get_grad();
+    BatchedPtensors0& get_grad(){
+      return cnine::diff_class<BatchedPtensors0<TYPE> >::get_grad();
     }
 
-    const BatchedPtensors0b& get_grad() const{
-      return cnine::diff_class<BatchedPtensors0b<TYPE> >::get_grad();
+    const BatchedPtensors0& get_grad() const{
+      return cnine::diff_class<BatchedPtensors0<TYPE> >::get_grad();
     }
 
-    Ptensors0b<TYPE> view_of(const int i) const{
-      return Ptensors0b<TYPE>(TENSOR::rows(atoms.offset(i),atoms.nrows(i)),atoms.obj->obj[i]);
+    Ptensors0<TYPE> view_of(const int i) const{
+      return Ptensors0<TYPE>(TENSOR::rows(atoms.offset(i),atoms.nrows(i)),atoms.obj->obj[i]);
     }
 
-    Ptensors0b<TYPE> operator[](const int i){
-      return Ptensors0b<TYPE>(atoms.obj->obj[i],TENSOR::rows(atoms.offset(i)),atoms.nrows(i));
+    Ptensors0<TYPE> operator[](const int i){
+      return Ptensors0<TYPE>(atoms.obj->obj[i],TENSOR::rows(atoms.offset(i)),atoms.nrows(i));
     }
 
-    Ptensors0b<TYPE> operator[](const int i) const{
-      return Ptensors0b<TYPE>(atoms.obj->obj[i],TENSOR::rows(atoms.offset(i),atoms.nrows(i)));
+    Ptensors0<TYPE> operator[](const int i) const{
+      return Ptensors0<TYPE>(atoms.obj->obj[i],TENSOR::rows(atoms.offset(i),atoms.nrows(i)));
     }
 
 
   public: // ---- Message passing ----------------------------------------------------------------------------
 
 
-    template<typename SOURCE, typename = typename std::enable_if<std::is_base_of<BatchedPtensorsb<float>, SOURCE>::value, SOURCE>::type>
-    static BatchedPtensors0b<TYPE> linmaps(const SOURCE& x){
-      BatchedPtensors0b<TYPE> R(x.get_atoms(),x.get_nc()*vector<int>({1,1,2})[x.getk()],x.get_dev());
+    template<typename SOURCE, typename = typename std::enable_if<std::is_base_of<BatchedPtensors<float>, SOURCE>::value, SOURCE>::type>
+    static BatchedPtensors0<TYPE> linmaps(const SOURCE& x){
+      BatchedPtensors0<TYPE> R(x.get_atoms(),x.get_nc()*vector<int>({1,1,2})[x.getk()],x.get_dev());
       R.add_linmaps(x);
       return R;
     }
 
-    template<typename SOURCE, typename = typename std::enable_if<std::is_base_of<BatchedPtensorsb<float>, SOURCE>::value, SOURCE>::type>
-    static BatchedPtensors0b<TYPE> gather(const SOURCE& x, const BatchedAtomsPack& a, const int min_overlaps=1){
-      BatchedPtensors0b<TYPE> R(a,x.get_nc()*vector<int>({1,1,2})[x.getk()],x.get_dev());
+    template<typename SOURCE, typename = typename std::enable_if<std::is_base_of<BatchedPtensors<float>, SOURCE>::value, SOURCE>::type>
+    static BatchedPtensors0<TYPE> gather(const SOURCE& x, const BatchedAtomsPack& a, const int min_overlaps=1){
+      BatchedPtensors0<TYPE> R(a,x.get_nc()*vector<int>({1,1,2})[x.getk()],x.get_dev());
       R.add_gather(x,min_overlaps);
       return R;
     }
 
 
-    template<typename SOURCE, typename = typename std::enable_if<std::is_base_of<BatchedPtensorsb<float>, SOURCE>::value, SOURCE>::type>
+    template<typename SOURCE, typename = typename std::enable_if<std::is_base_of<BatchedPtensors<float>, SOURCE>::value, SOURCE>::type>
     void add_linmaps(const SOURCE& x){
       //for(int i=0; i<size(); i++)
       //view_of(i).add_linmaps(x.view_of(i));
       cnine::MultiLoop(size(),[&](const int i){view_of(i).add_linmaps(x.view_of(i));});
     }
 
-    template<typename SOURCE, typename = typename std::enable_if<std::is_base_of<BatchedPtensorsb<float>, SOURCE>::value, SOURCE>::type>
+    template<typename SOURCE, typename = typename std::enable_if<std::is_base_of<BatchedPtensors<float>, SOURCE>::value, SOURCE>::type>
     void add_linmaps_back(const SOURCE& x){
       //for(int i=0; i<size(); i++)
       //view_of(i).add_linmaps_back(x.view_of(i));
@@ -286,11 +280,11 @@ namespace ptens{
 
 
     static string classname(){
-      return "BatchedPtensors0b";
+      return "BatchedPtensors0";
     }
 
     string repr() const{
-      return "<BatchedPtensors0b[N="+to_string(size())+",nrows="+to_string(TENSOR::dim(0))+",nc="+to_string(get_nc())+"]>";
+      return "<BatchedPtensors0[N="+to_string(size())+",nrows="+to_string(TENSOR::dim(0))+",nc="+to_string(get_nc())+"]>";
     }
 
     string str(const string indent="") const{ 
@@ -300,7 +294,7 @@ namespace ptens{
       return oss.str();
     }
 
-    friend ostream& operator<<(ostream& stream, const BatchedPtensors0b& x){
+    friend ostream& operator<<(ostream& stream, const BatchedPtensors0& x){
       stream<<x.str(); return stream;}
 
 

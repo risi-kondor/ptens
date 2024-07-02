@@ -21,7 +21,7 @@
 #include "Rtensor3_view.hpp"
 
 #include "Ptensor0.hpp"
-#include "Ptensorsb.hpp"
+#include "Ptensors.hpp"
 #include "AtomsPackTag.hpp"
 
 
@@ -30,13 +30,13 @@ namespace ptens{
 
 
   template<typename TYPE>
-  class Ptensors0: public Ptensorsb<TYPE>, public cnine::diff_class<Ptensors0<TYPE> >{
+  class Ptensors0: public Ptensors<TYPE>, public cnine::diff_class<Ptensors0<TYPE> >{
   public:
 
     friend class Ptensors1<TYPE>;
     friend class Ptensors2<TYPE>;
 
-    typedef Ptensorsb<TYPE> BASE;
+    typedef Ptensors<TYPE> BASE;
     typedef cnine::Ltensor<TYPE> TENSOR;
     typedef cnine::Rtensor1_view Rtensor1_view;
 
@@ -47,8 +47,12 @@ namespace ptens{
     using TENSOR::add;
     using TENSOR::get_arr;
 
+    using BASE::nc;
+    using BASE::atoms;
+    using BASE::size;
+    using BASE::atoms_of;
+    using BASE::get_nc;
 
-    AtomsPack atoms;
     AtomsPackTag0 tag;
 
 
@@ -64,24 +68,24 @@ namespace ptens{
 
     Ptensors0(){}
 
+    Ptensors0(const AtomsPack& _atoms, const TENSOR& M):
+      BASE(_atoms,M),
+      tag(_atoms){}
+
     Ptensors0(const TENSOR& M, const AtomsPack& _atoms):
-      BASE(M),
-      atoms(_atoms),
+      BASE(_atoms,M),
       tag(_atoms){}
 
     Ptensors0(const TENSOR& M, const AtomsPackTag0& _tag):
-      BASE(M),
-      atoms(_tag.obj->atoms.lock()),
+      BASE(_tag.obj->atoms.lock(),M),
       tag(_tag){}
 
     Ptensors0(const AtomsPack& _atoms, const int nc, const int _dev=0):
-      BASE(cnine::Gdims(_atoms.size(),nc),0,_dev),
-      atoms(_atoms),
+      BASE(_atoms,cnine::Gdims(_atoms.size(),nc),0,_dev),
       tag(_atoms){}
 
     Ptensors0(const AtomsPack& _atoms, const int nc, const int fcode, const int _dev):
-      BASE(cnine::Gdims(_atoms.size(),nc),fcode,_dev),
-      atoms(_atoms),
+      BASE(_atoms,cnine::Gdims(_atoms.size(),nc),fcode,_dev),
       tag(_atoms){}
 
     //Ptensors0(const int N, const int nc, const int fcode, const int _dev):
@@ -109,10 +113,11 @@ namespace ptens{
 
     template<typename... Args>
     Ptensors0(const AtomsPack& _atoms, const Args&... args):
-      atoms(_atoms),
+      BASE(_atoms),
       tag(_atoms){
       vparams v;
       unroller(v,args...);
+      nc=v.nc;
       TENSOR::reset(TENSOR({atoms.size(),v.nc},v.fcode,v.dev));
     }
 
@@ -186,8 +191,8 @@ namespace ptens{
 
 
     Ptensors0(const Ptensors0& x, const int _dev):
-      BASE(x.copy(_dev)), 
-      atoms(x.atoms),
+      BASE(x.atoms,x.copy(_dev)), 
+      //atoms(x.atoms),
       tag(x.tag){}
 
 
@@ -210,17 +215,17 @@ namespace ptens{
       return 0;
     }
 
-    int size() const{
-      return atoms.size();
-    }
+    //int size() const{
+    //return atoms.size();
+    //}
 
-    int get_nc() const{
-      return TENSOR::dim(1);
-    }
+    //int get_nc() const{
+    //return TENSOR::dim(1);
+    //}
 
-    const AtomsPack& get_atoms() const{
-      return atoms;
-    }
+    //const AtomsPack& get_atoms() const{
+    //return atoms;
+    //}
 
     int offset(const int i) const{
       return i; 
@@ -230,9 +235,9 @@ namespace ptens{
       return i;
     }
 
-    Atoms atoms_of(const int i) const{
-      return atoms(i);
-    }
+    //Atoms atoms_of(const int i) const{
+    //return atoms(i);
+    //}
     
     int size_of(const int i) const{
       return 1;
@@ -261,9 +266,9 @@ namespace ptens{
   public: // ---- Linmaps ------------------------------------------------------------------------------------
 
 
-    template<typename SOURCE, typename = typename std::enable_if<std::is_base_of<Ptensorsb<float>, SOURCE>::value, SOURCE>::type>
+    template<typename SOURCE, typename = typename std::enable_if<std::is_base_of<Ptensors<float>, SOURCE>::value, SOURCE>::type>
     static Ptensors0<float> linmaps(const SOURCE& x){
-      Ptensors0<float> R(x.get_atoms(),x.get_nc()*vector<int>({1,1,2})[x.getk()],x.get_dev());
+      Ptensors0<float> R(x.atoms,x.get_nc()*vector<int>({1,1,2})[x.getk()],x.get_dev());
       R.add_linmaps(x);
       return R;
     }
@@ -297,7 +302,7 @@ namespace ptens{
   public: // ---- Message passing ----------------------------------------------------------------------------
 
 
-    template<typename SOURCE, typename = typename std::enable_if<std::is_base_of<Ptensorsb<float>, SOURCE>::value, SOURCE>::type>
+    template<typename SOURCE, typename = typename std::enable_if<std::is_base_of<Ptensors<float>, SOURCE>::value, SOURCE>::type>
     static Ptensors0<TYPE> gather(const SOURCE& x, const AtomsPack& a){
       int nc=x.get_nc()*vector<int>({1,1,2})[x.getk()];
       Ptensors0<TYPE> R(a,nc,x.get_dev());
@@ -425,14 +430,14 @@ namespace ptens{
 
 
 
-  template<typename SOURCE, typename = typename std::enable_if<std::is_base_of<Ptensorsb<float>, SOURCE>::value, SOURCE>::type>
+  template<typename SOURCE, typename = typename std::enable_if<std::is_base_of<Ptensors<float>, SOURCE>::value, SOURCE>::type>
   inline Ptensors0<float> linmaps0(const SOURCE& x){
-    Ptensors0<float> R(x.get_atoms(),x.get_nc()*vector<int>({1,1,2})[x.getk()],x.get_dev());
+    Ptensors0<float> R(x.atoms,x.get_nc()*vector<int>({1,1,2})[x.getk()],x.get_dev());
     R.add_linmaps(x);
     return R;
   }
 
-  template<typename SOURCE, typename = typename std::enable_if<std::is_base_of<Ptensorsb<float>, SOURCE>::value, SOURCE>::type>
+  template<typename SOURCE, typename = typename std::enable_if<std::is_base_of<Ptensors<float>, SOURCE>::value, SOURCE>::type>
   Ptensors0<float> gather0(const SOURCE& x, const AtomsPack& a){
     int nc=x.get_nc()*vector<int>({1,1,2})[x.getk()];
     Ptensors0<float> R(a,nc,x.get_dev());

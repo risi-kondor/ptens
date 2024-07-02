@@ -14,34 +14,30 @@
 
 #include "Cnine_base.cpp"
 #include "Ptens_base.cpp"
-#include "SubgraphLayer0b.hpp"
-#include "SubgraphLayer1b.hpp"
-#include "SubgraphLayer2b.hpp"
+#include "SubgraphLayer0.hpp"
+//#include "BatchedGgraph.hpp"
 
 using namespace ptens;
 using namespace cnine;
 
-typedef Ptensors1b<float> Ptens1;
 
-PtensSession ptens_session;
+
+typedef Ptensors1<float> Ptens1;
 
 
 int main(int argc, char** argv){
 
+  PtensSession ptens_session;
+
   Ggraph G=Ggraph::random(10);
+  //BatchedGgraph G({g0,g0,g0});
   cout<<G<<endl;
 
   Subgraph trivial=Subgraph::trivial();
-  cout<<trivial<<endl;
-  Subgraph edge=Subgraph::edge();
-  cout<<edge<<endl;
-  Subgraph triangle=Subgraph::triangle();
-  cout<<triangle<<endl;
 
-  SubgraphLayer0b<float> f0(G,5,4);
-  cout<<f0<<endl;
-
-  SubgraphLayer2b<float> f2(f0,edge);
-  cout<<f2<<endl;
+  AtomsPack xatoms=AtomsPack::random(10,10,0.5);
+  Ptens1 X1=Ptens1(xatoms,channels=3,filltype=3);
+  SubgraphLayer0<float> U(X1,G,trivial);
+  cout<<U<<endl;
 
 }

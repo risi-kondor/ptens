@@ -15,102 +15,51 @@
 #ifndef _ptens_SubgraphLayer
 #define _ptens_SubgraphLayer
 
-#include "Ggraph.hpp"
-#include "Subgraph.hpp"
-#include "TransferMap.hpp"
-#include "Ptensors0.hpp"
-#include "Ptensors1.hpp"
-#include "Ptensors2.hpp"
-#include "NodeLayer.hpp"
-
+//#include "PtensSession.hpp"
 
 namespace ptens{
 
-  template<typename TLAYER> 
-  class SubgraphLayer: public TLAYER{
-  public:
-
-    typedef cnine::RtensorA rtensor;
-
-    using TLAYER::TLAYER;
-    using TLAYER::dev;
-    using TLAYER::atoms;
-    using TLAYER::get_nc;
-    using TLAYER::tensor;
-
-    const Ggraph G;
-    const Subgraph S;
+  //extern PtensSessionObj* ptens_session;
 
 
-  public: 
+  template<typename OBJ>
+    OBJ cat_channels_sg(const OBJ& x, const OBJ& y){
+    PTENS_ASSRT(x.dim(0)==y.dim(0));
+    //cnine::using_vram_manager vv(ptens_session->managed_gmem);
+    OBJ R(x.G,x.S,x.atoms,cnine::Ltensor<float>({x.dim(0),x.dim(1)+y.dim(1)},0,x.get_dev()));
+    R.block(0,0,x.dim(0),x.dim(1))+=x;
+    R.block(0,x.dim(1),x.dim(0),y.dim(1))+=y;
+    return R;
+  }
 
-    SubgraphLayer(){}
+  template<typename OBJ, typename TYPE>
+  OBJ scale_channels_sg(const OBJ& x, const cnine::Ltensor<TYPE>& s){
+    //cnine::using_vram_manager vv(ptens_session->managed_gmem);
+    return OBJ(x.G,x.S,x.atoms,x.scale_columns(s));
+  }
 
-    template<typename FILLTYPE, typename = typename std::enable_if<std::is_base_of<cnine::fill_pattern, FILLTYPE>::value, FILLTYPE>::type>
-    SubgraphLayer(const Ggraph& _G, const int nc, const FILLTYPE& dummy, const int _dev=0):
-    G(_G), S(Subgraph::trivial()), TLAYER(_G.getn(),nc,dummy,_dev){}
+  template<typename OBJ, typename TYPE>
+  OBJ mprod_sg(const OBJ& x, const cnine::Ltensor<TYPE>& y){
+    //cnine::using_vram_manager vv(ptens_session->managed_gmem);
+    return OBJ(x.G,x.S,x.atoms,x*y);
+  }
 
-    template<typename IPACK>
-    SubgraphLayer(const Ggraph& _G, const Subgraph& _S, const IPACK& ipack, const int nc, const int _dev=0):
-      G(_G), S(_S), TLAYER(ipack,nc,cnine::fill_zero(),_dev){}
+  template<typename OBJ, typename TYPE>
+  OBJ linear_sg(const OBJ& x, const cnine::Ltensor<TYPE>& w, const cnine::Ltensor<TYPE>& b){
+    //cnine::using_vram_manager vv(ptens_session->managed_gmem);
+    OBJ R(x.G,x.S,x.atoms,x*w);
+    R.view2().add_broadcast0(b.view1());
+    return R;
+  }
 
-    template<typename IPACK>
-    SubgraphLayer(const Ggraph& _G, const Subgraph& _S, const IPACK& _ipack, const int _nc, const cnine::fill_raw& dummy, const int nc, const int _dev=0):
-      G(_G), S(_S), TLAYER(TLAYER::raw(_ipack,_nc,_dev)){}
+  template<typename OBJ, typename TYPE>
+  OBJ ReLU_sg(const OBJ& x, TYPE alpha){
+    //cnine::using_vram_manager vv(ptens_session->managed_gmem);
+    return OBJ(x.G,x.S,x.atoms,x.ReLU(alpha));
+  }
 
-    template<typename IPACK>
-    SubgraphLayer(const Ggraph& _G, const Subgraph& _S, const IPACK& _ipack, const int _nc, const cnine::fill_zero& dummy, const int nc, const int _dev=0):
-      G(_G), S(_S), TLAYER(TLAYER::zero(_ipack,_nc,_dev)){}
-
-    template<typename IPACK>
-    SubgraphLayer(const Ggraph& _G, const Subgraph& _S, const IPACK& _ipack, const int _nc, const cnine::fill_gaussian& dummy, const int nc, const int _dev=0):
-      G(_G), S(_S), TLAYER(TLAYER::gaussian(_ipack,_nc,_dev)){}
-
-    template<typename IPACK>
-    SubgraphLayer(const Ggraph& _G, const Subgraph& _S, const IPACK& _ipack, const int _nc, const cnine::fill_sequential& dummy, const int nc, const int _dev=0):
-      G(_G), S(_S), TLAYER(TLAYER::sequential(_ipack,_nc,_dev)){}
-
-
-  public: // ---- Copying ------------------------------------------------------------------------------------------------
-
-
-    SubgraphLayer(const SubgraphLayer<TLAYER>& x):
-      TLAYER(x), G(x.G), S(x.S){}
-
-    
-  public: // ---- Transport ----------------------------------------------------------------------------------
-
-
-    //SubgraphLayer(const SubgraphLayer<TLAYER>& x, const int _dev):
-    //TLAYER(x,_dev), G(x.G), S(x.S){}
-
-
-  public: // ---- Conversions --------------------------------------------------------------------------------------------
-
-
-    SubgraphLayer(TLAYER&& x, const Ggraph& _G, const Subgraph& _S):
-      TLAYER(std::move(x)), G(_G), S(_S){}
-
-
-  public: // ---- Operations ---------------------------------------------------------------------------------------------
-
-
-    void add(const SubgraphLayer<TLAYER>& x){
-      PTENS_ASSRT(G==x.G);
-      PTENS_ASSRT(S==x.S);
-      TLAYER::add(x);
-    }
-
-
-  public: // ---- Message passing ----------------------------------------------------------------------------------------
-
-
-
-  public:
-
-
-  };
 
 }
+
 
 #endif 

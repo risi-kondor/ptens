@@ -12,8 +12,8 @@
  *
  */
 
-#ifndef _ptens_BatchedPtensorsb
-#define _ptens_BatchedPtensorsb
+#ifndef _ptens_BatchedPtensors
+#define _ptens_BatchedPtensors
 
 #include "diff_class.hpp"
 #include "AtomsPack0.hpp"
@@ -27,7 +27,7 @@ namespace ptens{
 
 
   template<typename TYPE>
-  class BatchedPtensorsb: public cnine::Ltensor<TYPE>{
+  class BatchedPtensors: public cnine::Ltensor<TYPE>{
   public:
 
     typedef cnine::Ltensor<TYPE> BASE;
@@ -40,26 +40,27 @@ namespace ptens{
     using BASE::reset;
 
 
-    virtual ~BatchedPtensorsb(){}
+    virtual ~BatchedPtensors(){}
 
 
   public: // ---- Constructors -------------------------------------------------------------------------------------
 
 
-    BatchedPtensorsb(const BASE& x):
+    BatchedPtensors(const BASE& x):
       BASE(x){}
 
-    BatchedPtensorsb(const cnine::Gdims& _dims, const int fcode, const int _dev):
-      BASE(BASE::vram_managed(ptens_session->managed_gmem,_dims,fcode,_dev)){
+    BatchedPtensors(const cnine::Gdims& _dims, const int fcode, const int _dev):
+      //BASE(BASE::vram_managed(ptens_global::managed_gmem,_dims,fcode,_dev)){
+      BASE(_dims,fcode,_dev){
     }
 
-    BatchedPtensorsb copy(const BatchedPtensorsb& x){
-      cnine::using_vram_manager vv(ptens_session->managed_gmem);
+    BatchedPtensors copy(const BatchedPtensors& x){
+      //cnine::using_vram_manager vv(ptens_session->managed_gmem);
       return BASE::copy(x); 
     }
 
-    BatchedPtensorsb zeros_like() const{
-      cnine::using_vram_manager vv(ptens_session->managed_gmem);
+    BatchedPtensors zeros_like() const{
+      //cnine::using_vram_manager vv(ptens_session->managed_gmem);
       return BASE::zeros_like();
     }
 
@@ -67,8 +68,8 @@ namespace ptens{
   public: // ---- Access -------------------------------------------------------------------------------------
 
 
-    virtual BatchedPtensorsb& get_grad(){CNINE_UNIMPL();return *this;} // dummy
-    virtual const BatchedPtensorsb& get_grad() const {CNINE_UNIMPL(); return *this;} // dummy
+    virtual BatchedPtensors& get_grad(){CNINE_UNIMPL();return *this;} // dummy
+    virtual const BatchedPtensors& get_grad() const {CNINE_UNIMPL(); return *this;} // dummy
 
 
   public: // ---- Operations ---------------------------------------------------------------------------------
@@ -81,27 +82,27 @@ namespace ptens{
     //return OBJ(BASE::stack(0,list),AtomsPackObjBase::cat(v));
     //}
 
-    void cat_channels_back0(const BatchedPtensorsb& g){
+    void cat_channels_back0(const BatchedPtensors& g){
       get_grad()+=g.get_grad().block(0,0,dim(0),dim(1));
     }
 
-    void cat_channels_back1(const BatchedPtensorsb& g){
+    void cat_channels_back1(const BatchedPtensors& g){
       get_grad()+=g.get_grad().block(0,g.dim(1)-dim(1),dim(0),dim(1));
     }
 
-    void add_mprod_back0(const BatchedPtensorsb& g, const TENSOR& M){
+    void add_mprod_back0(const BatchedPtensors& g, const TENSOR& M){
       get_grad().add_mprod(g.get_grad(),M.transp());
     }
 
-    void add_scale_channels_back(const BatchedPtensorsb& g, const TENSOR& s){
+    void add_scale_channels_back(const BatchedPtensors& g, const TENSOR& s){
       get_grad().add_scale_columns(g.get_grad(),s);
     }
 
-    void add_linear_back0(const BatchedPtensorsb& g, const TENSOR& M){
+    void add_linear_back0(const BatchedPtensors& g, const TENSOR& M){
       get_grad().add_mprod(g.get_grad(),M.transp());
     }
 
-    void add_ReLU_back(const BatchedPtensorsb& g, const float alpha){
+    void add_ReLU_back(const BatchedPtensors& g, const float alpha){
       get_grad().BASE::add_ReLU_back(g.get_grad(),*this,alpha);
     }
 

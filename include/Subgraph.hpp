@@ -21,7 +21,8 @@
 
 namespace ptens{
 
-  extern PtensSessionObj* ptens_session;
+  //extern PtensSessionObj* ptens_session;
+
 
 
   class Subgraph{
@@ -43,39 +44,39 @@ namespace ptens{
       obj(_obj){}
 
     Subgraph(const int _n):
-      obj(ptens_session->subgraphs.emplace(_n).first){}
+      obj(ptens_global::subgraph_cache.emplace(_n).first){}
 
     Subgraph(const vector<pair<int,int> >& list): 
-      obj(ptens_session->subgraphs.emplace(list).first){}
+      obj(ptens_global::subgraph_cache.emplace(list).first){}
 
     Subgraph(const int _n, const initializer_list<pair<int,int> >& list): 
-      obj(ptens_session->subgraphs.emplace(_n,list).first){}
+      obj(ptens_global::subgraph_cache.emplace(_n,list).first){}
 
     Subgraph(const int _n, const initializer_list<pair<int,int> >& list, const cnine::Tensor<float>& labels): 
-      obj(ptens_session->subgraphs.emplace(_n,list,labels).first){}
+      obj(ptens_global::subgraph_cache.emplace(_n,list,labels).first){}
 
     Subgraph(const cnine::Tensor<float>& M):
-      obj(ptens_session->subgraphs.emplace(M).first){}
+      obj(ptens_global::subgraph_cache.emplace(M).first){}
 
     Subgraph(const cnine::Tensor<float>& M, const cnine::Tensor<float>& L):
-      obj(ptens_session->subgraphs.emplace(M,L).first){}
+      obj(ptens_global::subgraph_cache.emplace(M,L).first){}
 
 
     static Subgraph edge_index(const cnine::Tensor<int>& x, int _n=-1){
       if(_n==-1) _n=x.max()+1;
-      return ptens_session->subgraphs.emplace(_n,x).first;
+      return ptens_global::subgraph_cache.emplace(_n,x).first;
     }
 
     static Subgraph edge_index(const cnine::Tensor<int>& x, const cnine::Tensor<int>& L, int _n=-1){
       if(_n==-1) _n=x.max()+1;
-      return ptens_session->subgraphs.emplace(_n,x,L).first;
+      return ptens_global::subgraph_cache.emplace(_n,x,L).first;
     }
 
     static Subgraph edge_index_degrees(const cnine::Tensor<int>& x, const cnine::Tensor<int>& D, int _n=-1){
       if(_n==-1) _n=x.max()+1;
       SubgraphObj H(_n,x);
       H.set_degrees(D);
-      return ptens_session->subgraphs.insert(H).first;
+      return ptens_global::subgraph_cache.insert(H).first;
     }
 
 
@@ -153,7 +154,7 @@ namespace ptens{
 
     static string cached(){
       ostringstream oss;
-      for(auto p: ptens_session->subgraphs)
+      for(auto p: ptens_global::subgraph_cache)
 	oss<<p<<endl;
       return oss.str();
     }

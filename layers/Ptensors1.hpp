@@ -21,7 +21,7 @@
 #include "Rtensor3_view.hpp"
 
 #include "Ptensor1.hpp"
-#include "Ptensorsb.hpp"
+#include "Ptensors.hpp"
 #include "AtomsPackTag.hpp"
 #include "Ptensor1view.hpp"
 
@@ -30,13 +30,13 @@ namespace ptens{
 
 
   template<typename TYPE>
-  class Ptensors1: public Ptensorsb<TYPE>, public cnine::diff_class<Ptensors1<TYPE> >{
+  class Ptensors1: public Ptensors<TYPE>, public cnine::diff_class<Ptensors1<TYPE> >{
   public:
 
     friend class Ptensors0<TYPE>;
     friend class Ptensors2<TYPE>;
 
-    typedef Ptensorsb<TYPE> BASE;
+    typedef Ptensors<TYPE> BASE;
     typedef cnine::Ltensor<TYPE> TENSOR;
     typedef cnine::Rtensor2_view Rtensor2_view;
 
@@ -51,8 +51,14 @@ namespace ptens{
     using TENSOR::get_arr;
     using TENSOR::cols;
 
+    using BASE::nc;
+    using BASE::atoms;
+    using BASE::size;
+    using BASE::atoms_of;
+    using BASE::get_nc;
 
-    AtomsPack atoms;
+
+    //AtomsPack atoms;
     AtomsPackTag1 tag;
 
 
@@ -72,23 +78,23 @@ namespace ptens{
     //BASE(M.copy()){} // for diff_class, unsafe!!
 
     Ptensors1(const TENSOR& M, const AtomsPack& _atoms):
-      BASE(M),
-      atoms(_atoms),
+      BASE(_atoms,M),
+      //atoms(_atoms),
       tag(_atoms){}
 
     Ptensors1(const TENSOR& M, const AtomsPackTag1& _tag):
-      BASE(M),
-      atoms(_tag.obj->atoms.lock()),
+      BASE(_tag.obj->atoms.lock(),M),
+      //atoms(_tag.obj->atoms.lock()),
       tag(_tag){}
 
     Ptensors1(const AtomsPack& _atoms, const int nc, const int _dev=0):
-      BASE(cnine::Gdims(_atoms.nrows1(),nc),0,_dev),
-      atoms(_atoms),
+      BASE(_atoms,cnine::Gdims(_atoms.nrows1(),nc),0,_dev),
+      //atoms(_atoms),
       tag(_atoms){}
 
     Ptensors1(const AtomsPack& _atoms, const int nc, const int fcode, const int _dev):
-      BASE(cnine::Gdims(_atoms.nrows1(),nc),fcode,_dev),
-      atoms(_atoms),
+      BASE(_atoms,cnine::Gdims(_atoms.nrows1(),nc),fcode,_dev),
+      //atoms(_atoms),
       tag(_atoms){}
 
 
@@ -113,10 +119,11 @@ namespace ptens{
 
     template<typename... Args>
     Ptensors1(const AtomsPack& _atoms, const Args&... args):
-      atoms(_atoms),
+      BASE(_atoms),
       tag(_atoms){
       vparams v;
       unroller(v,args...);
+      nc=v.nc;
       BASE::reset(BASE({atoms.nrows1(),v.nc},v.fcode,v.dev));
     }
 
@@ -212,8 +219,8 @@ namespace ptens{
 
 
     Ptensors1(const Ptensors1& x, const int _dev):
-      BASE(x.copy(_dev)), 
-      atoms(x.atoms),
+      BASE(x.atoms,x.copy(_dev)), 
+      //atoms(x.atoms),
       tag(x.tag){}
 
 
@@ -236,17 +243,17 @@ namespace ptens{
       return 1;
     }
 
-    int size() const{
-      return atoms.size();
-    }
+    //int size() const{
+    //return atoms.size();
+    //}
 
-    int get_nc() const{
-      return BASE::dim(1);
-    }
+    //int get_nc() const{
+    //return BASE::dim(1);
+    //}
 
-    AtomsPack get_atoms() const{
-      return atoms;
-    }
+    //AtomsPack get_atoms() const{
+    //return atoms;
+    //}
 
     int size_of(const int i) const{
       return atoms.size_of(i);
@@ -256,9 +263,9 @@ namespace ptens{
       return atoms.row_offset1(i);
     }
 
-    Atoms atoms_of(const int i) const{
-      return atoms(i);
-    }
+    //Atoms atoms_of(const int i) const{
+    //return atoms(i);
+    //}
     
     Rtensor2_view view_of(const int i) const{
       return Rtensor2_view(const_cast<TYPE*>(get_arr())+offset(i)*strides[0],size_of(i),get_nc(),strides[0],strides[1],dev);

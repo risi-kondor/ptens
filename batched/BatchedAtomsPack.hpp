@@ -84,7 +84,7 @@ namespace ptens{
     //}
 
 
-    BatchedAtomsPack cat(const vector<BatchedAtomsPack>& v){
+    static BatchedAtomsPack cat(const vector<BatchedAtomsPack>& v){
       PTENS_ASSRT(v.size()>0);
       int N=v[0].size();
       auto R=new BatchedAtomsPackObj();
