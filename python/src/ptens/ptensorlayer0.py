@@ -15,8 +15,9 @@
 import torch
 
 import ptens_base as pb 
+import ptens as p 
 import ptens.ptensorlayer as ptensorlayer
-import ptens.ptensor0c as ptensor0c
+import ptens.ptensor0 as ptensor0
 
 
 class ptensorlayer0(ptensorlayer):
@@ -42,7 +43,7 @@ class ptensorlayer0(ptensorlayer):
         assert isinstance(atoms,pb.atomspack)
         assert isinstance(M,torch.Tensor)
         assert M.dim()==2
-        assert M.size(0)==atoms.tsize0()
+        assert M.size(0)==atoms.nrows0()
         R=ptensorlayer0(M)
         R.atoms=atoms
         return R
@@ -77,7 +78,7 @@ class ptensorlayer0(ptensorlayer):
     def linmaps(self,x):
         if isinstance(x,ptensorlayer0):
             return x
-        if isinstance(x,ptensorlayer1c):
+        if isinstance(x,p.ptensorlayer1):
             return x.reduce0()
 
 
@@ -107,7 +108,7 @@ class ptensorlayer0(ptensorlayer):
     def __str__(self):
         r=""
         for i in range(len(self)):
-            r=r+str(self[i])+"\n\n"
+            r=r+str(self[i])+"\n"
         return r
 
 

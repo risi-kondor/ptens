@@ -8,6 +8,9 @@ pybind11::class_<AtomsPack>(m,"atomspack")
   .def("__getitem__",[](const AtomsPack& x, const int i){return vector<int>(x[i]);})
   .def("torch",[](const AtomsPack& x){return x.as_vecs();})
 
+  .def("is_constk",[](const AtomsPack& x){return x.constk()>0;})
+  .def("constk",[](const AtomsPack& x){return x.constk();})
+
   .def("nrows0",[](const AtomsPack& x){return x.nrows0();})
   .def("nrows1",[](const AtomsPack& x){return x.nrows1();})
   .def("nrows2",[](const AtomsPack& x){return x.nrows1();})

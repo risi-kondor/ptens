@@ -15,8 +15,13 @@
 import torch
 
 import ptens_base as pb 
+from ptens_base import ptensors0 as _ptensors0
+from ptens_base import ptensors1 as _ptensors1
+from ptens_base import ptensors2 as _ptensors2
+
+import ptens as p
 import ptens.ptensorlayer as ptensorlayer
-import ptens.ptensor1c as ptensor1c
+import ptens.ptensor1 as ptensor1
 
 
 class ptensorlayer1(ptensorlayer):
@@ -77,30 +82,31 @@ class ptensorlayer1(ptensorlayer):
 
     @classmethod
     def linmaps(self,x):
-        if isinstance(x,ptensorlayer0):
+        if isinstance(x,p.ptensorlayer0):
             return broadcast0(x)
-        if isinstance(x,ptensorlayer1):
+        if isinstance(x,p.ptensorlayer1):
             nc=x.get_nc()
-            r=ptensorlayer0c.zeros(atoms,2*nc)
+            r=p.ptensorlayer0.zeros(atoms,2*nc)
             r[:,0:nc]=broadcast(x.reduce0())
             r[:,nc:2*nc]=x
             return r
 
     def reduce0(self):
-        r=ptensorlayer0c.zero(atoms,get_nc())
         if self.atoms.is_constk():
-            k=self.atoms.get_constk()
+            k=self.atoms.constk()
             a=reshape(size(0)/k,k,size(1))
-            return ptensorlayer0c(atoms,a.sum(dim=1)) 
+            return ptensorlayer0(atoms,a.sum(dim=1)) 
         else:
-            raise RuntimeError("Unimplemented")
+            r=p.ptensorlayer0.zeros(self.atoms,self.get_nc())
+            _ptensors1(self.atoms,self).add_reduce0_to(_ptensors0(self.atoms,r))
+            return r
 
     @classmethod
     def broadcast(self,x):
         if isinstance(x,ptensorlayer0):
             if self.atoms.is_constk():
-                a=x.unsqueeze(1).expand(x.size(0),get_constk(),x.size(1))
-                return ptensorlayer1(atoms,a) 
+                a=x.unsqueeze(1).expand(x.size(0),self.atoms.constk(),x.size(1))
+                return p.ptensorlayer1(atoms,a) 
             else:
                 raise RuntimeError("Unimplemented")
 
@@ -122,7 +128,7 @@ class ptensorlayer1(ptensorlayer):
     def __str__(self):
         r=""
         for i in range(len(self)):
-            r=r+str(self[i])+"\n\n"
+            r=r+str(self[i])+"\n"
         return r
 
 

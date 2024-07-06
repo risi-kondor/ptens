@@ -39,6 +39,7 @@ namespace ptens{
     typedef Ptensors<TYPE> BASE;
     typedef cnine::Ltensor<TYPE> TENSOR;
     typedef cnine::Rtensor1_view Rtensor1_view;
+    typedef cnine::Rtensor2_view Rtensor2_view;
 
     using cnine::diff_class<Ptensors0<TYPE> >::grad;
     using TENSOR::get_dev;
@@ -377,6 +378,16 @@ namespace ptens{
       GPUCODE(CUDA_STREAM(Ptensors0_reduce0_cu(R,*this,list,0,nc,stream)));
       return R;
     }
+
+
+    //void add_reduce0(const Ptensors1<TYPE>& x, const int offs, const int nc) const{
+    //int N=x.size();
+    //Rtensor2_view r=BASE::view2();
+    //for(int i=0; i<N; i++)
+    //x.view_of(i,offs,nc).sum0_into(r.slice0(i));
+    //}
+
+
 
 
   public: // ---- Broadcasting -------------------------------------------------------------------------------

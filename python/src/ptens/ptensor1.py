@@ -37,10 +37,10 @@ class ptensor1(ptensor):
         R.atoms=_atoms
         return R
 
-    def clone(self):
-        r=ptensor1(super().clone())
-        r.atoms=self.atoms
-        return r
+#    def clone(self):
+#        r=ptensor1(super().clone())
+#        r.atoms=self.atoms
+#        return r
 
 #     def __copy__(self):
 #         print("copied")
@@ -58,9 +58,7 @@ class ptensor1(ptensor):
 
 
     def __repr__(self):
-        return "ptensor1("+str(self.atoms)+","+str(self.size(0))+")"
+        return "<ptensor1(atoms="+str(self.atoms)+",nc="+str(self.size(1))+")>"
 
     def __str__(self):
-        r="Ptensor1("+str(self.atoms)+"):\n"
-        r=r+torch.Tensor(self).__str__()
-        return r
+        return pb.ptensor1.view(self,self.atoms).str()

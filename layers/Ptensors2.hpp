@@ -78,24 +78,24 @@ namespace ptens{
     //Ptensors2(const TENSOR& M):
     //BASE(M.copy()){} // for diff_class
 
+    Ptensors2(const AtomsPack& _atoms, const TENSOR& M):
+      BASE(_atoms,M),
+      tag(_atoms){}
+
     Ptensors2(const TENSOR& M, const AtomsPack& _atoms):
       BASE(_atoms,M),
-      //atoms(_atoms),
       tag(_atoms){}
 
     Ptensors2(const TENSOR& M, const AtomsPackTag2& _tag):
       BASE(_tag.obj->atoms.lock(),M),
-      //atoms(_tag.obj->atoms.lock()),
       tag(_tag){}
 
     Ptensors2(const AtomsPack& _atoms, const int nc, const int _dev=0):
       BASE(_atoms,cnine::Gdims(_atoms.nrows2(),nc),0,_dev),
-      //atoms(_atoms),
       tag(_atoms){}
 
     Ptensors2(const AtomsPack& _atoms, const int nc, const int fcode, const int _dev):
       BASE(_atoms,cnine::Gdims(_atoms.nrows2(),nc),fcode,_dev),
-      //atoms(_atoms),
       tag(_atoms){}
 
 

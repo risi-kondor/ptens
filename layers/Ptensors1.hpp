@@ -38,6 +38,7 @@ namespace ptens{
 
     typedef Ptensors<TYPE> BASE;
     typedef cnine::Ltensor<TYPE> TENSOR;
+    typedef cnine::Rtensor1_view Rtensor1_view;
     typedef cnine::Rtensor2_view Rtensor2_view;
 
     using cnine::diff_class<Ptensors1<TYPE> >::grad;
@@ -74,27 +75,24 @@ namespace ptens{
 
     Ptensors1(){}
 
-    //Ptensors1(const TENSOR& M):
-    //BASE(M.copy()){} // for diff_class, unsafe!!
+    Ptensors1(const AtomsPack& _atoms, const TENSOR& M):
+      BASE(_atoms,M),
+      tag(_atoms){}
 
     Ptensors1(const TENSOR& M, const AtomsPack& _atoms):
       BASE(_atoms,M),
-      //atoms(_atoms),
       tag(_atoms){}
 
     Ptensors1(const TENSOR& M, const AtomsPackTag1& _tag):
       BASE(_tag.obj->atoms.lock(),M),
-      //atoms(_tag.obj->atoms.lock()),
       tag(_tag){}
 
     Ptensors1(const AtomsPack& _atoms, const int nc, const int _dev=0):
       BASE(_atoms,cnine::Gdims(_atoms.nrows1(),nc),0,_dev),
-      //atoms(_atoms),
       tag(_atoms){}
 
     Ptensors1(const AtomsPack& _atoms, const int nc, const int fcode, const int _dev):
       BASE(_atoms,cnine::Gdims(_atoms.nrows1(),nc),fcode,_dev),
-      //atoms(_atoms),
       tag(_atoms){}
 
 
@@ -452,6 +450,14 @@ namespace ptens{
       for(int i=0; i<N; i++)
 	view_of(i,offs,nc).sum0_into(r.slice0(i));
       return R;
+    }
+
+    void add_reduce0_to(const TENSOR& R, const int offs=0, int nc=0) const{
+      int N=size();
+      if(nc==0) nc=get_nc()-offs;
+      Rtensor2_view r=R.view2();
+      for(int i=0; i<N; i++)
+	view_of(i,offs,nc).sum0_into(r.slice0(i));
     }
 
     BASE reduce1() const{

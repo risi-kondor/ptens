@@ -7,7 +7,7 @@
 
 //#include "SimpleMemoryManager.hpp"
 //#include "Ltensor.hpp"
-//#include "ATview.hpp"
+#include "ATview.hpp"
 
 //#include "Hgraph.hpp"
 #include "Ggraph.hpp"
@@ -19,9 +19,9 @@
 #include "Ptensor0.hpp"
 #include "Ptensor1.hpp"
 #include "Ptensor2.hpp"
-//#include "Ptensors0.hpp"
-//#include "Ptensors1.hpp"
-//#include "Ptensors2.hpp"
+#include "Ptensors0.hpp"
+#include "Ptensors1.hpp"
+#include "Ptensors2.hpp"
 
 //#include "LinmapFunctions.hpp"
 //#include "MsgFunctions.hpp"
@@ -60,9 +60,13 @@ PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
   using namespace ptens;
   namespace py=pybind11;
   
-  typedef Ptensor0<float> Ptens0;
-  typedef Ptensor1<float> Ptens1;
-  typedef Ptensor2<float> Ptens2;
+  typedef Ptensor0<float> Ptensor0f;
+  typedef Ptensor1<float> Ptensor1f;
+  typedef Ptensor2<float> Ptensor2f;
+
+  typedef Ptensors0<float> Ptensors0f;
+  typedef Ptensors1<float> Ptensors1f;
+  typedef Ptensors2<float> Ptensors2f;
 
 #include "PtensGlobal_py.cpp"
 
@@ -76,12 +80,12 @@ PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
     //#include "MessageMap_py.cpp"
   
 #include "Ptensor0_py.cpp"
-    //#include "Ptensor1_py.cpp"
-    //#include "Ptensor2_py.cpp"
+#include "Ptensor1_py.cpp"
+#include "Ptensor2_py.cpp"
   
-  //#include "Ptensors0_py.cpp"
-  //#include "Ptensors1_py.cpp"
-  //#include "Ptensors2_py.cpp"
+#include "Ptensors0_py.cpp"
+#include "Ptensors1_py.cpp"
+#include "Ptensors2_py.cpp"
 
     //#include "LinmapFunctions_py.cpp"
     //#include "MsgFunctions_py.cpp"

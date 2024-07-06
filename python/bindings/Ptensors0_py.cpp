@@ -2,12 +2,12 @@ typedef cnine::ATview<float> TVIEW;
 
 pybind11::class_<Ptensors0<float> >(m,"ptensors0")
 
-  .def(py::init([](at::Tensor& M){
-	return Ptensors0b(Ltensor<float>(TVIEW(M)));}))
+//.def(py::init([](at::Tensor& M){
+//	return Ptensors0<float>(Ltensor<float>(TVIEW(M)));}))
   .def(py::init([](const AtomsPack& atoms, at::Tensor& M){
-	return Ptensors0b(atoms,Ltensor<float>(TVIEW(M)));}))
+	return Ptensors0<float>(atoms,Ltensor<float>(TVIEW(M)));}))
   .def(py::init([](const vector<vector<int> >& atoms, at::Tensor& M){
-	return Ptensors0b(AtomsPack(atoms),Ltensor<float>(TVIEW(M)));}))
+	return Ptensors0<float>(AtomsPack(atoms),Ltensor<float>(TVIEW(M)));}))
 
   .def_static("create",[](const int n, const int _nc, const int fcode, const int _dev){
       return Ptensors0<float>(n,_nc,fcode,_dev);}, 
@@ -21,8 +21,8 @@ pybind11::class_<Ptensors0<float> >(m,"ptensors0")
       return Ptensors0<float>(_atoms,cnine::channels=_nc,cnine::filltype=fcode,cnine::device=_dev);}, 
     py::arg("atoms"),py::arg("nc"),py::arg("fcode")=0,py::arg("device")=0)
 
-  .def("like",[](const Ptensors0<float>& x, at::Tensor& M){
-      return Ptensors0b(x.atoms,ATview<float>(M));})
+//.def("like",[](const Ptensors0<float>& x, at::Tensor& M){
+//      return Ptensors0<float>(x.atoms,ATview<float>(M));})
   .def("copy",[](const Ptensors0<float>& x){return x.copy();})
   .def("copy",[](const Ptensors0<float>& x, const int _dev){return x.copy(_dev);})
   .def("zeros_like",[](const Ptensors0<float>& x){return Ptensors0<float>::zeros_like(x);})
@@ -71,9 +71,9 @@ pybind11::class_<Ptensors0<float> >(m,"ptensors0")
   .def("add_cat_back",[](Ptensors0<float>& x, Ptensors0<float>& r, const int offs){
       x.get_grad()+=r.get_grad().rows(offs,x.dim(0));})
 
-//.def("outer",&Ptensors0b::outer)
-//.def("outer_back0",&Ptensors0b::outer_back0)
-//.def("outer_back1",&Ptensors0b::outer_back1)
+//.def("outer",&Ptensors0::outer)
+//.def("outer_back0",&Ptensors0::outer_back0)
+//.def("outer_back1",&Ptensors0::outer_back1)
 
   .def("scale_channels",[](Ptensors0<float>& x, at::Tensor& y){
       return scale_channels(x,ATview<float>(y));})
@@ -110,40 +110,44 @@ pybind11::class_<Ptensors0<float> >(m,"ptensors0")
 
   .def_static("linmaps",[](const Ptensors0<float>& x){
       return Ptensors0<float>::linmaps(x);}) 
-  .def_static("linmaps",[](const Ptensors1b<float>& x){
+  .def_static("linmaps",[](const Ptensors1<float>& x){
       return Ptensors0<float>::linmaps(x);}) 
-  .def_static("linmaps",[](const Ptensors2b<float>& x){
+  .def_static("linmaps",[](const Ptensors2<float>& x){
       return Ptensors0<float>::linmaps(x);}) 
 
   .def_static("gather",[](const Ptensors0<float>& x, const AtomsPack& a){
       return Ptensors0<float>::gather(x,a);}) 
-  .def_static("gather",[](const Ptensors1b<float>& x, const AtomsPack& a){
+  .def_static("gather",[](const Ptensors1<float>& x, const AtomsPack& a){
       return Ptensors0<float>::gather(x,a);}) 
-  .def_static("gather",[](const Ptensors2b<float>& x, const AtomsPack& a){
-      return Ptensors1b<float>::gather(x,a);}) 
+  .def_static("gather",[](const Ptensors2<float>& x, const AtomsPack& a){
+      return Ptensors1<float>::gather(x,a);}) 
 
   .def_static("gather",[](const Ptensors0<float>& x, const vector<vector<int> >& a){
       return Ptensors0<float>::gather(x,a);}) 
-  .def_static("gather",[](const Ptensors1b<float>& x, const vector<vector<int> >& a){
+  .def_static("gather",[](const Ptensors1<float>& x, const vector<vector<int> >& a){
       return Ptensors0<float>::gather(x,a);}) 
-  .def_static("gather",[](const Ptensors2b<float>& x, const vector<vector<int> >& a){
+  .def_static("gather",[](const Ptensors2<float>& x, const vector<vector<int> >& a){
       return Ptensors0<float>::gather(x,a);}) 
 
   .def("add_linmaps_back",[](Ptensors0<float>& x, Ptensors0<float>& g){
       x.get_grad().add_linmaps_back(g.get_grad());})
-  .def("add_linmaps_back",[](Ptensors0<float>& x, Ptensors1b<float>& g){
+  .def("add_linmaps_back",[](Ptensors0<float>& x, Ptensors1<float>& g){
       x.get_grad().add_linmaps_back(g.get_grad());})
-  .def("add_linmaps_back",[](Ptensors0<float>& x, Ptensors2b<float>& g){
+  .def("add_linmaps_back",[](Ptensors0<float>& x, Ptensors2<float>& g){
       x.get_grad().add_linmaps_back(g.get_grad());})
 
   .def("add_gather_back",[](Ptensors0<float>& x, Ptensors0<float>& g){
       x.get_grad().add_gather_back(g.get_grad());})
-  .def("add_gather_back",[](Ptensors0<float>& x, Ptensors1b<float>& g){
+  .def("add_gather_back",[](Ptensors0<float>& x, Ptensors1<float>& g){
       x.get_grad().add_gather_back(g.get_grad());})
-  .def("add_gather_back_alt",[](Ptensors0<float>& x, Ptensors1b<float>& g){
+  .def("add_gather_back_alt",[](Ptensors0<float>& x, Ptensors1<float>& g){
       x.add_gather_back(g);})
-  .def("add_gather_back",[](Ptensors0<float>& x, Ptensors2b<float>& g){
+  .def("add_gather_back",[](Ptensors0<float>& x, Ptensors2<float>& g){
       x.get_grad().add_gather_back(g.get_grad());})
+
+
+//  .def("add_reduce0",[](Ptensors0f& obj, const Ptensors1f& x, const int offs=0, const int nc=0){
+//      obj.add_reduce0(x,offs,nc);})
 
 
 // ---- I/O --------------------------------------------------------------------------------------------------

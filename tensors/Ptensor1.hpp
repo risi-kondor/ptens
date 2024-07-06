@@ -122,6 +122,7 @@ namespace ptens{
 
     #ifdef _WITH_ATEN
     static Ptensor1 view(at::Tensor& x, Atoms&& _atoms){
+      // Check dimensions of x here!
       return Ptensor1(BASE::view(x),std::move(_atoms));
     }
     #endif 

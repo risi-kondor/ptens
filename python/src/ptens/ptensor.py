@@ -18,10 +18,10 @@ import ptens_base as pb
 
 class ptensor(torch.Tensor):
 
-    def clone(self):
-        r=ptensorc_base(super().clone())
-        r.atoms=self.atoms
-        return r
+    #def clone(self):
+    #    r=super().copy()
+    #    r.atoms=self.atoms
+    #    return r
 
 
     # ---- Operations ----------------------------------------------------------------------------------------
@@ -30,6 +30,4 @@ class ptensor(torch.Tensor):
     def __add__(self,y):
         assert self.size()==y.size()
         assert self.atoms==y.atoms
-        r=self.clone()
-        r+=y
-        return r
+        return self.from_matrix(self.atoms,super().__add__(y))
