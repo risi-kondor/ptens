@@ -47,6 +47,13 @@ namespace ptens{
     // ---- Constructors -------------------------------------------------------------------------------------
 
 
+    Ptensor1(const Atoms& _atoms, const int _nc, const int _fcode, const int _dev=0):
+      BASE(cnine::Gdims(_atoms.size(),_nc),_fcode,_dev),
+      atoms(_atoms),
+      k(_atoms.size()), 
+      nc(_nc){
+    }
+
     template<typename FILLTYPE, typename = typename std::enable_if<std::is_base_of<cnine::fill_pattern, FILLTYPE>::value, FILLTYPE>::type>
     Ptensor1(const Atoms& _atoms, const int _nc, const FILLTYPE& dummy, const int _dev=0):
       BASE(cnine::Gdims(_atoms.size(),_nc),dummy,_dev),
@@ -161,7 +168,7 @@ namespace ptens{
     // ---- Linmaps ------------------------------------------------------------------------------------------
 
 
-    // 0 -> 1 
+    // 1 <- 0
     void add_linmaps(const Ptensor0<TYPE>& x, int offs=0){ // 1
       PTENS_K_SAME(x);
       PTENS_CHANNELS(offs+1*x.nc<=nc);
@@ -174,7 +181,7 @@ namespace ptens{
     }
 
     
-    // 1->1 
+    // 1 <- 1 
     void add_linmaps(const Ptensor1& x, int offs=0){ // 2 
       PTENS_K_SAME(x)
       PTENS_CHANNELS(offs+2*x.nc<=nc);
@@ -191,6 +198,7 @@ namespace ptens{
     
 
     // 1 -> 0
+    /*
     void add_linmaps_to(Ptensor0<TYPE>& x, int offs=0) const{ // 1 
       PTENS_K_SAME(x)
       PTENS_CHANNELS(offs+1*nc<=x.nc);
@@ -202,6 +210,7 @@ namespace ptens{
       PTENS_CHANNELS(offs+1*nc<=x.nc);
       view()+=repeat0(x.view(offs,nc),k);
     }
+    */
 
 
   public: // ---- Reductions ---------------------------------------------------------------------------------

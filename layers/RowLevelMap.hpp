@@ -15,7 +15,10 @@
 #define _ptens_RowLevelMap
 
 #include "AtomsPackObj.hpp"
-#include "GatherMapProgram.hpp"
+//#include "GatherMapProgram.hpp"
+#include "TensorProgram.hpp"
+#include "GatherMapB.hpp"
+#include "GatherRows.hpp"
 
 
 namespace ptens{
@@ -24,14 +27,16 @@ namespace ptens{
   class RowLevelMap{
   public:
 
-    shared_ptr<cnine::GatherMapProgram> obj;
+    typedef cnine::TensorProgram<cnine::GatherRows,cnine::GatherMapB> GatherMapProgram;
+
+    shared_ptr<GatherMapProgram> obj;
 
     ~RowLevelMap(){}
 
     RowLevelMap(){};
 
-    RowLevelMap(const cnine::GatherMapProgram&& _obj):
-      obj(new cnine::GatherMapProgram(_obj)){}
+    RowLevelMap(const GatherMapProgram&& _obj):
+      obj(new GatherMapProgram(_obj)){}
 
 
     RowLevelMap inv() const{

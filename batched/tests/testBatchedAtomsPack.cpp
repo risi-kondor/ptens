@@ -11,9 +11,11 @@
  * must be accompanied by a verbatim copy of the license. 
  *
  */
+
 #include "Cnine_base.cpp"
 #include "Ptens_base.cpp"
 #include "BatchedAtomsPack.hpp"
+#include "PtensSession.hpp"
 
 using namespace ptens;
 using namespace cnine;

@@ -26,12 +26,19 @@
 #include "cpermutation.hpp"
 #include "map_of_lists.hpp"
 #include "once.hpp"
-#include "GatherMap.hpp"
 
 #include "Atoms.hpp"
 
 
 namespace ptens{
+
+  class AtomsPackTag0;
+  class AtomsPackTag1;
+  class AtomsPackTag2;
+
+  class AtomsPackTagObj0;
+  class AtomsPackTagObj1;
+  class AtomsPackTagObj2;
 
 
   class AtomsPackObj: public cnine::array_pool<int>, public cnine::observable<AtomsPackObj>{
@@ -380,6 +387,13 @@ namespace ptens{
     }
     */
 
+    static AtomsPackObj cat(const vector<shared_ptr<AtomsPackObj> > list){
+      vector<reference_wrapper<cnine::array_pool<int> > > v;
+      for(auto p:list)
+	v.push_back(*p);
+      return AtomsPackObj(cnine::array_pool<int>::cat(v));
+    }
+
     static AtomsPackObj cat(const vector<AtomsPackObj*> list){
       vector<reference_wrapper<cnine::array_pool<int> > > v;
       for(auto p:list)
@@ -391,7 +405,7 @@ namespace ptens{
 
   public: // ---- to_nodes_map -------------------------------------------------------------------------------
 
-
+    /*
     cnine::oncep<cnine::GatherMap> gather_to_nodes_map=
       cnine::oncep<cnine::GatherMap>([&](){
 
@@ -425,7 +439,7 @@ namespace ptens{
 	R->to_device(1);
 	return R;
       });
-
+    */
 
   public: // ---- Operations ---------------------------------------------------------------------------------
 

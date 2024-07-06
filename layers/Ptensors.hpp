@@ -79,6 +79,10 @@ namespace ptens{
       //return TENSOR::dim(1);
     }
 
+    const AtomsPack& get_atoms() const{
+      return atoms;
+    }
+
 
   public: // ---- Operations ---------------------------------------------------------------------------------
 

@@ -20,6 +20,14 @@
 
 namespace ptens{
 
+  class AtomsPackTag0;
+  class AtomsPackTag1;
+  class AtomsPackTag2;
+
+  class AtomsPackTagObj0;
+  class AtomsPackTagObj1;
+  class AtomsPackTagObj2;
+
 
   class AtomsPackTagObj: public cnine::observable<AtomsPackTagObj>{
   public:

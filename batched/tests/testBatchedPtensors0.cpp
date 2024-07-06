@@ -13,7 +13,7 @@
  */
 #include "Cnine_base.cpp"
 #include "Ptens_base.cpp"
-#include "BatchedPtensors0b.hpp"
+#include "BatchedPtensors0.hpp"
 
 using namespace ptens;
 using namespace cnine;
@@ -23,12 +23,12 @@ PtensSession ptens_session;
 
 int main(int argc, char** argv){
 
-  typedef BatchedPtensors0b<float> Ptens0;
+  typedef BatchedPtensors0<float> Ptens0;
   //typedef BatchedPtensors1b<float> Ptens1;
   //typedef BatchedPtensors2b<float> Ptens22;
 
   AtomsPack xatoms=AtomsPack::random(8,8,0.5);
-  Ptensors0b<float> x0=Ptensors0b<float>(xatoms,channels=3,filltype=4);
+  Ptensors0<float> x0=Ptensors0<float>(xatoms,channels=3,filltype=4);
 
   Ptens0 X0({x0,x0,x0});
   cout<<X0<<endl;

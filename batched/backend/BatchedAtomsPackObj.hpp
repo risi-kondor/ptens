@@ -15,17 +15,17 @@
 #ifndef _ptens_BatchedAtomsPackObj
 #define _ptens_BatchedAtomsPackObj
 
-#include "object_pack_s.hpp"
+#include "shared_object_pack.hpp"
 #include "AtomsPackObj.hpp"
 
 
 namespace ptens{
 
 
-  class BatchedAtomsPackObj: public cnine::object_pack_s<AtomsPackObj>{
+  class BatchedAtomsPackObj: public cnine::shared_object_pack<AtomsPackObj>{
   public:
 
-    typedef cnine::object_pack_s<AtomsPackObj> BASE;
+    typedef cnine::shared_object_pack<AtomsPackObj> BASE;
 
     using BASE::BASE;
     using BASE::size;
@@ -37,12 +37,12 @@ namespace ptens{
 
     BatchedAtomsPackObj(const vector<vector<vector<int> > >& v){
       for(auto& p:v)
-	obj.push_back(to_share(new AtomsPackObj(p)));
+	push_back(to_share(new AtomsPackObj(p)));
     }
 
     BatchedAtomsPackObj(const initializer_list<initializer_list<initializer_list<int> > >& v){
       for(auto& p:v)
-	obj.push_back(to_share(new AtomsPackObj(p)));
+	push_back(to_share(new AtomsPackObj(p)));
     }
 
 

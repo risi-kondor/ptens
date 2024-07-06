@@ -34,7 +34,7 @@ namespace ptens{
     }
 
     ~PtensSession(){
-      cout<<banner()<<endl;
+      //cout<<banner()<<endl;
     }
 
 
@@ -84,6 +84,22 @@ namespace ptens{
       #endif
 
       ostringstream oss;
+      oss<<"-------------------------------------"<<endl;
+      oss<<"Ptens 0.0 "<<endl;
+      cout<<endl;
+      oss<<"CUDA support:                     "<<on_off(with_cuda)<<endl;
+      oss<<"Row level gather operations:      "<<on_off(ptens_global::row_level_operations)<<endl;
+      oss<<"-------------------------------------"<<endl;
+      return oss.str();
+    }
+    
+    string status_str() const{
+      bool with_cuda=0;
+      #ifdef _WITH_CUDA
+      with_cuda=1;
+      #endif
+
+      ostringstream oss;
       oss<<"---------------------------------------"<<endl;
       oss<<" Ptens 0.0 "<<endl;
       cout<<endl;
@@ -106,7 +122,7 @@ namespace ptens{
       return oss.str();
     }
     
-    string str() const{
+     string str() const{
       return banner();
     }
 

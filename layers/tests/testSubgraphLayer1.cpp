@@ -41,14 +41,15 @@ int main(int argc, char** argv){
   Subgraph triangle=Subgraph::triangle();
   cout<<triangle<<endl;
 
-  SubgraphLayer0<float> f0(G,5,4,1);
+  SubgraphLayer0<float> f0(G,5,4,0);
   cout<<f0<<endl;
 
-  SubgraphLayer1<float> f1=gather1(f0,Subgraph::star(99));
+  SubgraphLayer1<float> f1=gather1(f0,triangle);
   cout<<"-------"<<endl;
   cout<<f1.str()<<endl;
 
-  SubgraphLayer1<float> f2=gather1(f1,Subgraph::star(99));
+  exit(0);
+  SubgraphLayer1<float> f2=gather1(f1,edge);
   //f2.get_grad()=f2;
 
   f1.get_grad().add_gather_back(f2);

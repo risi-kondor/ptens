@@ -73,18 +73,12 @@ namespace ptens{
     BatchedPtensors0(const BatchedAtomsPack& _atoms, const int _nc, const int fcode, const int _dev):
       BASE({_atoms.tsize(),_nc},fcode,_dev), atoms(_atoms){}
 
-    BatchedPtensors0(const BatchedAtomsPack& _atoms, const int _nc, const int _dev):
-      BatchedPtensors0(BatchedAtomsPack0(_atoms),_nc,0,_dev){}
-
-    BatchedPtensors0(const BatchedAtomsPack& _atoms, const int _nc, const int fcode, const int _dev):
-      BatchedPtensors0(BatchedAtomsPack0(_atoms),_nc,fcode,_dev){}
-
 
     BatchedPtensors0(const initializer_list<Ptensors0<TYPE> >& list):
       BASE(cnine::Ltensor<TYPE>::stack(0,list)){
-      vector<shared_ptr<AtomsPack0obj<int> > > x;
+      vector<shared_ptr<AtomsPackObj> > x;
       for(auto& p:list) x.push_back(p.atoms.obj);
-      atoms=BatchedAtomsPackN<AtomsPack0obj<int> >(x);
+      atoms=BatchedAtomsPack(BatchedAtomsPackObj(x));
     }
 	
     /*

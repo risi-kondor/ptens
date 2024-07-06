@@ -16,7 +16,7 @@ import torch
 import ptens_base as pb 
 
 
-class ptensorc_base(torch.Tensor):
+class ptensor(torch.Tensor):
 
     def clone(self):
         r=ptensorc_base(super().clone())

@@ -16,14 +16,14 @@
 #define _ptens_BatchedPtensors
 
 #include "diff_class.hpp"
-#include "AtomsPack0.hpp"
+#include "AtomsPack.hpp"
 #include "PtensLoggedTimer.hpp"
 #include "Ltensor.hpp"
 
 
 namespace ptens{
 
-  extern PtensSessionObj* ptens_session;
+  //extern PtensSessionObj* ptens_session;
 
 
   template<typename TYPE>

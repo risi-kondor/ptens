@@ -14,9 +14,11 @@
 
 #include "Cnine_base.cpp"
 #include "Ptens_base.cpp"
-#include "Ptensors0b.hpp"
-#include "Ptensors1b.hpp"
-#include "Ptensors2b.hpp"
+#include "Ptensors0.hpp"
+#include "Ptensors1.hpp"
+#include "Ptensors2.hpp"
+#include "PtensSession.hpp"
+
 
 using namespace ptens;
 using namespace cnine;
@@ -34,9 +36,9 @@ int main(int argc, char** argv){
   //cudaDeviceSynchronize();
   cudaDeviceReset(); // why do we need this?
 
-  typedef Ptensors0b<float> Ptens0;
-  typedef Ptensors1b<float> Ptens1;
-  typedef Ptensors2b<float> Ptens2;
+  typedef Ptensors0<float> Ptens0;
+  typedef Ptensors1<float> Ptens1;
+  typedef Ptensors2<float> Ptens2;
 
   AtomsPack xatoms=AtomsPack::random(4,4,0.5);
   Ptens0 X0=Ptens0(xatoms,channels=3,filltype=3);

@@ -14,6 +14,7 @@
 #ifndef _ptens_OverlapsMmapCache
 #define _ptens_OverlapsMmapCache
 
+#include "ptr_pair_indexed_object_bank.hpp"
 #include "AtomsPack.hpp"
 #include "AtomsPackObj.hpp"
 #include "TensorLevelMapObj.hpp"

@@ -139,13 +139,13 @@ namespace ptens{
       return obj->gpu_arrs(dev);
     }
 
-    int* gather_to_nodes_map(const int dev) const{
-      return obj->gather_to_nodes_map()->arrg;
-    }
+    //int* gather_to_nodes_map(const int dev) const{
+    //return obj->gather_to_nodes_map()->arrg;
+    //}
 
-    int gather_to_nodes_map_size(const int dev) const{
-      return obj->gather_to_nodes_map()->n;
-    }
+    //int gather_to_nodes_map_size(const int dev) const{
+    //return obj->gather_to_nodes_map()->n;
+    //}
 
     bool operator==(const AtomsPack& x) const{
       if(obj.get()==x.obj.get()) return true;

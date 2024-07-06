@@ -1,9 +1,8 @@
 pybind11::class_<AtomsPack>(m,"atomspack")
 
   .def(py::init([](const vector<vector<int> >& x){return AtomsPack(x);}))
-//.def(py::init([](const AtomsPack& x){return AtomsPack(x);})) // why do we need this?
   .def_static("from_list",[](const vector<vector<int> >& x){return AtomsPack(x);})
-  .def_static("random",[](const int n, const float p){return AtomsPack::random(n,p);})
+  .def_static("random",[](const int n, const int m, const float p){return AtomsPack::random(n,m,p);})
 
   .def("__len__",&AtomsPack::size)
   .def("__getitem__",[](const AtomsPack& x, const int i){return vector<int>(x[i]);})
@@ -21,8 +20,8 @@ pybind11::class_<AtomsPack>(m,"atomspack")
   .def("row_offset1",[](const AtomsPack& x, const int i){return x.row_offset1(i);})
   .def("row_offset2",[](const AtomsPack& x, const int i){return x.row_offset2(i);})
 
-  .def("overlaps",[](const AtomsPack& x, const AtomsPack& y, const int min_overlaps=1){
-      return x.overlaps_mlist(y,min_overlaps);})
+//.def("overlaps",[](const AtomsPack& x, const AtomsPack& y, const int min_overlaps=1){
+//      return x.overlaps_mlist(y,min_overlaps);})
 
 
   .def("str",&AtomsPack::str,py::arg("indent")="")

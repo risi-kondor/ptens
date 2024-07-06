@@ -64,7 +64,7 @@ namespace ptens{
 
     AtomsPack operator[](const int i) const{
       PTENS_ASSRT(i<size());
-      return obj->obj[i];
+      return (*obj)(i);
     }
 
     vector<vector<vector<int> > > as_vecs() const{
@@ -91,8 +91,8 @@ namespace ptens{
       for(int i=0; i<N; i++){
 	vector<shared_ptr<AtomsPackObj> > w;
 	for(auto& p: v)
-	  w.push_back(p.obj->obj[i]);
-	R->obj.push_back(AtomsPackObj::cat(w));
+	  w.push_back((*p.obj)(i));
+	R->push_back(AtomsPackObj::cat(w));
       }
       return BatchedAtomsPack(R);
     }

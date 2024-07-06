@@ -15,26 +15,17 @@
 import torch
 
 import ptens_base as pb 
-import ptens.ptensorlayerc as ptensorlayerc
+import ptens.ptensorlayer as ptensorlayer
 import ptens.ptensor1c as ptensor1c
 
 
-class ptensorlayer1c(ptensorlayerc):
-
-#     def __init__(self,atoms,M):
-#         assert isinstance(atoms,pb.atomspack)
-#         assert isinstance(M,torch.Tensor)
-#         assert M.dim()==2
-#         assert M.size(0)==atoms.nrows1()
-#         R=ptensorlayer1c(M)
-#         R.atoms=atoms
-#         return R
+class ptensorlayer1(ptensorlayer):
 
     @classmethod
     def zeros(self,atoms,nc,device='cpu'):
         assert isinstance(atoms,pb.atomspack)
         assert isinstance(nc,int)
-        R=ptensorlayer1c(torch.zeros([atoms.nrows1(),nc],device=device))
+        R=ptensorlayer1(torch.zeros([atoms.nrows1(),nc],device=device))
         R.atoms=atoms
         return R
 
@@ -42,7 +33,7 @@ class ptensorlayer1c(ptensorlayerc):
     def randn(self,atoms,nc,device='cpu'):
         assert isinstance(atoms,pb.atomspack)
         assert isinstance(nc,int)
-        R=ptensorlayer1c(torch.randn([atoms.nrows1(),nc],device=device))
+        R=ptensorlayer1(torch.randn([atoms.nrows1(),nc],device=device))
         R.atoms=atoms
         return R
 
@@ -52,12 +43,12 @@ class ptensorlayer1c(ptensorlayerc):
         assert isinstance(M,torch.Tensor)
         assert M.dim()==2
         assert M.size(0)==atoms.nrows1()
-        R=ptensorlayer1c(M)
+        R=ptensorlayer1(M)
         R.atoms=atoms
         return R
 
     def clone(self):
-        r=ptensorlayer1c(super().clone())
+        r=ptensorlayer1(super().clone())
         r.atoms=self.atoms
         return r
 
@@ -78,7 +69,7 @@ class ptensorlayer1c(ptensorlayerc):
         assert i<len(self)
         offs=self.atoms.row_offset1(i)
         n=self.atoms.nrows1(i)
-        return ptensor1c.from_matrix(self.atoms[i],torch.Tensor(self)[offs:offs+n])
+        return ptensor1.from_matrix(self.atoms[i],torch.Tensor(self)[offs:offs+n])
 
 
     # ---- Linmaps -------------------------------------------------------------------------------------------
@@ -86,12 +77,12 @@ class ptensorlayer1c(ptensorlayerc):
 
     @classmethod
     def linmaps(self,x):
-        if isinstance(x,ptensorlayer0c):
+        if isinstance(x,ptensorlayer0):
             return broadcast0(x)
-        if isinstance(x,ptensorlayer1c):
+        if isinstance(x,ptensorlayer1):
             nc=x.get_nc()
             r=ptensorlayer0c.zeros(atoms,2*nc)
-            r[:,nc]=broadcast(x.reduce0())
+            r[:,0:nc]=broadcast(x.reduce0())
             r[:,nc:2*nc]=x
             return r
 
@@ -106,10 +97,10 @@ class ptensorlayer1c(ptensorlayerc):
 
     @classmethod
     def broadcast(self,x):
-        if isinstance(x,ptensorlayer0c):
-            if x.atoms.is_constk():
+        if isinstance(x,ptensorlayer0):
+            if self.atoms.is_constk():
                 a=x.unsqueeze(1).expand(x.size(0),get_constk(),x.size(1))
-                return ptensorlayer1c(atoms,a) 
+                return ptensorlayer1(atoms,a) 
             else:
                 raise RuntimeError("Unimplemented")
 
@@ -118,7 +109,7 @@ class ptensorlayer1c(ptensorlayerc):
 
 
     @classmethod
-    def gather(self,x,S):
+    def gather(self,atoms,x,map):
         return Ptensorsb_Gather0Fn.apply(x,S)
 
 
@@ -126,7 +117,7 @@ class ptensorlayer1c(ptensorlayerc):
 
 
     def __repr__(self):
-        return "ptensorlayer1c(len="+str(len(self.atoms))+",nc="+str(self.size(1))+")"
+        return "ptensorlayer1(len="+str(len(self.atoms))+",nc="+str(self.size(1))+")"
 
     def __str__(self):
         r=""
@@ -137,4 +128,13 @@ class ptensorlayer1c(ptensorlayerc):
 
 
 
+
+#     def __init__(self,atoms,M):
+#         assert isinstance(atoms,pb.atomspack)
+#         assert isinstance(M,torch.Tensor)
+#         assert M.dim()==2
+#         assert M.size(0)==atoms.nrows1()
+#         R=ptensorlayer1(M)
+#         R.atoms=atoms
+#         return R
 

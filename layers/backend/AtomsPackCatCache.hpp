@@ -29,7 +29,7 @@ namespace ptens{
     typedef cnine::plist_indexed_object_bank<AtomsPackObj,shared_ptr<AtomsPackObj>> BASE;
 
     AtomsPackCatCache():
-      BASE([this](const vector<AtomsPackObj*>& v){
+      BASE([](const vector<AtomsPackObj*>& v){
 	  return shared_ptr<AtomsPackObj>(new AtomsPackObj(AtomsPackObj::cat(v)));}){
     }
       

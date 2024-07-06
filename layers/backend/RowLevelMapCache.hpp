@@ -41,7 +41,8 @@ namespace ptens{
     typedef cnine::ptr_triple_indexed_cache<AtomsPackTagObj,AtomsPackTagObj,TensorLevelMapObj,shared_ptr<RowLevelMap> > BASE;
 
     typedef cnine::Gdims Gdims;
-    typedef cnine::GatherMapProgram GatherMapProgram;
+    //typedef cnine::GatherMapProgram GatherMapProgram;
+    typedef cnine::TensorProgram<cnine::GatherRows,cnine::GatherMapB> GatherMapProgram;
 
 
     RowLevelMapCache(){}
@@ -79,7 +80,7 @@ namespace ptens{
 	direct.push_back(x.index_of(out_tensor),y.index_of(in_tensor));
       }
 
-      return GatherMapProgram(x.nrows(),y.nrows(),new cnine::GatherMapB(direct));
+      return GatherMapProgram({x.nrows(),1},{y.nrows(),1},new cnine::GatherMapB(direct));
     };
   
 
@@ -96,7 +97,7 @@ namespace ptens{
 	  direct.push_back(x.index_of(out_tensor),y.index_of(in_tensor,in(m,j)));
       }
 
-      return GatherMapProgram(x.nrows(),y.nrows(),new cnine::GatherMapB(direct));
+      return GatherMapProgram({x.nrows(),1},{y.nrows(),1},new cnine::GatherMapB(direct));
     }
 
 
@@ -117,7 +118,7 @@ namespace ptens{
 	    direct.push_back(2*x.index_of(out_tensor),y.index_of(in_tensor,inv[i0],inv[i1]));
       }
 
-      return GatherMapProgram(new cnine::GatherMapB(direct,2));
+      return GatherMapProgram({x.nrows(),1},{y.nrows(),1},new cnine::GatherMapB(direct,2));
     }
 
 
@@ -137,7 +138,7 @@ namespace ptens{
 	  direct.push_back(x.index_of(out_tensor,out_lists(m,j)),y.index_of(in_tensor));
       }
       
-      return GatherMapProgram(x.nrows(),y.nrows(),new cnine::GatherMapB(direct));
+      return GatherMapProgram({x.nrows(),1},{y.nrows(),1},new cnine::GatherMapB(direct));
     }
   
 
@@ -155,7 +156,7 @@ namespace ptens{
 	}
       }
 
-      cnine::GatherMapProgram R(x.nrows(),y.nrows());
+      GatherMapProgram R({x.nrows(),1},{y.nrows(),1});
       R.add_var(Gdims(in_lists.size(),1));
       R.add_map(reduce0(y,in_lists),2,0);
       R.add_map(broadcast0(x,out_lists,2),1,2);
@@ -184,7 +185,7 @@ namespace ptens{
 	}
       }
 	
-      cnine::GatherMapProgram R;
+      GatherMapProgram R({x.nrows(),1},{y.nrows(),1});
       R.add_var(Gdims(in_lists.size(),2));
       R.add_map(reduce0(y,in_lists),2,0);
       R.add_map(broadcast0(x,out_lists,5,0,2),1,2);
@@ -235,7 +236,7 @@ namespace ptens{
 	  for(int i1=0; i1<out.size(); i1++)
 	    direct.push_back(2*x.index_of(out_tensor,out[i0],out[i1]),y.index_of(in_tensor));
       }
-      return GatherMapProgram(new cnine::GatherMapB(direct,2));
+      return GatherMapProgram({x.nrows(),1},{y.nrows(),1},new cnine::GatherMapB(direct,2));
     }
   
       
@@ -259,7 +260,7 @@ namespace ptens{
 	}
       }
 
-      GatherMapProgram R;
+      GatherMapProgram R({x.nrows(),1},{y.nrows(),1});
       R.add_var(Gdims(in_lists.size(),1));
       R.add_map(reduce0(y,in_lists),2,0);
       R.add_map(broadcast0(x,out_lists,5),1,2);
@@ -286,7 +287,7 @@ namespace ptens{
 	}
       }
 
-      GatherMapProgram R;
+      GatherMapProgram R({x.nrows(),1},{y.nrows(),1});
       R.add_var(Gdims(in_lists.size(),2));
       R.add_map(reduce0(y,in_lists),2,0);
       R.add_map(broadcast0(x,out_lists,15,0,2),1,2);

@@ -16,7 +16,7 @@
 #include "Ptens_base.cpp"
 #include "CnineSession.hpp"
 
-#include "PtensorMessageMap.hpp"
+#include "TensorLevelMap.hpp"
 
 using namespace ptens;
 using namespace cnine;
@@ -34,7 +34,7 @@ int main(int argc, char** argv){
   auto B=AtomsPack::random(N,N,0.3);
   cout<<B<<endl;
 
-  auto M=PtensorMessageMap::all_overlapping(A,B);
+  auto M=TensorLevelMap::all_overlapping(A,B);
   cout<<M<<endl;
 
 }
