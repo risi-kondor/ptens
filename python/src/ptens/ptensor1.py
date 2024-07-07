@@ -20,6 +20,12 @@ from ptens.ptensor import ptensor
 class ptensor1(ptensor):
 
     @classmethod
+    def make(self,atoms,M):
+        R=ptensor1(M)
+        R.atoms=atoms
+        return R
+
+    @classmethod
     def zeros(self,atoms,_nc,device='cpu'):
         R=ptensor1(torch.zeros([len(atoms),_nc],device=device))
         R.atoms=atoms
@@ -32,10 +38,43 @@ class ptensor1(ptensor):
         return R
 
     @classmethod
-    def from_matrix(self, _atoms, M):
-        R=ptensor1(M)
-        R.atoms=_atoms
-        return R
+    def from_tensor(self, _atoms, M):
+        return self.make(_atoms,M)
+
+    def backend(self):
+        return pb.ptensor1.view(self.atoms,self)
+
+
+    # ----- Access -------------------------------------------------------------------------------------------
+
+
+    def getd(self):
+        return self.size(0)
+    
+    def get_nc(self):
+        return self.size(1)
+    
+
+    # ---- Reductions ---------------------------------------------------------------------------------------
+
+
+    def reduce0(self):
+        return self.sum(dim=0)
+
+
+    # ---- I/O ----------------------------------------------------------------------------------------------
+
+
+    def __repr__(self):
+        return "<ptensor1(atoms="+str(self.atoms)+",nc="+str(self.size(1))+")>"
+
+    def __str__(self):
+        return self.backend().str()
+
+
+
+
+
 
 #    def clone(self):
 #        r=ptensor1(super().clone())
@@ -51,14 +90,3 @@ class ptensor1(ptensor):
 #         return self.__class__(copy.deepcopy(self.data, memo))
 
 
-    # ---- Operations ----------------------------------------------------------------------------------------
-
-
-    # ---- I/O ----------------------------------------------------------------------------------------------
-
-
-    def __repr__(self):
-        return "<ptensor1(atoms="+str(self.atoms)+",nc="+str(self.size(1))+")>"
-
-    def __str__(self):
-        return pb.ptensor1.view(self,self.atoms).str()

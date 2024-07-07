@@ -20,30 +20,50 @@ from ptens.ptensor import ptensor
 class ptensor0(ptensor):
 
     @classmethod
-    def zeros(self, _atoms, _nc, device='cpu'):
-        R=ptensor0(torch.zeros([_nc],device=device))
-        R.atoms=_atoms
+    def make(self,atoms,M):
+        R=ptensor0(M)
+        R.atoms=atoms
         return R
+
+    @classmethod
+    def zeros(self, _atoms, _nc, device='cpu'):
+        return self.make(_atoms,torch.zeros([_nc],device=device))
 
     @classmethod
     def randn(self, _atoms, _nc, device='cpu'):
-        R=ptensor0(torch.randn([_nc],device=device))
-        R.atoms=_atoms
-        return R
+        return self.make(_atoms,torch.randn([_nc],device=device))
 
     @classmethod
-    def from_matrix(self, _atoms, M):
-        R=ptensor0(M)
-        R.atoms=_atoms
-        return R
+    def from_tensor(self, _atoms, M):
+        return self.make(_atoms,M)
 
-    #def clone(self):
-    #    r=ptensor0(super().clone())
-    #    r.atoms=self.atoms
-    #    return r
+    def backend(self):
+        return pb.ptensor0.view(self.atoms,self)
+    
+
+    # ----- Access -------------------------------------------------------------------------------------------
 
 
-    # ---- Operations ----------------------------------------------------------------------------------------
+    def getd(self):
+        return 1
+    
+    def get_nc(self):
+        return self.size(0)
+    
+
+    # ---- Linmaps -------------------------------------------------------------------------------------------
+    
+
+    @classmethod
+    def linmaps(self,x):
+        if isinstance(x,ptensorlayer0):
+            return x
+        if isinstance(x,p.ptensorlayer1):
+            return self.make(x.atoms,x.reduce0())
+        if isinstance(x,p.ptensorlayer1):
+            return self.make(x.atoms,x.reduce0())
+
+
 
 
     # ---- I/O ----------------------------------------------------------------------------------------------
@@ -53,4 +73,4 @@ class ptensor0(ptensor):
         return "<ptensor0(atoms="+str(self.atoms)+",nc="+str(self.size(0))+")>"
 
     def __str__(self):
-        return pb.ptensor0.view(self,self.atoms).str()
+        return self.backend().str()

@@ -27,20 +27,22 @@ import ptens.ptensor1 as ptensor1
 class ptensorlayer1(ptensorlayer):
 
     @classmethod
+    def make(self,atoms,M):
+        R=ptensorlayer1(M)
+        R.atoms=atoms
+        return R
+
+    @classmethod
     def zeros(self,atoms,nc,device='cpu'):
         assert isinstance(atoms,pb.atomspack)
         assert isinstance(nc,int)
-        R=ptensorlayer1(torch.zeros([atoms.nrows1(),nc],device=device))
-        R.atoms=atoms
-        return R
+        return self.make(atoms,torch.zeros([atoms.nrows1(),nc],device=device))
 
     @classmethod
     def randn(self,atoms,nc,device='cpu'):
         assert isinstance(atoms,pb.atomspack)
         assert isinstance(nc,int)
-        R=ptensorlayer1(torch.randn([atoms.nrows1(),nc],device=device))
-        R.atoms=atoms
-        return R
+        return self.make(atoms,torch.randn([atoms.nrows1(),nc],device=device))
 
     @classmethod
     def from_matrix(self,atoms,M):
@@ -48,14 +50,10 @@ class ptensorlayer1(ptensorlayer):
         assert isinstance(M,torch.Tensor)
         assert M.dim()==2
         assert M.size(0)==atoms.nrows1()
-        R=ptensorlayer1(M)
-        R.atoms=atoms
-        return R
+        return self.make(atoms,M)
 
-    def clone(self):
-        r=ptensorlayer1(super().clone())
-        r.atoms=self.atoms
-        return r
+    def as_ptensors1(self):
+        return _ptensors1.view(self.atoms,self)
 
 
     # ----- Access -------------------------------------------------------------------------------------------
@@ -87,28 +85,9 @@ class ptensorlayer1(ptensorlayer):
         if isinstance(x,p.ptensorlayer1):
             nc=x.get_nc()
             r=p.ptensorlayer0.zeros(atoms,2*nc)
-            r[:,0:nc]=broadcast(x.reduce0())
+            r[:,0:nc]=broadcast0(x.reduce0())
             r[:,nc:2*nc]=x
             return r
-
-    def reduce0(self):
-        if self.atoms.is_constk():
-            k=self.atoms.constk()
-            a=reshape(size(0)/k,k,size(1))
-            return ptensorlayer0(atoms,a.sum(dim=1)) 
-        else:
-            r=p.ptensorlayer0.zeros(self.atoms,self.get_nc())
-            _ptensors1(self.atoms,self).add_reduce0_to(_ptensors0(self.atoms,r))
-            return r
-
-    @classmethod
-    def broadcast(self,x):
-        if isinstance(x,ptensorlayer0):
-            if self.atoms.is_constk():
-                a=x.unsqueeze(1).expand(x.size(0),self.atoms.constk(),x.size(1))
-                return p.ptensorlayer1(atoms,a) 
-            else:
-                raise RuntimeError("Unimplemented")
 
 
     # ---- Message passing -----------------------------------------------------------------------------------
@@ -117,6 +96,33 @@ class ptensorlayer1(ptensorlayer):
     @classmethod
     def gather(self,atoms,x,map):
         return Ptensorsb_Gather0Fn.apply(x,S)
+
+
+    # ---- Reductions -----------------------------------------------------------------------------------------
+
+
+    def reduce0(self):
+        if self.atoms.is_constk():
+            k=self.atoms.constk()
+            return self.reshape(size(0)/k,k,size(1)).sum(dim=1)
+        else:
+            r=torch.zeros([self.atoms.nrows0(),self.get_nc()])
+            self.as_ptensors1().add_reduce0_to(r)
+            return r
+
+
+    # ---- Broadcasting ---------------------------------------------------------------------------------------
+
+
+    @classmethod
+    def broadcast0(self,x):
+        if self.atoms.is_constk():
+            a=x.unsqueeze(1).expand(x.size(0),self.atoms.constk(),x.size(1))
+            return p.ptensorlayer1(atoms,a) 
+        else:
+            r=torch.zeros([self.atoms.nrows1(),x.dim(1)])
+            self.as_ptensors1().broadcast0(x)
+            return r
 
 
     # ---- I/O ----------------------------------------------------------------------------------------------

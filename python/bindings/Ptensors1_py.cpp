@@ -143,8 +143,11 @@ pybind11::class_<Ptensors1<float> >(m,"ptensors1")
   .def("add_gather_back",[](Ptensors1<float>& x, Ptensors2<float>& g){
       x.get_grad().add_gather_back(g.get_grad());})
 
-  .def("add_reduce0_to",[](const Ptensors1f& obj, const Ptensors0f& r, const int offs, const int nc){
-      obj.add_reduce0_to(r,offs,nc);},py::arg("r"),py::arg("offs")=0,py::arg("nc")=0)
+  .def("add_reduce0_to",[](const Ptensors1f& obj, at::Tensor& r, const int offs, const int nc){
+      obj.add_reduce0_to(tensorf::view(r),offs,nc);},py::arg("r"),py::arg("offs")=0,py::arg("nc")=0)
+
+  .def("broadcast0",[](Ptensors1f& obj, const at::Tensor& x, const int offs){
+      obj.broadcast0(tensorf::view(x),offs);},py::arg("x"),py::arg("offs")=0)
 
 
 // ---- I/O --------------------------------------------------------------------------------------------------

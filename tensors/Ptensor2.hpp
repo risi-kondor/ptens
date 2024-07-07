@@ -98,6 +98,14 @@ namespace ptens{
     // ---- Conversions --------------------------------------------------------------------------------------
 
 
+    Ptensor2(const Atoms& _atoms, const BASE& x):
+      BASE(x),
+      atoms(_atoms){
+      assert(x.ndims()==3);
+      k=dims(0);
+      nc=dims.back();
+    }
+ 
     Ptensor2(BASE&& x, Atoms&& _atoms):
       BASE(x),
       atoms(std::move(_atoms)){
@@ -116,9 +124,9 @@ namespace ptens{
     }
 
     #ifdef _WITH_ATEN
-    static Ptensor2 view(at::Tensor& x, Atoms&& _atoms){
-      return Ptensor2(BASE::view(x),std::move(_atoms));
-    }
+    //static Ptensor2 view(at::Tensor& x, Atoms&& _atoms){
+    //return Ptensor2(BASE::view(x),std::move(_atoms));
+    //}
     #endif 
 
 
@@ -545,8 +553,8 @@ namespace ptens{
       ostringstream oss;
       oss<<indent<<"Ptensor2 "<<atoms<<":"<<endl;
       for(int c=0; c<get_nc(); c++){
-	oss<<indent<<"channel "<<c<<":"<<endl;
-	oss<<view3().slice2(c).str(indent+"  ");
+	oss<<indent<<"  channel "<<c<<":"<<endl;
+	oss<<view3().slice2(c).str(indent+"    ");
 	if(c<get_nc()-1) oss<<endl;
       }
       return oss.str();

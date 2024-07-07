@@ -29,12 +29,12 @@ import torch
 
 from ptens.ptensor0 import ptensor0 as ptensor0
 from ptens.ptensor1 import ptensor1 as ptensor1
-#from ptens.ptensor2 import ptensor2 as ptensor2
+from ptens.ptensor2 import ptensor2 as ptensor2
 
 from ptens.ptensorlayer import *
 from ptens.ptensorlayer0 import ptensorlayer0
 from ptens.ptensorlayer1 import ptensorlayer1
-#from ptens.ptensorlayer2 import ptensorlayer2
+from ptens.ptensorlayer2 import ptensorlayer2
 
 #from ptens.graph import graph as graph
 from ptens.ggraph import ggraph as ggraph

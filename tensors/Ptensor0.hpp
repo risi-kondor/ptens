@@ -112,6 +112,14 @@ namespace ptens{
     // ---- Conversions --------------------------------------------------------------------------------------
 
 
+    Ptensor0(const Atoms& _atoms, const BASE& x):
+      BASE(x),
+      atoms(_atoms){
+      assert(x.ndims()==1);
+      k=dims(0);
+      nc=dims.back();
+    }
+
     Ptensor0(BASE&& x, Atoms&& _atoms):
       BASE(x),
       atoms(std::move(_atoms)){

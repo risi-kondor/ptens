@@ -9,7 +9,7 @@ print(A)
 
 print("Or define it from a torch tensor:\n")
 M=torch.randn([3])
-A=p.ptensor0.from_matrix([2,3],M)
+A=p.ptensor0.from_tensor([2,3],M)
 print(A)
 
 print("If two ptensors have the same reference domain,\nit is possible to do arithmetic on them:\n")
@@ -17,3 +17,16 @@ print("If two ptensors have the same reference domain,\nit is possible to do ari
 B=p.ptensor0.randn([2,3],3)
 print(A+B)
 
+
+print("\n Linmaps")
+print("--------\n")
+
+
+print("The linmaps from a 0th order tensor is just the identity:\n")
+A=p.ptensorlayer0.randn([2,3],3)
+print(ptensorlayer0.linmaps(A))
+
+print("The linmaps from a 1st order layer sums each P-tensor along the atoms dimension:\n")
+A=p.ptensorlayer1.randn(atoms,3)
+B=p.ptensorlayer0.linmaps(A)
+print(B)

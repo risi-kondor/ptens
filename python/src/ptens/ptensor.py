@@ -30,4 +30,4 @@ class ptensor(torch.Tensor):
     def __add__(self,y):
         assert self.size()==y.size()
         assert self.atoms==y.atoms
-        return self.from_matrix(self.atoms,super().__add__(y))
+        return self.make(self.atoms,super().__add__(y))

@@ -23,20 +23,22 @@ import ptens.ptensor0 as ptensor0
 class ptensorlayer0(ptensorlayer):
 
     @classmethod
+    def make(self,atoms,M):
+        R=ptensorlayer0(M)
+        R.atoms=atoms
+        return R
+
+    @classmethod
     def zeros(self,atoms,nc,device='cpu'):
         assert isinstance(atoms,pb.atomspack)
         assert isinstance(nc,int)
-        R=ptensorlayer0(torch.zeros([len(atoms),nc],device=device))
-        R.atoms=atoms
-        return R
+        return self.make(atoms,torch.zeros([len(atoms),nc],device=device))
 
     @classmethod
     def randn(self,atoms,nc,device='cpu'):
         assert isinstance(atoms,pb.atomspack)
         assert isinstance(nc,int)
-        R=ptensorlayer0(torch.randn([len(atoms),nc],device=device))
-        R.atoms=atoms
-        return R
+        return self.make(atoms,torch.randn([len(atoms),nc],device=device))
 
     @classmethod
     def from_matrix(self,atoms,M):
@@ -44,14 +46,10 @@ class ptensorlayer0(ptensorlayer):
         assert isinstance(M,torch.Tensor)
         assert M.dim()==2
         assert M.size(0)==atoms.nrows0()
-        R=ptensorlayer0(M)
-        R.atoms=atoms
-        return R
+        return self.make(atoms,M)
 
-    def clone(self):
-        r=ptensorlayer0(super().clone())
-        r.atoms=self.atoms
-        return r
+    def as_ptensors0(self):
+        return _ptensors0.view(self.atoms,self)
 
 
     # ----- Access -------------------------------------------------------------------------------------------
@@ -79,7 +77,9 @@ class ptensorlayer0(ptensorlayer):
         if isinstance(x,ptensorlayer0):
             return x
         if isinstance(x,p.ptensorlayer1):
-            return x.reduce0()
+            return self.make(x.atoms,x.reduce0())
+        if isinstance(x,p.ptensorlayer1):
+            return self.make(x.atoms,x.reduce0())
 
 
     # ---- Message passing -----------------------------------------------------------------------------------
@@ -141,4 +141,9 @@ class ptensorlayer0(ptensorlayer):
 #         assert M.size(0)==atoms.tsize0()
 #         super(ptensorlayerc,self).__init__(x)
 #         atoms=atoms
+
+    #def clone(self):
+    #    r=ptensorlayer0(super().clone())
+    #    r.atoms=self.atoms
+    #    return r
 

@@ -59,6 +59,8 @@ PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
   using namespace cnine;
   using namespace ptens;
   namespace py=pybind11;
+
+  typedef cnine::Ltensor<float> tensorf;
   
   typedef Ptensor0<float> Ptensor0f;
   typedef Ptensor1<float> Ptensor1f;

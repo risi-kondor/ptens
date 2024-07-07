@@ -103,6 +103,14 @@ namespace ptens{
     // ---- Conversions --------------------------------------------------------------------------------------
 
 
+    Ptensor1(const Atoms& _atoms, const BASE& x):
+      BASE(x.copy()),
+      atoms(_atoms){
+      assert(x.ndims()==2);
+      k=dims(0);
+      nc=dims.back();
+     }
+
     Ptensor1(const BASE& x, const Atoms& _atoms):
       BASE(x.copy()),
       atoms(_atoms){
