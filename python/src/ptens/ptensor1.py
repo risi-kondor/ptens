@@ -59,16 +59,15 @@ class ptensor1(ptensor):
     def linmaps(self,x):
         nc=x.get_nc()
         if isinstance(x,p.ptensor0):
-            r=ptensor1.zeros(x.atoms,nc)
-            return self.make(x.atoms,r.broadcast0(x))
+            return self.broadcast0(x)
         if isinstance(x,p.ptensor1):
             r=ptensor1.zeros(x.atoms,2*nc)
-            r[:,0:nc]=r.broadcast0(x.reduce0())
+            r[:,0:nc]=self.broadcast0(x.reduce0())
             r[:,nc:2*nc]=x
             return r
         if isinstance(x,p.ptensor2):
             r=ptensor1.zeros(x.atoms,5*nc)
-            r[:,0:2*nc]=r.broadcast0(x.reduce0())
+            r[:,0:2*nc]=self.broadcast0(x.reduce0())
             r[:,2*nc:5*nc]=x.reduce1()
             return r
 
@@ -77,14 +76,15 @@ class ptensor1(ptensor):
 
 
     def reduce0(self):
-        return self.sum(dim=0)
+        return p.ptensor0.make(self.atoms,self.sum(dim=0))
 
 
     # ---- Broadcasting ---------------------------------------------------------------------------------------
 
 
+    @classmethod
     def broadcast0(self,x):
-        return x.unsqueeze(0).expand(len(self.atoms),x.size(0)).contiguous()
+        return self.make(x.atoms,x.unsqueeze(0).expand(len(x.atoms),x.size(0)).contiguous())
 
 
     # ---- I/O ----------------------------------------------------------------------------------------------

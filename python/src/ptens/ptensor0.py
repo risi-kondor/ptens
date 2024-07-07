@@ -60,9 +60,9 @@ class ptensor0(ptensor):
         if isinstance(x,ptensor0):
             return x
         if isinstance(x,p.ptensor1):
-            return self.make(x.atoms,x.reduce0())
+            return x.reduce0()
         if isinstance(x,p.ptensor2):
-            return self.make(x.atoms,x.reduce0())
+            return x.reduce0()
 
 
 
