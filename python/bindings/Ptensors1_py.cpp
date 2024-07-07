@@ -3,9 +3,9 @@ typedef cnine::ATview<float> TVIEW;
 pybind11::class_<Ptensors1<float> >(m,"ptensors1")
 
   .def(py::init([](const AtomsPack& atoms, at::Tensor& M){
-	return Ptensors1<float>(atoms,Ltensor<float>(TVIEW(M)));}))
+	return Ptensors1<float>(atoms,Ltensor<float>::view(M));}))
   .def(py::init([](const vector<vector<int> >& atoms, at::Tensor& M){
-	return Ptensors1<float>(AtomsPack(atoms),Ltensor<float>(TVIEW(M)));}))
+	return Ptensors1<float>(AtomsPack(atoms),Ltensor<float>::view(M));}))
 
   .def_static("create",[](const vector<vector<int> > _atoms, const int _nc, const int fcode, const int _dev){
       return Ptensors1<float>(AtomsPack(_atoms),_nc,fcode,_dev);}, 
