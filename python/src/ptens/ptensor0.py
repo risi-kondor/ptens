@@ -14,6 +14,7 @@
 
 import torch
 import ptens_base as pb
+import ptens as p
 from ptens.ptensor import ptensor
 
 
@@ -56,11 +57,11 @@ class ptensor0(ptensor):
 
     @classmethod
     def linmaps(self,x):
-        if isinstance(x,ptensorlayer0):
+        if isinstance(x,ptensor0):
             return x
-        if isinstance(x,p.ptensorlayer1):
+        if isinstance(x,p.ptensor1):
             return self.make(x.atoms,x.reduce0())
-        if isinstance(x,p.ptensorlayer1):
+        if isinstance(x,p.ptensor2):
             return self.make(x.atoms,x.reduce0())
 
 

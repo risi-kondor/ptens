@@ -2,6 +2,11 @@ import torch
 import ptens_base as pb
 import ptens as p
 
+print("\n-------------------------------------")
+print (" ptensor0")
+print("-------------------------------------\n")
+
+
 print("We can define a random zeroth order P-tensor:\n")
 A=p.ptensor0.randn([2,3],3)
 print(A.__repr__(),"\n")
@@ -18,15 +23,21 @@ B=p.ptensor0.randn([2,3],3)
 print(A+B)
 
 
-print("\n Linmaps")
-print("--------\n")
+print("\n---------")
+print(" Linmaps")
+print("---------\n")
 
 
-print("The linmaps from a 0th order tensor is just the identity:\n")
-A=p.ptensorlayer0.randn([2,3],3)
-print(ptensorlayer0.linmaps(A))
+print("The linmaps from a 0th order P-tensor is just the identity:\n")
+A=p.ptensor0.randn([2,3,5],3)
+print(p.ptensor0.linmaps(A))
 
-print("The linmaps from a 1st order layer sums each P-tensor along the atoms dimension:\n")
-A=p.ptensorlayer1.randn(atoms,3)
-B=p.ptensorlayer0.linmaps(A)
-print(B)
+print("The linmaps from a 1st order P-tensor sums along the atoms dimension:\n")
+A=p.ptensor1.randn([2,3,5],3)
+print(p.ptensor0.linmaps(A))
+
+print("The linmaps from a 2nd order P-tensor consists of")
+print("(a) summing along both atoms dimensions")
+print("(b) summing along the diagonaol:\n")
+A=p.ptensor2.randn([2,3,5],3)
+print(p.ptensor0.linmaps(A))

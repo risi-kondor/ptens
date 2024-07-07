@@ -17,3 +17,21 @@ print("If two ptensors have the same reference domain,\n it is possible to do ar
 B=p.ptensor1.randn([2,3,5],3)
 print(A+B)
 
+
+print("\n---------")
+print(" Linmaps")
+print("---------\n")
+
+
+print("The linmaps from a 0th order P-tensor broadcasts along the atom dimension:\n")
+A=p.ptensor0.randn([2,3,5],3)
+print(p.ptensor1.linmaps(A))
+
+print("The linmaps from a 1st order P-tensor sums along the atoms dimension:\n")
+A=p.ptensor1.randn([2,3,5],3)
+print(p.ptensor1.linmaps(A))
+
+print("The linmaps from a 2nd order P-tensor consists of 5 different maps:\n")
+A=p.ptensor2.randn([2,3,5],3)
+print(p.ptensor1.linmaps(A))
+

@@ -80,12 +80,14 @@ class ptensorlayer1(ptensorlayer):
 
     @classmethod
     def linmaps(self,x):
+        nc=x.get_nc()
         if isinstance(x,p.ptensorlayer0):
-            return broadcast0(x)
+            r=p.ptensorlayer1.zeros(x.atoms,nc)
+            r[:,:]=r.broadcast0(x)
+            return r
         if isinstance(x,p.ptensorlayer1):
-            nc=x.get_nc()
-            r=p.ptensorlayer0.zeros(atoms,2*nc)
-            r[:,0:nc]=broadcast0(x.reduce0())
+            r=p.ptensorlayer1.zeros(x.atoms,2*nc)
+            r[:,0:nc]=r.broadcast0(x.reduce0())
             r[:,nc:2*nc]=x
             return r
 
@@ -114,11 +116,9 @@ class ptensorlayer1(ptensorlayer):
     # ---- Broadcasting ---------------------------------------------------------------------------------------
 
 
-    @classmethod
     def broadcast0(self,x):
         if self.atoms.is_constk():
-            a=x.unsqueeze(1).expand(x.size(0),self.atoms.constk(),x.size(1))
-            return p.ptensorlayer1(atoms,a) 
+            return x.unsqueeze(1).expand(x.size(0),self.atoms.constk(),x.size(1))
         else:
             r=torch.zeros([self.atoms.nrows1(),x.dim(1)])
             self.as_ptensors1().broadcast0(x)

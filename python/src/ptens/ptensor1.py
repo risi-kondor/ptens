@@ -14,6 +14,7 @@
 
 import torch
 import ptens_base as pb
+import ptens as p
 from ptens.ptensor import ptensor
 
 
@@ -27,15 +28,11 @@ class ptensor1(ptensor):
 
     @classmethod
     def zeros(self,atoms,_nc,device='cpu'):
-        R=ptensor1(torch.zeros([len(atoms),_nc],device=device))
-        R.atoms=atoms
-        return R
+        return self.make(atoms,torch.zeros([len(atoms),_nc],device=device))
 
     @classmethod
     def randn(self,atoms,_nc,device='cpu'):
-        R=ptensor1(torch.randn([len(atoms),_nc],device=device))
-        R.atoms=atoms
-        return R
+        return self.make(atoms,torch.randn([len(atoms),_nc],device=device))
 
     @classmethod
     def from_tensor(self, _atoms, M):
@@ -55,11 +52,39 @@ class ptensor1(ptensor):
         return self.size(1)
     
 
+    # ---- Linmaps -------------------------------------------------------------------------------------------
+    
+
+    @classmethod
+    def linmaps(self,x):
+        nc=x.get_nc()
+        if isinstance(x,p.ptensor0):
+            r=ptensor1.zeros(x.atoms,nc)
+            return self.make(x.atoms,r.broadcast0(x))
+        if isinstance(x,p.ptensor1):
+            r=ptensor1.zeros(x.atoms,2*nc)
+            r[:,0:nc]=r.broadcast0(x.reduce0())
+            r[:,nc:2*nc]=x
+            return r
+        if isinstance(x,p.ptensor2):
+            r=ptensor1.zeros(x.atoms,5*nc)
+            r[:,0:2*nc]=r.broadcast0(x.reduce0())
+            r[:,2*nc:5*nc]=x.reduce1()
+            return r
+
+
     # ---- Reductions ---------------------------------------------------------------------------------------
 
 
     def reduce0(self):
         return self.sum(dim=0)
+
+
+    # ---- Broadcasting ---------------------------------------------------------------------------------------
+
+
+    def broadcast0(self,x):
+        return x.unsqueeze(0).expand(len(self.atoms),x.size(0)).contiguous()
 
 
     # ---- I/O ----------------------------------------------------------------------------------------------
