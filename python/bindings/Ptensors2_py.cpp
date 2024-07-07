@@ -3,9 +3,9 @@ typedef cnine::ATview<float> TVIEW;
 pybind11::class_<Ptensors2<float> >(m,"ptensors2")
 
   .def(py::init([](const AtomsPack& atoms, at::Tensor& M){
-	return Ptensors2<float>(atoms,Ltensor<float>(TVIEW(M)));}))
+	return Ptensors2<float>(atoms,Ltensor<float>(M));}))
   .def(py::init([](const vector<vector<int> >& atoms, at::Tensor& M){
-	return Ptensors2<float>(AtomsPack(atoms),Ltensor<float>(TVIEW(M)));}))
+	return Ptensors2<float>(AtomsPack(atoms),Ltensor<float>(M));}))
 
   .def_static("create",[](const vector<vector<int> > _atoms, const int _nc, const int fcode, const int _dev){
       return Ptensors2<float>(AtomsPack(_atoms),_nc,fcode,_dev);}, 
@@ -22,6 +22,9 @@ pybind11::class_<Ptensors2<float> >(m,"ptensors2")
   .def("copy",[](const Ptensors2<float>& x, const int _dev){return x.copy(_dev);})
   .def("zeros_like",[](const Ptensors2<float>& x){return Ptensors2<float>::zeros_like(x);})
   .def("randn_like",[](const Ptensors2<float>& x){return Ptensors2<float>::gaussian_like(x);})
+
+  .def_static("view",[](const AtomsPack& atoms, at::Tensor& x){
+      return Ptensors2<float>(atoms,Ltensor<float>::view(x));})
 
 
 // ---- Conversions, transport, etc. ------------------------------------------------------------------------

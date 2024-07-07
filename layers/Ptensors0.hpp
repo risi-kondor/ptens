@@ -183,6 +183,13 @@ namespace ptens{
   public: // ----- Conversions -------------------------------------------------------------------------------
 
 
+#ifdef _WITH_ATEN
+    static Ptensors0 view(const , Atoms& _atoms, const at::Tensor& x){
+      // Check dimensions of x here!
+      return Ptensors0(_atoms,BASE::view(x));
+    }
+#endif 
+
     //Ptensors0(const TENSOR& x, const AtomsPack& _atoms):
     //BASE(x),
     //atoms(_atoms){}
