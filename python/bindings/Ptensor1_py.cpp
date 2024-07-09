@@ -4,7 +4,7 @@ pybind11::class_<Ptensor1<float> >(m,"ptensor1")
 	return Ptensor1<float>(_atoms,_nc,_fcode,_dev);}))
 
   .def_static("view",[](const vector<int>& v, at::Tensor& x){
-      return Ptensor1<float>(v,tensorf(x));})
+      return Ptensor1<float>(v,tensorf::view(x));})
 
   .def("torch",[](const Ptensor1<float>& x){
       return x.torch();})

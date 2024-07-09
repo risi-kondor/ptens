@@ -38,6 +38,6 @@ print(p.ptensor0.linmaps(A))
 
 print("The linmaps from a 2nd order P-tensor consists of")
 print("(a) summing along both atoms dimensions")
-print("(b) summing along the diagonaol:\n")
+print("(b) summing along the diagonal:\n")
 A=p.ptensor2.randn([2,3,5],3)
 print(p.ptensor0.linmaps(A))

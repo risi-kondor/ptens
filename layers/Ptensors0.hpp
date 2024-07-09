@@ -386,15 +386,17 @@ namespace ptens{
       return R;
     }
 
-
-    //void add_reduce0(const Ptensors1<TYPE>& x, const int offs, const int nc) const{
-    //int N=x.size();
-    //Rtensor2_view r=BASE::view2();
-    //for(int i=0; i<N; i++)
-    //x.view_of(i,offs,nc).sum0_into(r.slice0(i));
-    //}
-
-
+    void add_reduce0_to(const Ptensors0& R, const AindexPack& list) const{
+      TimedFn T("Ptensors0","reduce0",*this,list,list.size()*get_nc());
+      if(get_dev()==0){
+	int N=list.size();
+	for(int i=0; i<N; i++){
+	  if(list.nix(i)==0) continue;
+	  R.view_of(i)=view_of(list.tix(i));
+	}
+      }
+      GPUCODE(CUDA_STREAM(Ptensors0_reduce0_cu(R,*this,list,0,nc,stream)));
+    }
 
 
   public: // ---- Broadcasting -------------------------------------------------------------------------------

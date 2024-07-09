@@ -42,9 +42,10 @@ from ptens.subgraph import subgraph as subgraph
 from ptens.subgraph_cache import subgraph_cache as subgraph_cache 
 
 #from ptens.nodelayer import nodelayer as nodelayer
-#from ptens.subgraphlayer0 import subgraphlayer0 as subgraphlayer0
-#from ptens.subgraphlayer1 import subgraphlayer1 as subgraphlayer1
-#from ptens.subgraphlayer2 import subgraphlayer2 as subgraphlayer2
+from ptens.subgraphlayer import subgraphlayer as subgraphlayer
+from ptens.subgraphlayer0 import subgraphlayer0 as subgraphlayer0
+from ptens.subgraphlayer1 import subgraphlayer1 as subgraphlayer1
+from ptens.subgraphlayer2 import subgraphlayer2 as subgraphlayer2
 
 ##import ptens.modules as modules
 

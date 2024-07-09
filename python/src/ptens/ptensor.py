@@ -18,11 +18,6 @@ import ptens_base as pb
 
 class ptensor(torch.Tensor):
 
-    #def clone(self):
-    #    r=super().copy()
-    #    r.atoms=self.atoms
-    #    return r
-
 
     # ---- Operations ----------------------------------------------------------------------------------------
 
@@ -31,3 +26,10 @@ class ptensor(torch.Tensor):
         assert self.size()==y.size()
         assert self.atoms==y.atoms
         return self.make(self.atoms,super().__add__(y))
+
+
+    def __str__(self):
+        return self.backend().str()
+
+    def to_string(self,indent):
+        return self.backend().str(indent)

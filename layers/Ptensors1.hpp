@@ -452,23 +452,41 @@ namespace ptens{
       return R;
     }
 
-    void add_reduce0_to(const TENSOR& R, const int offs=0, int nc=0) const{
+    BASE reduce1() const{
+      return *this;
+    }
+
+
+  public: // ---- Cumulative Reductions ----------------------------------------------------------------------
+
+
+    void add_reduce0_to(const TENSOR& R, const int offs=0) const{
+      PTENS_ASSRT(R.ndims()==2);
+      PTENS_ASSRT(R.dim(0)==size());
+      PTENS_CPUONLY();
       int N=size();
-      if(nc==0) nc=get_nc()-offs;
+      int nc=R.dim(1);
       Rtensor2_view r=R.view2();
       for(int i=0; i<N; i++)
 	view_of(i,offs,nc).sum0_into(r.slice0(i));
     }
 
-    BASE reduce1() const{
-      return *this;
-    }
+
+  public: // ---- Indexed Reductions -------------------------------------------------------------------------
 
 
     Ptensors0<TYPE> reduce0(const AtomsPack& _atoms, const AindexPack& list, const int offs=0, int nc=0) const{
       TimedFn T("Ptensors1","reduce0",*this,list,list.count1*nc);
       if(nc==0) nc=get_nc();
       Ptensors0<TYPE> R(_atoms,get_nc(),0,get_dev());
+      add_reduce0_to(R,list,offs);
+      return R;
+    }
+
+
+    void add_reduce0_to(const Ptensors0<TYPE>& R, const AindexPack& list, const int offs=0) const{
+      TimedFn T("Ptensors1","reduce0",*this,list,list.count1*nc);
+      int nc=R.get_nc();
       if(dev==0){
 	int N=list.size();
 	for(int i=0; i<N; i++){
@@ -477,7 +495,6 @@ namespace ptens{
 	}
       }
       GPUCODE(CUDA_STREAM(Ptensors1_reduce0_cu(R,*this,list,0,nc,stream)));
-      return R;
     }
 
 
@@ -485,6 +502,14 @@ namespace ptens{
       TimedFn T("Ptensors1","reduce1",*this,list,list.count1*nc);
       if(nc==0) nc=get_nc();
       Ptensors1<TYPE> R(_atoms,get_nc(),0,get_dev());
+      add_reduce1_to(R,list,offs);
+      return R;
+    }
+
+
+    void add_reduce1_to(const Ptensors1& R, const AindexPack& list, const int offs=0) const{
+      TimedFn T("Ptensors1","reduce1",*this,list,list.count1*nc);
+      int nc=R.get_nc();
       if(dev==0){
 	int N=list.size();
 	for(int i=0; i<N; i++){
@@ -493,7 +518,6 @@ namespace ptens{
 	}
       }
       GPUCODE(CUDA_STREAM(Ptensors1_reduce1_cu(R,*this,list,0,nc,stream)));
-      return R;
     }
 
 
@@ -517,6 +541,10 @@ namespace ptens{
       int nc=X.dim(1);
       BASE::view2().block(0,offs,dim(0),nc)+=X.view2();
     }
+
+
+  public: // ---- Indexed broadcasting -----------------------------------------------------------------------
+
 
     void broadcast0(const Ptensors0<TYPE>& x, const AindexPack& list, const int offs=0){
       TimedFn T("Ptensors1","brcast0",*this,x,list,list.count1*x.get_nc());
@@ -542,11 +570,6 @@ namespace ptens{
       }
       GPUCODE(CUDA_STREAM(Ptensors1_broadcast1_cu(*this,x,list,offs,stream)));
     }
-
-
-   public: // ---- Message passing ----------------------------------------------------------------------------
-
-
     
 
    public: // ---- I/O ----------------------------------------------------------------------------------------

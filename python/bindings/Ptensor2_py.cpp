@@ -3,8 +3,8 @@ pybind11::class_<Ptensor2<float>>(m,"ptensor2")
   .def(py::init([](const vector<int>& _atoms, const int _nc, const int _fcode, const int _dev){
 	return Ptensor2<float>(_atoms,_nc,_fcode,_dev);}))
 
-  .def_static("view",[](const vector<int>& atoms, const at::Tensor& x){
-      return Ptensor2<float>(atoms,tensorf(x));})
+  .def_static("view",[](const vector<int>& v, at::Tensor& x){
+      return Ptensor2<float>(v,tensorf::view(x));})
 
   .def("torch",[](const Ptensor2<float>& x){return x.torch();})
 

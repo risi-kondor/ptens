@@ -206,7 +206,14 @@ namespace ptens{
     }
 
     string str(const string indent="") const{
-      return obj->str(indent);
+      ostringstream oss;
+      oss<<indent<<"(";
+      for(int i=0; i<size(); i++){
+	oss<<(*this)[i];
+	if(i<size()-1) oss<<",";
+      }
+      oss<<")";
+      return oss.str();
     }
 
     friend ostream& operator<<(ostream& stream, const AtomsPack& v){

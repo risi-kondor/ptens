@@ -27,7 +27,7 @@ print("The linmaps from a 0th order P-tensor broadcasts along the atom dimension
 A=p.ptensor0.randn([2,3,5],3)
 print(p.ptensor1.linmaps(A))
 
-print("The linmaps from a 1st order P-tensor sums along the atoms dimension:\n")
+print("The linmaps from a 1st order P-tensor consists of two different maps:\n")
 A=p.ptensor1.randn([2,3,5],3)
 print(p.ptensor1.linmaps(A))
 

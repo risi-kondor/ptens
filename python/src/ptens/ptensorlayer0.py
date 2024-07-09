@@ -48,8 +48,8 @@ class ptensorlayer0(ptensorlayer):
         assert M.size(0)==atoms.nrows0()
         return self.make(atoms,M)
 
-    def as_ptensors0(self):
-        return _ptensors0.view(self.atoms,self)
+    def backend(self):
+        return pb.ptensors0.view(self.atoms,self)
 
 
     # ----- Access -------------------------------------------------------------------------------------------
@@ -66,7 +66,7 @@ class ptensorlayer0(ptensorlayer):
     
     def __getitem__(self,i):
         assert i<len(self)
-        return ptensor0.from_matrix(self.atoms[i],torch.Tensor(self)[i])
+        return ptensor0.from_tensor(self.atoms[i],torch.Tensor(self)[i])
 
 
     # ---- Linmaps -------------------------------------------------------------------------------------------
@@ -77,17 +77,13 @@ class ptensorlayer0(ptensorlayer):
         if isinstance(x,ptensorlayer0):
             return x
         if isinstance(x,p.ptensorlayer1):
-            return self.make(x.atoms,x.reduce0())
-        if isinstance(x,p.ptensorlayer1):
-            return self.make(x.atoms,x.reduce0())
+            return x.reduce0()
+        if isinstance(x,p.ptensorlayer2):
+            return x.reduce0()
 
 
     # ---- Message passing -----------------------------------------------------------------------------------
 
-
-    @classmethod
-    def gather(self,atoms,x,mmap):
-        assert isinstance(x,p.ptensorlayer)
 
     @classmethod
     def gather_from_overlapping(self,atoms,x):
@@ -96,6 +92,11 @@ class ptensorlayer0(ptensorlayer):
     @classmethod
     def gather_from_neighbors(self,atoms,x):
         assert isinstance(x,p.ptensorlayer)
+
+    @classmethod
+    def gather(self,x,mmap):
+        if isinstance(x,p.ptensorlayer0):
+            pass 
 
         
 

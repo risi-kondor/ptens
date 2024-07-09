@@ -23,7 +23,7 @@ print(" Linmaps")
 print("---------\n")
 
 
-print("The linmaps from a 0th order P-tensor broadcasts along both atoms dimensions or just the diagonal:\n")
+print("The linmaps from a 0th order P-tensor broadcast along both atoms dimensions or just the diagonal:\n")
 A=p.ptensor0.randn([2,3,5],3)
 print(p.ptensor2.linmaps(A))
 

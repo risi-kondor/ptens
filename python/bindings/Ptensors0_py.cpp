@@ -2,6 +2,23 @@ typedef cnine::ATview<float> TVIEW;
 
 pybind11::class_<Ptensors0<float> >(m,"ptensors0")
 
+  .def_static("view",[](const AtomsPack& atoms, at::Tensor& x){
+      return Ptensors0<float>(atoms,tensorf::view(x));})
+
+  .def("add_reduce0_to",[](Ptensors0f& obj, const Ptensors0f& r, const AindexPack& list){
+      obj.add_reduce0_to(r,list);})
+  
+  .def("broadcast0",[](Ptensors0f& obj, const Ptensors0f& x, const AindexPack& list, const int offs){
+      obj.broadcast0(x,list,offs);},py::arg("x"),py::arg("list"),py::arg("offs")=0)
+
+
+  .def("str",&Ptensors0<float>::str,py::arg("indent")="")
+  .def("__str__",&Ptensors0<float>::str,py::arg("indent")="")
+  .def("__repr__",&Ptensors0<float>::repr);
+
+
+
+/*
   .def(py::init([](const AtomsPack& atoms, at::Tensor& M){
 	return Ptensors0<float>(atoms,Ltensor<float>(M));}))
   .def(py::init([](const vector<vector<int> >& atoms, at::Tensor& M){
@@ -18,6 +35,7 @@ pybind11::class_<Ptensors0<float> >(m,"ptensors0")
   .def_static("create",[](const AtomsPack& _atoms, const int _nc, const int fcode, const int _dev){
       return Ptensors0<float>(_atoms,cnine::channels=_nc,cnine::filltype=fcode,cnine::device=_dev);}, 
     py::arg("atoms"),py::arg("nc"),py::arg("fcode")=0,py::arg("device")=0)
+*/
 
 //.def("like",[](const Ptensors0<float>& x, at::Tensor& M){
 //      return Ptensors0<float>(x.atoms,ATview<float>(M));})
@@ -26,23 +44,21 @@ pybind11::class_<Ptensors0<float> >(m,"ptensors0")
 //   .def("zeros_like",[](const Ptensors0<float>& x){return Ptensors0<float>::zeros_like(x);})
 //   .def("randn_like",[](const Ptensors0<float>& x){return Ptensors0<float>::gaussian_like(x);})
 
-  .def_static("view",[](const AtomsPack& atoms, at::Tensor& x){
-      return Ptensors0<float>(atoms,Ltensor<float>::view(x));})
 
 
 // ---- Conversions, transport, etc. ------------------------------------------------------------------------
 
-
+/*
   .def("__len__",&Ptensors0<float>::size)
-//.def("add_to_grad",[](Ptensors0<float>& x, at::Tensor& y){x.add_to_grad(ATview<float>(y));})
-//.def("add_to_grad",[](Ptensors0<float>& x, const Ptensors0<float>& y, const float c){x.add_to_grad(y,c);})
+  .def("add_to_grad",[](Ptensors0<float>& x, at::Tensor& y){x.add_to_grad(ATview<float>(y));})
+  .def("add_to_grad",[](Ptensors0<float>& x, const Ptensors0<float>& y, const float c){x.add_to_grad(y,c);})
   .def("add_to_grad",[](Ptensors0<float>& x, at::Tensor& y){x.get_grad().add(ATview<float>(y));})
   .def("add_to_grad",[](Ptensors0<float>& x, const Ptensors0<float>& y, const float c){x.get_grad().add(y,c);})
   .def("get_grad",[](Ptensors0<float>& x){return x.get_grad();})
 
   .def("__getitem__",[](const Ptensors0<float>& x, const int i){return x(i);})
   .def("torch",[](const Ptensors0<float>& x){return x.torch();})
-
+*/
 
 // ---- Access ----------------------------------------------------------------------------------------------
 
@@ -68,9 +84,9 @@ pybind11::class_<Ptensors0<float> >(m,"ptensors0")
 //  .def("cat_channels_back0",&Ptensors0<float>::cat_channels_back0)
 //.def("cat_channels_back1",&Ptensors0<float>::cat_channels_back1)
 
-  .def("cat",&Ptensors0<float>::cat)
-  .def("add_cat_back",[](Ptensors0<float>& x, Ptensors0<float>& r, const int offs){
-      x.get_grad()+=r.get_grad().rows(offs,x.dim(0));})
+//  .def("cat",&Ptensors0<float>::cat)
+//  .def("add_cat_back",[](Ptensors0<float>& x, Ptensors0<float>& r, const int offs){
+//      x.get_grad()+=r.get_grad().rows(offs,x.dim(0));})
 
 //.def("outer",&Ptensors0::outer)
 //.def("outer_back0",&Ptensors0::outer_back0)
@@ -109,6 +125,7 @@ pybind11::class_<Ptensors0<float> >(m,"ptensors0")
 // ---- Message passing --------------------------------------------------------------------------------------
 
 
+/*
   .def_static("linmaps",[](const Ptensors0<float>& x){
       return Ptensors0<float>::linmaps(x);}) 
   .def_static("linmaps",[](const Ptensors1<float>& x){
@@ -145,7 +162,7 @@ pybind11::class_<Ptensors0<float> >(m,"ptensors0")
       x.add_gather_back(g);})
   .def("add_gather_back",[](Ptensors0<float>& x, Ptensors2<float>& g){
       x.get_grad().add_gather_back(g.get_grad());})
-
+*/
 
 //  .def("add_reduce0",[](Ptensors0f& obj, const Ptensors1f& x, const int offs=0, const int nc=0){
 //      obj.add_reduce0(x,offs,nc);})
@@ -154,8 +171,5 @@ pybind11::class_<Ptensors0<float> >(m,"ptensors0")
 // ---- I/O --------------------------------------------------------------------------------------------------
 
 
-  .def("str",&Ptensors0<float>::str,py::arg("indent")="")
-  .def("__str__",&Ptensors0<float>::str,py::arg("indent")="")
-  .def("__repr__",&Ptensors0<float>::repr);
 
 

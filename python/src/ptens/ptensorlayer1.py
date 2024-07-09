@@ -52,7 +52,7 @@ class ptensorlayer1(ptensorlayer):
         assert M.size(0)==atoms.nrows1()
         return self.make(atoms,M)
 
-    def as_ptensors1(self):
+    def backend(self):
         return _ptensors1.view(self.atoms,self)
 
 
@@ -72,7 +72,7 @@ class ptensorlayer1(ptensorlayer):
         assert i<len(self)
         offs=self.atoms.row_offset1(i)
         n=self.atoms.nrows1(i)
-        return ptensor1.from_matrix(self.atoms[i],torch.Tensor(self)[offs:offs+n])
+        return ptensor1.from_tensor(self.atoms[i],torch.Tensor(self)[offs:offs+n,:])
 
 
     # ---- Linmaps -------------------------------------------------------------------------------------------
@@ -82,14 +82,18 @@ class ptensorlayer1(ptensorlayer):
     def linmaps(self,x):
         nc=x.get_nc()
         if isinstance(x,p.ptensorlayer0):
-            r=p.ptensorlayer1.zeros(x.atoms,nc)
-            r[:,:]=r.broadcast0(x)
-            return r
+            return self.broadcast0(x)
         if isinstance(x,p.ptensorlayer1):
-            r=p.ptensorlayer1.zeros(x.atoms,2*nc)
-            r[:,0:nc]=r.broadcast0(x.reduce0())
+            r=ptensorlayer1.zeros(x.atoms,2*nc)
+            r[:,0:nc]=self.broadcast0(x.reduce0())
             r[:,nc:2*nc]=x
             return r
+        if isinstance(x,p.ptensorlayer2):
+            r=ptensorlayer1.zeros(x.atoms,5*nc)
+            r[:,0:2*nc]=self.broadcast0(x.reduce0())
+            r[:,2*nc:5*nc]=x.reduce1()
+            return r
+
 
 
     # ---- Message passing -----------------------------------------------------------------------------------
@@ -103,26 +107,36 @@ class ptensorlayer1(ptensorlayer):
     # ---- Reductions -----------------------------------------------------------------------------------------
 
 
+    def tensorize(self):
+        assert self.atoms.is_constk()
+        k=self.atoms.constk()
+        return self.unsqueeze(0).reshape(int(self.size(0)/k),k,self.size(1))
+
+
     def reduce0(self):
         if self.atoms.is_constk():
             k=self.atoms.constk()
-            return self.reshape(size(0)/k,k,size(1)).sum(dim=1)
+            return p.ptensorlayer0.make(self.atoms,self.tensorize().sum(dim=1))
         else:
-            r=torch.zeros([self.atoms.nrows0(),self.get_nc()])
-            self.as_ptensors1().add_reduce0_to(r)
-            return r
+            return ptensorlayer1_reduce0Fn.apply(self)
+
+    def reduce1(self):
+        return self
 
 
     # ---- Broadcasting ---------------------------------------------------------------------------------------
 
 
+    @classmethod
     def broadcast0(self,x):
-        if self.atoms.is_constk():
-            return x.unsqueeze(1).expand(x.size(0),self.atoms.constk(),x.size(1))
+        if x.atoms.is_constk():
+            return self.make(x.atoms,x.unsqueeze(1).expand(x.size(0),x.atoms.constk(),x.size(1)).reshape(x.size(0)*x.atoms.constk(),x.size(1)))
         else:
-            r=torch.zeros([self.atoms.nrows1(),x.dim(1)])
-            self.as_ptensors1().broadcast0(x)
-            return r
+            return ptensorlayer1_broadcast0Fn.apply(x)
+
+    @classmethod
+    def broadcast1(self,x):
+        return x
 
 
     # ---- I/O ----------------------------------------------------------------------------------------------
@@ -135,6 +149,42 @@ class ptensorlayer1(ptensorlayer):
         r=""
         for i in range(len(self)):
             r=r+str(self[i])+"\n"
+        return r
+
+
+
+# ---- Autograd functions --------------------------------------------------------------------------------------------
+
+
+class ptensorlayer1_reduce0Fn(torch.autograd.Function):
+    
+    @staticmethod
+    def forward(ctx,x):
+        ctx.x=x
+        r=p.ptensorlayer0.zeros(x.atoms,x.get_nc())
+        x.backend().add_reduce0_to(r)
+        return r
+
+    @staticmethod
+    def backward(ctx,g):
+        r=p.ptensorlayer1.zeros(ctx.x.atoms,ctx.x.get_nc())
+        r.backend().broadcast0(g)
+        return r
+
+
+class ptensorlayer1_broadcast0Fn(torch.autograd.Function):
+    
+    @staticmethod
+    def forward(ctx,x):
+        r=p.ptensorlayer1.zeros(x.atoms,x.get_nc())
+        r.backend().broadcast0(x)
+        ctx.r=r
+        return r
+
+    @staticmethod
+    def backward(ctx,g):
+        r=p.ptensorlayer0.zeros(ctx.r.atoms,ctx.r.get_nc())
+        g.backend().add_reduce0_to(r)
         return r
 
 

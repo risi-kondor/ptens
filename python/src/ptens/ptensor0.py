@@ -75,3 +75,6 @@ class ptensor0(ptensor):
 
     def __str__(self):
         return self.backend().str()
+
+    def to_string(self,indent):
+        return self.backend().str(indent)
