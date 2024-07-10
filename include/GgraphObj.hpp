@@ -20,7 +20,7 @@
 #include "FindPlantedSubgraphs2.hpp"
 #include "SubgraphObj.hpp"
 #include "AtomsPack.hpp"
-#include "Tensor.hpp"
+#include "Ltensor.hpp"
 
 
 namespace ptens{
@@ -36,17 +36,36 @@ namespace ptens{
     using BASE::BASE;
     using BASE::nedges;
 
-    bool is_cached=false;
-    AtomsPack original_edges;
+    //bool is_cached=false;
+    //AtomsPack original_edges;
 
     ~GgraphObj(){
       //for(auto& p:subgraphpack_cache)
       //p.second.obj->release_cached_packs();
     }
 
+    template<typename TYPE>
+    GgraphObj(const cnine::Ltensor<TYPE>& M):
+      BASE(M){}
+
+    template<typename TYPE>
+    GgraphObj(const cnine::Ltensor<TYPE>& M, const cnine::Ltensor<TYPE>& L):
+      BASE(M){
+      set_labels(L);
+    }
+
 
     GgraphObj(const initializer_list<pair<int,int> >& list, const int n): 
       BASE(n,list){}
+
+    GgraphObj(int n, const cnine::Ltensor<int>& M): 
+      GgraphObj(n){
+      PTENS_ASSRT(M.ndims()==2);
+      PTENS_ASSRT(M.dim(0)==2);
+      for(int i=0; i<M.dims(1); i++)
+	set(M(0,i),M(1,i),1.0);
+      //original_edges=AtomsPack(M.transp());
+    }
 
 
   public: //  ---- Named constructors -------------------------------------------------------------------------
@@ -56,21 +75,21 @@ namespace ptens{
       return BASE::random(_n,p);
     }
 
-    static GgraphObj from_edges(int n, const cnine::Tensor<int>& M){
+    static GgraphObj from_edges(int n, const cnine::Ltensor<int>& M){
       GgraphObj R(n);
       PTENS_ASSRT(M.ndims()==2);
       PTENS_ASSRT(M.dim(0)==2);
       for(int i=0; i<M.dims(1); i++)
 	R.set(M(0,i),M(1,i),1.0);
-      R.original_edges=AtomsPack(M.transp());
+      //R.original_edges=AtomsPack(M.transp());
       return R;
     }
 
-    static GgraphObj from_edges(const cnine::Tensor<int>& M){
+    static GgraphObj from_edges(const cnine::Ltensor<int>& M){
       return GgraphObj::from_edges(M.max()+1,M);
     }
 
-    static GgraphObj* from_edges_p(const cnine::Tensor<int>& M){
+    static GgraphObj* from_edges_p(const cnine::Ltensor<int>& M){
       auto R=new GgraphObj(M.max()+1);
       PTENS_ASSRT(M.ndims()==2);
       PTENS_ASSRT(M.dim(0)==2);
@@ -79,14 +98,6 @@ namespace ptens{
       return R;
     }
 
-    GgraphObj(int n, const cnine::Tensor<int>& M): 
-      GgraphObj(n){
-      PTENS_ASSRT(M.ndims()==2);
-      PTENS_ASSRT(M.dim(0)==2);
-      for(int i=0; i<M.dims(1); i++)
-	set(M(0,i),M(1,i),1.0);
-      original_edges=AtomsPack(M.transp());
-    }
 
 //     GgraphObj(int n, const cnine::Ltensor<int>& M):
 //       GgraphObj(n){
@@ -127,6 +138,11 @@ namespace ptens{
 	  t+=2;
 	});
       return R;
+    }
+
+    void set_labels(const cnine::Ltensor<float>& L){
+      labels=L;
+      labeled=true;
     }
 
 
@@ -210,9 +226,16 @@ namespace ptens{
       return "ptens::GgraphObj";
     }
 
-    //string str(const string indent="") const{
-    //return obj->str(indent);
-    //}
+    string str(const string indent="") const{
+      ostringstream oss;
+      oss<<indent<<"Ggraph on "<<to_string(getn())<<" vertices:"<<endl;
+      oss<<dense().str(indent+"  ");
+      if(labeled){
+	oss<<indent<<"Labels:"<<endl;
+	oss<<labels.str(indent+"  ");
+      }
+      return oss.str();
+    }
 
     friend ostream& operator<<(ostream& stream, const GgraphObj& x){
       stream<<x.str(); return stream;}

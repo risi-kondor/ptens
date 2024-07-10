@@ -165,6 +165,8 @@ namespace ptens{
   };
 
 
+  class SubgraphCache{};
+
 
 
 }

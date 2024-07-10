@@ -33,9 +33,13 @@ namespace ptens{
   public: // ---- Access -------------------------------------------------------------------------------------
 
 
+    int size(){
+      return BASE::size();
+    }
+
     void cache(const int key, const shared_ptr<GgraphObj>& x){
       (*this)[key]=x;
-      x->is_cached=true;
+      //x->is_cached=true;
       edge_list_map[x->edge_list()]=key;
     }
 
@@ -76,6 +80,17 @@ namespace ptens{
     }
 
 
+  public: // ---- I/O ---------------------------------------------------------------------------------------
+
+    
+    string str(const string indent=""){
+      ostringstream oss;
+      for(auto& p: *this){
+	oss<<indent<<"Graph "<<p.first<<":"<<endl;
+	oss<<p.second->str(indent+"  ");
+      }
+      return oss.str();
+    }
 
   };
 

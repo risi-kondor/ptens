@@ -149,6 +149,20 @@ namespace ptens{
       return "SubgraphObj";
     }
 
+    string str(const string indent="") const{
+      ostringstream oss;
+      oss<<indent<<"Subgraph on "<<to_string(getn())<<" vertices:"<<endl;
+      oss<<dense().str(indent+"  ");
+      if(labeled){
+	oss<<indent<<"Labels:"<<endl;
+	oss<<labels.str(indent+"  ");
+      }
+      return oss.str();
+    }
+
+    friend ostream& operator<<(ostream& stream, const SubgraphObj& x){
+      stream<<x.str(); return stream;}
+
   };
 
 }
