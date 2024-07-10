@@ -41,6 +41,11 @@ namespace ptens{
 
     AindexPack(){}
 
+    AindexPack(const vector<pair<int,vector<int> > >& x){
+      for(auto& p:x)
+	push_back(p.first,p.second);
+    }
+
 
   public: // ---- Copying -----------------------------------------------------------------------------------
 
