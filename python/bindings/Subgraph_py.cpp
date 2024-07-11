@@ -28,7 +28,7 @@ pybind11::class_<Subgraph>(m,"subgraph")
   .def("dense",[](const Subgraph& G){return G.dense().torch();})
 
   .def("str",&Subgraph::str,py::arg("indent")="")
-  .def("__str__",&Subgraph::str,py::arg("indent")="")
+  .def("__str__",&Subgraph::str,py::arg("indent")="");
 
-  .def("cached",&Subgraph::cached);
+//.def("cached",&Subgraph::cached);
 

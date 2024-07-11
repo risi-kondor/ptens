@@ -13,19 +13,8 @@
 #
 import torch
 
-# from ptens_base import *
-
-#import ptens.ptensor0 
-#import ptens.ptensor1 
-
-
-#from ptens.ptensor0 import *
-#from ptens.ptensor1 import *
-#from ptens.ptensor2 import *
-
-#from ptens.ptensors0 import *
-#from ptens.ptensors1 import *
-#from ptens.ptensors2 import *
+from ptens.ggraph import ggraph as ggraph
+from ptens.subgraph import subgraph as subgraph
 
 from ptens.ptensor0 import ptensor0 as ptensor0
 from ptens.ptensor1 import ptensor1 as ptensor1
@@ -35,11 +24,6 @@ from ptens.ptensorlayer import *
 from ptens.ptensorlayer0 import ptensorlayer0
 from ptens.ptensorlayer1 import ptensorlayer1
 from ptens.ptensorlayer2 import ptensorlayer2
-
-#from ptens.graph import graph as graph
-from ptens.ggraph import ggraph as ggraph
-from ptens.subgraph import subgraph as subgraph
-from ptens.subgraph_cache import subgraph_cache as subgraph_cache 
 
 #from ptens.nodelayer import nodelayer as nodelayer
 from ptens.subgraphlayer import subgraphlayer as subgraphlayer
@@ -80,3 +64,4 @@ from ptens.subgraphlayer2 import subgraphlayer2 as subgraphlayer2
 
 
 # from ptens.subgraphlayer0c import subgraphlayer0c
+#from ptens.subgraph_cache import subgraph_cache as subgraph_cache 

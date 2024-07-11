@@ -31,7 +31,7 @@ namespace ptens{
 
     typedef cnine::sparse_graph<int,float,float> BASE;
 
-    mutable unordered_map<SubgraphObj,AtomsPack> subgraphpack_cache;
+    mutable unordered_map<shared_ptr<SubgraphObj>,AtomsPack> subgraphpack_cache;
 
     using BASE::BASE;
     using BASE::nedges;
@@ -161,36 +161,6 @@ namespace ptens{
      }
 
 
-    AtomsPack subgraphs(const SubgraphObj& H) const{
-      auto it=subgraphpack_cache.find(H);
-      if(it!=subgraphpack_cache.end()) return it->second;
-      else{
-	//cout<<"Not in subgraph cache"<<endl;
-	cnine::flog timer("GgraphObj::finding subgraphs");
-
-	if(H.getn()==1 && H.labeled==false && H.nedges()==0){
-	  AtomsPack r(getn());
-	  //if(is_cached) r.obj->cache_packs=true; 
-	  subgraphpack_cache[H]=r;
-	  return r;
-	}
-
-	if(H.getn()==2 && H.labeled==false && H.nedges()==1){
-	  AtomsPack r;
-	  for_each_edge([&](const int i, const int j, const float v){
-	      if(i<j) r.push_back({i,j});});
-	  //if(is_cached) r.obj->cache_packs=true; 
-	  subgraphpack_cache[H]=r;
-	  return r;
-	}
-
-	AtomsPack r(new AtomsPackObj(cnine::Tensor<int>(cnine::FindPlantedSubgraphs<float>(*this,H))));
-	//if(is_cached) r.obj->cache_packs=true; 
-	subgraphpack_cache[H]=r;
-	return r;
-      }
-    }
-
     cnine::once<AtomsPack> edges=cnine::once<AtomsPack>([&](){
 	auto R=new AtomsPackObj(nedges(),2,cnine::fill_raw());
 	int i=0;
@@ -204,20 +174,36 @@ namespace ptens{
 	return AtomsPack(R);
       });
 
-    /*
-    cnine::once<Tensor<int> > edges=cnine::once<Tensor<int> >([&](){
-	auto R=new Tensor<int>(cnine::Gdims(nedges(),2));
-	int i=0;
-	for(auto& p:data)
-	  for(auto& q:p.second)
-	    if(p.first<q.first){
-	      R->set(i,0,p.first);
-	      R->set(i,1,q.first);
-	      i++;
-	    }
-	return R;
-      });
-    */
+
+  public: // ---- Subgraphs ----------------------------------------------------------------------------------
+
+
+    AtomsPack subgraphs(const shared_ptr<SubgraphObj>& S) const{
+      auto it=subgraphpack_cache.find(S);
+      if(it!=subgraphpack_cache.end()) return it->second;
+      else{
+	cnine::flog timer("GgraphObj::finding subgraphs");
+
+	if(S->getn()==1 && S->labeled==false && S->nedges()==0){
+	  AtomsPack r(getn());
+	  subgraphpack_cache[S]=r;
+	  return r;
+	}
+
+	if(S->getn()==2 && S->labeled==false && S->nedges()==1){
+	  AtomsPack r;
+	  for_each_edge([&](const int i, const int j, const float v){
+	      if(i<j) r.push_back({i,j});});
+	  subgraphpack_cache[S]=r;
+	  return r;
+	}
+
+	AtomsPack r(new AtomsPackObj(cnine::Tensor<int>(cnine::FindPlantedSubgraphs<float>(*this,*S))));
+	subgraphpack_cache[S]=r;
+	return r;
+      }
+    }
+
 
   public: // ---- I/O -----------------------------------------------------------------------------------------
 

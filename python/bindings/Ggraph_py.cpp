@@ -1,8 +1,8 @@
 pybind11::class_<ptens::Ggraph>(m,"ggraph")
 
 
-  .def(pybind11::init([](const at::Tensor& x){
-	return Ggraph(cnine::Ltensor<float>(x));}))
+//.def(pybind11::init([](const at::Tensor& x){
+//return Ggraph(cnine::Ltensor<float>(x));}))
 
 
   .def_static("from_matrix",[](const at::Tensor& x){
@@ -11,7 +11,6 @@ pybind11::class_<ptens::Ggraph>(m,"ggraph")
   .def_static("from_matrix",[](const at::Tensor& x, const at::Tensor& labels){
 	return Ggraph(cnine::Ltensor<float>(x),cnine::Ltensor<float>(labels));})
 
-
   .def_static("from_edge_index",[](const at::Tensor& x, const int n=-1){
       return Ggraph::from_edges(n,cnine::Tensor<float>(x));})
 
@@ -19,8 +18,6 @@ pybind11::class_<ptens::Ggraph>(m,"ggraph")
       auto G=Ggraph::from_edges(n,cnine::Tensor<float>(x));
       G.set_labels(labels);
     })
-
-
 
   .def_static("random",static_cast<Ggraph(*)(const int, const float)>(&ptens::Ggraph::random))
 
@@ -42,16 +39,15 @@ pybind11::class_<ptens::Ggraph>(m,"ggraph")
 
   .def("is_labeled",[](Ggraph& G){
       return G.is_labeled();})
-
   .def("set_labels",[](Ggraph& G, const at::Tensor& x){
       G.set_labels(cnine::Ltensor<float>(x));})
-
   .def("get_labels",[](Ggraph& G){
-      //if(!G.is_labeled()) return ;
       return G.get_labels().torch();})
 
   .def("subgraphs",[](const Ggraph& G, const Subgraph& H){
       return G.subgraphs(H);})
+  .def("cached_subgraph_lists_as_map",[](const Ggraph& G){
+      return G.cached_subgraph_lists_as_map();})
 
 
   .def("str",&Ggraph::str,py::arg("indent")="")

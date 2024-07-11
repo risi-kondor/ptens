@@ -16,11 +16,12 @@
 #define _ptens_TensorLevelMap
 
 #include "TensorLevelMapObj.hpp"
+#include "AtomsPack.hpp"
 
 
 namespace ptens{
 
-  class AtomsPackObj;
+  //class AtomsPackObj;
 
 
   class TensorLevelMap{
@@ -37,8 +38,11 @@ namespace ptens{
     TensorLevelMap(TensorLevelMapObj* x):
       obj(x){}
 
-    //TensorLevelMap(const AtomsPack& _in_atoms, const AtomsPack& _out_atoms):
-    //obj(new TensorLevelMapObj(*_in_atoms.obj,*_out_atoms.obj)){}
+    static TensorLevelMap overlaps_map(const AtomsPack& out, const AtomsPack& in){
+      if(ptens_global::cache_overlap_maps) 
+	return TensorLevelMap(ptens_global::overlaps_cache(out,in));
+      return new TensorLevelMapObj(*in.obj,*out.obj); 
+    }
 
 
   public: // ---- Access -------------------------------------------------------------------------------------

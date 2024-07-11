@@ -29,8 +29,8 @@ int main(int argc, char** argv){
   cout<<M<<endl;
   auto E=M.edge_list();
 
-  cout<<Ggraph::cached_from_edge_list(E)<<endl;
-  cout<<Ggraph::cached_from_edge_list(E)<<endl;
-  cout<<Ggraph::cached_from_edge_list(E)<<endl;
+  //cout<<Ggraph::cached_from_edge_list(E)<<endl;
+  //cout<<Ggraph::cached_from_edge_list(E)<<endl;
+  //cout<<Ggraph::cached_from_edge_list(E)<<endl;
 
 }

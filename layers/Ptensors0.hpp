@@ -23,6 +23,7 @@
 #include "Ptensor0.hpp"
 #include "Ptensors.hpp"
 #include "AtomsPackTag.hpp"
+#include "TensorLevelMap.hpp"
 
 
 namespace ptens{

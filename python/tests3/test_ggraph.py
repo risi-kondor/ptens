@@ -57,4 +57,22 @@ G.cache(5)
 H=p.ggraph.from_cache(5)
 print(H)
 
-print(pb.status_str())
+
+print("\n-----------")
+print(" Subgraphs")
+print("-----------\n")
+
+print("Given a subgraph S, we can find all occurrences of S in G:\n")
+G=p.ggraph.random(8,0.5)
+S=p.subgraph.triangle()
+A=G.subgraphs(S)
+print(A)
+print("\n")
+
+print("The result of finding subgraphs is automatically cached.")
+print("We can inspect the graph's subgraph list cache:\n")
+C=G.cached_subgraph_lists()
+for c in C:
+    print(c)
+    print(C[c])
+    print("\n")

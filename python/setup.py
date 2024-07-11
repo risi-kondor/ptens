@@ -47,6 +47,7 @@ def main():
                      cwd + cnine_folder + '/tensors/functions',
                      cwd + cnine_folder + '/tensor_views',
                      cwd + '/../include',
+                     cwd + '/../caches',
                      cwd + '/../tensors',
                      cwd + '/../layers',
                      cwd + '/../layers/backend'

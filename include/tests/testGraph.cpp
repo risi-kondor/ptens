@@ -51,7 +51,7 @@ int main(int argc, char** argv){
 
 
   Tensor<int> B({{0,1,2},{1,2,0}});
-  Tensor<int> D(3);
+  Tensor<int> D(Gdims(3));
   D.set(0,2);
   D.set(1,3);
   D.set(2,2);
@@ -59,5 +59,7 @@ int main(int argc, char** argv){
   cout<<P<<endl;
 
   cout<<"-- Cache: --"<<endl;
-  cout<<Subgraph::cached()<<endl;
+  //cout<<Subgraph::cached()<<endl;
+  cout<<ptens_global::subgraph_cache<<endl;
+
 }

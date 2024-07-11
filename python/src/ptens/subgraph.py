@@ -21,6 +21,12 @@ from ptens_base import subgraph as _subgraph
 class subgraph:
 
     @classmethod
+    def make(self,x):
+        G=subgraph()
+        G.obj=x
+        return G;
+
+    @classmethod
     def from_edge_index(self,M,n=-1,labels=None,degrees=None):
         G=subgraph()
         if degrees is None: 

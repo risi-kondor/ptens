@@ -2,6 +2,7 @@
 m.def("status_str",[](){return ptens_session.status_str();});
 
 
+/*
 m.def("subgraph_cache_subgraphs",[](){
     vector<Subgraph> R;
     //for(auto& p:ptens_global::subgraph_cache)
@@ -9,7 +10,7 @@ m.def("subgraph_cache_subgraphs",[](){
       R.push_back(Subgraph(it));
     return R;
   });
-
+*/ 
 
 
 

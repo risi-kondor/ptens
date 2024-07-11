@@ -14,12 +14,8 @@
 #ifndef _Ptens_Graph
 #define _Ptens_Graph
 
-//#include "Hgraph.hpp"
 #include "GgraphObj.hpp"
 #include "Subgraph.hpp"
-//#include "PtensSessionObj.hpp"
-
-//extern ptens::PtensSessionObj* ptens::ptens_session;
 
 
 namespace ptens{
@@ -51,7 +47,7 @@ namespace ptens{
       obj(new OBJ(M)){}
 
     Ggraph(const cnine::Ltensor<float>& M, const cnine::Ltensor<float>& L):
-      obj(new OBJ(M)){}
+      obj(new OBJ(M,L)){}
 
     Ggraph(const int key):
       Ggraph(ptens_global::graph_cache(key)){}
@@ -164,16 +160,17 @@ namespace ptens{
       return Ggraph(new OBJ(obj->permute(pi)));
     }
 
-    //cnine::array_pool<int> subgraphs_list(const Subgraph& H) const{
-    //return obj->subgraphs_list(*H.obj);
-    //}
+    AtomsPack subgraphs(const Subgraph& S) const{
+      return obj->subgraphs(S.obj);
+      //return obj->subgraphs(*S.obj);
+      //return ptens_global::subgraph_list_cache(*obj,*S.obj);
+    }
 
-    //cnine::Tensor<int>& subgraphs_matrix(const Subgraph& H) const{
-    //return obj->subgraphs_matrix(*H.obj);
-    //}
-
-    AtomsPack subgraphs(const Subgraph& H) const{
-      return obj->subgraphs(*H.obj);
+    unordered_map<Subgraph,AtomsPack> cached_subgraph_lists_as_map() const{
+      unordered_map<Subgraph,AtomsPack> R;
+      for(auto& p:obj->subgraphpack_cache)
+	R[Subgraph(p.first)]=p.second;
+      return R;
     }
 
 
@@ -196,5 +193,14 @@ namespace ptens{
 
 }
 
+
 #endif 
+
+    //cnine::array_pool<int> subgraphs_list(const Subgraph& H) const{
+    //return obj->subgraphs_list(*H.obj);
+    //}
+
+    //cnine::Tensor<int>& subgraphs_matrix(const Subgraph& H) const{
+    //return obj->subgraphs_matrix(*H.obj);
+    //}
 

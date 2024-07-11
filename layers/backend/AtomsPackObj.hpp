@@ -76,7 +76,7 @@ namespace ptens{
       constk=k;
     }
 
-    // eliminate?
+    // needed by SubgrapgListCache
     AtomsPackObj(const int N):
       AtomsPackObj(){
       for(int i=0; i<N; i++)

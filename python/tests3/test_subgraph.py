@@ -1,5 +1,7 @@
 import torch
 import ptens as p
+import ptens_base as pb
+
 
 print("\n----------------------------------")
 print(" subgraph")
@@ -26,4 +28,6 @@ print(s1)
 #print(G.subgraphs(s1))
 
 print("Contents of cache:\n")
-print(p.subgraph_cache.subgraphs())
+C=pb.subgraph_cache.torch()
+for s in C:
+    print(s)

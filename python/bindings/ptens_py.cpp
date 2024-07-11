@@ -77,9 +77,11 @@ PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
 
 #include "Ggraph_py.cpp"
 #include "Subgraph_py.cpp"
+#include "TensorLevelMap_py.cpp"
 
 #include "GgraphCache_py.cpp"
 #include "SubgraphCache_py.cpp"
+#include "OverlapsMmapCache_py.cpp"
 
 
     //#include "MessageList_py.cpp"

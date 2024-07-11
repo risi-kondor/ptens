@@ -24,7 +24,8 @@ namespace ptens{
 #include "RowLevelMapCache.hpp"
 
 #include "GgraphCache.hpp"
-#include "SubgraphObj.hpp"
+#include "SubgraphCache.hpp"
+//#include "SubgraphObj.hpp"
 
 
 namespace ptens{
@@ -46,7 +47,11 @@ namespace ptens{
 
     GgraphCache graph_cache;
 
-    std::unordered_set<SubgraphObj> subgraph_cache;
+    //std::unordered_set<SubgraphObj> subgraph_cache;
+    SubgraphCache subgraph_cache;
+
+    //bool cache_subgraph_lists=true;
+    //SubgraphListCache subgraph_list_cache;
 
   }
 

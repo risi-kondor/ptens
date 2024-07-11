@@ -18,7 +18,7 @@
 #include "AtomsPack.hpp"
 #include "AtomsPackObj.hpp"
 #include "TensorLevelMapObj.hpp"
-#include "TensorLevelMap.hpp"
+//#include "TensorLevelMap.hpp"
 
 
 namespace ptens{
@@ -41,12 +41,12 @@ namespace ptens{
   public: // ---- Access ------------------------------------------------------------------------------------------
 
 
-    TensorLevelMap operator()(const AtomsPackObj& out, const AtomsPackObj& in){
+    shared_ptr<TensorLevelMapObj> operator()(const AtomsPackObj& out, const AtomsPackObj& in){
       if(ptens_global::cache_overlap_maps) return BASE::operator()(out,in); 
-      return new TensorLevelMapObj(in,out);
+      return make_shared<TensorLevelMapObj>(in,out);
     }
 
-    TensorLevelMap operator()(const AtomsPack& out, const AtomsPack& in){
+    shared_ptr<TensorLevelMapObj> operator()(const AtomsPack& out, const AtomsPack& in){
       return (*this)(*out.obj,*in.obj);
     }
 

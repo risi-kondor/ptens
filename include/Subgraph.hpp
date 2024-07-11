@@ -28,7 +28,8 @@ namespace ptens{
   class Subgraph{
   public:
 
-    unordered_set<SubgraphObj>::iterator obj;
+    //unordered_set<SubgraphObj>::iterator obj;
+    shared_ptr<SubgraphObj> obj;
     
 
   public: // ---- Constructors -------------------------------------------------------------------------------
@@ -40,43 +41,47 @@ namespace ptens{
     Subgraph(const Subgraph& x):
       obj(x.obj){}
 
-    Subgraph(unordered_set<SubgraphObj>::iterator _obj):
+    //Subgraph(unordered_set<SubgraphObj>::iterator _obj):
+    //obj(_obj){}
+
+    Subgraph(const shared_ptr<SubgraphObj>& _obj):
       obj(_obj){}
 
     Subgraph(const int _n):
-      obj(ptens_global::subgraph_cache.emplace(_n).first){}
+      obj(ptens_global::subgraph_cache.emplace(_n)){}
+    //obj(ptens_global::subgraph_cache.emplace(_n).first){}
 
     Subgraph(const vector<pair<int,int> >& list): 
-      obj(ptens_global::subgraph_cache.emplace(list).first){}
+      obj(ptens_global::subgraph_cache.emplace(list)){}
 
     Subgraph(const int _n, const initializer_list<pair<int,int> >& list): 
-      obj(ptens_global::subgraph_cache.emplace(_n,list).first){}
+      obj(ptens_global::subgraph_cache.emplace(_n,list)){}
 
     Subgraph(const int _n, const initializer_list<pair<int,int> >& list, const cnine::Tensor<float>& labels): 
-      obj(ptens_global::subgraph_cache.emplace(_n,list,labels).first){}
+      obj(ptens_global::subgraph_cache.emplace(_n,list,labels)){}
 
     Subgraph(const cnine::Tensor<float>& M):
-      obj(ptens_global::subgraph_cache.emplace(M).first){}
+      obj(ptens_global::subgraph_cache.emplace(M)){}
 
     Subgraph(const cnine::Tensor<float>& M, const cnine::Tensor<float>& L):
-      obj(ptens_global::subgraph_cache.emplace(M,L).first){}
+      obj(ptens_global::subgraph_cache.emplace(M,L)){}
 
 
     static Subgraph edge_index(const cnine::Tensor<int>& x, int _n=-1){
       if(_n==-1) _n=x.max()+1;
-      return ptens_global::subgraph_cache.emplace(_n,x).first;
+      return ptens_global::subgraph_cache.emplace(_n,x);
     }
 
     static Subgraph edge_index(const cnine::Tensor<int>& x, const cnine::Tensor<int>& L, int _n=-1){
       if(_n==-1) _n=x.max()+1;
-      return ptens_global::subgraph_cache.emplace(_n,x,L).first;
+      return ptens_global::subgraph_cache.emplace(_n,x,L);
     }
 
     static Subgraph edge_index_degrees(const cnine::Tensor<int>& x, const cnine::Tensor<int>& D, int _n=-1){
       if(_n==-1) _n=x.max()+1;
       SubgraphObj H(_n,x);
       H.set_degrees(D);
-      return ptens_global::subgraph_cache.insert(H).first;
+      return ptens_global::subgraph_cache.insert(H);
     }
 
 
@@ -140,6 +145,10 @@ namespace ptens{
       const_cast<SubgraphObj&>(*obj).make_eigenbasis();
     }
 
+    //bool operator==(const Subgraph& x) const{
+    //return obj==x.obj;
+    //}
+
 
   public: // ---- I/O -----------------------------------------------------------------------------------------
 
@@ -152,12 +161,12 @@ namespace ptens{
       return obj->str(indent);
     }
 
-    static string cached(){
-      ostringstream oss;
-      for(auto p: ptens_global::subgraph_cache)
-	oss<<p<<endl;
-      return oss.str();
-    }
+    //static string cached(){
+    //ostringstream oss;
+    //for(auto p: ptens_global::subgraph_cache)
+    //oss<<p<<endl;
+    //return oss.str();
+    //}
 
     friend ostream& operator<<(ostream& stream, const Subgraph& x){
       stream<<x.str(); return stream;}
@@ -165,10 +174,21 @@ namespace ptens{
   };
 
 
-  class SubgraphCache{};
-
-
+  //class SubgraphCache{};
 
 }
+
+
+namespace std{
+  
+  template<>
+  struct hash<ptens::Subgraph>{
+  public:
+    size_t operator()(const ptens::Subgraph& x) const{
+      return hash<ptens::SubgraphObj*>()(&const_cast<ptens::SubgraphObj&>(*x.obj));
+    }
+  };
+}
+
 
 #endif 
