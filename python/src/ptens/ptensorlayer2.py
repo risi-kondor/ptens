@@ -14,17 +14,15 @@
 
 import torch
 
+import ptens as p
 import ptens_base as pb 
 from ptens_base import ptensors0 as _ptensors0
 from ptens_base import ptensors1 as _ptensors1
 from ptens_base import ptensors2 as _ptensors2
 
-import ptens as p
-import ptens.ptensorlayer as ptensorlayer
-import ptens.ptensor2 as ptensor2
 
 
-class ptensorlayer2(ptensorlayer):
+class ptensorlayer2(p.ptensorlayer):
 
     @classmethod
     def make(self,atoms,M):
@@ -55,6 +53,9 @@ class ptensorlayer2(ptensorlayer):
     def backend(self):
         return _ptensors2.view(self.atoms,self)
 
+    def zeros_like(self):
+        return ptensorlayer0.zeros(self.atoms,self.get_nc(),device=self.device)
+    
 
     # ----- Access -------------------------------------------------------------------------------------------
 
@@ -74,7 +75,7 @@ class ptensorlayer2(ptensorlayer):
         n=self.atoms.nrows2(i)
         k=self.atoms.nrows1(i)
         nc=self.size(1)
-        return ptensor2.from_tensor(self.atoms[i],torch.Tensor(self)[offs:offs+n,:].reshape(k,k,nc))
+        return p.ptensor2.from_tensor(self.atoms[i],torch.Tensor(self)[offs:offs+n,:].reshape(k,k,nc))
 
 
     # ---- Linmaps -------------------------------------------------------------------------------------------
@@ -102,8 +103,14 @@ class ptensorlayer2(ptensorlayer):
 
 
     @classmethod
-    def gather(self,atoms,x,map):
-        return Ptensorsb_Gather0Fn.apply(x,S)
+    def gather(self,atoms,x,*args):
+        assert isinstance(atoms,pb.atomspack)
+        assert isinstance(x,p.ptensorlayer)
+        if len(args)==0:
+            return ptensorlayer2.gather(atoms,x,pb.tensor_map.overlaps_map(atoms,x.atoms)) 
+        else:
+            assert isinstance(args[0],pb.tensor_map)
+            return ptensorlayer2_gatherFn.apply(atoms,x,args[0])
 
 
     # ---- Reductions -----------------------------------------------------------------------------------------
@@ -200,7 +207,7 @@ class ptensorlayer2(ptensorlayer):
 
 
     def __repr__(self):
-        return "ptensorlayer1(len="+str(len(self.atoms))+",nc="+str(self.size(1))+")"
+        return "ptensorlayer2(len="+str(len(self.atoms))+",nc="+str(self.size(1))+")"
 
     def __str__(self):
         r=""
@@ -292,18 +299,18 @@ class ptensorlayer2_broadcast2Fn(torch.autograd.Function):
         return r
 
 
+class ptensorlayer2_gatherFn(torch.autograd.Function):
 
-#     def __init__(self,atoms,M):
-#         assert isinstance(atoms,pb.atomspack)
-#         assert isinstance(M,torch.Tensor)
-#         assert M.dim()==2
-#         assert M.size(0)==atoms.nrows1()
-#         R=ptensorlayer1(M)
-#         R.atoms=atoms
-#         return R
+    @staticmethod
+    def forward(ctx,atoms,x,tmap):
+        r=ptensorlayer2.zeros(atoms,x.get_nc()*([2,5,15][x.getk()]))
+        r.backend().add_gather(x.backend(),tmap)
+        ctx.x=x
+        ctx.tmap=tmap
+        return r
 
-    #def clone(self):
-    #    r=ptensorlayer2(super().clone())
-    #    r.atoms=self.atoms
-    #    return r
-
+    @staticmethod
+    def backward(ctx,g):
+        r=ctx.x.zeros_like()
+        r.backend().add_gather_back(g.backend(),ctx.tmap)
+        return r

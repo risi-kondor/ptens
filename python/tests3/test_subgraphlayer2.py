@@ -29,16 +29,35 @@ print(" Linmaps")
 print("---------\n")
 
 print("Linmaps from a 0th order subgraph layer:\n")
-A=p.subgraphlayer0.from_matrix(G,S,M)
-B=p.subgraphlayer0.linmaps(A)
+A0=p.subgraphlayer0.from_matrix(G,S,M)
+B=p.subgraphlayer0.linmaps(A0)
 print(B)
 
 print("Linmaps from a 1st order subgraph layer:\n")
-A=p.subgraphlayer1.randn(G,S,3)
-B=p.subgraphlayer2.linmaps(A)
+A1=p.subgraphlayer1.randn(G,S,3)
+B=p.subgraphlayer2.linmaps(A1)
 print(B)
 
 print("Linmaps from a 2nd order subgraph layer:\n")
-A=p.subgraphlayer2.randn(G,S,3)
-B=p.subgraphlayer2.linmaps(A)
+A2=p.subgraphlayer2.randn(G,S,3)
+B=p.subgraphlayer2.linmaps(A2)
 print(B)
+
+
+print("\n---------")
+print(" Gather")
+print("---------\n")
+
+
+atoms2=pb.atomspack.random(5,5,0.6)
+print(atoms2,"\n")
+
+B0=p.ptensorlayer2.gather(atoms2,A0)
+print(B0)
+
+B1=p.ptensorlayer2.gather(atoms2,A1)
+print(B1)
+
+B2=p.ptensorlayer2.gather(atoms2,A2)
+print(B2)
+

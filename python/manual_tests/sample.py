@@ -1,3 +1,18 @@
+def fun(a,b,*args):
+    print([5,6,7][a])
+    print(a)
+    print(b)
+    print(len(args))
+    print(args)
+    print(args[0])
+
+fun(0,2,3)
+
+exit(0)
+    
+    
+
+
 x=subgraphlayer0(G,x_in)
 
 a=p.subgraphlayer1.gather(x,self.nodes)

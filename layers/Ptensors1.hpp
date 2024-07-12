@@ -363,7 +363,7 @@ namespace ptens{
 
     
     template<typename SOURCE>
-    static Ptensors1<TYPE> gather(const SOURCE& x, const AtomsPack& a, const int min_overlaps=1){
+    static Ptensors1<TYPE> gather(const AtomsPack& a, const SOURCE& x, const int min_overlaps=1){
       int nc=x.get_nc()*vector<int>({1,2,5})[x.getk()];
       Ptensors1<TYPE> R(a,nc,x.get_dev());
       R.add_gather(x,min_overlaps);

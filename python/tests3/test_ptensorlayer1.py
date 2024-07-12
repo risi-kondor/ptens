@@ -31,15 +31,32 @@ print("---------\n")
 
 
 print("The linmaps from a 0th order P-tensor layer broadcast along the atom dimension:\n")
-A=p.ptensorlayer0.randn(atoms,3)
-print(p.ptensorlayer1.linmaps(A))
+A0=p.ptensorlayer0.randn(atoms,3)
+print(p.ptensorlayer1.linmaps(A0))
 
 print("The linmaps from a 1st order P-tensor consists of two different maps:\n")
-A=p.ptensorlayer1.randn(atoms,3)
-print(p.ptensorlayer1.linmaps(A))
+A1=p.ptensorlayer1.randn(atoms,3)
+print(p.ptensorlayer1.linmaps(A1))
 
 print("The linmaps from a 2nd order P-tensor consists of 5 different maps:\n")
-A=p.ptensorlayer2.randn(atoms,3)
-print(p.ptensorlayer1.linmaps(A))
+A2=p.ptensorlayer2.randn(atoms,3)
+print(p.ptensorlayer1.linmaps(A2))
 
+
+print("\n---------")
+print(" Gather")
+print("---------\n")
+
+
+atoms2=pb.atomspack.random(5,5,0.6)
+print(atoms2,"\n")
+
+B0=p.ptensorlayer1.gather(atoms2,A0)
+print(B0)
+
+B1=p.ptensorlayer1.gather(atoms2,A1)
+print(B1)
+
+B2=p.ptensorlayer1.gather(atoms2,A2)
+print(B2)
 

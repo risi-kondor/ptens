@@ -48,6 +48,9 @@ class ptensorlayer0(ptensorlayer):
         assert M.size(0)==atoms.nrows0()
         return self.make(atoms,M)
 
+    def zeros_like(self):
+        return ptensorlayer0.zeros(self.atoms,self.get_nc(),device=self.device)
+    
     def backend(self):
         return pb.ptensors0.view(self.atoms,self)
 
@@ -86,18 +89,14 @@ class ptensorlayer0(ptensorlayer):
 
 
     @classmethod
-    def gather_from_overlapping(self,atoms,x):
+    def gather(self,atoms,x,*args):
+        assert isinstance(atoms,pb.atomspack)
         assert isinstance(x,p.ptensorlayer)
-
-    @classmethod
-    def gather_from_neighbors(self,atoms,x):
-        assert isinstance(x,p.ptensorlayer)
-
-    @classmethod
-    def gather(self,x,mmap):
-        if isinstance(x,p.ptensorlayer0):
-            pass 
-
+        if len(args)==0:
+            return ptensorlayer0.gather(atoms,x,pb.tensor_map.overlaps_map(atoms,x.atoms)) 
+        else:
+            assert isinstance(args[0],pb.tensor_map)
+            return ptensorlayer0_gatherFn.apply(atoms,x,args[0])
         
 
     # ---- I/O ----------------------------------------------------------------------------------------------
@@ -114,37 +113,25 @@ class ptensorlayer0(ptensorlayer):
 
 
 
+# ---- Autograd functions --------------------------------------------------------------------------------------------
 
 
 
+class ptensorlayer0_gatherFn(torch.autograd.Function):
+
+    @staticmethod
+    def forward(ctx,atoms,x,tmap):
+        r=ptensorlayer0.zeros(atoms,x.get_nc()*([1,1,2][x.getk()]))
+        r.backend().add_gather(x.backend(),tmap)
+        ctx.x=x
+        ctx.tmap=tmap
+        return r
+
+    @staticmethod
+    def backward(ctx,g):
+        r=ctx.x.zeros_like()
+        r.backend().add_gather_back(g.backend(),ctx.tmap)
+        return r
 
 
-
-
-
-
-
-    # ---- Operations ----------------------------------------------------------------------------------------
-
-
-#     def __add__(self,y):
-#         assert self.size==y.size
-#         assert self.atoms==y.atoms
-#         r=self.clone()
-#         r+=y
-#         return r
-
-
-#     def __init__(self,atoms,M):
-#         assert isinstance(atoms,pb.atomspack)
-#         assert isinstance(M,torch.Tensor)
-#         assert M.dim()==2
-#         assert M.size(0)==atoms.tsize0()
-#         super(ptensorlayerc,self).__init__(x)
-#         atoms=atoms
-
-    #def clone(self):
-    #    r=ptensorlayer0(super().clone())
-    #    r.atoms=self.atoms
-    #    return r
 

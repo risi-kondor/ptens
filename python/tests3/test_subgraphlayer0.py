@@ -49,3 +49,28 @@ B=p.subgraphlayer0.linmaps(A)
 print(B)
 
 
+print("\n---------")
+print(" Gather")
+print("---------\n")
+
+E=p.subgraph.edge()
+
+
+print("Gather from a 0th order subgraph layer:\n")
+A0=p.subgraphlayer0.randn(G,E,3)
+B0=p.subgraphlayer0.gather(S,A0)
+print(B0)
+
+print("Gather from a 1st order subgraph layer:\n")
+A1=p.subgraphlayer1.randn(G,E,3)
+B1=p.subgraphlayer0.gather(S,A1)
+print(B1)
+
+
+print("Gather from a 2nd order subgraph layer:\n")
+A2=p.subgraphlayer2.randn(G,E,3)
+B2=p.subgraphlayer0.gather(S,A2)
+print(B2)
+
+
+

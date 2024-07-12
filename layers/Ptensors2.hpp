@@ -303,7 +303,6 @@ namespace ptens{
       broadcast2(x,13*nc);
     }
 
-
     void add_linmaps_back(const Ptensors0<TYPE>& r){
       broadcast0_shrink(r);
     }
@@ -317,8 +316,8 @@ namespace ptens{
     void add_linmaps_back(const Ptensors2<TYPE>& r){
       int nc=get_nc();
       broadcast0_shrink(r.reduce0_shrink(0,nc));
-      broadcast1_shrink(r.reduce1_shrink(2*nc,9*nc));
-      // TODO
+      broadcast1_shrink(r.reduce1_shrink(4*nc,3*nc));
+      add(r.reduce2_shrink(13*nc,nc));
     }
 
 
@@ -326,7 +325,7 @@ namespace ptens{
 
 
     template<typename SOURCE>
-    static Ptensors2<TYPE> gather(const SOURCE& x, const AtomsPack& a){
+    static Ptensors2<TYPE> gather(const AtomsPack& a, const SOURCE& x){
       int nc=x.get_nc()*vector<int>({2,5,15})[x.getk()];
       Ptensors2<TYPE> R(a,nc,x.get_dev());
       R.add_gather(x);
@@ -378,7 +377,7 @@ namespace ptens{
 	if constexpr(std::is_same<OUTPUT,Ptensors2<TYPE> >::value){
 	  broadcast0_shrink(x.reduce0_shrink(map.atoms(),map.out(),0,2*nc),map.in());
 	  broadcast1_shrink(x.reduce1_shrink(map.atoms(),map.out(),4*nc,3*nc),map.in());
-	  broadcast2_shrink(x.reduce2_shrink(map.atoms(),map.out(),13*nc,nc),map.in());
+	  broadcast2(x.reduce2_shrink(map.atoms(),map.out(),13*nc,nc),map.in());
 	}
       }
     }
@@ -627,7 +626,7 @@ namespace ptens{
       TimedFn T("Ptensors2","reduce0",*this,list,(list.count2+list.count1)*nc);
       if(nc==0) nc=get_nc()/2;
       Ptensors0<TYPE> R(_atoms,nc,0,dev);
-      add_reduce0_shrink_to(R,list,offs,nc);
+      add_reduce0_shrink_to(R,list,offs);
       return R;
     }
 

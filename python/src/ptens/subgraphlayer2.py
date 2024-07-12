@@ -57,6 +57,15 @@ class subgraphlayer2(p.subgraphlayer,p.ptensorlayer2):
         return subgraphlayer2(x.G,x.S,x.atoms,super().linmaps(x))
 
 
+    # ---- Gather ------------------------------------------------------------------------------------------
+
+
+    @classmethod
+    def gather(self,S,x):
+        atoms=x.G.subgraphs(S)
+        return subgraphlayer2(x.G,x.S,atoms,super().gather(atoms,x))
+
+
     # ---- I/O ----------------------------------------------------------------------------------------------
 
 

@@ -312,7 +312,7 @@ namespace ptens{
 
 
     template<typename SOURCE, typename = typename std::enable_if<std::is_base_of<Ptensors<float>, SOURCE>::value, SOURCE>::type>
-    static Ptensors0<TYPE> gather(const SOURCE& x, const AtomsPack& a){
+    static Ptensors0<TYPE> gather(const AtomsPack& a, const SOURCE& x){
       int nc=x.get_nc()*vector<int>({1,1,2})[x.getk()];
       Ptensors0<TYPE> R(a,nc,x.get_dev());
       R.add_gather(x);
