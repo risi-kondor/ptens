@@ -72,6 +72,22 @@ namespace ptens{
     }
 
 
+  public: // ---- Layout -------------------------------------------------------------------------------------
+
+
+    int nrows0() const{return obj->nrows0();}
+    int nrows0(const int i) const{return obj->nrows0(i);}
+    int offset0(const int i) const{return obj->offset0(i);}
+
+    int nrows1() const{return obj->nrows1();}
+    int nrows1(const int i) const{return obj->nrows1(i);}
+    int offset1(const int i) const{return obj->offset1(i);}
+
+    int nrows2() const{return obj->nrows2();}
+    int nrows2(const int i) const{return obj->nrows2(i);}
+    int offset2(const int i) const{return obj->offset2(i);}
+
+
   public: // ---- Operations ---------------------------------------------------------------------------------
 
 

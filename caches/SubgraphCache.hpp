@@ -14,6 +14,8 @@
 #ifndef _Ptens_SubgraphCache
 #define _Ptens_SubgraphCache
 
+#include <unordered_set>
+
 #include "SubgraphObj.hpp"
 
 

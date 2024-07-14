@@ -50,7 +50,9 @@ def main():
                      cwd + '/../caches',
                      cwd + '/../tensors',
                      cwd + '/../layers',
-                     cwd + '/../layers/backend'
+                     cwd + '/../layers/backend',
+                     cwd + '/../batched',
+                     cwd + '/../batched/backend'
                      ]
 
 

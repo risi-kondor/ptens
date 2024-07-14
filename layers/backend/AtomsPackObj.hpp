@@ -472,6 +472,17 @@ namespace ptens{
       return "AtomsPackObj";
     }
 
+    string str(const string indent="") const{
+      ostringstream oss;
+      oss<<indent<<"(";
+      for(int i=0; i<size(); i++){
+	oss<<(*this)[i];
+	if(i<size()-1) oss<<",";
+      }
+      oss<<")";
+      return oss.str();
+    }
+
     friend ostream& operator<<(ostream& stream, const AtomsPackObj& v){
       stream<<v.str(); return stream;}
 

@@ -12,28 +12,28 @@
  *
  */
 
-#ifndef _ptens_BatchedSubgraphLayer1b
-#define _ptens_BatchedSubgraphLayer1b
+#ifndef _ptens_BatchedSubgraphLayer1
+#define _ptens_BatchedSubgraphLayer1
 
 #include "BatchedGgraph.hpp"
 #include "Subgraph.hpp"
-#include "BatchedPtensors1b.hpp"
+#include "BatchedPtensors1.hpp"
 
 
 namespace ptens{
 
 
   template<typename TYPE> 
-  class BatchedSubgraphLayer0b;
+  class BatchedSubgraphLayer0;
 
   template<typename TYPE> 
-  class BatchedSubgraphLayer1b: public BatchedPtensors1b<TYPE>{
+  class BatchedSubgraphLayer1: public BatchedPtensors1<TYPE>{
 
   public:
 
-    typedef BatchedPtensors1b<TYPE> BASE;
+    typedef BatchedPtensors1<TYPE> BASE;
     typedef cnine::Ltensor<TYPE> TENSOR;
-    typedef BatchedAtomsPackN<AtomsPack1obj<int> > BatchedAtomsPack1;
+    //typedef BatchedAtomsPackN<AtomsPack1obj<int> > BatchedAtomsPack1;
 
     using BASE::BASE;
     using BASE::atoms;
@@ -51,7 +51,7 @@ namespace ptens{
     const BatchedGgraph G;
     const Subgraph S;
 
-    //    ~BatchedSubgraphLayer1b(){
+    //    ~BatchedSubgraphLayer1(){
     //#ifdef WITH_FAKE_GRAD
     //if(grad) delete grad;
     //#endif 
@@ -61,41 +61,43 @@ namespace ptens{
   public: // ----- Constructors ------------------------------------------------------------------------------
 
 
-    //BatchedSubgraphLayer0b(const BatchedGgraph& _G, const TENSOR& x):
+    //BatchedSubgraphLayer0(const BatchedGgraph& _G, const TENSOR& x):
     //BASE(x), G(_G), S(Subgraph::trivial()){}
 
-    BatchedSubgraphLayer1b(const BatchedGgraph& _G, const Subgraph& _S, const BASE& x):
+    BatchedSubgraphLayer1(const BatchedGgraph& _G, const Subgraph& _S, const BASE& x):
       BASE(x), G(_G), S(_S){}
 
-    BatchedSubgraphLayer1b(const BatchedGgraph& _G, const Subgraph& _S, const BatchedAtomsPack1& atoms, const TENSOR& x):
-      BASE(atoms,x), G(_G), S(_S){}
+    //BatchedSubgraphLayer1(const BatchedGgraph& _G, const Subgraph& _S, const BatchedAtomsPack1& atoms, const TENSOR& x):
+    //BASE(atoms,x), G(_G), S(_S){}
 
-    BatchedSubgraphLayer1b(const BatchedGgraph& _G, const int nc, const int fcode=0, const int _dev=0):
+    BatchedSubgraphLayer1(const BatchedGgraph& _G, const int nc, const int fcode=0, const int _dev=0):
       G(_G), S(Subgraph::trivial()), BASE(_G.getn(),nc,fcode,_dev){}
 
-    BatchedSubgraphLayer1b(const BatchedGgraph& _G, const Subgraph& _S, const BatchedAtomsPack& _atoms, const int nc, const int fcode, const int _dev=0):
+    BatchedSubgraphLayer1(const BatchedGgraph& _G, const Subgraph& _S, const BatchedAtomsPack& _atoms, const int nc, const int fcode, const int _dev=0):
       G(_G), S(_S), BASE(_atoms,nc,fcode,_dev){}
 
 
-    BatchedSubgraphLayer1b(TYPE* _arr, const BatchedGgraph& _G, const Subgraph& _S, const BatchedAtomsPack& _atoms, const int nc, const int _dev=0):
+    BatchedSubgraphLayer1(TYPE* _arr, const BatchedGgraph& _G, const Subgraph& _S, const BatchedAtomsPack& _atoms, const int nc, const int _dev=0):
       G(_G), S(_S), BASE(_arr,_atoms,nc,_dev){}
 
 
-    static BatchedSubgraphLayer1b from_edge_features(const vector<int>& graphs, const TENSOR& M){
+    /*
+    static BatchedSubgraphLayer1 from_edge_features(const vector<int>& graphs, const TENSOR& M){
       BatchedGgraph G(graphs);
       auto atoms=new BatchedAtomsPackNobj<AtomsPack1obj<int> >();
       for(int i=0; i<G.size(); i++)
 	atoms->obj.push_back(to_share(new AtomsPack1obj<int>(G[i].original_edges())));
       atoms->make_row_offsets();
-      return BatchedSubgraphLayer1b(G,Subgraph::edge(),BASE(BatchedAtomsPack1(atoms),M));
+      return BatchedSubgraphLayer1(G,Subgraph::edge(),BASE(BatchedAtomsPack1(atoms),M));
     }
+    */
 
     /*
-    static BatchedSubgraphLayer0b cat(const vector<BatchedSubgraphLayer0b>& list){
+    static BatchedSubgraphLayer0 cat(const vector<BatchedSubgraphLayer0>& list){
       vector<AtomsPack0> v;
       for(auto& p:list)
 	v.push_back(p.atoms);
-      return BatchedSubgraphLayer0b(AtomsPack0::cat(v),cnine::Ltensor<TYPE>::stack(0,list));
+      return BatchedSubgraphLayer0(AtomsPack0::cat(v),cnine::Ltensor<TYPE>::stack(0,list));
     }
     */
 
@@ -103,34 +105,34 @@ namespace ptens{
   public: // ----- Spawning ----------------------------------------------------------------------------------
 
 
-    BatchedSubgraphLayer1b copy() const{
-      return BatchedSubgraphLayer1b(G,S,BASE::copy());
+    BatchedSubgraphLayer1 copy() const{
+      return BatchedSubgraphLayer1(G,S,BASE::copy());
     }
 
-    BatchedSubgraphLayer1b copy(const int _dev) const{
-      return BatchedSubgraphLayer1b(G,S,BASE::copy(_dev));
+    BatchedSubgraphLayer1 copy(const int _dev) const{
+      return BatchedSubgraphLayer1(G,S,BASE::copy(_dev));
     }
 
-    BatchedSubgraphLayer1b zeros_like() const{
-      return BatchedSubgraphLayer1b(G,S,BASE::zeros_like());
+    BatchedSubgraphLayer1 zeros_like() const{
+      return BatchedSubgraphLayer1(G,S,BASE::zeros_like());
     }
 
-    BatchedSubgraphLayer1b zeros_like(const int nc) const{
-      return BatchedSubgraphLayer1b(G,S,BASE::zeros_like(nc));
+    BatchedSubgraphLayer1 zeros_like(const int nc) const{
+      return BatchedSubgraphLayer1(G,S,BASE::zeros_like(nc));
     }
 
-    BatchedSubgraphLayer1b gaussian_like() const{
-      return BatchedSubgraphLayer1b(G,S,BASE::gaussian_like());
+    BatchedSubgraphLayer1 gaussian_like() const{
+      return BatchedSubgraphLayer1(G,S,BASE::gaussian_like());
     }
 
-    static BatchedSubgraphLayer1b* new_zeros_like(const BatchedSubgraphLayer1b& x){
+    static BatchedSubgraphLayer1* new_zeros_like(const BatchedSubgraphLayer1& x){
       //cnine::using_vram_manager vv(ptens_session.managed_gmem);
-      //return new BatchedSubgraphLayer1b(x.G,x.S,x.TENSOR::zeros_like());
-      return new BatchedSubgraphLayer1b(x.G,x.S,x.BASE::zeros_like());
+      //return new BatchedSubgraphLayer1(x.G,x.S,x.TENSOR::zeros_like());
+      return new BatchedSubgraphLayer1(x.G,x.S,x.BASE::zeros_like());
     }
     
-    //BatchedSubgraphLayer0b(const BatchedSubgraphLayer0b& x, const int _dev):
-    //BatchedSubgraphLayer0b(x.G,x.S,BASE(x,_dev)){}
+    //BatchedSubgraphLayer0(const BatchedSubgraphLayer0& x, const int _dev):
+    //BatchedSubgraphLayer0(x.G,x.S,BASE(x,_dev)){}
 
 
   public: // ---- Access -------------------------------------------------------------------------------------
@@ -159,23 +161,23 @@ namespace ptens{
 
 
     template<typename SOURCE>
-    BatchedSubgraphLayer1b(const SOURCE& x, const Subgraph& _S, const int min_overlaps=1):
-      BatchedSubgraphLayer1b(x.G,_S,x.G.subgraphs(_S),x.get_nc()*vector<int>({1,2,5})[x.getk()],0,x.dev){
+    BatchedSubgraphLayer1(const SOURCE& x, const Subgraph& _S, const int min_overlaps=1):
+      BatchedSubgraphLayer1(x.G,_S,x.G.subgraphs(_S),x.get_nc()*vector<int>({1,2,5})[x.getk()],0,x.dev){
       add_gather(x,min_overlaps);
     }
 
     template<typename SOURCE>
-    BatchedSubgraphLayer1b(const SOURCE& x, const BatchedGgraph& _G, const Subgraph& _S, const int min_overlaps=1):
-      BatchedSubgraphLayer1b(_G,_S,_G.subgraphs(_S),x.get_nc()*vector<int>({1,2,5})[x.getk()],0,x.dev){
-      cnine::fnlog timer("BatchedSubgraphLayer1b::init::gather");
+    BatchedSubgraphLayer1(const SOURCE& x, const BatchedGgraph& _G, const Subgraph& _S, const int min_overlaps=1):
+      BatchedSubgraphLayer1(_G,_S,_G.subgraphs(_S),x.get_nc()*vector<int>({1,2,5})[x.getk()],0,x.dev){
+      cnine::fnlog timer("BatchedSubgraphLayer1::init::gather");
       add_gather(x,min_overlaps);
     }
 
 
     template<typename SOURCE>
-    BatchedSubgraphLayer1b(TYPE* _arr, const SOURCE& x, const BatchedGgraph& _G, const Subgraph& _S, const int min_overlap=1):
-      BatchedSubgraphLayer1b(_arr,_G,_S,_G.subgraphs(_S),x.get_nc()*vector<int>({1,2,5})[x.getk()],x.dev){
-      cnine::fnlog timer("BatchedSubgraphLayer1b::init::gather(ATen)");
+    BatchedSubgraphLayer1(TYPE* _arr, const SOURCE& x, const BatchedGgraph& _G, const Subgraph& _S, const int min_overlap=1):
+      BatchedSubgraphLayer1(_arr,_G,_S,_G.subgraphs(_S),x.get_nc()*vector<int>({1,2,5})[x.getk()],x.dev){
+      cnine::fnlog timer("BatchedSubgraphLayer1::init::gather(ATen)");
       add_gather(x,min_overlap);
     }
 
@@ -184,17 +186,17 @@ namespace ptens{
 
 
     template<typename SOURCE>
-    static BatchedSubgraphLayer1b linmaps(const SOURCE& x){
-      BatchedSubgraphLayer1b R(x.G,x.S,x.get_atoms(),x.get_nc()*vector<int>({1,2,5})[x.getk()],0,x.get_dev());
+    static BatchedSubgraphLayer1 linmaps(const SOURCE& x){
+      BatchedSubgraphLayer1 R(x.G,x.S,x.atoms,x.get_nc()*vector<int>({1,2,5})[x.getk()],0,x.get_dev());
       R.add_linmaps(x);
       return R;
     }
 
-    void add_linmaps(const BatchedSubgraphLayer0b<TYPE>& x){
+    void add_linmaps(const BatchedSubgraphLayer0<TYPE>& x){
       BASE::add_linmaps(x);
     }
 
-    void add_linmaps(const BatchedSubgraphLayer1b<TYPE>& x){
+    void add_linmaps(const BatchedSubgraphLayer1<TYPE>& x){
       int nc=x.get_nc();
       broadcast0(x.reduce0(),0);
       cols(nc,nc)+=x;
@@ -208,14 +210,14 @@ namespace ptens{
     //}
 
     /*
-    void add_linmaps_back(const BatchedSubgraphLayer1b<TYPE>& x){
+    void add_linmaps_back(const BatchedSubgraphLayer1<TYPE>& x){
       int nc=get_nc();
       broadcast0(x.reduce0(0,nc),0);
       add(x.cols(nc,nc));
     }
     */
 
-    void add_linmaps_back_alt(const BatchedSubgraphLayer1b<TYPE>& x){
+    void add_linmaps_back_alt(const BatchedSubgraphLayer1<TYPE>& x){
       int K=S.getn();
       int nc=get_nc();
       get_grad().broadcast0(K,x.get_grad().reduce0(K,0,nc),0);
@@ -225,24 +227,24 @@ namespace ptens{
       //cnine::MultiLoop(size(),[&](const int i){view_of(i).add_linmaps_back(x.view_of(i));});
     }
 
-    Ptensorsb<TYPE> reduce0() const{
-      TimedFn T("BatchedSubgraphLayer1b","reduce0",*this);
-      cnine::using_vram_manager vv(ptens_session->managed_gmem);
-      Ptensorsb<TYPE> R({dim(0)/S.getn(),get_nc()},0,get_dev());
+    Ptensors<TYPE> reduce0() const{
+      TimedFn T("BatchedSubgraphLayer1","reduce0",*this);
+      //cnine::using_vram_manager vv(ptens_session->managed_gmem);
+      Ptensors<TYPE> R({dim(0)/S.getn(),get_nc()},0,get_dev());
       view3(S.getn()).sum1_into(R.view2());
       return R;
     }
 
-    Ptensorsb<TYPE> reduce0(const int offs, const int nc) const{
-      TimedFn T("BatchedSubgraphLayer1b","reduce0",*this);
-      cnine::using_vram_manager vv(ptens_session->managed_gmem);
-      Ptensorsb<TYPE> R({dim(0)/S.getn(),nc},0,get_dev());
+    Ptensors<TYPE> reduce0(const int offs, const int nc) const{
+      TimedFn T("BatchedSubgraphLayer1","reduce0",*this);
+      //cnine::using_vram_manager vv(ptens_session->managed_gmem);
+      Ptensors<TYPE> R({dim(0)/S.getn(),nc},0,get_dev());
       view3(S.getn(),offs,nc).sum1_into(R.view2());
       return R;
     }
 
-    void broadcast0(const Ptensorsb<TYPE>& x, const int offs){
-      TimedFn T("BatchedSubgraphLayer1b","broadcast0",*this);
+    void broadcast0(const Ptensors<TYPE>& x, const int offs){
+      TimedFn T("BatchedSubgraphLayer1","broadcast0",*this);
       PTENS_ASSRT(x.ndims()==2);
       view3(S.getn(),offs,x.dim(1))+=cnine::repeat1(x.view2(),S.getn());
     }
@@ -251,7 +253,7 @@ namespace ptens{
 
 
     // abstract these into a separate template 
-    BatchedSubgraphLayer1b autobahn(const TENSOR& W, const TENSOR& B) const{
+    BatchedSubgraphLayer1 autobahn(const TENSOR& W, const TENSOR& B) const{
       S.make_eigenbasis();
       int K=S.getn();
       PTENS_ASSRT(W.dims.size()==3);
@@ -261,7 +263,7 @@ namespace ptens{
       PTENS_ASSRT(B.dims[0]==S.obj->eblocks.size());
       PTENS_ASSRT(B.dims[1]==W.dims[2]);
 
-      BatchedSubgraphLayer1b R=zeros_like(W.dims[2]);
+      BatchedSubgraphLayer1 R=zeros_like(W.dims[2]);
       for_each_eigenslice(R.view3(K),view3(K),[&]
 	(cnine::Rtensor2_view rslice, cnine::Rtensor2_view xslice, const int b){
 	  rslice.add_matmul_AA(xslice,W.view3().slice0(b));
@@ -271,7 +273,7 @@ namespace ptens{
     }
 
 
-   void add_autobahn_back0(const BatchedPtensors1b<TYPE>& r, const TENSOR& W){
+   void add_autobahn_back0(const BatchedPtensors1<TYPE>& r, const TENSOR& W){
       S.make_eigenbasis();
       int K=S.getn();
       PTENS_ASSRT(W.dims.size()==3);
@@ -286,7 +288,7 @@ namespace ptens{
     }
 
 
-    void add_autobahn_back1_to(const TENSOR& W, const TENSOR& B, const BatchedPtensors1b<TYPE>& r){
+    void add_autobahn_back1_to(const TENSOR& W, const TENSOR& B, const BatchedPtensors1<TYPE>& r){
       S.make_eigenbasis();
       int K=S.getn();
       PTENS_ASSRT(W.dims.size()==3);
@@ -308,7 +310,7 @@ namespace ptens{
     void for_each_eigenslice(const cnine::Rtensor3_view x, const cnine::Rtensor3_view y,
       std::function<void(cnine::Rtensor2_view xslice, cnine::Rtensor2_view yslice, const int b)> lambda,
 			     const bool inplace_add=false) const{
-      cnine::using_vram_manager vv(ptens_session->managed_gmem);
+      //cnine::using_vram_manager vv(ptens_session->managed_gmem);
       S.make_eigenbasis();
       int N=x.n0;
       int K=x.n1;
@@ -347,11 +349,11 @@ namespace ptens{
 
 
     string classname() const{
-      return "BatchedSubgraphLayer1b";
+      return "BatchedSubgraphLayer1";
     }
 
     string repr() const{
-      return "<BSGlayer1b[N="+to_string(BASE::size())+",nrows="+to_string(TENSOR::dim(0))+",nc="+to_string(get_nc())+"]>";
+      return "<BSGlayer1[N="+to_string(BASE::size())+",nrows="+to_string(TENSOR::dim(0))+",nc="+to_string(get_nc())+"]>";
     }
 
 

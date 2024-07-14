@@ -19,10 +19,8 @@
 #include "object_pack.hpp"
 
 #include "BatchedAtomsPack.hpp"
-#include "BatchedAtomsPackN.hpp"
 #include "Ptensors2.hpp"
 #include "BatchedPtensors.hpp"
-#include "SubgraphLayerb.hpp"
 
 
 namespace ptens{
@@ -38,12 +36,11 @@ namespace ptens{
 
     typedef BatchedPtensors<TYPE> BASE;
     typedef cnine::Ltensor<TYPE> TENSOR;
-    typedef BatchedAtomsPackN<AtomsPack2obj<int> > BatchedAtomsPack2;
     
     using cnine::diff_class<BatchedPtensors2<TYPE> >::grad;
     using BASE::get_dev;
 
-    BatchedAtomsPackN<AtomsPack2obj<int> > atoms;
+    BatchedAtomsPack atoms;
 
 
     ~BatchedPtensors2(){
@@ -59,11 +56,12 @@ namespace ptens{
     //BatchedPtensors2(){}
 
     BatchedPtensors2(const BatchedAtomsPack& _atoms, const TENSOR& M):
-      BASE(M.copy()), atoms(BatchedAtomsPack2(_atoms)){}
+      BASE(M.copy()), atoms(_atoms){}
 
     BatchedPtensors2(const BatchedAtomsPack& _atoms, const cnine::Tensor<float>& M):
-      BASE(cnine::Ltensor<float>(M).copy()), atoms(BatchedAtomsPack2(_atoms)){}
+      BASE(M.copy()), atoms(_atoms){}
 
+    /*
     BatchedPtensors2(const BatchedAtomsPack2& _atoms, const TENSOR& M):
       BASE(M.copy()), atoms(_atoms){}
 
@@ -86,7 +84,8 @@ namespace ptens{
       for(auto& p:list) x.push_back(p.atoms.obj);
       atoms=BatchedAtomsPackN<AtomsPack2obj<int> >(x);
     }
-	
+    */
+
 
   public: // ---- Named parameter constructors ---------------------------------------------------------------
 
@@ -102,7 +101,7 @@ namespace ptens{
       atoms(_atoms){
       vparams v;
       unroller(v,args...);
-      BASE::reset(BASE({atoms.tsize(),v.nc},v.fcode,v.dev));
+      BASE::reset(BASE({atoms.nrows2(),v.nc},v.fcode,v.dev));
     }
 
     template<typename... Args>
@@ -159,9 +158,9 @@ namespace ptens{
   public: // ----- Conversions -------------------------------------------------------------------------------
 
 
-    BatchedPtensors2(const TENSOR& x, const BatchedAtomsPack2& _atoms):
-      BASE(x),
-      atoms(_atoms){}
+    //BatchedPtensors2(const TENSOR& x, const BatchedAtomsPack2& _atoms):
+    //BASE(x),
+    //atoms(_atoms){}
 
 
   public: // ----- Access ------------------------------------------------------------------------------------
@@ -179,9 +178,9 @@ namespace ptens{
       return TENSOR::dim(1);
     }
 
-    BatchedAtomsPack get_atoms() const{
-      return atoms.obj->get_atoms();
-    }
+    //BatchedAtomsPack get_atoms() const{
+    //return atoms.obj->get_atoms();
+    //}
 
     BatchedPtensors2& get_grad(){
       return cnine::diff_class<BatchedPtensors2<TYPE> >::get_grad();
@@ -192,15 +191,15 @@ namespace ptens{
     }
 
     Ptensors2<TYPE> view_of(const int i) const{
-      return Ptensors2<TYPE>(TENSOR::rows(atoms.offset(i),atoms.nrows(i)),atoms.obj->obj[i]);
+      return Ptensors2<TYPE>(atoms[i],TENSOR::rows(atoms.offset2(i),atoms.nrows2(i)));
     }
 
     Ptensors2<TYPE> operator[](const int i){
-      return Ptensors2<TYPE>(atoms.obj->obj[i],TENSOR::rows(atoms.offset(i)),atoms.nrows(i));
+      return Ptensors2<TYPE>(atoms[i],TENSOR::rows(atoms.offset2(i)),atoms.nrows2(i));
     }
 
     Ptensors2<TYPE> operator[](const int i) const{
-      return Ptensors2<TYPE>(atoms.obj->obj[i],TENSOR::rows(atoms.offset(i),atoms.nrows(i)));
+      return Ptensors2<TYPE>(atoms[i],TENSOR::rows(atoms.offset2(i),atoms.nrows2(i)));
     }
 
 

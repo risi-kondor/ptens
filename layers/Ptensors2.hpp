@@ -82,6 +82,10 @@ namespace ptens{
       BASE(_atoms,M),
       tag(_atoms){}
 
+    Ptensors2(const AtomsPack& _atoms, const cnine::TensorView<TYPE>& M):
+      BASE(_atoms,M),
+      tag(_atoms){}
+
     Ptensors2(const TENSOR& M, const AtomsPack& _atoms):
       BASE(_atoms,M),
       tag(_atoms){}
@@ -401,6 +405,7 @@ namespace ptens{
       int dev=get_dev();
       PTENS_CPUONLY();
       
+      cnine::using_vram_manager vv(ptens_global::vram_manager);
       BASE R({N,2*nc},0,dev);
       Rtensor2_view r=R.view2();
       if(dev==0){
@@ -420,6 +425,7 @@ namespace ptens{
       int dev=get_dev();
       PTENS_CPUONLY();
       
+      cnine::using_vram_manager vv(ptens_global::vram_manager);
       BASE R({N,nc},0,dev);
       Rtensor2_view r=R.view2();
       if(dev==0){
@@ -439,6 +445,7 @@ namespace ptens{
       int dev=get_dev();
       PTENS_CPUONLY();
 
+      cnine::using_vram_manager vv(ptens_global::vram_manager);
       BASE R({atoms.nrows1(),3*nc},0,dev);
       Rtensor2_view r=R.view2();
       if(dev==0){
@@ -460,6 +467,7 @@ namespace ptens{
       int dev=get_dev();
       PTENS_CPUONLY();
 
+      cnine::using_vram_manager vv(ptens_global::vram_manager);
       BASE R({atoms.nrows1(),nc},0,dev);
       Rtensor2_view r=R.view2();
       if(dev==0){
@@ -481,6 +489,7 @@ namespace ptens{
       int dev=get_dev();
       PTENS_CPUONLY();
       
+      cnine::using_vram_manager vv(ptens_global::vram_manager);
       BASE R({dim(0),nc},0,dev);
       Rtensor2_view r=R.view2();
       if(dev==0){
@@ -604,6 +613,7 @@ namespace ptens{
     Ptensors0<TYPE> reduce0(const AtomsPack& _atoms, const AindexPack& list) const{
       TimedFn T("Ptensors2","reduce0",*this,list,(list.count2+list.count1)*get_nc());
       int nc=get_nc();
+      cnine::using_vram_manager vv(ptens_global::vram_manager);
       Ptensors0<TYPE> R(_atoms,2*nc,0,dev);
       add_reduce0_to(R,list);
       return R;
@@ -625,6 +635,7 @@ namespace ptens{
     Ptensors0<TYPE> reduce0_shrink(const AtomsPack& _atoms, const AindexPack& list, const int offs=0, int nc=0) const{
       TimedFn T("Ptensors2","reduce0",*this,list,(list.count2+list.count1)*nc);
       if(nc==0) nc=get_nc()/2;
+      cnine::using_vram_manager vv(ptens_global::vram_manager);
       Ptensors0<TYPE> R(_atoms,nc,0,dev);
       add_reduce0_shrink_to(R,list,offs);
       return R;
@@ -647,6 +658,7 @@ namespace ptens{
     Ptensors1<TYPE> reduce1(const AtomsPack& _atoms, const AindexPack& list) const{
       TimedFn T("Ptensors2","reduce1",*this,list,(list.count1+2*list.count2)*get_nc());
       int nc=get_nc();
+      cnine::using_vram_manager vv(ptens_global::vram_manager);
       Ptensors1<TYPE> R(_atoms,3*nc,0,dev);
       add_reduce1_to(R,list);
       return R;
@@ -669,6 +681,7 @@ namespace ptens{
     Ptensors1<TYPE> reduce1_shrink(const AtomsPack& _atoms, const AindexPack& list, const int offs=0, int nc=0) const{
       TimedFn T("Ptensors2","reduce1",*this,list,(list.count1+2*list.count2)*nc);
       if(nc==0) nc=get_nc()/3;
+      cnine::using_vram_manager vv(ptens_global::vram_manager);
       Ptensors1<TYPE> R(_atoms,nc,0,dev);
       add_reduce1_shrink_to(R,list,offs,nc);
       return R;
@@ -690,6 +703,7 @@ namespace ptens{
 
     Ptensors2<TYPE> reduce2(const AtomsPack& _atoms, const AindexPack& list) const{
       TimedFn T("Ptensors2","reduce2",*this,list,(2*list.count2)*get_nc());
+      cnine::using_vram_manager vv(ptens_global::vram_manager);
       Ptensors2<TYPE> R(_atoms,get_nc(),0,dev);
       add_reduce2_to(R,list);
       return R;
@@ -712,6 +726,7 @@ namespace ptens{
     Ptensors2<TYPE> reduce2_shrink(const AtomsPack& _atoms, const AindexPack& list, const int offs=0, int nc=0) const{
       TimedFn T("Ptensors2","reduce2",*this,list,(2*list.count2)*nc);
       if(nc==0) nc=get_nc()/2;
+      cnine::using_vram_manager vv(ptens_global::vram_manager);
       Ptensors2<TYPE> R(_atoms,nc,0,dev);
       add_reduce2_shrink_to(R,list,offs,nc);
       return R;

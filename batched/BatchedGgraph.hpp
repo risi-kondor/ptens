@@ -53,11 +53,11 @@ namespace ptens{
   public: //  ---- Named constructors -------------------------------------------------------------------------
 
 
-    static BatchedGgraph from_edge_list(const vector<int>& sizes, const cnine::TensorView<int>& M, const bool cached=false){
-      return BatchedGgraphObj::from_edge_list_p(sizes,M,cached);
+    static BatchedGgraph from_edge_list(const vector<int>& sizes, const cnine::TensorView<int>& M){
+      return BatchedGgraphObj::from_edge_list_p(sizes,M);
     }
 
-    static BatchedGgraph from_edge_list(const cnine::TensorView<int>& M, vector<int>& indicators, const bool cached=false){
+    static BatchedGgraph from_edge_list(const cnine::TensorView<int>& M, vector<int>& indicators){ //, const bool cached=false){
       vector<int> sizes;
       int i=0;
       int t=0;
@@ -70,7 +70,7 @@ namespace ptens{
 	}
       }
       sizes.push_back(indicators.size()-t);
-      return BatchedGgraph::from_edge_list(sizes,M,cached);
+      return BatchedGgraph::from_edge_list(sizes,M);
     }
 
 
@@ -103,7 +103,7 @@ namespace ptens{
     }
 
     BatchedAtomsPack subgraphs(const Subgraph& H) const{
-      return obj->subgraphs(*H.obj);
+      return obj->subgraphs(H.obj);
     }
 
 

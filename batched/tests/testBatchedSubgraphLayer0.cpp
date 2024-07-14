@@ -14,23 +14,21 @@
 
 #include "Cnine_base.cpp"
 #include "Ptens_base.cpp"
-#include "BatchedPtensors0b.hpp"
-#include "BatchedPtensors1b.hpp"
-#include "BatchedSubgraphLayer1b.hpp"
-//#include "BatchedSubgraphLayer1b.hpp"
+#include "BatchedPtensors1.hpp"
+#include "BatchedSubgraphLayer0.hpp"
 
 using namespace ptens;
 using namespace cnine;
 
 PtensSession ptens_session;
 
-typedef BatchedPtensors0b<float> BPtens0;
-typedef BatchedPtensors1b<float> BPtens1;
+typedef BatchedPtensors0<float> BPtens0;
+typedef BatchedPtensors1<float> BPtens1;
 
 
 int main(int argc, char** argv){
-  
-  int n=6; 
+
+  int n=6;
 
   Ggraph g0=Ggraph::random(n);
   BatchedGgraph G({g0,g0,g0});
@@ -43,26 +41,23 @@ int main(int argc, char** argv){
 
   BPtens1 X1=BPtens1(xatoms,channels=3,filltype=3);
 
-  BatchedSubgraphLayer1b<float> U(X1,G,trivial);
+  BatchedSubgraphLayer0<float> U(X1,G,trivial);
   cout<<U<<endl;
 
-  cout<<66666<<endl;
-  cout<<BatchedSubgraphLayer1b<float>::linmaps(U)<<endl;
-  cout<<77777<<endl;
+  cout<<666666<<endl;
 
-  auto edges=g0.edge_list();
-  cout<<edges<<endl;
+  Ggraph g1=Ggraph::from_edges(g0.edge_list());
+  g1.cache(0);
+  Ltensor<float> M({3*n,3},3);
+  Ltensor<float> P({6*g0.nedges(),3},3);
+  //cout<<M<<endl;
 
-  Ggraph g1=Ggraph::from_edges(edges);
-  g1.cache(32);
-  cout<<g1.original_edges()<<endl;
-  cout<<Ggraph(32)<<endl;
-  auto g2=Ggraph(32);
-  cout<<g2.getn()<<endl;
-  cout<<g1.nedges()<<endl;
-
-  Ltensor<float> M({12*g1.nedges(),3},3);
-  auto V=BatchedSubgraphLayer1b<float>::from_edge_features({32,32,32},M);
+  auto V=BatchedSubgraphLayer0<float>::from_vertex_features({0,0,0},M);
   cout<<V<<endl;
+  
+  //auto W=BatchedSubgraphLayer0<float>::from_edge_features({0,0,0},P);
+  //cout<<W<<endl;
+  
+
 
 }

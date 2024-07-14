@@ -24,6 +24,7 @@
 #include "Ptensors.hpp"
 #include "AtomsPackTag.hpp"
 #include "Ptensor1view.hpp"
+#include "TensorLevelMap.hpp"
 
 
 namespace ptens{
@@ -76,6 +77,10 @@ namespace ptens{
     Ptensors1(){}
 
     Ptensors1(const AtomsPack& _atoms, const TENSOR& M):
+      BASE(_atoms,M),
+      tag(_atoms){}
+
+    Ptensors1(const AtomsPack& _atoms, const cnine::TensorView<TYPE>& M):
       BASE(_atoms,M),
       tag(_atoms){}
 
@@ -434,6 +439,7 @@ namespace ptens{
       TimedFn T("Ptensors1","reduce0",*this);
       int N=size();
       int dev=get_dev();
+      cnine::using_vram_manager vv(ptens_global::vram_manager);
       BASE R({N,get_nc()},0,dev);
       Rtensor2_view r=R.view2();
       for(int i=0; i<N; i++)
@@ -445,6 +451,7 @@ namespace ptens{
       TimedFn T("Ptensors1","reduce0",*this);
       int N=size();
       int dev=get_dev();
+      cnine::using_vram_manager vv(ptens_global::vram_manager);
       BASE R({N,nc},0,dev);
       Rtensor2_view r=R.view2();
       for(int i=0; i<N; i++)
@@ -478,6 +485,7 @@ namespace ptens{
     Ptensors0<TYPE> reduce0(const AtomsPack& _atoms, const AindexPack& list, const int offs=0, int nc=0) const{
       TimedFn T("Ptensors1","reduce0",*this,list,list.count1*nc);
       if(nc==0) nc=get_nc();
+      cnine::using_vram_manager vv(ptens_global::vram_manager);
       Ptensors0<TYPE> R(_atoms,get_nc(),0,get_dev());
       add_reduce0_to(R,list,offs);
       return R;
@@ -501,6 +509,7 @@ namespace ptens{
     Ptensors1<TYPE> reduce1(const AtomsPack& _atoms, const AindexPack& list, const int offs=0, int nc=0) const{
       TimedFn T("Ptensors1","reduce1",*this,list,list.count1*nc);
       if(nc==0) nc=get_nc();
+      cnine::using_vram_manager vv(ptens_global::vram_manager);
       Ptensors1<TYPE> R(_atoms,get_nc(),0,get_dev());
       add_reduce1_to(R,list,offs);
       return R;
@@ -531,7 +540,6 @@ namespace ptens{
       int nc=X.dim(1);
       PTENS_ASSRT(X.dim(0)==N);
       Rtensor2_view x=X.view2();
-      
       for(int i=0; i<N; i++)
 	view_of(i,offs,nc)+=cnine::repeat0(x.slice0(i),size_of(i));
     }

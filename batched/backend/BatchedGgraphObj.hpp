@@ -18,8 +18,6 @@
 #include "Ggraph.hpp"
 #include "BatchedAtomsPack.hpp"
 
-extern ptens::PtensSessionObj* ptens::ptens_session;
-
 
 namespace ptens{
 
@@ -34,14 +32,14 @@ namespace ptens{
 
     BatchedGgraphObj(const vector<int>& keys){
       for(auto p: keys)
-	obj.push_back(ptens_session->graph_cache(p));
+	obj.push_back(ptens_global::graph_cache(p));
     }
 
 
   public: //  ---- Named constructors -------------------------------------------------------------------------
 
 
-    static BatchedGgraphObj* from_edge_list_p(const vector<int>& sizes, const cnine::Tensor<int>& M, const bool cached=false){
+    static BatchedGgraphObj* from_edge_list_p(const vector<int>& sizes, const cnine::Tensor<int>& M){//, const bool cached=false){
       PTENS_ASSRT(sizes.size()>0);
       PTENS_ASSRT(M.ndims()==2);
       PTENS_ASSRT(M.dim(0)==2);
@@ -56,22 +54,22 @@ namespace ptens{
 	  PTENS_ASSRT(M(j,1)<upper);
 	  j++;
 	}
-	if(cached){
-	  auto G=Ggraph::cached_from_edge_list(M.cols(t,j-t));
-	  R->obj.push_back(G.obj);
-	}else{
+	//if(cached){
+	//auto G=Ggraph::cached_from_edge_list(M.cols(t,j-t));
+	//R->obj.push_back(G.obj);
+	//}else{
 	  R->obj.push_back(to_share(GgraphObj::from_edges_p(M.cols(t,j-t))));
-	}
+	  //}
 	t=j;
 	upper+=sizes[i];
       }
-      if(cached){
-	auto G=Ggraph::cached_from_edge_list(M.cols(t,M.dim(1)-t));
-	R->obj.push_back(G.obj);
-      }else{
+      //if(cached){
+      //auto G=Ggraph::cached_from_edge_list(M.cols(t,M.dim(1)-t));
+      //R->obj.push_back(G.obj);
+      //}else{
 	R->obj.push_back(to_share(GgraphObj::from_edges_p(M.cols(t,M.dim(1)-t))));
 	//R.obj.push_back(new GgraphObj(M.cols(t,M.dim(1)-t)));
-      }
+	//}
       return R;
     }
 
@@ -89,10 +87,10 @@ namespace ptens{
       return mapcar<BatchedGgraphObj,GgraphObj>([&](const GgraphObj& x){return x.permute(pi);});
     }
 
-    BatchedAtomsPack subgraphs(const SubgraphObj& H){
+    BatchedAtomsPack subgraphs(const shared_ptr<SubgraphObj>& H){
       auto R=new BatchedAtomsPackObj();
       for(auto& p:obj)
-	R->obj.push_back(p->subgraphs(H).obj);
+	R->push_back(p->subgraphs(H).obj);
       return R;
       //return mapcar<BatchedAtomsPackObj,AtomsPack>([&](const GgraphObj& x){return x.subgraphs(H);});
     }

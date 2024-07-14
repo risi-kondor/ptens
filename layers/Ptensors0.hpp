@@ -74,6 +74,10 @@ namespace ptens{
       BASE(_atoms,M),
       tag(_atoms){}
 
+    Ptensors0(const AtomsPack& _atoms, const cnine::TensorView<TYPE>& M):
+      BASE(_atoms,M),
+      tag(_atoms){}
+
     Ptensors0(const TENSOR& M, const AtomsPack& _atoms):
       BASE(_atoms,M),
       tag(_atoms){}
@@ -224,18 +228,6 @@ namespace ptens{
       return 0;
     }
 
-    //int size() const{
-    //return atoms.size();
-    //}
-
-    //int get_nc() const{
-    //return TENSOR::dim(1);
-    //}
-
-    //const AtomsPack& get_atoms() const{
-    //return atoms;
-    //}
-
     int offset(const int i) const{
       return i; 
     }
@@ -244,10 +236,6 @@ namespace ptens{
       return i;
     }
 
-    //Atoms atoms_of(const int i) const{
-    //return atoms(i);
-    //}
-    
     int size_of(const int i) const{
       return 1;
     }
@@ -375,6 +363,7 @@ namespace ptens{
 
     Ptensors0 reduce0(const AtomsPack& _atoms, const AindexPack& list) const{
       TimedFn T("Ptensors0","reduce0",*this,list,list.size()*get_nc());
+      cnine::using_vram_manager vv(ptens_global::vram_manager);
       Ptensors0 R(_atoms,get_nc(),0,get_dev());
       if(get_dev()==0){
 	int N=list.size();

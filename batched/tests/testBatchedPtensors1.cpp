@@ -14,9 +14,10 @@
 
 #include "Cnine_base.cpp"
 #include "Ptens_base.cpp"
-#include "BatchedPtensors0b.hpp"
-#include "BatchedPtensors1b.hpp"
-#include "BatchedPtensors2b.hpp"
+#include "BatchedPtensors0.hpp"
+#include "BatchedPtensors1.hpp"
+#include "BatchedPtensors2.hpp"
+#include "PtensSession.hpp"
 
 using namespace ptens;
 using namespace cnine;
@@ -26,9 +27,9 @@ PtensSession ptens_session;
 
 int main(int argc, char** argv){
 
-  typedef BatchedPtensors0b<float> BPtens0;
-  typedef BatchedPtensors1b<float> BPtens1;
-  typedef BatchedPtensors2b<float> BPtens2;
+  typedef BatchedPtensors0<float> BPtens0;
+  typedef BatchedPtensors1<float> BPtens1;
+  typedef BatchedPtensors2<float> BPtens2;
 
   AtomsPack xatoms=AtomsPack::random(4,4,0.5);
   BatchedAtomsPack bxatoms({xatoms,xatoms,xatoms});
