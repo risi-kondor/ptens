@@ -68,7 +68,7 @@ namespace ptens{
       return *obj->out;
     }
 
-    std::shared_ptr<cnine::GatherMap> get_bmap() const{
+    std::shared_ptr<cnine::GatherMapB> get_bmap() const{
       return obj->get_bmap();
     }
     

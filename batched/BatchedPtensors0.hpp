@@ -56,10 +56,10 @@ namespace ptens{
 
 
     BatchedPtensors0(const BatchedAtomsPack& _atoms, const TENSOR& M):
-      BASE(M.copy()), atoms(_atoms){}
+      BASE(M), atoms(_atoms){}
 
     BatchedPtensors0(const TENSOR& M, const BatchedAtomsPack& _atoms):
-      BASE(M.copy()), atoms(_atoms){}
+      BASE(M), atoms(_atoms){}
 
     BatchedPtensors0(const BatchedAtomsPack& _atoms, const int _nc, const int _dev):
       BatchedPtensors0(_atoms,_nc,0,_dev){}
@@ -192,7 +192,7 @@ namespace ptens{
     }
 
 
-  public: // ---- Message passing ----------------------------------------------------------------------------
+  public: // ---- Linmaps ------------------------------------------------------------------------------------
 
 
     template<typename SOURCE, typename = typename std::enable_if<std::is_base_of<BatchedPtensors<float>, SOURCE>::value, SOURCE>::type>
@@ -201,14 +201,6 @@ namespace ptens{
       R.add_linmaps(x);
       return R;
     }
-
-    template<typename SOURCE, typename = typename std::enable_if<std::is_base_of<BatchedPtensors<float>, SOURCE>::value, SOURCE>::type>
-    static BatchedPtensors0<TYPE> gather(const SOURCE& x, const BatchedAtomsPack& a, const int min_overlaps=1){
-      BatchedPtensors0<TYPE> R(a,x.get_nc()*vector<int>({1,1,2})[x.getk()],x.get_dev());
-      R.add_gather(x,min_overlaps);
-      return R;
-    }
-
 
     template<typename SOURCE, typename = typename std::enable_if<std::is_base_of<BatchedPtensors<float>, SOURCE>::value, SOURCE>::type>
     void add_linmaps(const SOURCE& x){
@@ -220,10 +212,23 @@ namespace ptens{
       cnine::MultiLoop(size(),[&](const int i){view_of(i).add_linmaps_back(x.view_of(i));});
     }
 
+
+  public: // ---- Message Passing ----------------------------------------------------------------------------
+
+
+    template<typename SOURCE, typename = typename std::enable_if<std::is_base_of<BatchedPtensors<float>, SOURCE>::value, SOURCE>::type>
+    static BatchedPtensors0<TYPE> gather(const BatchedAtomsPack& a, const SOURCE& x, const int min_overlaps=1){
+      BatchedPtensors0<TYPE> R(a,x.get_nc()*vector<int>({1,1,2})[x.getk()],x.get_dev());
+      R.add_gather(x,min_overlaps);
+      return R;
+    }
+
+
     template<typename SOURCE>
     void add_gather(const SOURCE& x,const int min_overlaps=1){
       int N=size();
       PTENS_ASSRT(N==x.size());
+      cnine::MultiLoop(size(),[&](const int i){view_of(i).add_gather(x.view_of(i));});
       //for(int i=0; i<N; i++){
       //MessageList mlist=atoms.obj->obj[i]->atoms->overlaps_mlist(*x.atoms.obj->obj[i]->atoms,min_overlaps);
       //MessageMap mmap=atoms.obj->obj[i]->message_map(*mlist.obj,*x.atoms.obj->obj[i]);
@@ -237,6 +242,7 @@ namespace ptens{
     void add_gather_back(const OUTPUT& x){
       int N=size();
       PTENS_ASSRT(N==x.size());
+      cnine::MultiLoop(size(),[&](const int i){view_of(i).add_gather_back(x.view_of(i));});
       //cnine::GatherMapProgramPack P;
       //for(int i=0; i<N; i++){
       //MessageList mlist=x.atoms.obj->obj[i]->atoms->overlaps_mlist(*atoms.obj->obj[i]->atoms);

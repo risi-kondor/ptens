@@ -83,20 +83,7 @@ class ptensorlayer2(p.ptensorlayer):
 
     @classmethod
     def linmaps(self,x):
-        nc=x.get_nc()
-        if isinstance(x,p.ptensorlayer0):
-            return self.broadcast0(x)
-        if isinstance(x,p.ptensorlayer1):
-            r=ptensorlayer2.zeros(x.atoms,5*nc)
-            r[:,0:2*nc]=self.broadcast0(x.reduce0())
-            r[:,2*nc:5*nc]=self.broadcast1(x)
-            return r
-        if isinstance(x,p.ptensorlayer2):
-            r=ptensorlayer2.zeros(x.atoms,15*nc)
-            r[:,0:4*nc]=self.broadcast0(x.reduce0())
-            r[:,4*nc:13*nc]=self.broadcast1(x.reduce1())
-            r[:,13*nc:15*nc]=self.broadcast2(x)
-            return r
+        return ptensorlayer2_linmapsFn.apply(x)
 
 
     # ---- Message passing -----------------------------------------------------------------------------------
@@ -209,14 +196,50 @@ class ptensorlayer2(p.ptensorlayer):
     def __repr__(self):
         return "ptensorlayer2(len="+str(len(self.atoms))+",nc="+str(self.size(1))+")"
 
-    def __str__(self):
-        r=""
-        for i in range(len(self)):
-            r=r+str(self[i])+"\n"
+    def __str__(self,indent=""):
+        r=indent+self.__repr__()+"\n"
+        r=r+self.backend().__str__(indent+"  ")
         return r
 
 
+
 # ---- Autograd functions --------------------------------------------------------------------------------------------
+
+
+class ptensorlayer2_linmapsFn(torch.autograd.Function):
+
+    @staticmethod
+    def forward(ctx,x):
+        r=ptensorlayer2.zeros(x.atoms,x.get_nc()*([2,5,15][x.getk()]))
+        r.backend().add_linmaps(x.backend())
+        ctx.x=x
+        return r
+
+    @staticmethod
+    def backward(ctx,g):
+        r=ctx.x.zeros_like()
+        r.backend().add_linmaps_back(g.backend())
+        return r
+
+
+class ptensorlayer2_gatherFn(torch.autograd.Function):
+
+    @staticmethod
+    def forward(ctx,atoms,x,tmap):
+        r=ptensorlayer2.zeros(atoms,x.get_nc()*([2,5,15][x.getk()]))
+        r.backend().add_gather(x.backend(),tmap)
+        ctx.x=x
+        ctx.tmap=tmap
+        return r
+
+    @staticmethod
+    def backward(ctx,g):
+        r=ctx.x.zeros_like()
+        r.backend().add_gather_back(g.backend(),ctx.tmap)
+        return r
+
+
+# ------------------------------------------------------------------------------------------------------------
 
 
 class ptensorlayer2_reduce0Fn(torch.autograd.Function):
@@ -299,18 +322,18 @@ class ptensorlayer2_broadcast2Fn(torch.autograd.Function):
         return r
 
 
-class ptensorlayer2_gatherFn(torch.autograd.Function):
+#         nc=x.get_nc()
+#         if isinstance(x,p.ptensorlayer0):
+#             return self.broadcast0(x)
+#         if isinstance(x,p.ptensorlayer1):
+#             r=ptensorlayer2.zeros(x.atoms,5*nc)
+#             r[:,0:2*nc]=self.broadcast0(x.reduce0())
+#             r[:,2*nc:5*nc]=self.broadcast1(x)
+#             return r
+#         if isinstance(x,p.ptensorlayer2):
+#             r=ptensorlayer2.zeros(x.atoms,15*nc)
+#             r[:,0:4*nc]=self.broadcast0(x.reduce0())
+#             r[:,4*nc:13*nc]=self.broadcast1(x.reduce1())
+#             r[:,13*nc:15*nc]=self.broadcast2(x)
+#             return r
 
-    @staticmethod
-    def forward(ctx,atoms,x,tmap):
-        r=ptensorlayer2.zeros(atoms,x.get_nc()*([2,5,15][x.getk()]))
-        r.backend().add_gather(x.backend(),tmap)
-        ctx.x=x
-        ctx.tmap=tmap
-        return r
-
-    @staticmethod
-    def backward(ctx,g):
-        r=ctx.x.zeros_like()
-        r.backend().add_gather_back(g.backend(),ctx.tmap)
-        return r

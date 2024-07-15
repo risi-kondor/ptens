@@ -317,6 +317,7 @@ namespace ptens{
       add_gather_back(x,ptens_global::overlaps_cache(x.atoms,atoms));
     }
 
+
     template<typename SOURCE>
       void add_gather(const SOURCE& x, const TensorLevelMap& map){
       if(ptens_global::row_level_operations){
@@ -427,7 +428,7 @@ namespace ptens{
       }
       ostringstream oss;
       for(int i=0; i<size(); i++){
-	oss<<indent<<(*this)(i)<<endl;
+	oss<<(*this)(i).str(indent);
       }
       return oss.str();
     }

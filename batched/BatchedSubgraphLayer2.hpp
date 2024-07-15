@@ -30,7 +30,7 @@ namespace ptens{
     typedef BatchedPtensors2<TYPE> BASE;
     typedef cnine::Ltensor<TYPE> TENSOR;
 
-    typedef BatchedAtomsPackN<AtomsPack2obj<int> > BatchedAtomsPack2;
+    //typedef BatchedAtomsPackN<AtomsPack2obj<int> > BatchedAtomsPack2;
 
     using BASE::BASE;
     using BASE::atoms;
@@ -49,7 +49,7 @@ namespace ptens{
     BatchedSubgraphLayer2(const BatchedGgraph& _G, const Subgraph& _S, const BASE& x):
       BASE(x), G(_G), S(_S){}
 
-    BatchedSubgraphLayer2(const BatchedGgraph& _G, const Subgraph& _S, const BatchedAtomsPack2& atoms, const TENSOR& x):
+    BatchedSubgraphLayer2(const BatchedGgraph& _G, const Subgraph& _S, const BatchedAtomsPack& atoms, const TENSOR& x):
       BASE(atoms,x), G(_G), S(_S){}
 
     BatchedSubgraphLayer2(const BatchedGgraph& _G, const int nc, const int fcode=0, const int _dev=0):

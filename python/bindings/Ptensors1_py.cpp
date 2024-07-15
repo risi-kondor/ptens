@@ -4,6 +4,24 @@ pybind11::class_<Ptensors1<float> >(m,"ptensors1")
       return Ptensors1<float>(atoms,tensorf::view(x));})
 
 
+// ---- Linmaps ----------------------------------------------------------------------------------------------
+
+
+  .def("add_linmaps",[](Ptensors1f& obj, const Ptensors0f& x){
+      return obj.add_linmaps(x);}) 
+  .def("add_linmaps",[](Ptensors1f& obj, const Ptensors1f& x){
+      return obj.add_linmaps(x);}) 
+  .def("add_linmaps",[](Ptensors1f& obj, const Ptensors2f& x){
+      return obj.add_linmaps(x);}) 
+  
+  .def("add_linmaps_back",[](Ptensors1f& obj, const Ptensors0f& x){
+      return obj.add_linmaps(x);}) 
+  .def("add_linmaps_back",[](Ptensors1f& obj, const Ptensors1f& x){
+      return obj.add_linmaps(x);}) 
+  .def("add_linmaps_back",[](Ptensors1f& obj, const Ptensors2f& x){
+      return obj.add_linmaps(x);}) 
+  
+
 // ---- Gather ----------------------------------------------------------------------------------------------
 
 

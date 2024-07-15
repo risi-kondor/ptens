@@ -64,10 +64,11 @@ namespace ptens{
     //BatchedPtensors1(){}
 
     BatchedPtensors1(const BatchedAtomsPack& _atoms, const TENSOR& M):
-      BASE(M.copy()), atoms(_atoms){}
+      BASE(M), atoms(_atoms){
+    }
 
     BatchedPtensors1(const TENSOR& M, const BatchedAtomsPack& _atoms):
-      BASE(M.copy()), atoms(_atoms){}
+      BASE(M), atoms(_atoms){}
 
     //BatchedPtensors1(const BatchedAtomsPack& _atoms, const cnine::TensorView<TYPE>& M):
     //BASE(M.copy()), atoms(_atoms){}

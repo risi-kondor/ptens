@@ -26,6 +26,8 @@
 #include "cpermutation.hpp"
 #include "map_of_lists.hpp"
 #include "once.hpp"
+#include "monitored.hpp"
+#include "Ltensor.hpp"
 
 #include "Atoms.hpp"
 
@@ -55,6 +57,20 @@ namespace ptens{
     mutable shared_ptr<AtomsPackTagObj1> cached_tag1;
     mutable shared_ptr<AtomsPackTagObj2> cached_tag2;
 
+    cnine::monitored<cnine::Ltensor<int> > gpu_offsets1=
+      cnine::monitored<cnine::Ltensor<int> >(ptens_global::atomspack_offsets1_monitor,[this](){
+	  cnine::Ltensor<int> R(BASE::dir);
+	  return make_shared<cnine::Ltensor<int> >(R,1);
+	});
+
+    cnine::monitored<cnine::Ltensor<int> > gpu_offsets2=
+      cnine::monitored<cnine::Ltensor<int> >(ptens_global::atomspack_offsets2_monitor,[this](){
+	  cnine::Ltensor<int> R({size(),2});
+	  for(int i=0; i<size(); i++){
+	    R.set(i,0,offsets2[i]);
+	    R.set(i,1,size_of(i));
+	  }
+	  return make_shared<cnine::Ltensor<int> >(R,1);});
 
     ~AtomsPackObj(){
     }
@@ -146,7 +162,7 @@ namespace ptens{
 
 
     AtomsPackObj(const AtomsPackObj& x):
-      array_pool(x),
+      BASE(x),
       observable(this),
       _tsize2(x._tsize2),
       offsets2(x.offsets2),
@@ -183,8 +199,7 @@ namespace ptens{
 
     AtomsPackObj(cnine::array_pool<int>&& x):
       cnine::array_pool<int>(std::move(x)),
-      observable(this)
-    {}
+      observable(this){}
 
     AtomsPackObj(const cnine::Tensor<int>& M):
       AtomsPackObj(cnine::array_pool<int>(M)){
@@ -484,9 +499,8 @@ namespace ptens{
     }
 
     friend ostream& operator<<(ostream& stream, const AtomsPackObj& v){
-      stream<<v.str(); return stream;}
-
-  };
+      stream<<v.str(); return stream;}}
+;
 
   
 

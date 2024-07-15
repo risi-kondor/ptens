@@ -83,20 +83,7 @@ class ptensorlayer1(ptensorlayer):
 
     @classmethod
     def linmaps(self,x):
-        nc=x.get_nc()
-        if isinstance(x,p.ptensorlayer0):
-            return self.broadcast0(x)
-        if isinstance(x,p.ptensorlayer1):
-            r=ptensorlayer1.zeros(x.atoms,2*nc)
-            r[:,0:nc]=self.broadcast0(x.reduce0())
-            r[:,nc:2*nc]=x
-            return r
-        if isinstance(x,p.ptensorlayer2):
-            r=ptensorlayer1.zeros(x.atoms,5*nc)
-            r[:,0:2*nc]=self.broadcast0(x.reduce0())
-            r[:,2*nc:5*nc]=x.reduce1()
-            return r
-
+        return ptensorlayer1_linmapsFn.apply(x)
 
 
     # ---- Message passing -----------------------------------------------------------------------------------
@@ -154,15 +141,29 @@ class ptensorlayer1(ptensorlayer):
     def __repr__(self):
         return "ptensorlayer1(len="+str(len(self.atoms))+",nc="+str(self.size(1))+")"
 
-    def __str__(self):
-        r=""
-        for i in range(len(self)):
-            r=r+str(self[i])+"\n"
+    def __str__(self,indent=""):
+        r=indent+self.__repr__()+"\n"
+        r=r+self.backend().__str__(indent+"  ")
         return r
 
 
-
 # ---- Autograd functions --------------------------------------------------------------------------------------------
+
+
+class ptensorlayer1_linmapsFn(torch.autograd.Function):
+
+    @staticmethod
+    def forward(ctx,x):
+        r=ptensorlayer1.zeros(x.atoms,x.get_nc()*([1,2,5][x.getk()]))
+        r.backend().add_linmaps(x.backend())
+        ctx.x=x
+        return r
+
+    @staticmethod
+    def backward(ctx,g):
+        r=ctx.x.zeros_like()
+        r.backend().add_linmaps_back(g.backend())
+        return r
 
 
 class ptensorlayer1_reduce0Fn(torch.autograd.Function):
@@ -226,3 +227,16 @@ class ptensorlayer1_gatherFn(torch.autograd.Function):
 #         R.atoms=atoms
 #         return R
 
+#        nc=x.get_nc()
+#        if isinstance(x,p.ptensorlayer0):
+#            return self.broadcast0(x)
+#        if isinstance(x,p.ptensorlayer1):
+#            r=ptensorlayer1.zeros(x.atoms,2*nc)
+#            r[:,0:nc]=self.broadcast0(x.reduce0())
+#            r[:,nc:2*nc]=x
+#            return r
+#        if isinstance(x,p.ptensorlayer2):
+#            r=ptensorlayer1.zeros(x.atoms,5*nc)
+#            r[:,0:2*nc]=self.broadcast0(x.reduce0())
+#            r[:,2*nc:5*nc]=x.reduce1()
+#            return r

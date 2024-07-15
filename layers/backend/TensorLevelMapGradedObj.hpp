@@ -19,7 +19,7 @@
 #include "Tensor.hpp"
 #include "array_pool.hpp"
 #include "AindexPack.hpp"
-#include "GatherMap.hpp"
+//#include "GatherMap.hpp"
 #include "flog.hpp"
 
 
@@ -39,7 +39,7 @@ namespace ptens{
     ITENSOR in;
     ITENSOR out;
 
-    mutable shared_ptr<cnine::GatherMap> bmap;
+    //mutable shared_ptr<cnine::GatherMap> bmap;
 
     ~TensorLevelMapGradedObj(){
     }
@@ -101,10 +101,10 @@ namespace ptens{
 	  }
 	  p++;
 	}, false);
-      get_bmap();
+      //get_bmap();
     }
 
-
+    /*
     std::shared_ptr<cnine::GatherMap> get_bmap() const{
       if(bmap) return bmap; 
 
@@ -139,7 +139,7 @@ namespace ptens{
       bmap=std::shared_ptr<cnine::GatherMap>(R);
       return bmap;
     }
-
+    */
     
   };
 

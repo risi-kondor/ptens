@@ -19,7 +19,7 @@ M=torch.randn([atoms.nrows1(),3])
 A=p.ptensorlayer1.from_matrix(atoms,M)
 print(A)
 
-print("If two P-tensor layer  have the same reference domains,\nwe can do arithmetic on them:\n")
+print("If two P-tensor layers  have the same reference domains,\nwe can do arithmetic on them:\n")
 # Unfortunately these have to be added manually one-by-one
 B=p.ptensorlayer1.randn(atoms,3)
 print(A+B)

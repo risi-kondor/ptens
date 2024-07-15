@@ -51,9 +51,9 @@ int main(int argc, char** argv){
 
   AtomsPack yatoms=AtomsPack::random(N,N,0.5);
   cout<<X0<<endl;
-  auto Y0=Ptens1::gather(X0,yatoms);
-  auto Y1=Ptens1::gather(X1,yatoms);
-  auto Y2=Ptens1::gather(X2,yatoms);
+  auto Y0=Ptens1::gather(yatoms,X0);
+  auto Y1=Ptens1::gather(yatoms,X1);
+  auto Y2=Ptens1::gather(yatoms,X2);
   cout<<Y0<<endl;
   cout<<Y1<<endl;
   cout<<Y2<<endl;

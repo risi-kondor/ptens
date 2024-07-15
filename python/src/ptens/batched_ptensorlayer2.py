@@ -2,7 +2,7 @@
 # This file is part of ptens, a C++/CUDA library for permutation 
 # equivariant message passing. 
 #  
-# Copyright (c) 2023, Imre Risi Kondor
+# Copyright (c) 2024, Imre Risi Kondor
 #
 # This source code file is subject to the terms of the noncommercial 
 # license distributed with cnine in the file LICENSE.TXT. Commercial 
@@ -16,50 +16,56 @@ import torch
 
 import ptens_base as pb 
 import ptens as p 
-import ptens.ptensorlayer as ptensorlayer
 import ptens.ptensor0 as ptensor0
 
 
-class ptensorlayer0(ptensorlayer):
+class batched_ptensorlayer2(p.batched_ptensorlayer):
 
     @classmethod
     def make(self,atoms,M):
-        R=ptensorlayer0(M)
+        R=batched_ptensorlayer2(M)
         R.atoms=atoms
         return R
 
     @classmethod
     def zeros(self,atoms,nc,device='cpu'):
-        assert isinstance(atoms,pb.atomspack)
+        assert isinstance(atoms,pb.batched_atomspack)
         assert isinstance(nc,int)
-        return self.make(atoms,torch.zeros([len(atoms),nc],device=device))
+        return self.make(atoms,torch.zeros([atoms.nrows2(),nc],device=device))
 
     @classmethod
     def randn(self,atoms,nc,device='cpu'):
-        assert isinstance(atoms,pb.atomspack)
+        assert isinstance(atoms,pb.batched_atomspack)
         assert isinstance(nc,int)
-        return self.make(atoms,torch.randn([len(atoms),nc],device=device))
+        return self.make(atoms,torch.randn([atoms.nrows2(),nc],device=device))
+
+    @classmethod
+    def from_ptensorlayers(self,list):
+        for a in list:
+            assert isinstance(a,p.ptensorlayer2)
+        atoms=pb.batched_atomspack([a.atoms for a in list])
+        return self.make(atoms,torch.cat(list,0))
 
     @classmethod
     def from_matrix(self,atoms,M):
-        assert isinstance(atoms,pb.atomspack)
+        assert isinstance(atoms,pb.batched_atomspack)
         assert isinstance(M,torch.Tensor)
         assert M.dim()==2
-        assert M.size(0)==atoms.nrows0()
+        assert M.size(0)==atoms.nrows2()
         return self.make(atoms,M)
 
     def zeros_like(self):
-        return ptensorlayer0.zeros(self.atoms,self.get_nc(),device=self.device)
+        return batched_ptensorlayer2.zeros(self.atoms,self.get_nc(),device=self.device)
     
     def backend(self):
-        return pb.ptensors0.view(self.atoms,self)
+        return pb.batched_ptensors2.view(self.atoms,self)
 
 
     # ----- Access -------------------------------------------------------------------------------------------
 
 
     def getk(self):
-        return 0
+        return 2
     
     def __len__(self):
         return len(self.atoms)
@@ -69,7 +75,10 @@ class ptensorlayer0(ptensorlayer):
     
     def __getitem__(self,i):
         assert i<len(self)
-        return ptensor0.from_tensor(self.atoms[i],torch.Tensor(self)[i])
+        offs=self.atoms.offset2(i)
+        n=self.atoms.nrows2(i)
+        M=torch.Tensor(self)[offs:offs+n,:]
+        return p.ptensorlayer2.from_matrix(self.atoms[i],M)
 
 
     # ---- Linmaps -------------------------------------------------------------------------------------------
@@ -77,14 +86,7 @@ class ptensorlayer0(ptensorlayer):
 
     @classmethod
     def linmaps(self,x):
-        return ptensorlayer0_linmapsFn.apply(x)
-    
-#        if isinstance(x,ptensorlayer0):
-#            return x
-#        if isinstance(x,p.ptensorlayer1):
-#            return x.reduce0()
-#        if isinstance(x,p.ptensorlayer2):
-#            return x.reduce0()
+        return batched_ptensorlayer2_linmapsFn.apply(x)
 
 
     # ---- Message passing -----------------------------------------------------------------------------------
@@ -92,24 +94,26 @@ class ptensorlayer0(ptensorlayer):
 
     @classmethod
     def gather(self,atoms,x,*args):
-        assert isinstance(atoms,pb.atomspack)
-        assert isinstance(x,p.ptensorlayer)
+        assert isinstance(atoms,pb.batched_atomspack)
+        assert isinstance(x,p.batched_ptensorlayer)
         if len(args)==0:
-            return ptensorlayer0.gather(atoms,x,pb.tensor_map.overlaps_map(atoms,x.atoms)) 
+            return batched_ptensorlayer2.gather(atoms,x,pb.tensor_map.overlaps_map(atoms,x.atoms)) 
         else:
             assert isinstance(args[0],pb.tensor_map)
-            return ptensorlayer0_gatherFn.apply(atoms,x,args[0])
+            return batched_ptensorlayer2_gatherFn.apply(atoms,x,args[0])
         
 
     # ---- I/O ----------------------------------------------------------------------------------------------
 
 
     def __repr__(self):
-        return "ptensorlayer0(len="+str(self.size(0))+",nc="+str(self.size(1))+")"
+        return "batched_ptensorlayer2(len="+str(len(self))+",nc="+str(self.size(1))+")"
 
     def __str__(self,indent=""):
-        r=indent+self.__repr__()+"\n"
-        r=r+self.backend().__str__(indent+"  ")
+        r=""
+        r=r+indent+self.__repr__()+":\n"
+        for i in range(len(self)):
+            r=r+self[i].__str__("  ")+"\n"
         return r
 
 
@@ -117,12 +121,11 @@ class ptensorlayer0(ptensorlayer):
 # ---- Autograd functions --------------------------------------------------------------------------------------------
 
 
-
-class ptensorlayer0_linmapsFn(torch.autograd.Function):
+class batched_ptensorlayer2_linmapsFn(torch.autograd.Function):
 
     @staticmethod
     def forward(ctx,x):
-        r=ptensorlayer0.zeros(x.atoms,x.get_nc()*([1,1,2][x.getk()]))
+        r=batched_ptensorlayer2.zeros(x.atoms,x.get_nc()*([2,5,15][x.getk()]))
         r.backend().add_linmaps(x.backend())
         ctx.x=x
         return r
@@ -134,11 +137,11 @@ class ptensorlayer0_linmapsFn(torch.autograd.Function):
         return r
 
 
-class ptensorlayer0_gatherFn(torch.autograd.Function):
+class batched_ptensorlayer2_gatherFn(torch.autograd.Function):
 
     @staticmethod
     def forward(ctx,atoms,x,tmap):
-        r=ptensorlayer0.zeros(atoms,x.get_nc()*([1,1,2][x.getk()]))
+        r=batched_ptensorlayer2.zeros(atoms,x.get_nc()*([2,5,15][x.getk()]))
         r.backend().add_gather(x.backend(),tmap)
         ctx.x=x
         ctx.tmap=tmap

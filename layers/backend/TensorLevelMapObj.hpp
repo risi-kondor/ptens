@@ -20,7 +20,7 @@
 #include "Tensor.hpp"
 #include "array_pool.hpp"
 #include "AindexPack.hpp"
-#include "GatherMap.hpp"
+#include "GatherMapB.hpp"
 #include "TensorLevelMapGradedObj.hpp"
 #include "flog.hpp"
 
@@ -40,8 +40,10 @@ namespace ptens{
     shared_ptr<AtomsPackObj> atoms;
     shared_ptr<AindexPack> in;
     shared_ptr<AindexPack> out;
+    int n_in, n_out;
 
-    mutable shared_ptr<cnine::GatherMap> bmap;
+    //mutable shared_ptr<cnine::GatherMap> bmap;
+    mutable shared_ptr<cnine::GatherMapB> bmap;
 
     unordered_map<int,unique_ptr<TensorLevelMapGradedObj> > graded_maps;
 
@@ -55,7 +57,9 @@ namespace ptens{
       observable(this),
       atoms(new AtomsPackObj()),
       in(new AindexPack()),
-      out(new AindexPack()){
+      out(new AindexPack()),
+      n_in(_in_atoms.size()),
+      n_out(_out_atoms.size()){
       //cout<<"Creating new TensorLevelMapObj...";//<<endl;
       if(graded){
 	make_graded(_in_atoms,_out_atoms);
@@ -179,42 +183,21 @@ namespace ptens{
 	  out->count2+=_out.size()*_out.size();
 	    
 	}, false);
-      out->bmap=get_bmap();
+      out->bmap2=get_bmap();
     }
 
 
-    std::shared_ptr<cnine::GatherMap> get_bmap() const{
-      if(bmap) return bmap; 
-
-      int nlists=0;
-      int nedges=0;
-      for(auto q:lists)
-	if(q.second->size()>0){
-	  nlists++;
-	  nedges+=q.second->size();
-	}
-      
-      cnine::GatherMap* R=new cnine::GatherMap(nlists,nedges);
-      int i=0;
+    std::shared_ptr<cnine::GatherMapB> get_bmap() const{
+      if(bmap.get()) return bmap; 
+      cnine::GatherMapB* R=new cnine::GatherMapB(n_out,n_in);
       int m=0;
-      int tail=3*nlists;
       for(auto q:lists){
-	int len=q.second->size();
-	if(len==0) continue;
-	R->arr[3*i]=tail;
-	R->arr[3*i+1]=len;
-	R->arr[3*i+2]=q.first;
-	int j=0;
-	for(auto p:*q.second){
-	  R->arr[tail+2*j]=m++;
-	  *reinterpret_cast<float*>(R->arr+tail+2*j+1)=p.second;
-	  j++;
-	}
-	tail+=2*len;
-	i++;
+	vector<int> v;
+	for(auto p:*q.second)
+	  v.push_back(m++);
+	R->arr.push_back(q.first,v);
       }
-      
-      bmap=std::shared_ptr<cnine::GatherMap>(R);
+      bmap=to_share(R);
       return bmap;
     }
 
@@ -265,35 +248,3 @@ namespace ptens{
 #endif 
 
 
-    // for future use 
-    /*  
-    pair<IntMatrix,IntMatrix> intersects(const IntMatrix& inputs, const IntMatrix& outputs, const bool self=0) const{
-      PTENS_ASSRT(outputs.dims[0]==n);
-      PTENS_ASSRT(inputs.dims[0]==m);
-      int N=size();
-      int kin=inputs.dims[1];
-      int kout=outputs.dims[1];
-
-      IntMatrix in_indices({N,kin,kin},cnine::fill_zero());
-      IntMatrix out_indices({N,kout,kout},cnine::fill_zero());
-      int t=0;
-      forall_edges([&](const int i, const int j, const float v){
-	  for(int a=0; a<kin; a++){
-	    int x=inputs(j,a);
-	    int s=0;
-	    for(int b=0; b<kout; b++){
-	      if(outputs(i,b)==x){
-		in_indices.set(t,s,a,1.0);
-		out_indices.set(t,s,b,1.0);
-		s++;
-		break;
-	      }
-	    }
-	  }
-	  t++;
-	});
-      out_indices.bmap=get_bmap();
-      return make_pair(in_indices, out_indices);
-    }
-    */
-    //pair<AindexPack,AindexPack> intersects(const ATOMSPACK& inputs, const ATOMSPACK& outputs, const bool self=0) const{

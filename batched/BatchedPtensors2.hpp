@@ -56,10 +56,10 @@ namespace ptens{
     //BatchedPtensors2(){}
 
     BatchedPtensors2(const BatchedAtomsPack& _atoms, const TENSOR& M):
-      BASE(M.copy()), atoms(_atoms){}
+      BASE(M), atoms(_atoms){}
 
-    BatchedPtensors2(const BatchedAtomsPack& _atoms, const cnine::Tensor<float>& M):
-      BASE(M.copy()), atoms(_atoms){}
+    //BatchedPtensors2(const BatchedAtomsPack& _atoms, const cnine::Tensor<float>& M):
+    //BASE(M.copy()), atoms(_atoms){}
 
     /*
     BatchedPtensors2(const BatchedAtomsPack2& _atoms, const TENSOR& M):
@@ -67,10 +67,12 @@ namespace ptens{
 
     BatchedPtensors2(const BatchedAtomsPack2& _atoms, const int _nc, const int _dev):
       BatchedPtensors2(_atoms,_nc,0,_dev){}
+    */
 
-    BatchedPtensors2(const BatchedAtomsPack2& _atoms, const int _nc, const int fcode, const int _dev):
-      BASE({_atoms.tsize(),_nc},fcode,_dev), atoms(_atoms){}
+    BatchedPtensors2(const BatchedAtomsPack& _atoms, const int _nc, const int fcode, const int _dev):
+      BASE({_atoms.nrows2(),_nc},fcode,_dev), atoms(_atoms){}
 
+    /*
     BatchedPtensors2(const BatchedAtomsPack& _atoms, const int _nc, const int _dev):
       BatchedPtensors2(BatchedAtomsPack2(_atoms),_nc,0,_dev){}
 

@@ -76,6 +76,7 @@ namespace ptens{
     }
 
     int nrows0(const int i) const{
+      if(row_offsets0.size()==0) make_row_offsets0();
       if(i==0) return row_offsets0[0];
       return row_offsets0[i]-row_offsets0[i-1];
     }
@@ -105,6 +106,7 @@ namespace ptens{
     }
 
     int nrows1(const int i) const{
+      if(row_offsets1.size()==0) make_row_offsets1();
       if(i==0) return row_offsets1[0];
       return row_offsets1[i]-row_offsets1[i-1];
     }
@@ -134,6 +136,7 @@ namespace ptens{
     }
 
     int nrows2(const int i) const{
+      if(row_offsets0.size()==0) make_row_offsets2();
       if(i==0) return row_offsets2[0];
       return row_offsets2[i]-row_offsets2[i-1];
     }

@@ -619,7 +619,7 @@ namespace ptens{
       return R;
     }
 
-    Ptensors0<TYPE> add_reduce0_to(const Ptensors0<TYPE>& R, const AindexPack& list) const{
+    void add_reduce0_to(const Ptensors0<TYPE>& R, const AindexPack& list) const{
       if(dev==0){
 	int N=list.size();
 	for(int i=0; i<N; i++){
@@ -957,7 +957,7 @@ namespace ptens{
       }
       ostringstream oss;
       for(int i=0; i<size(); i++){
-	oss<<indent<<(*this)(i)<<endl;
+	oss<<(*this)(i).str(indent);
       }
       return oss.str();
     }

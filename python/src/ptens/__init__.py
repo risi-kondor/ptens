@@ -34,6 +34,10 @@ from ptens.subgraphlayer2 import subgraphlayer2 as subgraphlayer2
 
 from ptens.batched_ggraph import batched_ggraph as batched_ggraph
 
+from ptens.batched_ptensorlayer import batched_ptensorlayer
+from ptens.batched_ptensorlayer0 import batched_ptensorlayer0
+from ptens.batched_ptensorlayer1 import batched_ptensorlayer1
+from ptens.batched_ptensorlayer2 import batched_ptensorlayer2
 
 
 

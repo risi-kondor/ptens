@@ -17,8 +17,10 @@
 #include <map>
 
 #include "hlists.hpp"
+#include "monitored.hpp"
 #include "Atoms.hpp"
-#include "GatherMap.hpp"
+#include "GatherMapB.hpp"
+#include "Ltensor.hpp"
 
 
 namespace ptens{
@@ -33,7 +35,16 @@ namespace ptens{
     int count1=0;
     int count2=0;
 
-    std::shared_ptr<cnine::GatherMap> bmap;
+    //cnine::monitored<cnine::int_pool> arrg=
+    //cnine::monitored<cnine::int_pool>(ptens_global::indexpack_arrg_monitor,[this](){
+    //return to_share(new cnine::int_pool(to_int_pool()));});
+
+    cnine::monitored<cnine::Ltensor<int> > gpu_tensor=
+      cnine::monitored<cnine::Ltensor<int> >(ptens_global::indexpack_arrg_monitor,[this](){
+	  return to_share(new cnine::Ltensor<int>(to_tensor(1)));});
+
+    //std::shared_ptr<cnine::GatherMap> bmap;
+    std::shared_ptr<cnine::GatherMapB> bmap2;
 
 
   public: // ---- Constructors ------------------------------------------------------------------------------
@@ -52,7 +63,8 @@ namespace ptens{
 
     AindexPack(const AindexPack& x):
       BASE(x){
-      bmap=x.bmap;
+      //bmap=x.bmap;
+      bmap2=x.bmap2;
       _max_nix=x._max_nix;
       count1=x.count1;
       count2=x.count2;
@@ -60,7 +72,8 @@ namespace ptens{
 
     AindexPack(AindexPack&& x):
       BASE(std::move(x)){
-      bmap=x.bmap; 
+      //bmap=x.bmap; 
+      bmap2=x.bmap2; 
       _max_nix=x._max_nix;
       count1=x.count1;
       count2=x.count2;
@@ -111,6 +124,11 @@ namespace ptens{
       return bmap->arrg;
     }
     */
+
+    const cnine::Ltensor<int>& gpu_gather_map(const int _dev=1){
+      assert(bmap2.get());
+      return bmap2->gpu_format;
+    }
 
     void push_back(const int tix, vector<int> indices){
       BASE::push_back(tix,indices);

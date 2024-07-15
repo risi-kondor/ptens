@@ -1,6 +1,5 @@
 #include <torch/torch.h>
 #include <pybind11/stl.h>
-//#include <pybind11/complex.h>
 
 #include "Ptens_base.cpp"
 #include "SimpleMemoryManager.hpp"
@@ -19,18 +18,17 @@
 #include "BatchedGgraph.hpp"
 #include "BatchedAtomsPack.hpp"
 
+#include "BatchedPtensors0.hpp"
+#include "BatchedPtensors1.hpp"
+#include "BatchedPtensors2.hpp"
 
 /*
-#include "BatchedPtensors0b.hpp"
-#include "BatchedPtensors1b.hpp"
-#include "BatchedPtensors2b.hpp"
-
 #include "BatchedSubgraphLayer0b.hpp"
 #include "BatchedSubgraphLayer1b.hpp"
 #include "BatchedSubgraphLayer2b.hpp"
 */
 
-ptens::PtensSession ptens_session(8);
+ptens::PtensSession ptens_session(1); // Ltensors are not thread safe 
 
 
 PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
@@ -48,6 +46,10 @@ PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
   typedef Ptensors0<float> Ptensors0f;
   typedef Ptensors1<float> Ptensors1f;
   typedef Ptensors2<float> Ptensors2f;
+
+  typedef BatchedPtensors0<float> BPtensors0f;
+  typedef BatchedPtensors1<float> BPtensors1f;
+  typedef BatchedPtensors2<float> BPtensors2f;
 
 
 #include "PtensGlobal_py.cpp"
@@ -77,6 +79,9 @@ PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
 #include "BatchedGgraph_py.cpp"
 #include "BatchedAtomsPack_py.cpp"
 
+#include "BatchedPtensors0_py.cpp"
+#include "BatchedPtensors1_py.cpp"
+#include "BatchedPtensors2_py.cpp"
 
 
 

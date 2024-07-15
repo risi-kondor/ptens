@@ -3,6 +3,17 @@
 
 #include "Cnine_base.cpp"
 #include "Ptens_base.hpp"
+#include "monitored.hpp"
+#include "Ltensor.hpp"
+
+
+namespace ptens{
+  namespace ptens_global{
+    cnine::obj_monitor<cnine::Ltensor<int> > atomspack_offsets1_monitor;
+    cnine::obj_monitor<cnine::Ltensor<int> > atomspack_offsets2_monitor;
+    cnine::obj_monitor<cnine::Ltensor<int> > indexpack_arrg_monitor;
+  }
+}
 
 #include "AtomsPackCatCache.hpp"
 #include "OverlapsMmapCache.hpp"

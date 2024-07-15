@@ -126,14 +126,9 @@ namespace ptens{
     }
 
     static BatchedSubgraphLayer1* new_zeros_like(const BatchedSubgraphLayer1& x){
-      //cnine::using_vram_manager vv(ptens_session.managed_gmem);
-      //return new BatchedSubgraphLayer1(x.G,x.S,x.TENSOR::zeros_like());
       return new BatchedSubgraphLayer1(x.G,x.S,x.BASE::zeros_like());
     }
     
-    //BatchedSubgraphLayer0(const BatchedSubgraphLayer0& x, const int _dev):
-    //BatchedSubgraphLayer0(x.G,x.S,BASE(x,_dev)){}
-
 
   public: // ---- Access -------------------------------------------------------------------------------------
 
@@ -192,6 +187,7 @@ namespace ptens{
       return R;
     }
 
+    /*
     void add_linmaps(const BatchedSubgraphLayer0<TYPE>& x){
       BASE::add_linmaps(x);
     }
@@ -202,31 +198,11 @@ namespace ptens{
       cols(nc,nc)+=x;
       //for(int i=0; i<size(); i++)
       //view_of(i).add_linmaps(x.view_of(i));
-      //cnine::MultiLoop(size(),[&](const int i){view_of(i).add_linmaps(x.view_of(i));});
-    }
-
-    //void add_linmaps(const BatchedSubgraphLayer2b<TYPE>& x){
-    //BASE::add_limnmaps(x);
-    //}
-
-    /*
-    void add_linmaps_back(const BatchedSubgraphLayer1<TYPE>& x){
-      int nc=get_nc();
-      broadcast0(x.reduce0(0,nc),0);
-      add(x.cols(nc,nc));
+      cnine::MultiLoop(size(),[&](const int i){view_of(i).add_linmaps(x.view_of(i));});
     }
     */
 
-    void add_linmaps_back_alt(const BatchedSubgraphLayer1<TYPE>& x){
-      int K=S.getn();
-      int nc=get_nc();
-      get_grad().broadcast0(K,x.get_grad().reduce0(K,0,nc),0);
-      get_grad().add(x.get_grad().cols(nc,nc));
-      //for(int i=0; i<size(); i++)
-      //view_of(i).add_linmaps_back(x.view_of(i));
-      //cnine::MultiLoop(size(),[&](const int i){view_of(i).add_linmaps_back(x.view_of(i));});
-    }
-
+    /*
     Ptensors<TYPE> reduce0() const{
       TimedFn T("BatchedSubgraphLayer1","reduce0",*this);
       //cnine::using_vram_manager vv(ptens_session->managed_gmem);
@@ -242,6 +218,7 @@ namespace ptens{
       view3(S.getn(),offs,nc).sum1_into(R.view2());
       return R;
     }
+    */
 
     void broadcast0(const Ptensors<TYPE>& x, const int offs){
       TimedFn T("BatchedSubgraphLayer1","broadcast0",*this);
