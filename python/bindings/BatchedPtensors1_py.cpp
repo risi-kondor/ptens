@@ -25,18 +25,18 @@ pybind11::class_<BatchedPtensors1<float> >(m,"batched_ptensors1")
 // ---- Gather ----------------------------------------------------------------------------------------------
 
 
-  .def("add_gather",[](BPtensors1f& obj, const BPtensors0f& x){
+  .def("add_gather",[](BPtensors1f& obj, const BPtensors0f& x, const BatchedPtensorMap& map){
       return obj.add_gather(x);}) 
-  .def("add_gather",[](BPtensors1f& obj, const BPtensors1f& x){
+  .def("add_gather",[](BPtensors1f& obj, const BPtensors1f& x, const BatchedPtensorMap& map){
       return obj.add_gather(x);}) 
-  .def("add_gather",[](BPtensors1f& obj, const BPtensors2f& x){
+  .def("add_gather",[](BPtensors1f& obj, const BPtensors2f& x, const BatchedPtensorMap& map){
       return obj.add_gather(x);}) 
 
-  .def("add_gather_back",[](BPtensors1f& obj, const BPtensors0f& x){
+  .def("add_gather_back",[](BPtensors1f& obj, const BPtensors0f& x, const BatchedPtensorMap& map){
       return obj.add_gather_back(x);}) 
-  .def("add_gather_back",[](BPtensors1f& obj, const BPtensors1f& x){
+  .def("add_gather_back",[](BPtensors1f& obj, const BPtensors1f& x, const BatchedPtensorMap& map){
       return obj.add_gather_back(x);}) 
-  .def("add_gather_back",[](BPtensors1f& obj, const BPtensors2f& x){
+  .def("add_gather_back",[](BPtensors1f& obj, const BPtensors2f& x, const BatchedPtensorMap& map){
       return obj.add_gather_back(x);}) 
 
 

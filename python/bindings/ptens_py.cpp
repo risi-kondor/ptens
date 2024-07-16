@@ -17,6 +17,8 @@
 
 #include "BatchedGgraph.hpp"
 #include "BatchedAtomsPack.hpp"
+#include "BatchedAindexPack.hpp"
+#include "BatchedPtensorMap.hpp"
 
 #include "BatchedPtensors0.hpp"
 #include "BatchedPtensors1.hpp"
@@ -78,6 +80,8 @@ PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
 
 #include "BatchedGgraph_py.cpp"
 #include "BatchedAtomsPack_py.cpp"
+#include "BatchedAindexPack_py.cpp"
+#include "BatchedPtensorMap_py.cpp"
 
 #include "BatchedPtensors0_py.cpp"
 #include "BatchedPtensors1_py.cpp"

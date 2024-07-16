@@ -77,7 +77,7 @@ namespace ptens{
 
 
     string classname() const{
-      return "TransferrMap";
+      return "TensorLevelMap";
     }
 
     string repr() const{

@@ -44,15 +44,14 @@ print("The linmaps from a 1st batched layer consist of 15 different maps:\n")
 A2=p.batched_ptensorlayer2.randn(atoms,3)
 print(p.batched_ptensorlayer2.linmaps(A2))
 
-exit(0) 
 
 print("\n---------")
 print(" Gather")
 print("---------\n")
 
 
-atoms2=pb.atomspack.random(5,5,0.6)
-print(atoms2,"\n")
+subatoms2=pb.atomspack.random(5,5,0.6)
+atoms2=pb.batched_atomspack([subatoms2,subatoms2,subatoms2])
 
 B0=p.batched_ptensorlayer2.gather(atoms2,A0)
 print(B0)

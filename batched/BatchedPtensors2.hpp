@@ -205,7 +205,7 @@ namespace ptens{
     }
 
 
-  public: // ---- Message passing ----------------------------------------------------------------------------
+  public: // ---- Linmaps ------------------------------------------------------------------------------------
 
 
     template<typename SOURCE, typename = typename std::enable_if<std::is_base_of<BatchedPtensors<float>, SOURCE>::value, SOURCE>::type>
@@ -214,14 +214,6 @@ namespace ptens{
       R.add_linmaps(x);
       return R;
     }
-
-    template<typename SOURCE, typename = typename std::enable_if<std::is_base_of<BatchedPtensors<float>, SOURCE>::value, SOURCE>::type>
-    static BatchedPtensors2<TYPE> gather(const SOURCE& x, const BatchedAtomsPack& a){
-      BatchedPtensors2<TYPE> R(a,x.get_nc()*vector<int>({2,5,15})[x.getk()],x.get_dev());
-      R.add_gather(x);
-      return R;
-    }
-
 
     template<typename SOURCE, typename = typename std::enable_if<std::is_base_of<BatchedPtensors<float>, SOURCE>::value, SOURCE>::type>
     void add_linmaps(const SOURCE& x){
@@ -233,6 +225,16 @@ namespace ptens{
     void add_linmaps_back(const SOURCE& x){
       for(int i=0; i<size(); i++)
 	view_of(i).add_linmaps_back(x.view_of(i));
+    }
+
+  public: // ---- Message passing ----------------------------------------------------------------------------
+
+
+    template<typename SOURCE, typename = typename std::enable_if<std::is_base_of<BatchedPtensors<float>, SOURCE>::value, SOURCE>::type>
+    static BatchedPtensors2<TYPE> gather(const SOURCE& x, const BatchedAtomsPack& a){
+      BatchedPtensors2<TYPE> R(a,x.get_nc()*vector<int>({2,5,15})[x.getk()],x.get_dev());
+      R.add_gather(x);
+      return R;
     }
 
     template<typename SOURCE>
