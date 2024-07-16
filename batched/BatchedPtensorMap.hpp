@@ -22,7 +22,7 @@
 namespace ptens{
 
 
-  class BatchedPtensorMap{ //: public cnine::object_pack_s<TensorLevelMapObj>{
+  class BatchedPtensorMap{ //: public cnine::object_pack_s<PtensorMapObj>{
   public:
 
     BatchedAindexPack in_indices;
@@ -42,9 +42,9 @@ namespace ptens{
       BatchedPtensorMap R;
       int N=out.size();
 
-      vector<TensorLevelMap> maps;
+      vector<PtensorMap> maps;
       for(int i=0; i<N; i++)
-	maps.push_back(TensorLevelMap::overlaps_map(out[i],in[i]));
+	maps.push_back(PtensorMap::overlaps_map(out[i],in[i]));
 	  
       vector<AtomsPack> atomsv;
       for(int i=0; i<N; i++)

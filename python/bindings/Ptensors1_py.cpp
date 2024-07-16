@@ -25,18 +25,18 @@ pybind11::class_<Ptensors1<float> >(m,"ptensors1")
 // ---- Gather ----------------------------------------------------------------------------------------------
 
 
-  .def("add_gather",[](Ptensors1f& obj, const Ptensors0f& x, const TensorLevelMap& tmap){
+  .def("add_gather",[](Ptensors1f& obj, const Ptensors0f& x, const PtensorMap& tmap){
       return obj.add_gather(x,tmap);}) 
-  .def("add_gather",[](Ptensors1f& obj, const Ptensors1f& x, const TensorLevelMap& tmap){
+  .def("add_gather",[](Ptensors1f& obj, const Ptensors1f& x, const PtensorMap& tmap){
       return obj.add_gather(x,tmap);}) 
-  .def("add_gather",[](Ptensors1f& obj, const Ptensors2f& x, const TensorLevelMap& tmap){
+  .def("add_gather",[](Ptensors1f& obj, const Ptensors2f& x, const PtensorMap& tmap){
       return obj.add_gather(x,tmap);}) 
 
-  .def("add_gather_back",[](Ptensors1f& obj, const Ptensors0f& x, const TensorLevelMap& tmap){
+  .def("add_gather_back",[](Ptensors1f& obj, const Ptensors0f& x, const PtensorMap& tmap){
       return obj.add_gather_back(x,tmap);}) 
-  .def("add_gather_back",[](Ptensors1f& obj, const Ptensors1f& x, const TensorLevelMap& tmap){
+  .def("add_gather_back",[](Ptensors1f& obj, const Ptensors1f& x, const PtensorMap& tmap){
       return obj.add_gather_back(x,tmap);}) 
-  .def("add_gather_back",[](Ptensors1f& obj, const Ptensors2f& x, const TensorLevelMap& tmap){
+  .def("add_gather_back",[](Ptensors1f& obj, const Ptensors2f& x, const PtensorMap& tmap){
       return obj.add_gather_back(x,tmap);}) 
 
 

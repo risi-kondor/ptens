@@ -12,10 +12,10 @@
  *
  */
 
-#ifndef _ptens_TensorLevelMap
-#define _ptens_TensorLevelMap
+#ifndef _ptens_PtensorMap
+#define _ptens_PtensorMap
 
-#include "TensorLevelMapObj.hpp"
+#include "PtensorMapObj.hpp"
 #include "AtomsPack.hpp"
 
 
@@ -24,24 +24,24 @@ namespace ptens{
   //class AtomsPackObj;
 
 
-  class TensorLevelMap{
+  class PtensorMap{
   public:
     
-    shared_ptr<TensorLevelMapObj> obj;
+    shared_ptr<PtensorMapObj> obj;
 
-    TensorLevelMap(){
+    PtensorMap(){
       PTENS_ASSRT(false);}
 
-    TensorLevelMap(const shared_ptr<TensorLevelMapObj>& x):
+    PtensorMap(const shared_ptr<PtensorMapObj>& x):
       obj(x){}
 
-    TensorLevelMap(TensorLevelMapObj* x):
+    PtensorMap(PtensorMapObj* x):
       obj(x){}
 
-    static TensorLevelMap overlaps_map(const AtomsPack& out, const AtomsPack& in){
+    static PtensorMap overlaps_map(const AtomsPack& out, const AtomsPack& in){
       if(ptens_global::cache_overlap_maps) 
-	return TensorLevelMap(ptens_global::overlaps_cache(out,in));
-      return new TensorLevelMapObj(*in.obj,*out.obj); 
+	return PtensorMap(ptens_global::overlaps_cache(out,in));
+      return new PtensorMapObj(*in.obj,*out.obj); 
     }
 
 
@@ -77,18 +77,18 @@ namespace ptens{
 
 
     string classname() const{
-      return "TensorLevelMap";
+      return "PtensorMap";
     }
 
     string repr() const{
-      return "TensorLevelMap";
+      return "PtensorMap";
     }
 
     string str(const string indent="") const{
       return obj->str();
     }
 
-    friend ostream& operator<<(ostream& stream, const TensorLevelMap& v){
+    friend ostream& operator<<(ostream& stream, const PtensorMap& v){
       stream<<v.str(); return stream;}
 
 

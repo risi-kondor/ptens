@@ -29,7 +29,8 @@ namespace ptens{
     PtensSession(const int _nthreads=1):
       cnineSession(_nthreads){
 
-      cout<<banner()<<endl;
+      //cout<<banner()<<endl;
+      cout<<"Starting ptens..."<<endl;
 
     }
 

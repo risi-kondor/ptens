@@ -24,7 +24,7 @@
 #include "Ptensors.hpp"
 #include "AtomsPackTag.hpp"
 #include "Ptensor1view.hpp"
-#include "TensorLevelMap.hpp"
+#include "PtensorMap.hpp"
 
 
 namespace ptens{
@@ -386,7 +386,7 @@ namespace ptens{
     }
 
     template<typename SOURCE>
-      void add_gather(const SOURCE& x, const TensorLevelMap& map){
+      void add_gather(const SOURCE& x, const PtensorMap& map){
       if(ptens_global::row_level_operations){
 	rmap(x,map)(*this,x);
       }else{
@@ -405,7 +405,7 @@ namespace ptens{
     }
 
     template<typename OUTPUT>
-    void add_gather_back(const OUTPUT& x, const TensorLevelMap& map){
+    void add_gather_back(const OUTPUT& x, const PtensorMap& map){
       if(ptens_global::row_level_operations){
 	x.rmap(*this,map).inv()(*this,x);
       }else{
@@ -427,7 +427,7 @@ namespace ptens{
   private:
 
     template<typename SOURCE>
-    RowLevelMap& rmap(const SOURCE& x, const TensorLevelMap& tmap) const{
+    RowLevelMap& rmap(const SOURCE& x, const PtensorMap& tmap) const{
       return *ptens_global::rmap_cache(tag,x.tag,tmap.obj);
     }
 

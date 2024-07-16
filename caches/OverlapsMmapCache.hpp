@@ -17,8 +17,8 @@
 #include "ptr_pair_indexed_object_bank.hpp"
 #include "AtomsPack.hpp"
 #include "AtomsPackObj.hpp"
-#include "TensorLevelMapObj.hpp"
-//#include "TensorLevelMap.hpp"
+#include "PtensorMapObj.hpp"
+//#include "PtensorMap.hpp"
 
 
 namespace ptens{
@@ -28,25 +28,25 @@ namespace ptens{
   }
 
   class OverlapsMmapCache: 
-    public cnine::ptr_pair_indexed_object_bank<AtomsPackObj,AtomsPackObj,shared_ptr<TensorLevelMapObj> >{
+    public cnine::ptr_pair_indexed_object_bank<AtomsPackObj,AtomsPackObj,shared_ptr<PtensorMapObj> >{
   public:
 
-    typedef cnine::ptr_pair_indexed_object_bank<AtomsPackObj,AtomsPackObj,shared_ptr<TensorLevelMapObj> > BASE;
+    typedef cnine::ptr_pair_indexed_object_bank<AtomsPackObj,AtomsPackObj,shared_ptr<PtensorMapObj> > BASE;
 
     OverlapsMmapCache():
       BASE([](const AtomsPackObj& out, const AtomsPackObj& in){
-	  return shared_ptr<TensorLevelMapObj>(new TensorLevelMapObj (in,out));}){}
+	  return shared_ptr<PtensorMapObj>(new PtensorMapObj (in,out));}){}
 
 
   public: // ---- Access ------------------------------------------------------------------------------------------
 
 
-    shared_ptr<TensorLevelMapObj> operator()(const AtomsPackObj& out, const AtomsPackObj& in){
+    shared_ptr<PtensorMapObj> operator()(const AtomsPackObj& out, const AtomsPackObj& in){
       if(ptens_global::cache_overlap_maps) return BASE::operator()(out,in); 
-      return make_shared<TensorLevelMapObj>(in,out);
+      return make_shared<PtensorMapObj>(in,out);
     }
 
-    shared_ptr<TensorLevelMapObj> operator()(const AtomsPack& out, const AtomsPack& in){
+    shared_ptr<PtensorMapObj> operator()(const AtomsPack& out, const AtomsPack& in){
       return (*this)(*out.obj,*in.obj);
     }
 

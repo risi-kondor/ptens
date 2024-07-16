@@ -17,17 +17,15 @@ import torch
 import ptens as p
 import ptens_base as pb 
 
-import ptens.ptensorlayer1 as ptensorlayer1
 
-
-class subgraphlayer1(p.subgraphlayer,ptensorlayer1):
+class batched_subgraphlayer1(p.subgraphlayer,p.batched_ptensorlayer1):
 
 
     def __new__(cls,G,S,atoms,M):
-        assert isinstance(atoms,pb.atomspack)
-        assert isinstance(G,p.ggraph)
+        assert isinstance(atoms,pb.batched_atomspack)
+        assert isinstance(G,p.batched_ggraph)
         assert isinstance(S,p.subgraph)
-        R=super().__new__(subgraphlayer1,M)
+        R=super().__new__(batched_subgraphlayer1,M)
         R.atoms=atoms
         R.G=G
         R.S=S
@@ -37,30 +35,50 @@ class subgraphlayer1(p.subgraphlayer,ptensorlayer1):
     def zeros(self,G,S,nc,device='cpu'):
         atoms=G.subgraphs(S)
         M=torch.zeros([atoms.nrows1(),nc],device=device)
-        return subgraphlayer1(G,S,atoms,M)
+        return batched_subgraphlayer1(G,S,atoms,M)
 
     @classmethod
     def randn(self,G,S,nc,device='cpu'):
         atoms=G.subgraphs(S)
         M=torch.randn([atoms.nrows1(),nc],device=device)
-        return subgraphlayer1(G,S,atoms,M)
+        return batched_subgraphlayer1(G,S,atoms,M)
+
+    @classmethod
+    def from_ptensorlayers(self,list):
+        for a in list:
+            assert isinstance(a,p.ptensorlayer1)
+        atoms=pb.batched_atomspack([a.atoms for a in list])
+        M=torch.cat(list,0)
+        return batched_subgraphlayer1(G,S,atoms,M)
 
     @classmethod
     def from_matrix(self,G,S,M):
+        assert isinstance(G,p.batched_ggraph)
+        assert isinstance(S,p.subgraph)
+        assert isinstance(M,torch.Tensor)
         atoms=G.subgraphs(S)
-        return subgraphlayer1(G,S,atoms,M)
-
-    @classmethod
-    def from_matrixA(self,G,S,atoms,M):
-        return subgraphlayer1(G,S,atoms,M)
+        assert M.dim()==2
+        assert M.size(0)==atoms.nrows1()
+        return batched_subgraphlayer1(G,S,atoms,M)
 
     
+    # ----- Access -------------------------------------------------------------------------------------------
+
+
+    def __getitem__(self,i):
+        assert i<len(self)
+        offs=self.atoms.offset1(i)
+        n=self.atoms.nrows1(i)
+        M=torch.Tensor(self)[offs:offs+n,:]
+        return p.subgraphlayer1.from_matrixA(self.G[i],self.S,self.atoms[i],M)
+
+
     # ---- Linmaps ------------------------------------------------------------------------------------------
 
 
     @classmethod
     def linmaps(self,x):
-        return subgraphlayer1(x.G,x.S,x.atoms,super().linmaps(x))
+        return batched_subgraphlayer1(x.G,x.S,x.atoms,super().linmaps(x))
 
 
     # ---- Gather ------------------------------------------------------------------------------------------
@@ -69,21 +87,20 @@ class subgraphlayer1(p.subgraphlayer,ptensorlayer1):
     @classmethod
     def gather(self,S,x):
         atoms=x.G.subgraphs(S)
-        return subgraphlayer1(x.G,x.S,atoms,super().gather(atoms,x))
+        return batched_subgraphlayer1(x.G,x.S,atoms,super().gather(atoms,x))
 
 
     # ---- I/O ----------------------------------------------------------------------------------------------
 
 
     def __repr__(self):
-        return "subgraphlayer1(len="+str(self.size(0))+",nc="+str(self.get_nc())+")"
+        return "batched_subgraphlayer1(N="+str(len(self))+",nc="+str(self.size(1))+")"
 
     def __str__(self,indent=""):
-        r=indent+"subgraphlayer1:\n"
+        r=indent+self.__repr__()+":\n"
         for i in range(len(self)):
-            r=r+self[i].to_string(indent+"  ")+""
+            r=r+self[i].__str__("  ")+"\n"
         return r
-
 
 
 

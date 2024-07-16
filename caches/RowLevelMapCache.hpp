@@ -18,7 +18,7 @@
 //#include "AtomsPack.hpp"
 //#include "AtomsPackObj.hpp"
 #include "AtomsPackTag.hpp"
-#include "TensorLevelMapObj.hpp"
+#include "PtensorMapObj.hpp"
 #include "RowLevelMap.hpp"
 
 
@@ -33,12 +33,12 @@ namespace ptens{
 
 
   class RowLevelMapCache: 
-    public cnine::ptr_triple_indexed_cache<AtomsPackTagObj,AtomsPackTagObj,TensorLevelMapObj,shared_ptr<RowLevelMap> >{
+    public cnine::ptr_triple_indexed_cache<AtomsPackTagObj,AtomsPackTagObj,PtensorMapObj,shared_ptr<RowLevelMap> >{
   public:
 
-    typedef std::tuple<AtomsPackTagObj*,AtomsPackTagObj*,TensorLevelMapObj*> KEYS;
+    typedef std::tuple<AtomsPackTagObj*,AtomsPackTagObj*,PtensorMapObj*> KEYS;
     typedef shared_ptr<RowLevelMap> OBJ;
-    typedef cnine::ptr_triple_indexed_cache<AtomsPackTagObj,AtomsPackTagObj,TensorLevelMapObj,shared_ptr<RowLevelMap> > BASE;
+    typedef cnine::ptr_triple_indexed_cache<AtomsPackTagObj,AtomsPackTagObj,PtensorMapObj,shared_ptr<RowLevelMap> > BASE;
 
     typedef cnine::Gdims Gdims;
     //typedef cnine::GatherMapProgram GatherMapProgram;
@@ -52,7 +52,7 @@ namespace ptens{
 
 
     template<typename OUT_TAG, typename IN_TAG>
-    shared_ptr<RowLevelMap> operator()(const OUT_TAG& out, const IN_TAG& in, const shared_ptr<TensorLevelMapObj>& map){
+    shared_ptr<RowLevelMap> operator()(const OUT_TAG& out, const IN_TAG& in, const shared_ptr<PtensorMapObj>& map){
       auto out_p=out.obj.get();
       auto in_p=in.obj.get();
       auto p=make_tuple(out_p,in_p,map.get());
@@ -70,7 +70,7 @@ namespace ptens{
 
 
     // 0 <- 0
-    GatherMapProgram mmap(const AtomsPackObj0& x, const AtomsPackObj0& y, const TensorLevelMapObj& map){
+    GatherMapProgram mmap(const AtomsPackObj0& x, const AtomsPackObj0& y, const PtensorMapObj& map){
       auto[in,out]=map.ipacks();
 
       cnine::map_of_lists<int,int> direct;
@@ -85,7 +85,7 @@ namespace ptens{
   
 
     // 0 <- 1
-    GatherMapProgram mmap(const AtomsPackObj0& x, const AtomsPackObj1& y, const TensorLevelMapObj& map){
+    GatherMapProgram mmap(const AtomsPackObj0& x, const AtomsPackObj1& y, const PtensorMapObj& map){
       auto[in,out]=map.ipacks();
 
       cnine::map_of_lists<int,int> direct;
@@ -102,7 +102,7 @@ namespace ptens{
 
 
     // 0 <- 2
-    GatherMapProgram mmap(const AtomsPackObj0& x, const AtomsPackObj2& y, const TensorLevelMapObj& map){
+    GatherMapProgram mmap(const AtomsPackObj0& x, const AtomsPackObj2& y, const PtensorMapObj& map){
       auto[in,out]=map.ipacks();
 
       cnine::map_of_lists<int,int> direct;
@@ -126,7 +126,7 @@ namespace ptens{
 
 
     // 1 <- 0
-    GatherMapProgram mmap(const AtomsPackObj1& x, const AtomsPackObj0& y, const TensorLevelMapObj& map){
+    GatherMapProgram mmap(const AtomsPackObj1& x, const AtomsPackObj0& y, const PtensorMapObj& map){
       auto[in_lists,out_lists]=map.ipacks();
 
       cnine::map_of_lists<int,int> direct;
@@ -143,7 +143,7 @@ namespace ptens{
   
 
     // 1 <- 1
-    GatherMapProgram mmap(const AtomsPackObj1& x, const AtomsPackObj1& y, const TensorLevelMapObj& map){
+    GatherMapProgram mmap(const AtomsPackObj1& x, const AtomsPackObj1& y, const PtensorMapObj& map){
       auto[in_lists,out_lists]=map.ipacks();
 
       cnine::map_of_lists<int,int> direct;
@@ -166,7 +166,7 @@ namespace ptens{
 
 
     // 1 <- 2
-    GatherMapProgram mmap(const AtomsPackObj1& x, const AtomsPackObj2& y, const TensorLevelMapObj& map){
+    GatherMapProgram mmap(const AtomsPackObj1& x, const AtomsPackObj2& y, const PtensorMapObj& map){
       auto[in_lists,out_lists]=map.ipacks();
 
       cnine::map_of_lists<int,int> direct;
@@ -221,7 +221,7 @@ namespace ptens{
 
 
     // 2 <- 0 
-    GatherMapProgram mmap(const AtomsPackObj2& x, const AtomsPackObj0& y, const TensorLevelMapObj& map){
+    GatherMapProgram mmap(const AtomsPackObj2& x, const AtomsPackObj0& y, const PtensorMapObj& map){
       auto[in_lists,out_lists]=map.ipacks();
 
       cnine::map_of_lists<int,int> direct;
@@ -241,7 +241,7 @@ namespace ptens{
   
       
     // 2 <- 1
-    GatherMapProgram mmap(const AtomsPackObj2& x, const AtomsPackObj1& y, const TensorLevelMapObj& map){
+    GatherMapProgram mmap(const AtomsPackObj2& x, const AtomsPackObj1& y, const PtensorMapObj& map){
       auto[in_lists,out_lists]=map.ipacks();
 
       cnine::map_of_lists<int,int> direct;
@@ -270,7 +270,7 @@ namespace ptens{
 
 
     // 2 <- 2
-    GatherMapProgram mmap(const AtomsPackObj2& x, const AtomsPackObj2& y, const TensorLevelMapObj& map){
+    GatherMapProgram mmap(const AtomsPackObj2& x, const AtomsPackObj2& y, const PtensorMapObj& map){
       auto[in_lists,out_lists]=map.ipacks();
 	
       cnine::map_of_lists<int,int> direct;

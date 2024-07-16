@@ -1,11 +1,11 @@
-pybind11::class_<TensorLevelMap>(m,"tensor_map")
+pybind11::class_<PtensorMap>(m,"tensor_map")
 
   .def_static("overlaps_map",[](const AtomsPack& out, const AtomsPack& in){
-      return TensorLevelMap::overlaps_map(out,in);})
+      return PtensorMap::overlaps_map(out,in);})
 
-  .def("atoms",&TensorLevelMap::atoms)
-  .def("out_indices",&TensorLevelMap::out)
-  .def("in_indices",&TensorLevelMap::in)
+  .def("atoms",&PtensorMap::atoms)
+  .def("out_indices",&PtensorMap::out)
+  .def("in_indices",&PtensorMap::in)
 
-  .def("__str__",[](const TensorLevelMap& obj){return obj.str();});
+  .def("__str__",[](const PtensorMap& obj){return obj.str();});
 

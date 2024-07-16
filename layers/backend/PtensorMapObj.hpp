@@ -12,8 +12,8 @@
  *
  */
 
-#ifndef _ptens_TensorLevelMapObj
-#define _ptens_TensorLevelMapObj
+#ifndef _ptens_PtensorMapObj
+#define _ptens_PtensorMapObj
 
 #include "observable.hpp"
 #include "SparseRmatrix.hpp"
@@ -21,14 +21,14 @@
 #include "array_pool.hpp"
 #include "AindexPack.hpp"
 #include "GatherMapB.hpp"
-#include "TensorLevelMapGradedObj.hpp"
+#include "PtensorMapGradedObj.hpp"
 #include "flog.hpp"
 
 
 namespace ptens{
 
 
-  class TensorLevelMapObj: public cnine::SparseRmatrix, public cnine::observable<TensorLevelMapObj>{
+  class PtensorMapObj: public cnine::SparseRmatrix, public cnine::observable<PtensorMapObj>{
   public:
     
     typedef cnine::SparseRmatrix SparseRmatrix;
@@ -45,14 +45,14 @@ namespace ptens{
     //mutable shared_ptr<cnine::GatherMap> bmap;
     mutable shared_ptr<cnine::GatherMapB> bmap;
 
-    unordered_map<int,unique_ptr<TensorLevelMapGradedObj> > graded_maps;
+    unordered_map<int,unique_ptr<PtensorMapGradedObj> > graded_maps;
 
 
-    ~TensorLevelMapObj(){
-      //cout<<"Destroying a TensorLevelMapObj"<<endl;
+    ~PtensorMapObj(){
+      //cout<<"Destroying a PtensorMapObj"<<endl;
     }
 
-    TensorLevelMapObj(const AtomsPackObj& _in_atoms, const AtomsPackObj& _out_atoms, const bool graded=false):
+    PtensorMapObj(const AtomsPackObj& _in_atoms, const AtomsPackObj& _out_atoms, const bool graded=false):
       SparseRmatrix(_out_atoms.size(),_in_atoms.size()),
       observable(this),
       atoms(new AtomsPackObj()),
@@ -60,7 +60,7 @@ namespace ptens{
       out(new AindexPack()),
       n_in(_in_atoms.size()),
       n_out(_out_atoms.size()){
-      //cout<<"Creating new TensorLevelMapObj...";//<<endl;
+      //cout<<"Creating new PtensorMapObj...";//<<endl;
       if(graded){
 	make_graded(_in_atoms,_out_atoms);
       }else{
@@ -125,7 +125,7 @@ namespace ptens{
 
 
     void make_overlaps(const AtomsPackObj& in_atoms, const AtomsPackObj& out_atoms){
-      cnine::flog timer("TensorLevelMapObj::make_overlaps");
+      cnine::flog timer("PtensorMapObj::make_overlaps");
       if(in_atoms.size()<10){
 	for(int i=0; i<out_atoms.size(); i++){
 	  auto v=(out_atoms)(i);
@@ -164,7 +164,7 @@ namespace ptens{
 
 
     void make_intersects(const AtomsPackObj& in_atoms, const AtomsPackObj& out_atoms){
-      cnine::ftimer timer("TensorLevelMapObj::make_intersects");
+      cnine::ftimer timer("PtensorMapObj::make_intersects");
 
       PTENS_ASSRT(out_atoms.size()==n);
       PTENS_ASSRT(in_atoms.size()==m);
@@ -206,7 +206,7 @@ namespace ptens{
 
 
     void make_graded(const AtomsPackObj& in_atoms, const AtomsPackObj& out_atoms){
-      cnine::flog timer("TensorLevelMapObj::make_graded");
+      cnine::flog timer("PtensorMapObj::make_graded");
 
       unordered_map<int,vector<int> > map;
       for(int j=0; j<in_atoms.size(); j++){
@@ -227,8 +227,8 @@ namespace ptens{
 	      int k=out_atoms.n_intersects(in_atoms,i,j);
 	      auto it=graded_maps.find(k);
 	      if(it==graded_maps.end())
-		it=graded_maps.emplace(k,unique_ptr<TensorLevelMapGradedObj>
-		  (new TensorLevelMapGradedObj(k,out_atoms.size(),in_atoms.size()))).first;
+		it=graded_maps.emplace(k,unique_ptr<PtensorMapGradedObj>
+		  (new PtensorMapGradedObj(k,out_atoms.size(),in_atoms.size()))).first;
 	      it->second->set(i,j,1.0);
 	    }
 	  }

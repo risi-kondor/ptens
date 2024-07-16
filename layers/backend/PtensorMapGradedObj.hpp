@@ -12,8 +12,8 @@
  *
  */
 
-#ifndef _ptens_TensorLevelMapGradedObj
-#define _ptens_TensorLevelMapGradedObj
+#ifndef _ptens_PtensorMapGradedObj
+#define _ptens_PtensorMapGradedObj
 
 #include "SparseRmatrix.hpp"
 #include "Tensor.hpp"
@@ -27,7 +27,7 @@ namespace ptens{
 
 
   //template<typename ATOMSPACK> // dummy template to avoid circular dependency 
-  class TensorLevelMapGradedObj: public cnine::SparseRmatrix{
+  class PtensorMapGradedObj: public cnine::SparseRmatrix{
   public:
     
     typedef cnine::SparseRmatrix SparseRmatrix;
@@ -41,10 +41,10 @@ namespace ptens{
 
     //mutable shared_ptr<cnine::GatherMap> bmap;
 
-    ~TensorLevelMapGradedObj(){
+    ~PtensorMapGradedObj(){
     }
 
-    TensorLevelMapGradedObj(const int _k, const int _n, const int _m):
+    PtensorMapGradedObj(const int _k, const int _n, const int _m):
       k(_k),
       SparseRmatrix(_n,_m){}
 
@@ -74,7 +74,7 @@ namespace ptens{
 
 
     void make_intersects(const AtomsPackObj& in_pack, const AtomsPackObj& out_pack){
-      cnine::ftimer timer("TensorLevelMapGradedObj["+to_string(k)+"]::make_intersects");
+      cnine::ftimer timer("PtensorMapGradedObj["+to_string(k)+"]::make_intersects");
 
       in=ITENSOR(cnine::Gdims(size(),k+1),cnine::fill_raw());
       out=ITENSOR(cnine::Gdims(size(),k+1),cnine::fill_raw());

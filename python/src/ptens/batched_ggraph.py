@@ -11,8 +11,10 @@
 # must be accompanied by a verbatim copy of the license. 
 #
 #
+
 import torch
-import ptens_base
+import ptens as p
+import ptens_base as pb
 from ptens_base import batched_ggraph as _batched_ggraph
 
 
@@ -37,17 +39,24 @@ class batched_ggraph:
         return G
 
 
+    # ----- Access -------------------------------------------------------------------------------------------
+
+
     def __len__(self):
         return len(self.obj)
     
     def __getitem__(self,i):
-        r=ptens.ggraph()
-        r.obj=__getitem__(self.obj)
+        r=p.ggraph()
+        r.obj=self.obj.__getitem__(i)
         return r
 
     
     def subgraphs(self,H):
         return self.obj.subgraphs(H.obj)
+
+
+    # ---- I/O ----------------------------------------------------------------------------------------------
+
 
     def __str__(self):
         return self.obj.__str__()

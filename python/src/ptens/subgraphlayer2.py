@@ -48,6 +48,10 @@ class subgraphlayer2(p.subgraphlayer,p.ptensorlayer2):
         atoms=G.subgraphs(S)
         return subgraphlayer2(G,S,atoms,M)
 
+    @classmethod
+    def from_matrixA(self,G,S,atoms,M):
+        return subgraphlayer2(G,S,atoms,M)
+
     
     # ---- Linmaps ------------------------------------------------------------------------------------------
 
@@ -73,9 +77,9 @@ class subgraphlayer2(p.subgraphlayer,p.ptensorlayer2):
         return "subgraphlayer2(len="+str(self.size(0))+",nc="+str(self.get_nc())+")"
 
     def __str__(self):
-        r="subgraphlayer2:\n"
+        r=indent+"subgraphlayer2:\n"
         for i in range(len(self)):
-            r=r+self[i].to_string("  ")+""
+            r=r+self[i].to_string(indent+"  ")+""
         return r
 
 
