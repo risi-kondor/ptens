@@ -12,29 +12,22 @@
  *
  */
 
-#ifndef _ptens_BatchedAindexPack
-#define _ptens_BatchedAindexPack
+#ifndef _ptens_PtensorMapFactory
+#define _ptens_PtensorMapFactory
 
-#include "object_pack_s.hpp"
-#include "AindexPack.hpp"
+#include "PtensorMapObj.hpp"
+#include "AtomsPack.hpp"
+
 
 namespace ptens{
 
+  //class AtomsPackObj;
 
-  class BatchedAindexPack: public cnine::object_pack_s<AindexPack>{
+
+  class PtensorMapFactory{
   public:
 
-    typedef cnine::object_pack_s<AindexPack> BASE;
 
-    using BASE::BASE;
-
-    int count1=0;
-    int count2=0;
-
-    
   };
-
-}
-
 
 #endif 

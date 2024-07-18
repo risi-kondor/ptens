@@ -97,7 +97,7 @@ class batched_ptensorlayer1(p.batched_ptensorlayer):
         assert isinstance(atoms,pb.batched_atomspack)
         assert isinstance(x,p.batched_ptensorlayer)
         if len(args)==0:
-            return batched_ptensorlayer1.gather(atoms,x,pb.batched_ptensor_map.overlaps_map(atoms,x.atoms)) 
+            return batched_ptensorlayer1.gather(atoms,x,pb.batched_ptensor_map.overlaps(atoms,x.atoms)) 
         else:
             assert isinstance(args[0],pb.batched_ptensor_map)
             return batched_ptensorlayer1_gatherFn.apply(atoms,x,args[0])

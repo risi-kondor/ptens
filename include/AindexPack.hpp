@@ -141,6 +141,10 @@ namespace ptens{
   public: // ---- I/O ----------------------------------------------------------------------------------------
 
 
+    static string classname(){
+      return "AindexPack";
+    }
+    
     string repr() const{
       return "<AindexPack[N="+to_string(size())+"]>";
     }

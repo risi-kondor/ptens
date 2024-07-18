@@ -321,19 +321,3 @@ class ptensorlayer2_broadcast2Fn(torch.autograd.Function):
         g.backend().add_reduce2_shrink_to(r)
         return r
 
-
-#         nc=x.get_nc()
-#         if isinstance(x,p.ptensorlayer0):
-#             return self.broadcast0(x)
-#         if isinstance(x,p.ptensorlayer1):
-#             r=ptensorlayer2.zeros(x.atoms,5*nc)
-#             r[:,0:2*nc]=self.broadcast0(x.reduce0())
-#             r[:,2*nc:5*nc]=self.broadcast1(x)
-#             return r
-#         if isinstance(x,p.ptensorlayer2):
-#             r=ptensorlayer2.zeros(x.atoms,15*nc)
-#             r[:,0:4*nc]=self.broadcast0(x.reduce0())
-#             r[:,4*nc:13*nc]=self.broadcast1(x.reduce1())
-#             r[:,13*nc:15*nc]=self.broadcast2(x)
-#             return r
-

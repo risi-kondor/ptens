@@ -9,32 +9,19 @@
  * use is prohibited. All redistributed versions of this file (in 
  * original or modified form) must retain this copyright notice and 
  * must be accompanied by a verbatim copy of the license. 
- *
  */
 
-#ifndef _ptens_BatchedAindexPack
-#define _ptens_BatchedAindexPack
-
-#include "object_pack_s.hpp"
-#include "AindexPack.hpp"
+#ifndef _Ptens_GPUbundle
+#define _Ptens_GPUbundle
 
 namespace ptens{
 
-
-  class BatchedAindexPack: public cnine::object_pack_s<AindexPack>{
+  class GPUbundle{
   public:
 
-    typedef cnine::object_pack_s<AindexPack> BASE;
-
-    using BASE::BASE;
-
-    int count1=0;
-    int count2=0;
-
-    
+    vector<shared_ptr<AtomsPack> > atoms;
   };
 
 }
-
 
 #endif 

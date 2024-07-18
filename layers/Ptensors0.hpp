@@ -188,24 +188,11 @@ namespace ptens{
   public: // ----- Conversions -------------------------------------------------------------------------------
 
 
-#ifdef _WITH_ATEN
-    //    static Ptensors0 view(const Atoms& _atoms, const at::Tensor& x){
-      // Check dimensions of x here!
-      //return Ptensors0(_atoms,BASE::view(x));
-    //}
-#endif 
-
-    //Ptensors0(const TENSOR& x, const AtomsPack& _atoms):
-    //BASE(x),
-    //atoms(_atoms){}
-    
-
   public: // ---- Transport ----------------------------------------------------------------------------------
 
 
     Ptensors0(const Ptensors0& x, const int _dev):
       BASE(x.atoms,x.copy(_dev)), 
-      //atoms(x.atoms),
       tag(x.tag){}
 
 
@@ -358,11 +345,11 @@ namespace ptens{
   public: // ---- Reductions ---------------------------------------------------------------------------------
 
 
-    BASE reduce0() const{
+    TENSOR reduce0() const{
       return *this;
     }
 
-    Ptensors0 reduce0(const AtomsPack& _atoms, const AindexPack& list) const{
+    Ptensors0<TYPE> reduce0(const AtomsPack& _atoms, const AindexPack& list) const{
       TimedFn T("Ptensors0","reduce0",*this,list,list.size()*get_nc());
       cnine::using_vram_manager vv(ptens_global::vram_manager);
       Ptensors0 R(_atoms,get_nc(),0,get_dev());
@@ -377,23 +364,11 @@ namespace ptens{
       return R;
     }
 
-    void add_reduce0_to(const Ptensors0& R, const AindexPack& list) const{
-      TimedFn T("Ptensors0","reduce0",*this,list,list.size()*get_nc());
-      if(get_dev()==0){
-	int N=list.size();
-	for(int i=0; i<N; i++){
-	  if(list.nix(i)==0) continue;
-	  R.view_of(i)=view_of(list.tix(i));
-	}
-      }
-      GPUCODE(CUDA_STREAM(Ptensors0_reduce0_cu(R,*this,list,0,nc,stream)));
-    }
-
 
   public: // ---- Broadcasting -------------------------------------------------------------------------------
 
 
-    void broadcast0(const BASE& X, const int offs=0){
+    void broadcast0(const TENSOR& X, const int offs=0){
       int nc=X.dim(1);
       BASE::view2().cols(offs,nc)+=X.view2();
     }
@@ -460,3 +435,14 @@ namespace ptens{
 
 
 #endif 
+//     void add_reduce0_to(const Ptensors0& R, const AindexPack& list) const{
+//       TimedFn T("Ptensors0","reduce0",*this,list,list.size()*get_nc());
+//       if(get_dev()==0){
+// 	int N=list.size();
+// 	for(int i=0; i<N; i++){
+// 	  if(list.nix(i)==0) continue;
+// 	  R.view_of(i)=view_of(list.tix(i));
+// 	}
+//       }
+//       GPUCODE(CUDA_STREAM(Ptensors0_reduce0_cu(R,*this,list,0,nc,stream)));
+//     }

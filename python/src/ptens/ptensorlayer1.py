@@ -215,28 +215,3 @@ class ptensorlayer1_gatherFn(torch.autograd.Function):
         return r
 
 
-
-
-
-#     def __init__(self,atoms,M):
-#         assert isinstance(atoms,pb.atomspack)
-#         assert isinstance(M,torch.Tensor)
-#         assert M.dim()==2
-#         assert M.size(0)==atoms.nrows1()
-#         R=ptensorlayer1(M)
-#         R.atoms=atoms
-#         return R
-
-#        nc=x.get_nc()
-#        if isinstance(x,p.ptensorlayer0):
-#            return self.broadcast0(x)
-#        if isinstance(x,p.ptensorlayer1):
-#            r=ptensorlayer1.zeros(x.atoms,2*nc)
-#            r[:,0:nc]=self.broadcast0(x.reduce0())
-#            r[:,nc:2*nc]=x
-#            return r
-#        if isinstance(x,p.ptensorlayer2):
-#            r=ptensorlayer1.zeros(x.atoms,5*nc)
-#            r[:,0:2*nc]=self.broadcast0(x.reduce0())
-#            r[:,2*nc:5*nc]=x.reduce1()
-#            return r

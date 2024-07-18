@@ -33,16 +33,21 @@ namespace ptens{
 
     mutable unordered_map<shared_ptr<SubgraphObj>,AtomsPack> subgraphpack_cache;
 
-    using BASE::BASE;
     using BASE::nedges;
 
-    //bool is_cached=false;
-    //AtomsPack original_edges;
+    //shared_ptr<GPUbundle> bundle;
 
     ~GgraphObj(){
-      //for(auto& p:subgraphpack_cache)
-      //p.second.obj->release_cached_packs();
     }
+
+
+  public: //  ---- Constructors -------------------------------------------------------------------------------
+
+
+    GgraphObj(){}
+
+    GgraphObj(const int n, const initializer_list<pair<int,int> >& list): 
+      BASE(n,list){}
 
     template<typename TYPE>
     GgraphObj(const cnine::Ltensor<TYPE>& M):
@@ -114,7 +119,6 @@ namespace ptens{
 
     GgraphObj(const BASE& x):
       BASE(x){
-      //cout<<"conversion"<<endl;
     }
 
     //GgraphObj(const GgraphObj& x):

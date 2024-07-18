@@ -16,9 +16,10 @@
 #define _ptens_PtensorMapObj
 
 #include "observable.hpp"
-#include "SparseRmatrix.hpp"
+//#include "SparseRmatrix.hpp"
 #include "Tensor.hpp"
 #include "array_pool.hpp"
+#include "map_of_lists.hpp"
 #include "AindexPack.hpp"
 #include "GatherMapB.hpp"
 #include "PtensorMapGradedObj.hpp"
@@ -28,14 +29,17 @@
 namespace ptens{
 
 
-  class PtensorMapObj: public cnine::SparseRmatrix, public cnine::observable<PtensorMapObj>{
+  class PtensorMapObj: //public cnine::SparseRmatrix, 
+		       public cnine::observable<PtensorMapObj>{
   public:
     
-    typedef cnine::SparseRmatrix SparseRmatrix;
-    typedef cnine::SparseRmatrix BASE;
-    typedef cnine::Tensor<int> IntMatrix;
+    //typedef cnine::SparseRmatrix SparseRmatrix;
+    //typedef cnine::SparseRmatrix BASE;
+    //typedef cnine::Tensor<int> IntMatrix;
 
-    using SparseRmatrix::SparseRmatrix;
+    //using SparseRmatrix::SparseRmatrix;
+
+    cnine::map_of_lists<int,int> gmap;
 
     shared_ptr<AtomsPackObj> atoms;
     shared_ptr<AindexPack> in;
@@ -53,7 +57,7 @@ namespace ptens{
     }
 
     PtensorMapObj(const AtomsPackObj& _in_atoms, const AtomsPackObj& _out_atoms, const bool graded=false):
-      SparseRmatrix(_out_atoms.size(),_in_atoms.size()),
+      //SparseRmatrix(_out_atoms.size(),_in_atoms.size()),
       observable(this),
       atoms(new AtomsPackObj()),
       in(new AindexPack()),
@@ -75,11 +79,12 @@ namespace ptens{
 
 
     bool is_empty() const{
-      for(auto q:lists){
-	if(q.second->size()>0)
-	  return false;
-      }
-      return true;
+      return false; 
+      //for(auto q:lists){
+      //if(q.second->size()>0)
+      //  return false;
+      //}
+      //return true;
     }
 
     bool is_graded() const{
@@ -87,38 +92,39 @@ namespace ptens{
     }
 
     int ntotal() const{
-      return BASE::size();
+      return gmap.size();
+      //return BASE::size();
     }
 
-    pair<const AindexPack&, const AindexPack&> ipacks() const{
-      return pair<const AindexPack&, const AindexPack&>(*in,*out);
-    }
+    // pair<const AindexPack&, const AindexPack&> ipacks() const{
+    //return pair<const AindexPack&, const AindexPack&>(*in,*out);
+    //}
 
     //pair<const cnine::hlists<int>&, const cnine::hlists<int>&> ipacks() const{
     //return pair<const cnine::hlists<int>&, const cnine::hlists<int>&>(in,out);
     //}
 
-    void for_each_row(std::function<void(const int, const vector<int>)> lambda) const{
-      for(auto& p: lists){
-	vector<int> v;
-	p.second->forall_nonzero([&](const int j, const float a){
-	    v.push_back(j);});
-	lambda(p.first,v);
-      }
-    }
+//     void for_each_row(std::function<void(const int, const vector<int>)> lambda) const{
+//       for(auto& p: lists){
+// 	vector<int> v;
+// 	p.second->forall_nonzero([&](const int j, const float a){
+// 	    v.push_back(j);});
+// 	lambda(p.first,v);
+//       }
+//     }
 
-    void for_each_edge(std::function<void(const int, const int, const float)> lambda, const bool self=0) const{
-      for(auto& p: lists){
-	int i=p.first;
-	if(self) lambda(i,i,1.0);
-	p.second->forall_nonzero([&](const int j, const float v){
-	    lambda(i,j,v);});
-      }
-    }
+//     void for_each_edge(std::function<void(const int, const int, const float)> lambda, const bool self=0) const{
+//       for(auto& p: lists){
+// 	int i=p.first;
+// 	if(self) lambda(i,i,1.0);
+// 	p.second->forall_nonzero([&](const int j, const float v){
+// 	    lambda(i,j,v);});
+//       }
+//     }
 
-    size_t rmemsize() const{
-      return BASE::rmemsize();
-    }
+//    size_t rmemsize() const{
+//      return BASE::rmemsize();
+//    }
 
 
   public: // ---- Overlaps -----------------------------------------------------------------------------------
@@ -132,7 +138,8 @@ namespace ptens{
 	  for(int j=0; j<in_atoms.size(); j++){
 	    auto w=(in_atoms)(j);
 	    if([&](){for(auto p:v) if(std::find(w.begin(),w.end(),p)!=w.end()) return true; return false;}())
-	      set(i,j,1.0);
+	      gmap.push_back(i,j);
+	    //set(i,j,1.0);
 	  }
 	}
       }else{
@@ -151,7 +158,8 @@ namespace ptens{
 	    auto it=map.find(p);
 	    if(it!=map.end())
 	      for(auto q:it->second)
-		set(i,q,1.0);
+		gmap.push_back(i,q);
+	    //set(i,q,1.0);
 	  }
 	}
       }
@@ -166,9 +174,10 @@ namespace ptens{
     void make_intersects(const AtomsPackObj& in_atoms, const AtomsPackObj& out_atoms){
       cnine::ftimer timer("PtensorMapObj::make_intersects");
 
-      PTENS_ASSRT(out_atoms.size()==n);
-      PTENS_ASSRT(in_atoms.size()==m);
-      for_each_edge([&](const int i, const int j, const float v){
+      //PTENS_ASSRT(out_atoms.size()==n);
+      //PTENS_ASSRT(in_atoms.size()==m);
+      //for_each_edge([&](const int i, const int j, const float v){
+      gmap.for_each([&](const int i, const int j){
 	  Atoms in_j=(in_atoms)[j];
 	  Atoms out_i=(out_atoms)[i];
 	  Atoms common=out_i.intersect(in_j);
@@ -182,7 +191,7 @@ namespace ptens{
 	  out->count1+=_out.size();
 	  out->count2+=_out.size()*_out.size();
 	    
-	}, false);
+	});
       out->bmap2=get_bmap();
     }
 
@@ -191,12 +200,13 @@ namespace ptens{
       if(bmap.get()) return bmap; 
       cnine::GatherMapB* R=new cnine::GatherMapB(n_out,n_in);
       int m=0;
-      for(auto q:lists){
-	vector<int> v;
-	for(auto p:*q.second)
-	  v.push_back(m++);
-	R->arr.push_back(q.first,v);
-      }
+      // TODO 
+      //for(auto q:lists){
+      //vector<int> v;
+      //for(auto p:*q.second)
+      //  v.push_back(m++);
+      //R->arr.push_back(q.first,v);
+      //}
       bmap=to_share(R);
       return bmap;
     }
@@ -240,6 +250,10 @@ namespace ptens{
       }
     }
 
+
+    string str(const string indent=""){
+      return gmap.str(indent);
+    }
     
   };
 

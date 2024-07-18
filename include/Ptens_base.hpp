@@ -79,6 +79,10 @@ namespace ptens{
   template<typename TYPE> class Ptensors1;
   template<typename TYPE> class Ptensors2;
 
+  template<typename TYPE> class BatchedPtensors0;
+  template<typename TYPE> class BatchedPtensors1;
+  template<typename TYPE> class BatchedPtensors2;
+
   namespace ptens_global{};
 
 }

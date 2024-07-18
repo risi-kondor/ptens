@@ -26,9 +26,6 @@
 
 namespace ptens{
 
-  //template<typename TYPE> class Ptensors1Batch;
-  //template<typename TYPE> class Ptensors2Batch;
-
 
   template<typename TYPE>
   class BatchedPtensors1: public BatchedPtensors<TYPE>,
@@ -37,7 +34,6 @@ namespace ptens{
 
     typedef BatchedPtensors<TYPE> BASE;
     typedef cnine::Ltensor<TYPE> TENSOR;
-    //typedef BatchedAtomsPackN<AtomsPack1obj<int> > BatchedAtomsPack1;
     
     using cnine::diff_class<BatchedPtensors1<TYPE> >::grad;
     using BASE::get_dev;
@@ -46,9 +42,6 @@ namespace ptens{
     using TENSOR::get_arr;
 
     BatchedAtomsPack atoms;
-
-    //cnine::GatherMapProgramPack forward_program;
-    //cnine::GatherMapProgramPack backward_program;
 
 
     ~BatchedPtensors1(){
@@ -61,23 +54,11 @@ namespace ptens{
   public: // ----- Constructors ------------------------------------------------------------------------------
 
 
-    //BatchedPtensors1(){}
-
     BatchedPtensors1(const BatchedAtomsPack& _atoms, const TENSOR& M):
-      BASE(M), atoms(_atoms){
-    }
+      BASE(M), atoms(_atoms){}
 
     BatchedPtensors1(const TENSOR& M, const BatchedAtomsPack& _atoms):
       BASE(M), atoms(_atoms){}
-
-    //BatchedPtensors1(const BatchedAtomsPack& _atoms, const cnine::TensorView<TYPE>& M):
-    //BASE(M.copy()), atoms(_atoms){}
-
-    //BatchedPtensors1(const BatchedAtomsPack& _atoms, const cnine::Tensor<float>& M):
-    //BASE(cnine::Ltensor<float>(M).copy(ptens_session->managed_gmem)), atoms(_atoms){}
-
-    //BatchedPtensors1(const BatchedAtomsPack& _atoms, const TENSOR& M):
-    //BASE(M.copy(ptens_session->managed_gmem)), atoms(_atoms){}
 
     BatchedPtensors1(const BatchedAtomsPack& _atoms, const int _nc, const int fcode, const int _dev):
       BASE({_atoms.nrows1(),_nc},fcode,_dev), atoms(_atoms){}
@@ -86,12 +67,9 @@ namespace ptens{
     BatchedPtensors1(const BatchedAtomsPack& _atoms, const int _nc, const int _dev):
       BatchedPtensors1(_atoms,_nc,0,_dev){}
 
-    //BatchedPtensors1(const BatchedAtomsPack& _atoms, const int _nc, const int fcode, const int _dev):
-    //BatchedPtensors1(BatchedAtomsPack1(_atoms),_nc,fcode,_dev){}
 
-
-    BatchedPtensors1(TYPE* _arr, const BatchedAtomsPack& _atoms, const int _nc, const int _dev):
-      BASE(_arr,{_atoms.nrows1(),_nc},_dev), atoms(_atoms){}
+    //BatchedPtensors1(TYPE* _arr, const BatchedAtomsPack& _atoms, const int _nc, const int _dev):
+    //BASE(_arr,{_atoms.nrows1(),_nc},_dev), atoms(_atoms){}
 
 
     // TODO 
@@ -210,10 +188,6 @@ namespace ptens{
   public: // ----- Conversions -------------------------------------------------------------------------------
 
 
-    //BatchedPtensors1(const TENSOR& x, const BatchedAtomsPack1& _atoms):
-    //BASE(x),
-    //atoms(_atoms){}
-
 
   public: // ----- Access ------------------------------------------------------------------------------------
 
@@ -229,10 +203,6 @@ namespace ptens{
     int get_nc() const{
       return TENSOR::dim(1);
     }
-
-    //BatchedAtomsPack get_atoms() const{
-    //return atoms.obj->get_atoms();
-    //}
 
     BatchedPtensors1& get_grad(){ // why do we need these?
       return cnine::diff_class<BatchedPtensors1<TYPE> >::get_grad();
@@ -251,10 +221,6 @@ namespace ptens{
       return Ptensors1<TYPE>(atoms[i],TENSOR::rows(atoms.offset1(i),atoms.nrows1(i)));
     }
 
-    //Ptensors1<TYPE> operator[](const int i){
-    //return Ptensors1<TYPE>(atoms.obj->obj[i],TENSOR::rows(atoms.offset(i)),atoms.nrows(i));
-    //}
-
     Ptensors1<TYPE> operator[](const int i) const{
       return Ptensors1<TYPE>(atoms[i],TENSOR::rows(atoms.offset1(i),atoms.nrows1(i)));
     }
@@ -265,37 +231,14 @@ namespace ptens{
       //return cnine::Rtensor3_view(const_cast<float*>(get_arr()),dim(0)/K,K,nc,K*nc,nc,1,get_dev());
     }
 
-    //cnine::Rtensor3_view view3(const int K){
-    //int nc=get_nc();
-    //return cnine::Rtensor3_view(get_arr(),dim(0)/K,K,nc,K*nc,nc,1,get_dev());
-    //}
-
     const cnine::Rtensor3_view view3(const int K, const int offs, const int nc) const{
       int _nc=get_nc();
       return split0(TENSOR::view2().cols(offs,nc),dim(0)/K,K);
       //return cnine::Rtensor3_view(const_cast<float*>(get_arr())+offs,dim(0)/K,K,nc,K*_nc,_nc,1,get_dev());
     }
 
-    /*
-    cnine::Rtensor3_view view3(const int K, const int offs, const int nc){
-      int _nc=get_nc();
-      return cnine::Rtensor3_view(get_arr()+offs,dim(0)/K,K,nc,K*_nc,_nc,1,get_dev());
-    }
-
-
-    static int nrows(const BatchedAtomsPack& _atoms){
-      return _atoms.nrows1();
-    }
-    */
-
-    //template<typename SOURCE, typename = typename std::enable_if<std::is_base_of<BatchedPtensors<float>, SOURCE>::value, SOURCE>::type>
-    //static int nchannels(const SOURCE& x){
-    //return x.get_nc()*vector<int>({1,2,5})[x.getk()];
-    //}
-
 
   public: // ---- Linmaps ------------------------------------------------------------------------------------
-
     // these are hacks for the sake of BatchedSubgraphLayer1. todo: introduce constk
 
 
@@ -322,7 +265,7 @@ namespace ptens{
     }
 
 
-  public: // ---- Message passing ----------------------------------------------------------------------------
+  public: // ---- Linmaps ------------------------------------------------------------------------------------
 
 
     template<typename SOURCE, typename = typename std::enable_if<std::is_base_of<BatchedPtensors<float>, SOURCE>::value, SOURCE>::type>
@@ -347,7 +290,7 @@ namespace ptens{
     }
 
 
-  public: // ---- Message passing ----------------------------------------------------------------------------
+  public: // ---- Gather -------------------------------------------------------------------------------------
 
 
     template<typename SOURCE, typename = typename std::enable_if<std::is_base_of<BatchedPtensors<float>, SOURCE>::value, SOURCE>::type>
@@ -358,36 +301,94 @@ namespace ptens{
     }
 
     template<typename SOURCE>
-    void add_gather(const SOURCE& x, const int min_overlaps=1){
-      int N=size();
-      PTENS_ASSRT(N==x.size());
-      //for(int i=0; i<N; i++){
-      //MessageList mlist=atoms.obj->obj[i]->atoms->overlaps_mlist(*x.atoms.obj->obj[i]->atoms,min_overlaps);
-      //MessageMap mmap=atoms.obj->obj[i]->message_map(*mlist.obj,*x.atoms.obj->obj[i]);
-      //forward_program.obj.push_back(mmap.obj);
-      //backward_program.obj.push_back(to_share(new cnine::GatherMapProgram(mmap.obj->inv()))); // eliminate the copy here 
-      //}
-      //forward_program(*this,x);
+    void add_gather(const SOURCE& x,const int min_overlaps=1){
+      add_gather(x,BatchedPtensorMap::overlaps(atoms,x.atoms));
+    }
+
+    template<typename SOURCE>
+    void add_gather_back(const SOURCE& x,const int min_overlaps=1){
+      add_gather_back(x,BatchedPtensorMap::overlaps(x.atoms,atoms));
+    }
+
+    template<typename SOURCE>
+      void add_gather(const SOURCE& x, const BatchedPtensorMap& map){
+      int nc=x.get_nc();
+	if constexpr(std::is_same<SOURCE,BatchedPtensors0<TYPE> >::value)
+	  broadcast0(x.reduce0(map.atoms(),map.in()),map.out(),0);
+	if constexpr(std::is_same<SOURCE,BatchedPtensors1<TYPE> >::value){
+	  broadcast0(x.reduce0(map.atoms(),map.in()),map.out(),0);
+	  broadcast1(x.reduce1(map.atoms(),map.in()),map.out(),nc);
+	}
+	if constexpr(std::is_same<SOURCE,BatchedPtensors2<TYPE> >::value){
+	  broadcast0(x.reduce0(map.atoms(),map.in()),map.out(),0);
+	  broadcast1(x.reduce1(map.atoms(),map.in()),map.out(),2*nc);
+	}
     }
 
     template<typename OUTPUT>
-    void add_gather_back(const OUTPUT& x){
-      //x.atoms.inverse_overlaps_mmap(atoms)(*this,x);
-      //for(int i=0; i<size(); i++)
-      //view_of(i).add_gather_back(x.view_of(i));
-      //cnine::MultiLoop(size(),[&](const int i){view_of(i).add_gather_back(x.view_of(i));});
-      int N=size();
-      PTENS_ASSRT(N==x.size());
-      //cnine::GatherMapProgramPack P;
-      //for(int i=0; i<N; i++){
-      //MessageList mlist=x.atoms.obj->obj[i]->atoms->overlaps_mlist(*atoms.obj->obj[i]->atoms);
-      //MessageMap mmap=x.atoms.obj->obj[i]->message_map(*mlist.obj,*atoms.obj->obj[i]);
-      //P.obj.push_back(to_share(new cnine::GatherMapProgram(mmap.obj->inv()))); // eliminate the copy here 
-      //}
-      //P(*this,x);
+    void add_gather_back(const OUTPUT& x, const BatchedPtensorMap& map){
+      int nc=get_nc();
+      if constexpr(std::is_same<OUTPUT,BatchedPtensors0<TYPE> >::value)
+	broadcast0(x.reduce0(map.atoms(),map.out()),map.in());
+      if constexpr(std::is_same<OUTPUT,BatchedPtensors1<TYPE> >::value){
+	broadcast0(x.reduce0(map.atoms(),map.out(),0,nc),map.in());
+	broadcast1(x.reduce1(map.atoms(),map.out(),nc,nc),map.in());
+      }
+      if constexpr(std::is_same<OUTPUT,BatchedPtensors2<TYPE> >::value){
+	broadcast0(x.reduce0_shrink(map.atoms(),map.out(),0,nc),map.in());
+	broadcast1(x.reduce1_shrink(map.atoms(),map.out(),2*nc,nc),map.in());
+      }
     }
 
     
+  public: // ---- Indexed Reductions -------------------------------------------------------------------------
+
+
+    BatchedPtensors0<TYPE> reduce0(const BatchedAtomsPack& _atoms, const BatchedAindexPack& list, const int offs=0, int nc=0) const{
+      TimedFn T("BatchedPtensors1","reduce0",*this,list,list.count1*nc);
+      if(nc==0) nc=get_nc();
+      cnine::using_vram_manager vv(ptens_global::vram_manager);
+      BatchedPtensors0<TYPE> R(_atoms,nc,0,get_dev());
+      for(int i=0; i<size(); i++)
+	view_of(i).add_reduce0_to(R.view_of(i),list[i],offs);
+      return R;
+    }
+
+
+    BatchedPtensors1<TYPE> reduce1(const BatchedAtomsPack& _atoms, const BatchedAindexPack& list, const int offs=0, int nc=0) const{
+      TimedFn T("BatchedPtensors1","reduce1",*this,list,list.count1*nc);
+      if(nc==0) nc=get_nc();
+      cnine::using_vram_manager vv(ptens_global::vram_manager);
+      BatchedPtensors1<TYPE> R(_atoms,nc,0,get_dev());
+      for(int i=0; i<size(); i++)
+	view_of(i).add_reduce1_to(R.view_of(i),list[i],offs);
+      return R;
+    }
+
+    
+  public: // ---- Broadcasting -------------------------------------------------------------------------------
+
+
+    void broadcast0(const BatchedPtensors0<TYPE>& x, const int offs=0){
+      for(int i=0; i<size(); i++)
+	view_of(i).broadcast0(x.view_of(i),offs);
+    }
+
+    void broadcast1(const BASE& x, const int offs=0){
+      BASE::view2().block(0,offs,dim(0),x.dim(1))+=x.view2();
+    }
+
+    void broadcast0(const BatchedPtensors0<TYPE>& x, const BatchedAindexPack& list, const int offs=0){
+      for(int i=0; i<size(); i++)
+	view_of(i).broadcast0(x.view_of(i),list[i],offs);
+    }
+
+    void broadcast1(const BatchedPtensors1<TYPE>& x, const BatchedAindexPack& list, const int offs=0){
+      for(int i=0; i<size(); i++)
+	view_of(i).broadcast1(x.view_of(i),list[i],offs);
+    }
+
+
   public: // ---- I/O ----------------------------------------------------------------------------------------
 
 
@@ -418,34 +419,3 @@ namespace ptens{
 
 #endif 
 
-    /*
-    template<typename OUTPUT>
-    void add_gather_back(const OUTPUT& x){
-      //x.atoms.inverse_overlaps_mmap(atoms)(*this,x);
-      //for(int i=0; i<size(); i++)
-      //view_of(i).add_gather_back(x.view_of(i));
-      //cnine::MultiLoop(size(),[&](const int i){view_of(i).add_gather_back(x.view_of(i));});
-      int N=size();
-      PTENS_ASSRT(N==x.size());
-      //cnine::GatherMapProgramPack P;
-      for(int i=0; i<N; i++){
-	MessageList mlist=x.atoms.obj->obj[i]->atoms->overlaps_mlist(*atoms.obj->obj[i]->atoms);
-	MessageMap mmap=x.atoms.obj->obj[i]->message_map(*mlist.obj,*atoms.obj->obj[i]);
-	backward_program.obj.push_back(to_share(new cnine::GatherMapProgram(mmap.obj->inv()))); // eliminate the copy here 
-      }
-      backward_program(*this,x);
-    }
-    */
-
-    /*
-    template<typename OUTPUT>
-    void add_gather_back_alt(const OUTPUT& x){
-      int N=size();
-      PTENS_ASSRT(N==x.size());
-      cnine::GatherMapProgramPack P;
-      for(int i=0; i<N; i++){
-	P.obj.push_back(to_share(new cnine::GatherMapProgram(mmap.obj->inv()))); // eliminate the copy here 
-      }
-      P(*this,x);
-    }
-    */

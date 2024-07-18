@@ -79,13 +79,6 @@ class ptensorlayer0(ptensorlayer):
     def linmaps(self,x):
         return ptensorlayer0_linmapsFn.apply(x)
     
-#        if isinstance(x,ptensorlayer0):
-#            return x
-#        if isinstance(x,p.ptensorlayer1):
-#            return x.reduce0()
-#        if isinstance(x,p.ptensorlayer2):
-#            return x.reduce0()
-
 
     # ---- Message passing -----------------------------------------------------------------------------------
 

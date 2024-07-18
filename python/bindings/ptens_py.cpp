@@ -40,6 +40,8 @@ PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
   namespace py=pybind11;
 
   typedef cnine::Ltensor<float> tensorf;
+
+  typedef PtensorMap Pmap;
   
   typedef Ptensor0<float> Ptensor0f;
   typedef Ptensor1<float> Ptensor1f;
@@ -48,6 +50,9 @@ PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
   typedef Ptensors0<float> Ptensors0f;
   typedef Ptensors1<float> Ptensors1f;
   typedef Ptensors2<float> Ptensors2f;
+
+
+  typedef BatchedPtensorMap BPmap;
 
   typedef BatchedPtensors0<float> BPtensors0f;
   typedef BatchedPtensors1<float> BPtensors1f;

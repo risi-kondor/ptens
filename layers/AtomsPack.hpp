@@ -193,6 +193,10 @@ namespace ptens{
   public: // ---- Operations ---------------------------------------------------------------------------------
 
 
+    //TensorMap overlaps(const AtomsPack& y){
+    //return obj->overlaps(*y.obj);
+    //}
+
     AtomsPack permute(const cnine::permutation& pi){
       return AtomsPack(new AtomsPackObj(obj->permute(pi)));
     } 

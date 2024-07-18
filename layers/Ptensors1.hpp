@@ -246,18 +246,6 @@ namespace ptens{
       return 1;
     }
 
-    //int size() const{
-    //return atoms.size();
-    //}
-
-    //int get_nc() const{
-    //return BASE::dim(1);
-    //}
-
-    //AtomsPack get_atoms() const{
-    //return atoms;
-    //}
-
     int size_of(const int i) const{
       return atoms.size_of(i);
     }
@@ -266,10 +254,6 @@ namespace ptens{
       return atoms.row_offset1(i);
     }
 
-    //Atoms atoms_of(const int i) const{
-    //return atoms(i);
-    //}
-    
     Rtensor2_view view_of(const int i) const{
       return Rtensor2_view(const_cast<TYPE*>(get_arr())+offset(i)*strides[0],size_of(i),get_nc(),strides[0],strides[1],dev);
     }
@@ -289,12 +273,12 @@ namespace ptens{
       return Ptensor1view<TYPE>(const_cast<TYPE*>(get_arr())+offset(i)*nc+offs,n,nc,1,ix,get_dev());
     }
 
-    TENSOR tensor_of(const int i) const{
-      return TENSOR::rows(offset(i),size_of(i));
-    }
+    //TENSOR tensor_of(const int i) const{
+    //return TENSOR::rows(offset(i),size_of(i));
+    //}
 
     Ptensor1<TYPE> operator()(const int i) const{
-      return Ptensor1(tensor_of(i),atoms_of(i));
+      return Ptensor1(TENSOR(TENSOR::rows(offset(i),size_of(i))),atoms_of(i));
     }
 
     const cnine::Rtensor3_view view3(const int K) const{
@@ -377,11 +361,13 @@ namespace ptens{
 
     template<typename SOURCE>
     void add_gather(const SOURCE& x, const int min_overlaps=1){
+      //add_gather(x,ptens_global::overlaps_cache(atoms,x.atoms));
       add_gather(x,ptens_global::overlaps_cache(atoms,x.atoms));
     }
 
     template<typename OUTPUT>
     void add_gather_back(const OUTPUT& x){
+      //add_gather_back(x,ptens_global::overlaps_cache(x.atoms,atoms));
       add_gather_back(x,ptens_global::overlaps_cache(x.atoms,atoms));
     }
 
@@ -435,37 +421,22 @@ namespace ptens{
   public: // ---- Reductions ---------------------------------------------------------------------------------
 
 
-    BASE reduce0() const{
+    TENSOR reduce0(const int offs=0, int nc=0) const{
       TimedFn T("Ptensors1","reduce0",*this);
       int N=size();
       int dev=get_dev();
+      if(nc==0) nc=get_nc()-offs;
       cnine::using_vram_manager vv(ptens_global::vram_manager);
-      BASE R({N,get_nc()},0,dev);
-      Rtensor2_view r=R.view2();
-      for(int i=0; i<N; i++)
-	view_of(i).sum0_into(r.slice0(i));
-      return R;
-    }
-
-    BASE reduce0(const int offs, const int nc) const{
-      TimedFn T("Ptensors1","reduce0",*this);
-      int N=size();
-      int dev=get_dev();
-      cnine::using_vram_manager vv(ptens_global::vram_manager);
-      BASE R({N,nc},0,dev);
+      TENSOR R({N,nc},0,dev);
       Rtensor2_view r=R.view2();
       for(int i=0; i<N; i++)
 	view_of(i,offs,nc).sum0_into(r.slice0(i));
       return R;
     }
 
-    BASE reduce1() const{
+    TENSOR reduce1() const{
       return *this;
     }
-
-
-  public: // ---- Cumulative Reductions ----------------------------------------------------------------------
-
 
     void add_reduce0_to(const TENSOR& R, const int offs=0) const{
       PTENS_ASSRT(R.ndims()==2);
@@ -486,15 +457,7 @@ namespace ptens{
       TimedFn T("Ptensors1","reduce0",*this,list,list.count1*nc);
       if(nc==0) nc=get_nc();
       cnine::using_vram_manager vv(ptens_global::vram_manager);
-      Ptensors0<TYPE> R(_atoms,get_nc(),0,get_dev());
-      add_reduce0_to(R,list,offs);
-      return R;
-    }
-
-
-    void add_reduce0_to(const Ptensors0<TYPE>& R, const AindexPack& list, const int offs=0) const{
-      TimedFn T("Ptensors1","reduce0",*this,list,list.count1*nc);
-      int nc=R.get_nc();
+      Ptensors0<TYPE> R(_atoms,nc,0,get_dev());
       if(dev==0){
 	int N=list.size();
 	for(int i=0; i<N; i++){
@@ -503,6 +466,7 @@ namespace ptens{
 	}
       }
       GPUCODE(CUDA_STREAM(Ptensors1_reduce0_cu(R,*this,list,0,nc,stream)));
+      return R;
     }
 
 
@@ -510,15 +474,7 @@ namespace ptens{
       TimedFn T("Ptensors1","reduce1",*this,list,list.count1*nc);
       if(nc==0) nc=get_nc();
       cnine::using_vram_manager vv(ptens_global::vram_manager);
-      Ptensors1<TYPE> R(_atoms,get_nc(),0,get_dev());
-      add_reduce1_to(R,list,offs);
-      return R;
-    }
-
-
-    void add_reduce1_to(const Ptensors1& R, const AindexPack& list, const int offs=0) const{
-      TimedFn T("Ptensors1","reduce1",*this,list,list.count1*nc);
-      int nc=R.get_nc();
+      Ptensors1<TYPE> R(_atoms,nc,0,get_dev());
       if(dev==0){
 	int N=list.size();
 	for(int i=0; i<N; i++){
@@ -527,14 +483,40 @@ namespace ptens{
 	}
       }
       GPUCODE(CUDA_STREAM(Ptensors1_reduce1_cu(R,*this,list,0,nc,stream)));
+      return R;
     }
 
+    void add_reduce1_to(const Ptensors1& R, const AindexPack& list, const int offs=0) const{
+      TimedFn T("Ptensors1","reduce1",*this,list,list.count1*nc);
+      int nc=R.get_nc();
+      if(dev==0){
+ 	int N=list.size();
+ 	for(int i=0; i<N; i++){
+ 	  if(list.nix(i)==0) continue;
+ 	  R.view_of(i)+=view_of(list.tens(i),list.ix(i));
+ 	}
+      }
+      GPUCODE(CUDA_STREAM(Ptensors1_reduce1_cu(R,*this,list,0,nc,stream)));
+    }
+
+    void add_reduce0_to(const Ptensors0<TYPE>& R, const AindexPack& list, const int offs=0) const{
+      TimedFn T("Ptensors1","reduce0",*this,list,list.count1*nc);
+      int nc=R.get_nc();
+      if(dev==0){
+ 	int N=list.size();
+ 	for(int i=0; i<N; i++){
+ 	  if(list.nix(i)==0) continue;
+ 	  view_of(list.tens(i),list.ix(i)).sum0_into(R.view_of(i));
+ 	}
+      }
+      GPUCODE(CUDA_STREAM(Ptensors1_reduce0_cu(R,*this,list,0,nc,stream)));
+    }
 
     
   public: // ---- Broadcasting -------------------------------------------------------------------------------
 
 
-    void broadcast0(const BASE& X, const int offs=0){
+    void broadcast0(const TENSOR& X, const int offs=0){
       TimedFn T("Ptensors1","broadcast0",*this);
       int N=size();
       int nc=X.dim(1);
@@ -544,7 +526,7 @@ namespace ptens{
 	view_of(i,offs,nc)+=cnine::repeat0(x.slice0(i),size_of(i));
     }
 
-    void broadcast1(const BASE& X, const int offs=0){
+    void broadcast1(const TENSOR& X, const int offs=0){
       TimedFn T("Ptensors1","broadcast1",*this);
       int nc=X.dim(1);
       BASE::view2().block(0,offs,dim(0),nc)+=X.view2();
@@ -657,3 +639,15 @@ namespace ptens{
       }
     }
     */
+    //TENSOR reduce0() const{
+    //TimedFn T("Ptensors1","reduce0",*this);
+    //int N=size();
+    //int dev=get_dev();
+    //cnine::using_vram_manager vv(ptens_global::vram_manager);
+    //TENSOR R({N,get_nc()},0,dev);
+    //Rtensor2_view r=R.view2();
+    //for(int i=0; i<N; i++)
+    //view_of(i).sum0_into(r.slice0(i));
+    //return R;
+    //}
+

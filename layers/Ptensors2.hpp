@@ -610,7 +610,7 @@ namespace ptens{
   public: // ---- Indexed reductions -------------------------------------------------------------------------
 
 
-    Ptensors0<TYPE> reduce0(const AtomsPack& _atoms, const AindexPack& list) const{
+    Ptensors0<TYPE> reduce0(const AtomsPack& _atoms, const AindexPack& list, const int offs=0) const{
       TimedFn T("Ptensors2","reduce0",*this,list,(list.count2+list.count1)*get_nc());
       int nc=get_nc();
       cnine::using_vram_manager vv(ptens_global::vram_manager);
@@ -619,7 +619,7 @@ namespace ptens{
       return R;
     }
 
-    void add_reduce0_to(const Ptensors0<TYPE>& R, const AindexPack& list) const{
+    void add_reduce0_to(const Ptensors0<TYPE>& R, const AindexPack& list, const int offs=0) const{
       if(dev==0){
 	int N=list.size();
 	for(int i=0; i<N; i++){
@@ -655,7 +655,7 @@ namespace ptens{
     }
 
 
-    Ptensors1<TYPE> reduce1(const AtomsPack& _atoms, const AindexPack& list) const{
+    Ptensors1<TYPE> reduce1(const AtomsPack& _atoms, const AindexPack& list, const int offs=0) const{
       TimedFn T("Ptensors2","reduce1",*this,list,(list.count1+2*list.count2)*get_nc());
       int nc=get_nc();
       cnine::using_vram_manager vv(ptens_global::vram_manager);
@@ -664,7 +664,7 @@ namespace ptens{
       return R;
     }
 
-    void add_reduce1_to(const Ptensors1<TYPE>& R, const AindexPack& list) const{
+    void add_reduce1_to(const Ptensors1<TYPE>& R, const AindexPack& list, const int offs=0) const{
       if(dev==0){
 	int N=list.size();
 	for(int i=0; i<N; i++){
@@ -701,7 +701,7 @@ namespace ptens{
     }
 
 
-    Ptensors2<TYPE> reduce2(const AtomsPack& _atoms, const AindexPack& list) const{
+    Ptensors2<TYPE> reduce2(const AtomsPack& _atoms, const AindexPack& list, const int offs=0) const{
       TimedFn T("Ptensors2","reduce2",*this,list,(2*list.count2)*get_nc());
       cnine::using_vram_manager vv(ptens_global::vram_manager);
       Ptensors2<TYPE> R(_atoms,get_nc(),0,dev);
@@ -709,7 +709,7 @@ namespace ptens{
       return R;
     }
 
-    void add_reduce2_to(const Ptensors2<TYPE>& R, const AindexPack& list) const{
+    void add_reduce2_to(const Ptensors2<TYPE>& R, const AindexPack& list, const int offs=0) const{
       if(dev==0){
 	int nc=get_nc();
 	int N=list.size();
@@ -765,11 +765,12 @@ namespace ptens{
       }
     }
 
-    void broadcast0_shrink(const BASE& X){
+    void broadcast0_shrink(const BASE& X, int offs=0){
       TimedFn T("Ptensors2","broadcast0_shrink",*this);
       int N=size();
       int dev=get_dev();
       int nc=dim(1);
+      PTENS_ASSRT(offs==0);
       PTENS_ASSRT(X.dim(0)==N);
       PTENS_ASSRT(X.dim(1)==2*nc);
       Rtensor2_view x=X.view2();
@@ -805,12 +806,13 @@ namespace ptens{
     }
 
 
-    void broadcast1_shrink(const BASE& X){
+    void broadcast1_shrink(const BASE& X, const int offs=0){
       TimedFn T("Ptensors2","broadcast1_shrink",*this);
       int N=size();
       int dev=get_dev();
       int nc=dim(1);
       PTENS_ASSRT(X.dim(1)==3*nc);
+      PTENS_ASSRT(offs==0);
       Rtensor2_view x=X.view2();
       Rtensor2_view x0=x.block(0,0,X.dim(0),nc);
       Rtensor2_view x1=x.block(0,nc,X.dim(0),nc);

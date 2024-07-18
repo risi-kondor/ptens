@@ -40,16 +40,6 @@ pybind11::class_<Ptensors0<float> >(m,"ptensors0")
       return obj.add_gather_back(x,tmap);}) 
 
 
-// ---- Reductions ------------------------------------------------------------------------------------------
-
-
-  .def("add_reduce0_to",[](Ptensors0f& obj, const Ptensors0f& r, const AindexPack& list){
-      obj.add_reduce0_to(r,list);})
-  
-  .def("broadcast0",[](Ptensors0f& obj, const Ptensors0f& x, const AindexPack& list, const int offs){
-      obj.broadcast0(x,list,offs);},py::arg("x"),py::arg("list"),py::arg("offs")=0)
-
-
 // ---- I/O ------------------------------------------------------------------------------------------
 
 
@@ -57,5 +47,15 @@ pybind11::class_<Ptensors0<float> >(m,"ptensors0")
   .def("__str__",&Ptensors0<float>::str,py::arg("indent")="")
   .def("__repr__",&Ptensors0<float>::repr);
 
+
+
+// ---- Reductions ------------------------------------------------------------------------------------------
+
+
+//   .def("add_reduce0_to",[](Ptensors0f& obj, const Ptensors0f& r, const AindexPack& list){
+//       obj.add_reduce0_to(r,list);})
+  
+//   .def("broadcast0",[](Ptensors0f& obj, const Ptensors0f& x, const AindexPack& list, const int offs){
+//       obj.broadcast0(x,list,offs);},py::arg("x"),py::arg("list"),py::arg("offs")=0)
 
 
