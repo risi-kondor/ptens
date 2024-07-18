@@ -38,11 +38,13 @@ namespace ptens{
     PtensorMap(PtensorMapObj* x):
       obj(x){}
 
+    /*
     static PtensorMap overlaps_map(const AtomsPack& out, const AtomsPack& in){
       if(ptens_global::cache_overlap_maps) 
 	return PtensorMap(ptens_global::overlaps_cache(out,in));
       return new PtensorMapObj(*in.obj,*out.obj); 
     }
+    */
 
 
   public: // ---- Access -------------------------------------------------------------------------------------

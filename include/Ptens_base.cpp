@@ -29,6 +29,7 @@ namespace ptens{
   namespace ptens_global{
 
     bool row_level_operations=false; 
+    bool using_pgather=true;
 
     cnine::MemoryManager* vram_manager=nullptr;
 

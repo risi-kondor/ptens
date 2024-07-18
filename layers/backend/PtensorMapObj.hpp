@@ -21,6 +21,7 @@
 #include "array_pool.hpp"
 #include "map_of_lists.hpp"
 #include "AindexPack.hpp"
+#include "AindexPackB.hpp"
 #include "GatherMapB.hpp"
 #include "PtensorMapGradedObj.hpp"
 #include "flog.hpp"
@@ -44,6 +45,8 @@ namespace ptens{
     shared_ptr<AtomsPackObj> atoms;
     shared_ptr<AindexPack> in;
     shared_ptr<AindexPack> out;
+    //shared_ptr<AindexPackB> inB;
+    //shared_ptr<AindexPackB> outB;
     int n_in, n_out;
 
     //mutable shared_ptr<cnine::GatherMap> bmap;
@@ -56,6 +59,13 @@ namespace ptens{
       //cout<<"Destroying a PtensorMapObj"<<endl;
     }
 
+    PtensorMapObj():
+      observable(this),
+      atoms(new AtomsPackObj()),
+      in(new AindexPack()),
+      out(new AindexPack()){}
+
+    /*
     PtensorMapObj(const AtomsPackObj& _in_atoms, const AtomsPackObj& _out_atoms, const bool graded=false):
       //SparseRmatrix(_out_atoms.size(),_in_atoms.size()),
       observable(this),
@@ -73,7 +83,7 @@ namespace ptens{
       }
       //cout<<"done."<<endl;
     }
-
+    */
 
   public: // ---- Access -------------------------------------------------------------------------------------
 
@@ -96,9 +106,9 @@ namespace ptens{
       //return BASE::size();
     }
 
-    // pair<const AindexPack&, const AindexPack&> ipacks() const{
-    //return pair<const AindexPack&, const AindexPack&>(*in,*out);
-    //}
+    pair<const AindexPack&, const AindexPack&> ipacks() const{
+      return pair<const AindexPack&, const AindexPack&>(*in,*out);
+    }
 
     //pair<const cnine::hlists<int>&, const cnine::hlists<int>&> ipacks() const{
     //return pair<const cnine::hlists<int>&, const cnine::hlists<int>&>(in,out);

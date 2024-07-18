@@ -18,7 +18,7 @@
 #include "AtomsPack.hpp"
 #include "AtomsPackObj.hpp"
 #include "PtensorMapObj.hpp"
-//#include "PtensorMap.hpp"
+#include "PtensorMapFactory.hpp"
 
 
 namespace ptens{
@@ -35,7 +35,9 @@ namespace ptens{
 
     OverlapsMmapCache():
       BASE([](const AtomsPackObj& out, const AtomsPackObj& in){
-	  return shared_ptr<PtensorMapObj>(new PtensorMapObj (in,out));}){}
+	  return PtensorMapFactory::overlaps_obj(out,in);
+	  //return shared_ptr<PtensorMapObj>(new PtensorMapObj (in,out));
+	}){}
 
 
   public: // ---- Access ------------------------------------------------------------------------------------------
@@ -43,7 +45,8 @@ namespace ptens{
 
     shared_ptr<PtensorMapObj> operator()(const AtomsPackObj& out, const AtomsPackObj& in){
       if(ptens_global::cache_overlap_maps) return BASE::operator()(out,in); 
-      return make_shared<PtensorMapObj>(in,out);
+      //return make_shared<PtensorMapObj>(in,out);
+      return PtensorMapFactory::overlaps_obj(out,in);
     }
 
     shared_ptr<PtensorMapObj> operator()(const AtomsPack& out, const AtomsPack& in){

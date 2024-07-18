@@ -24,6 +24,7 @@
 #include "Ptensors.hpp"
 #include "AtomsPackTag.hpp"
 #include "Ptensor2view.hpp"
+#include "PtensorMapFactory.hpp"
 
 
 namespace ptens{
@@ -338,12 +339,14 @@ namespace ptens{
 
     template<typename SOURCE>
     void add_gather(const SOURCE& x){
-      add_gather(x,ptens_global::overlaps_cache(atoms,x.atoms));
+      //add_gather(x,ptens_global::overlaps_cache(atoms,x.atoms));
+      add_gather(x,PtensorMapFactory::overlaps(atoms,x.atoms));
     }
 
     template<typename OUTPUT>
     void add_gather_back(const OUTPUT& x){
-      add_gather_back(x,ptens_global::overlaps_cache(x.atoms,atoms));
+      //add_gather_back(x,ptens_global::overlaps_cache(x.atoms,atoms));
+      add_gather(x,PtensorMapFactory::overlaps(x.atoms,atoms));
     }
 
     template<typename SOURCE>

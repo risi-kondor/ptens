@@ -1,7 +1,7 @@
 pybind11::class_<PtensorMap>(m,"tensor_map")
 
-  .def_static("overlaps_map",[](const AtomsPack& out, const AtomsPack& in){
-      return PtensorMap::overlaps_map(out,in);})
+//.def_static("overlaps_map",[](const AtomsPack& out, const AtomsPack& in){
+//    return PtensorMap::overlaps_map(out,in);})
 
   .def("atoms",&PtensorMap::atoms)
   .def("out_indices",&PtensorMap::out)

@@ -24,6 +24,8 @@
 #include "Ptensors.hpp"
 #include "AtomsPackTag.hpp"
 #include "PtensorMap.hpp"
+#include "PtensorMapFactory.hpp"
+#include "PgatherMapFactory.hpp"
 
 
 namespace ptens{
@@ -296,12 +298,14 @@ namespace ptens{
 
     template<typename SOURCE>
     void add_gather(const SOURCE& x){
-      add_gather(x,ptens_global::overlaps_cache(atoms,x.atoms));
+      //add_gather(x,ptens_global::overlaps_cache(atoms,x.atoms));
+      add_gather(x,PtensorMapFactory::overlaps(atoms,x.atoms));
     }
     
     template<typename OUTPUT>
     void add_gather_back(const OUTPUT& x){
-      add_gather_back(x,ptens_global::overlaps_cache(x.atoms,atoms));
+      //add_gather_back(x,ptens_global::overlaps_cache(x.atoms,atoms));
+      add_gather_back(x,PtensorMapFactory::overlaps(x.atoms,atoms));
     }
 
 
@@ -310,12 +314,17 @@ namespace ptens{
       if(ptens_global::row_level_operations){
 	rmap(x,map)(*this,x);
       }else{
-	if constexpr(std::is_same<SOURCE,Ptensors0<TYPE> >::value)
-	  broadcast0(x.reduce0(map.atoms(),map.in()),map.out(),0);
-	if constexpr(std::is_same<SOURCE,Ptensors1<TYPE> >::value)
-	  broadcast0(x.reduce0(map.atoms(),map.in()),map.out(),0);
-	if constexpr(std::is_same<SOURCE,Ptensors2<TYPE> >::value)
-	  broadcast0(x.reduce0(map.atoms(),map.in()),map.out(),0);
+	if(ptens_global::using_pgather){
+	  auto pmap=PgatherMapFactory::gather_map0(map,atoms,x.atoms,0,x.getk());
+	  //broadcast0(x.reduce0(map.in()),map.out(),0);
+	}else{
+	  if constexpr(std::is_same<SOURCE,Ptensors0<TYPE> >::value)
+	    broadcast0(x.reduce0(map.atoms(),map.in()),map.out(),0);
+	  if constexpr(std::is_same<SOURCE,Ptensors1<TYPE> >::value)
+	    broadcast0(x.reduce0(map.atoms(),map.in()),map.out(),0);
+	  if constexpr(std::is_same<SOURCE,Ptensors2<TYPE> >::value)
+	    broadcast0(x.reduce0(map.atoms(),map.in()),map.out(),0);
+	}
       }
     }
 

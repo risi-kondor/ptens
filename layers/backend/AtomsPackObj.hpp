@@ -50,6 +50,7 @@ namespace ptens{
     using  BASE::BASE;
 
     int constk=0;
+    int order=0;
     mutable int _tsize2=-1;
     mutable vector<int> offsets2;
 
@@ -171,6 +172,7 @@ namespace ptens{
       cached_tag2(x.cached_tag2){
       PTENS_COPY_WARNING();
       constk=x.constk;
+      order=x.order;
     }
 
     AtomsPackObj(AtomsPackObj&& x): 
@@ -183,6 +185,7 @@ namespace ptens{
       cached_tag2(x.cached_tag2){
       PTENS_MOVE_WARNING();
       constk=x.constk;
+      order=x.order;
     }
 
     AtomsPackObj& operator=(const AtomsPackObj& x){
@@ -219,6 +222,10 @@ namespace ptens{
     //int size_of(const int i) const{
     //return size_of(i);
     //}
+
+    int getk() const{
+      return order;
+    }
 
     Atoms operator[](const int i) const{
       return Atoms(cnine::array_pool<int>::operator()(i));

@@ -59,7 +59,8 @@ namespace ptens{
 
       vector<PtensorMap> maps;
       for(int i=0; i<N; i++)
-	maps.push_back(PtensorMap::overlaps_map(out[i],in[i]));
+	maps.push_back(PtensorMapFactory::overlaps(out[i],in[i]));
+      //maps.push_back(PtensorMap::overlaps_map(out[i],in[i]));
 	  
       vector<AtomsPack> atomsv;
       for(int i=0; i<N; i++)
