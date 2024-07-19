@@ -43,6 +43,24 @@ namespace ptens{
       return *obj->out_map;
     }
 
+  public: // ---- I/O ----------------------------------------------------------------------------------------
+
+
+    static string classname(){
+      return "PgatherMap";
+    }
+
+    string repr() const{
+      return "PgatherMap";
+    }
+
+    string str(const string indent="") const{
+      return obj->str(indent);
+    }
+
+    friend ostream& operator<<(ostream& stream, const PgatherMap& v){
+      stream<<v.str(); return stream;}
+
 
   };
 

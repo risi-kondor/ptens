@@ -83,6 +83,13 @@ namespace ptens{
 	  arr[s0*ix[i0]+s1*i1]+=x.arr[x.s0*i0+x.s1*i1]/c;
     }
 
+    void add_to(const Rtensor2_view& x) const{
+      CNINE_CPUONLY();
+      for(int i0=0; i0<n0; i0++)
+	for(int i1=0; i1<n1; i1++)
+	  x.arr[x.s0*i0+x.s1*i1]+=arr[s0*ix[i0]+s1*i1];
+    }
+
     void operator+=(const Rtensor2_view& x) const{
       return add(x);
     }
@@ -91,7 +98,11 @@ namespace ptens{
   public: // ---- Operations --------------------------------------------------------------------------------
 
 
-    void sum0_into(const Rtensor1_view& r){
+    Ptensor1view cols(const int offs, const int n) const{
+      return Ptensor1view(arr+offs,n,s0,s1,ix,dev);
+    }
+
+    void sum0_into(const Rtensor1_view& r) const{
       CNINE_CPUONLY();
       assert(r.n0==n1);
       for(int i=0; i<n1; i++){
@@ -102,7 +113,7 @@ namespace ptens{
       }
     }
 
-    void avg0_into(const Rtensor1_view& r){
+    void avg0_into(const Rtensor1_view& r) const{
       CNINE_CPUONLY();
       assert(r.n0==n1);
       for(int i=0; i<n1; i++){

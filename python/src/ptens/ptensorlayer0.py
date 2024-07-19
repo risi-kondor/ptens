@@ -88,10 +88,10 @@ class ptensorlayer0(ptensorlayer):
         assert isinstance(atoms,pb.atomspack)
         assert isinstance(x,p.ptensorlayer)
         if len(args)==0:
-            return ptensorlayer0.gather(atoms,x,pb.tensor_map.overlaps_map(atoms,x.atoms)) 
+            map=pb.layer_map.overlaps_map(atoms,x.atoms)
         else:
-            assert isinstance(args[0],pb.tensor_map)
-            return ptensorlayer0_gatherFn.apply(atoms,x,args[0])
+            map=args[0]
+        return ptensorlayer0_gatherFn.apply(atoms,x,map)
         
 
     # ---- I/O ----------------------------------------------------------------------------------------------
@@ -130,17 +130,17 @@ class ptensorlayer0_linmapsFn(torch.autograd.Function):
 class ptensorlayer0_gatherFn(torch.autograd.Function):
 
     @staticmethod
-    def forward(ctx,atoms,x,tmap):
+    def forward(ctx,atoms,x,map):
         r=ptensorlayer0.zeros(atoms,x.get_nc()*([1,1,2][x.getk()]))
-        r.backend().add_gather(x.backend(),tmap)
+        r.backend().add_gather(x.backend(),map)
         ctx.x=x
-        ctx.tmap=tmap
+        ctx.map=map
         return r
 
     @staticmethod
     def backward(ctx,g):
         r=ctx.x.zeros_like()
-        r.backend().add_gather_back(g.backend(),ctx.tmap)
+        r.backend().add_gather_back(g.backend(),ctx.map)
         return r
 
 

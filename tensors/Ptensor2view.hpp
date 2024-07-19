@@ -74,7 +74,11 @@ namespace ptens{
   public: // ---- Operations --------------------------------------------------------------------------------
 
 
-    void sum0_into(const Rtensor2_view& r){
+    Ptensor2view cols(const int offs, const int n) const{
+      return Ptensor2view(arr+offs,n,s0,s1,s2,ix,dev);
+    }
+
+    void sum0_into(const Rtensor2_view& r) const{
       CNINE_CPUONLY();
       assert(r.n0==n1);
       assert(r.n1==n2);
@@ -87,7 +91,7 @@ namespace ptens{
 	}
     }
 
-    void sum1_into(const Rtensor2_view& r){
+    void sum1_into(const Rtensor2_view& r) const{
       CNINE_CPUONLY();
       assert(r.n0==n0);
       assert(r.n1==n2);
@@ -100,7 +104,7 @@ namespace ptens{
 	}
     }
 
-    void sum01_into(const Rtensor1_view& r){
+    void sum01_into(const Rtensor1_view& r) const{
       CNINE_CPUONLY();
       assert(r.n0==n2);
       for(int i2=0; i2<n2; i2++){

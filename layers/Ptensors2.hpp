@@ -42,6 +42,7 @@ namespace ptens{
 
     typedef Ptensors<TYPE> BASE;
     typedef cnine::Ltensor<TYPE> TENSOR;
+    typedef cnine::Rtensor1_view Rtensor1_view;
     typedef cnine::Rtensor2_view Rtensor2_view;
     typedef cnine::Rtensor3_view Rtensor3_view;
 
@@ -278,6 +279,53 @@ namespace ptens{
       int n=size_of(i);
       return Rtensor3_view(const_cast<TYPE*>(get_arr())+offset(i)*strides[0]+offs*strides[1],
 	n,n,m,strides[0]*n,strides[0],strides[1],dev);
+    }
+
+    Ptensor2view<TYPE> view_of(const AindexPackB& apack, const int i, const vector<int>& ix) const{
+      int nc=get_nc();
+      int k=apack.ssize(i);
+      return Ptensor2view<TYPE>(const_cast<TYPE*>(get_arr())+apack.soffset(i)*nc,nc,k*nc,nc,1,apack.ix(i),get_dev());
+    }
+
+    Ptensor2view<TYPE> view_of(const AindexPackB& apack, const int i, const vector<int>& ix, const int offs, const int n) const{
+      int nc=get_nc();
+      int k=apack.ssize(i);
+      return Ptensor2view<TYPE>(const_cast<TYPE*>(get_arr())+apack.soffset(i)*nc+offs,n,k*nc,nc,1,apack.ix(i),get_dev());
+    }
+
+    void zip0(const AindexPackB& map, const TENSOR& M, 
+      const std::function<void(const Rtensor1_view&,const Ptensor2view<TYPE>&, int)>& lambda, const int offset=0, int n=0) const{
+      int N=map.size();
+      int nc=get_nc();
+      if(n==0) n=nc-offset; 
+      for(int i=0; i<N; i++)
+	lambda(M.row(map.toffset(i)).view1(),
+	  Ptensor2view<TYPE>(const_cast<float*>(get_arr())+map.soffset(i)*nc+offset,
+	    n,map.ssize(i)*nc,nc,1,map.ix(i),get_dev()),map.nix(i));
+    }
+
+    void zip1(const AindexPackB& map, const TENSOR& M, 
+      const std::function<void(const Rtensor2_view&, const Ptensor2view<TYPE>&, int)>& lambda, const int offset=0, int n=0) const{
+      int N=map.size();
+      int nc=get_nc();
+      if(n==0) n=nc-offset; 
+      for(int i=0; i<N; i++)
+	lambda(M.rows(map.toffset(i),map.nix(i)).view2(),
+	  Ptensor2view<TYPE>(const_cast<float*>(get_arr())+map.soffset(i)*nc+offset,
+	    n,map.ssize(i)*nc,nc,1,map.ix(i),get_dev()),map.nix(i));
+    }
+
+    void zip2(const AindexPackB& map, const TENSOR& M, 
+      const std::function<void(const Rtensor3_view&, const Ptensor2view<TYPE>&, int)>& lambda, const int offset=0, int n=0) const{
+      int N=map.size();
+      int nc=get_nc();
+      if(n==0) n=nc-offset; 
+      for(int i=0; i<N; i++){
+	int k=map.nix(i);
+	lambda(cnine::split0(M.rows(map.toffset(i),k*k).view2(),k,k),
+	  Ptensor2view<TYPE>(const_cast<float*>(get_arr())+map.soffset(i)*nc+offset,
+	    n,map.ssize(i)*nc,nc,1,map.ix(i),get_dev()),map.nix(i));
+      }
     }
 
 
@@ -746,6 +794,61 @@ namespace ptens{
       }
       GPUCODE(CUDA_STREAM(Ptensors2_reduce2B_cu(R,*this,list,offs,n,stream)));
     }
+
+
+  public: // ---- Indexed reductions -------------------------------------------------------------------------
+
+
+    TENSOR reduce0(const AindexPackB& map, const int offs=0, int nc=0) const{
+      TimedFn T("Ptensors2","reduce0",*this,map,(map.count2+map.count1)*get_nc());
+      if (nc==0) nc=get_nc()-offs;
+      cnine::using_vram_manager vv(ptens_global::vram_manager);
+      TENSOR R({map.nrows,2*nc},0,dev);
+      if(dev==0) zip0(map,R,[nc](auto& r, auto& x, int k){
+	  x.sum01_into(r.block(0,nc));
+	  x.diag01().sum0_into(r.block(nc,nc));
+	},offs,nc);
+      return R;
+    }
+
+    TENSOR reduce0_shrink(const AindexPackB& map, const int offs=0, int nc=0) const{
+      TimedFn T("Ptensors2","reduce0",*this,map,(map.count2+map.count1)*nc);
+      if(nc==0) nc=(get_nc()-offs)/2;
+      cnine::using_vram_manager vv(ptens_global::vram_manager);
+      TENSOR R({map.nrows,nc},0,dev);
+      if(dev==0) zip0(map,R,[nc](auto& r, auto& x, int k){
+	  x.cols(0,nc).sum01_into(r);
+	  x.cols(nc,nc).diag01().sum0_into(r);
+	},offs,nc);
+      return R;
+    }
+
+    TENSOR reduce1(const AindexPackB& map, const int offs=0, int nc=0) const{
+      TimedFn T("Ptensors2","reduce1",*this,map,(map.count1+2*map.count2)*get_nc());
+      if (nc==0) nc=get_nc()-offs;
+      cnine::using_vram_manager vv(ptens_global::vram_manager);
+      TENSOR R({map.nrows,3*nc},0,dev);
+      if(dev==0) zip1(map,R,[nc](auto& r, auto& x, int k){
+	  x.sum0_into(r.cols(0,nc));
+	  x.sum1_into(r.cols(nc,nc));
+	  r.cols(2*nc,nc)+=x.diag01();
+	},offs,nc);
+      return R;
+    }
+
+    TENSOR reduce1_shrink(const AindexPackB& map, const int offs=0, int nc=0) const{
+      TimedFn T("Ptensors2","reduce1",*this,map,(map.count1+2*map.count2)*nc);
+      if(nc==0) nc=(get_nc()-offs)/3;
+      cnine::using_vram_manager vv(ptens_global::vram_manager);
+      TENSOR R({map.nrows,nc},0,dev);
+      if(dev==0) zip1(map,R,[nc](auto& r, auto& x, int k){
+	  x.cols(0,nc).sum0_into(r);
+	  x.cols(nc,nc).sum1_into(r);
+	  r+=x.cols(2*nc,nc).diag01();
+	},offs,nc);
+      return R;
+    }
+
 
 
   public: // ---- Broadcasting -------------------------------------------------------------------------------

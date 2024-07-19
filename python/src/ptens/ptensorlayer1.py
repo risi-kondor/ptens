@@ -94,10 +94,10 @@ class ptensorlayer1(ptensorlayer):
         assert isinstance(atoms,pb.atomspack)
         assert isinstance(x,p.ptensorlayer)
         if len(args)==0:
-            return ptensorlayer1.gather(atoms,x,pb.tensor_map.overlaps_map(atoms,x.atoms)) 
+            map=pb.layer_map.overlaps_map(atoms,x.atoms)
         else:
-            assert isinstance(args[0],pb.tensor_map)
-            return ptensorlayer1_gatherFn.apply(atoms,x,args[0])
+            map=args[0]
+        return ptensorlayer1_gatherFn.apply(atoms,x,map)
 
 
     # ---- Reductions -----------------------------------------------------------------------------------------

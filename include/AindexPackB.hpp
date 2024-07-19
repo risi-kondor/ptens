@@ -32,6 +32,8 @@ namespace ptens{
     typedef cnine::Ltensor<int> TENSOR;
 
     int _max_nix=0;
+    int nrows=0;
+
     int count1=0;
     int count2=0;
 
@@ -96,7 +98,7 @@ namespace ptens{
       int n=nix(i);
       vector<int> R(n);
       for(int j=0; j<n; j++)
-	R[j]=(*this)(i,j);
+	R[j]=(*this)(i,j+4);
       return R;
     }
 
@@ -109,6 +111,19 @@ namespace ptens{
       TENSOR::set(i,3,_ssize);
       for(int j=0; j<v.size(); j++)
 	TENSOR::set(i,j+4,v[j]);
+    }
+
+    cnine::Rtensor1_view chunk0(const cnine::Ltensor<float>& x, const int i) const{
+      return x.row(toffset(i)).view1();
+    }
+
+    cnine::Rtensor2_view chunk1(const cnine::Ltensor<float>& x, const int i) const{
+      return x.rows(toffset(i),nix(i)).view2();
+    }
+    
+    cnine::Rtensor3_view chunk2(const cnine::Ltensor<float>& x, const int i) const{
+      int k=nix(i);
+      return cnine::split0(x.rows(toffset(i),k*k).view2(),k,k);
     }
 
     //const cnine::GatherMap& get_bmap() const{

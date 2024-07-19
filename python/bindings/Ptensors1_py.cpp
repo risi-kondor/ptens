@@ -25,19 +25,37 @@ pybind11::class_<Ptensors1<float> >(m,"ptensors1")
 // ---- Gather ----------------------------------------------------------------------------------------------
 
 
-  .def("add_gather",[](Ptensors1f& obj, const Ptensors0f& x, const PtensorMap& tmap){
-      return obj.add_gather(x,tmap);}) 
-  .def("add_gather",[](Ptensors1f& obj, const Ptensors1f& x, const PtensorMap& tmap){
-      return obj.add_gather(x,tmap);}) 
-  .def("add_gather",[](Ptensors1f& obj, const Ptensors2f& x, const PtensorMap& tmap){
-      return obj.add_gather(x,tmap);}) 
+  .def("add_gather",[](Ptensors1f& obj, const Ptensors0f& x, const LayerMap& map){
+      return obj.add_gather(x,map);}) 
+  .def("add_gather",[](Ptensors1f& obj, const Ptensors1f& x, const LayerMap& map){
+      return obj.add_gather(x,map);}) 
+  .def("add_gather",[](Ptensors1f& obj, const Ptensors2f& x, const LayerMap& map){
+      return obj.add_gather(x,map);}) 
 
-  .def("add_gather_back",[](Ptensors1f& obj, const Ptensors0f& x, const PtensorMap& tmap){
-      return obj.add_gather_back(x,tmap);}) 
-  .def("add_gather_back",[](Ptensors1f& obj, const Ptensors1f& x, const PtensorMap& tmap){
-      return obj.add_gather_back(x,tmap);}) 
-  .def("add_gather_back",[](Ptensors1f& obj, const Ptensors2f& x, const PtensorMap& tmap){
-      return obj.add_gather_back(x,tmap);}) 
+  .def("add_gather_back",[](Ptensors1f& obj, const Ptensors0f& x, const LayerMap& map){
+      return obj.add_gather_back(x,map);}) 
+  .def("add_gather_back",[](Ptensors1f& obj, const Ptensors1f& x, const LayerMap& map){
+      return obj.add_gather_back(x,map);}) 
+  .def("add_gather_back",[](Ptensors1f& obj, const Ptensors2f& x, const LayerMap& map){
+      return obj.add_gather_back(x,map);}) 
+
+
+// ---- Gather ----------------------------------------------------------------------------------------------
+
+
+//   .def("add_gather",[](Ptensors1f& obj, const Ptensors0f& x, const PtensorMap& tmap){
+//       return obj.add_gather(x,tmap);}) 
+//   .def("add_gather",[](Ptensors1f& obj, const Ptensors1f& x, const PtensorMap& tmap){
+//       return obj.add_gather(x,tmap);}) 
+//   .def("add_gather",[](Ptensors1f& obj, const Ptensors2f& x, const PtensorMap& tmap){
+//       return obj.add_gather(x,tmap);}) 
+
+//   .def("add_gather_back",[](Ptensors1f& obj, const Ptensors0f& x, const PtensorMap& tmap){
+//       return obj.add_gather_back(x,tmap);}) 
+//   .def("add_gather_back",[](Ptensors1f& obj, const Ptensors1f& x, const PtensorMap& tmap){
+//       return obj.add_gather_back(x,tmap);}) 
+//   .def("add_gather_back",[](Ptensors1f& obj, const Ptensors2f& x, const PtensorMap& tmap){
+//       return obj.add_gather_back(x,tmap);}) 
 
 
 // ---- I/O ------------------------------------------------------------------------------------------

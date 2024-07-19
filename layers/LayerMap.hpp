@@ -12,57 +12,48 @@
  *
  */
 
-#ifndef _ptens_PgatherMapObj
-#define _ptens_PgatherMapObj
+#ifndef _ptens_LayerMap
+#define _ptens_LayerMap
 
-#include "observable.hpp"
-#include "AindexPackB.hpp"
-#include "GatherMapB.hpp"
-#include "flog.hpp"
+#include "LayerMapObj.hpp"
 
 
 namespace ptens{
 
 
-  class PgatherMapObj: public cnine::observable<PgatherMapObj>{
+  class LayerMap{
   public:
+    
+    shared_ptr<LayerMapObj> obj;
 
-    shared_ptr<AindexPackB> in_map;
-    shared_ptr<AindexPackB> out_map;
+    LayerMap(const shared_ptr<LayerMapObj>& _obj):
+      obj(_obj){}
 
-    PgatherMapObj():
-      observable(this){}
-    //in_map(new AindexPackB()),
-    //out_map(new AindexPackB()){}
+    static LayerMap overlaps_map(const AtomsPack& out, const AtomsPack& in){
+      return LayerMapObj::overlaps_map(*out.obj,*in.obj);
+    }
 
 
   public: // ---- I/O ----------------------------------------------------------------------------------------
 
 
     static string classname(){
-      return "PgatherMapObj";
+      return "LayerMap";
     }
 
     string repr() const{
-      return "PgatherMapObj";
+      return "LayerMap";
     }
 
     string str(const string indent="") const{
-      ostringstream oss;
-      oss<<"In:"<<endl;
-      oss<<in_map->str(indent+"  ");
-      oss<<"Out:"<<endl;
-      oss<<out_map->str(indent+"  ");
-      return oss.str();
+      return obj->str();
     }
 
-    friend ostream& operator<<(ostream& stream, const PgatherMapObj& v){
+    friend ostream& operator<<(ostream& stream, const LayerMap& v){
       stream<<v.str(); return stream;}
-
 
   };
 
 }
-
 
 #endif 

@@ -7,6 +7,8 @@
 #include "Ggraph.hpp"
 #include "Subgraph.hpp"
 
+#include "LayerMap.hpp"
+
 #include "Ptensor0.hpp"
 #include "Ptensor1.hpp"
 #include "Ptensor2.hpp"
@@ -66,6 +68,7 @@ PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
 
 #include "Ggraph_py.cpp"
 #include "Subgraph_py.cpp"
+#include "LayerMap_py.cpp"
 #include "TensorLevelMap_py.cpp"
 
 #include "SimpleMemoryManager_py.cpp"
