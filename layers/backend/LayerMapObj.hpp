@@ -69,7 +69,9 @@ namespace ptens{
 	}
       }
 
-      return cnine::to_share(R);
+      auto r=cnine::to_share(R);
+      //out.related_layermaps.emplace_back(r);
+      return r;
     }
 
 
@@ -81,7 +83,7 @@ namespace ptens{
     }
 
     string repr() const{
-      return "LayerMapObj";
+      return "<LayerMapObj>";
     }
 
     string str(const string indent="") const{

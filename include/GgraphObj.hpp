@@ -216,6 +216,10 @@ namespace ptens{
       return "ptens::GgraphObj";
     }
 
+    string repr() const{
+      return "<Ggraph N="+to_string(getn())+">";
+    }
+
     string str(const string indent="") const{
       ostringstream oss;
       oss<<indent<<"Ggraph on "<<to_string(getn())<<" vertices:"<<endl;

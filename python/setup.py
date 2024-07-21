@@ -146,12 +146,12 @@ def main():
           zip_safe=False,
           cmdclass={'build_ext': BuildExtension})
 
+    print("Compilation finished:", time.ctime(time.time()))
 
     # ------------------------------------------------------------------------------------------------------------
 
 
 if __name__ == "__main__":
     main()
+    print("Compilation finished:", time.ctime(time.time()))
 
-
-print("Compilation finished:", time.ctime(time.time()))

@@ -30,6 +30,12 @@
 
 namespace ptens{
 
+  #ifdef _WITH_CUDA 
+  extern void Ptensors0_reduce0_cu(cnine::Ltensor<float>& R, const cnine::Ltensor<float>& x, 
+    const AindexPackB& map, int offs, int n, const cudaStream_t& stream){
+  extern void Ptensors0_broadcast0_cu(cnine::Ltensor<float>& x, const cnine::Ltensor<float>& R, 
+    const AindexPackB& map, const int offs, const cudaStream_t& stream){
+  #endif 
 
 
   template<typename TYPE>
@@ -96,9 +102,6 @@ namespace ptens{
     Ptensors0(const AtomsPack& _atoms, const int nc, const int fcode, const int _dev):
       BASE(_atoms,cnine::Gdims(_atoms.size(),nc),fcode,_dev),
       tag(_atoms){}
-
-    //Ptensors0(const int N, const int nc, const int fcode, const int _dev):
-    //BASE(cnine::Gdims(N,nc),fcode,_dev){}
 
 
     static Ptensors0 cat(const vector<Ptensors0>& list){
@@ -300,8 +303,7 @@ namespace ptens{
     }
 
     void add_linmaps_back(const Ptensors2<TYPE>& r){
-      int nc=get_nc();
-      add(r.reduce0_shrink(0,nc));
+      add(r.reduce0_shrink(0,get_nc()));
     }
 
 
@@ -309,9 +311,9 @@ namespace ptens{
 
 
     template<typename SOURCE, typename = typename std::enable_if<std::is_base_of<Ptensors<float>, SOURCE>::value, SOURCE>::type>
-    static Ptensors0<TYPE> gather(const AtomsPack& a, const SOURCE& x){
+    static Ptensors0<TYPE> gather(const AtomsPack& atoms, const SOURCE& x){
       int nc=x.get_nc()*vector<int>({1,1,2})[x.getk()];
-      Ptensors0<TYPE> R(a,nc,x.get_dev());
+      Ptensors0<TYPE> R(atoms,nc,x.get_dev());
       R.add_gather(x,LayerMap::overlaps_map(atoms,x.atoms));
       return R;
     }
@@ -363,6 +365,8 @@ namespace ptens{
     }
 
     Ptensors0<TYPE> reduce0(const AtomsPack& _atoms, const AindexPack& list) const{
+      PTENS_DEPRECATED();
+      PTENS_CPUONLY();
       TimedFn T("Ptensors0","reduce0",*this,list,list.size()*get_nc());
       cnine::using_vram_manager vv(ptens_global::vram_manager);
       Ptensors0 R(_atoms,get_nc(),0,get_dev());
@@ -380,16 +384,18 @@ namespace ptens{
       TimedFn T("Ptensors0","reduce0",*this,map,map.size()*get_nc());
       if(nc==0) nc=get_nc();
       cnine::using_vram_manager vv(ptens_global::vram_manager);
-      TENSOR R({map.nrows,get_nc()},0,get_dev());
+      TENSOR R({map.nrows,nc},0,get_dev());
       if(dev==0) zip0(map,R,[](auto& r, auto& x, int k){r+=x;},offs,nc);
-      //if(get_dev()==0){
-      //int N=map.size();
-      //for(int i=0; i<N; i++){
-      //if(map.nix(i)==0) continue;
-      //map.chunk0(R,i)+=view_of(map,i);
-      //}
-      //}
+      GPUCODE(CUDA_STREAM(Ptensors0_reduce0_cu(R,*this,map,offs,stream)));
       return R;
+    }
+
+    void add_reduce0(const TENSOR& R, const AindexPackB& map, const int offs=0) const{
+      TimedFn T("Ptensors0","reduce0",*this,map,map.size()*get_nc());
+      PTENS_ASSRT(R.get_dev()==dev);
+      int nc=R.dim(1);
+      if(dev==0) zip0(map,R,[](auto& r, auto& x, int k){r+=x;},offs,nc);
+      GPUCODE(CUDA_STREAM(Ptensors0_reduce0_cu(R,*this,map,offs,stream)));
     }
 
 
@@ -402,6 +408,8 @@ namespace ptens{
     }
 
     void broadcast0(const Ptensors0& x, const AindexPack& list, const int offs=0){
+      PTENS_DEPRECATED();
+      PTENS_CPUONLY();
       TimedFn T("Ptensors0","broadcast0",*this,x,list,list.size()*get_nc());
       if(get_dev()==0){
 	int N=list.size();
@@ -409,18 +417,12 @@ namespace ptens{
 	for(int i=0; i<N; i++)
 	  view_of(list.tix(i),offs,n)+=x.view_of(i);
       }
-      GPUCODE(CUDA_STREAM(Ptensors0_broadcast0_cu(*this,x,list,offs,stream)));
     }
 
     void broadcast0(const TENSOR& x, const AindexPackB& map, const int offs=0){
       TimedFn T("Ptensors0","broadcast0",*this,x,map,map.size()*get_nc());
       if(dev==0) zip0(map,x,[](auto& r, auto& x, int k){x+=r;},offs);
-      //if(get_dev()==0){
-      //int N=map.size();
-      //const int nc=x.dim(1);
-      //for(int i=0; i<N; i++)
-      //view_of(map,i,offs,nc)+=map.chunk0(x,i);
-      //}
+      GPUCODE(CUDA_STREAM(Ptensors0_broadcast0_cu(*this,x,map,offs,stream)));
     }
 
 
@@ -550,3 +552,16 @@ namespace ptens{
     //add_gather_back(x,LayerMap::overlaps_map(x.atoms,atoms));
     //}
 
+      //if(get_dev()==0){
+      //int N=map.size();
+      //for(int i=0; i<N; i++){
+      //if(map.nix(i)==0) continue;
+      //map.chunk0(R,i)+=view_of(map,i);
+      //}
+      //}
+      //if(get_dev()==0){
+      //int N=map.size();
+      //const int nc=x.dim(1);
+      //for(int i=0; i<N; i++)
+      //view_of(map,i,offs,nc)+=map.chunk0(x,i);
+      //}

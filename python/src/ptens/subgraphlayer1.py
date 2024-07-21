@@ -27,6 +27,7 @@ class subgraphlayer1(p.subgraphlayer,ptensorlayer1):
         assert isinstance(atoms,pb.atomspack)
         assert isinstance(G,p.ggraph)
         assert isinstance(S,p.subgraph)
+        assert M.size(0)==atoms.nrows1()
         R=super().__new__(subgraphlayer1,M)
         R.atoms=atoms
         R.G=G

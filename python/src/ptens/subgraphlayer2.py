@@ -20,11 +20,11 @@ import ptens_base as pb
 
 class subgraphlayer2(p.subgraphlayer,p.ptensorlayer2):
 
-
     def __new__(cls,G,S,atoms,M):
         assert isinstance(atoms,pb.atomspack)
         assert isinstance(G,p.ggraph)
         assert isinstance(S,p.subgraph)
+        assert M.size(0)==atoms.nrows2()
         R=super().__new__(subgraphlayer2,M)
         R.atoms=atoms
         R.G=G
@@ -76,7 +76,7 @@ class subgraphlayer2(p.subgraphlayer,p.ptensorlayer2):
     def __repr__(self):
         return "subgraphlayer2(len="+str(self.size(0))+",nc="+str(self.get_nc())+")"
 
-    def __str__(self):
+    def __str__(self,indent=""):
         r=indent+"subgraphlayer2:\n"
         for i in range(len(self)):
             r=r+self[i].to_string(indent+"  ")+""

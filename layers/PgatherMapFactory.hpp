@@ -50,6 +50,9 @@ namespace ptens{
       int N=map.tsize();
       int longest=map.max_size();
 
+      cnine::map_of_lists<int,int> out_lists;
+      cnine::map_of_lists<int,int> in_lists;
+
       auto out_pack=new AindexPackB(N,longest);
       auto in_pack=new AindexPackB(N,longest);
 
@@ -69,19 +72,35 @@ namespace ptens{
 	  if(ink==1) in_pack->set(c,toffset,nix,in.row_offset1(j),in.size_of(j),in[j](common));
 	  if(ink==2) in_pack->set(c,toffset,nix,in.row_offset2(j),in.size_of(j),in[j](common));
 
+	  out_lists.push_back((*out_pack)(c,2),c);
+	  in_lists.push_back((*in_pack)(c,2),c);
+
 	  if(gatherk==0) toffset+=1;
 	  if(gatherk==1) toffset+=nix;
 	  if(gatherk==2) toffset+=nix*nix;
 	  c++;
 	});
 
+      out_pack->gather_map=cnine::GatherMapB(out_lists);
+      in_pack->gather_map=cnine::GatherMapB(in_lists);
+
       out_pack->nrows=toffset;
+      if(outk==0) out_pack->n_input_rows=out.nrows0();
+      if(outk==1) out_pack->n_input_rows=out.nrows1();
+      if(outk==2) out_pack->n_input_rows=out.nrows2();
+
       in_pack->nrows=toffset;
+      if(ink==0) in_pack->n_input_rows=in.nrows0();
+      if(ink==1) in_pack->n_input_rows=in.nrows1();
+      if(ink==2) in_pack->n_input_rows=in.nrows2();
 
       auto R=new PgatherMapObj(); 
       R->out_map=to_share(out_pack);
       R->in_map=to_share(in_pack);
-      return cnine::to_share(R);
+
+      auto r=cnine::to_share(R);
+      out.related_gatherplans.emplace_back(r);
+      return r;
     }
     
 
@@ -108,6 +127,9 @@ namespace ptens{
       int N=pmap.gmap.tsize();
       int longest=pmap.gmap.max_size();
 
+      cnine::map_of_lists<int,int> out_lists;
+      cnine::map_of_lists<int,int> in_lists;
+
       auto out_pack=new AindexPackB(N,longest);
       auto in_pack=new AindexPackB(N,longest);
 
@@ -125,19 +147,37 @@ namespace ptens{
 	  if(ink==1) in_pack->set(c,toffset,nix,in.row_offset1(j),in.nrows1(j),in[j](common));
 	  if(ink==2) in_pack->set(c,toffset,nix,in.row_offset2(j),in.nrows2(j),in[j](common));
 
+	  out_lists.push_back((*out_pack)(c,2),c);
+	  in_lists.push_back((*in_pack)(c,2),c);
+
 	  if(gatherk==0) toffset+=1;
 	  if(gatherk==1) toffset+=nix;
 	  if(gatherk==2) toffset+=nix*nix;
 	  c++;
 	});
 
+      out_pack->gather_map=cnine::GatherMapB(out_lists);
+      in_pack->gather_map=cnine::GatherMapB(in_lists);
+
       out_pack->nrows=toffset;
+      if(outk==0) out_pack->n_input_rows=out.nrows0();
+      if(outk==1) out_pack->n_input_rows=out.nrows1();
+      if(outk==2) out_pack->n_input_rows=out.nrows2();
+      out_pack->n_gather_lists=out_lists.size();
+
       in_pack->nrows=toffset;
+      if(ink==0) in_pack->n_input_rows=in.nrows0();
+      if(ink==1) in_pack->n_input_rows=in.nrows1();
+      if(ink==2) in_pack->n_input_rows=in.nrows2();
+      in_pack->n_gather_lists=in_lists.size();
 
       auto R=new PgatherMapObj(); 
       R->out_map=to_share(out_pack);
       R->in_map=to_share(in_pack);
-      return cnine::to_share(R);
+
+      auto r=cnine::to_share(R);
+      out.related_gatherplans.emplace_back(r);
+      return r;
     }
 
   };

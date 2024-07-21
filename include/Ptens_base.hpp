@@ -34,6 +34,8 @@
 
 #define PTENS_UNIMPL() printf("Ptens error: function \"%s\" not implemented.\n",__PRETTY_FUNCTION__);
 
+#define PTENS_DEPRECATED() printf("Ptens warning: function \"%s\" deprecated.\n",__PRETTY_FUNCTION__);
+
 
 // ---- Copy, assign and convert warnings --------------------------------------------------------------------
 

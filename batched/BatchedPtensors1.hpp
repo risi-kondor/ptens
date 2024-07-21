@@ -22,6 +22,7 @@
 #include "Ptensors1.hpp"
 #include "BatchedPtensors.hpp"
 #include "MultiLoop.hpp"
+#include "BatchedPgatherMapFactory.hpp"
 
 
 namespace ptens{
@@ -294,50 +295,67 @@ namespace ptens{
 
 
     template<typename SOURCE, typename = typename std::enable_if<std::is_base_of<BatchedPtensors<float>, SOURCE>::value, SOURCE>::type>
-    static BatchedPtensors1<TYPE> gather(const SOURCE& x, const BatchedAtomsPack& a, const int min_overlaps=1){
+    static BatchedPtensors1<TYPE> gather(const BatchedAtomsPack& a, const SOURCE& x, const int min_overlaps=1){
       BatchedPtensors1<TYPE> R(a,x.get_nc()*vector<int>({1,2,5})[x.getk()],x.get_dev());
-      R.add_gather(x,min_overlaps);
+      R.add_gather(x,BatchedLayerMap::overlaps_map(a,x.atoms));
+      return R;
+    }
+
+    template<typename SOURCE, typename = typename std::enable_if<std::is_base_of<BatchedPtensors<float>, SOURCE>::value, SOURCE>::type>
+    static BatchedPtensors1<TYPE> gather(const BatchedAtomsPack& a, const SOURCE& x, const BatchedLayerMap& map){
+      BatchedPtensors1<TYPE> R(a,x.get_nc()*vector<int>({1,2,5})[x.getk()],x.get_dev());
+      R.add_gather(x,map);
       return R;
     }
 
     template<typename SOURCE>
-    void add_gather(const SOURCE& x,const int min_overlaps=1){
-      add_gather(x,BatchedPtensorMap::overlaps(atoms,x.atoms));
-    }
-
-    template<typename SOURCE>
-    void add_gather_back(const SOURCE& x,const int min_overlaps=1){
-      add_gather_back(x,BatchedPtensorMap::overlaps(x.atoms,atoms));
-    }
-
-    template<typename SOURCE>
-      void add_gather(const SOURCE& x, const BatchedPtensorMap& map){
+      void add_gather(const SOURCE& x, const BatchedLayerMap& map){
       int nc=x.get_nc();
-	if constexpr(std::is_same<SOURCE,BatchedPtensors0<TYPE> >::value)
-	  broadcast0(x.reduce0(map.atoms(),map.in()),map.out(),0);
-	if constexpr(std::is_same<SOURCE,BatchedPtensors1<TYPE> >::value){
-	  broadcast0(x.reduce0(map.atoms(),map.in()),map.out(),0);
-	  broadcast1(x.reduce1(map.atoms(),map.in()),map.out(),nc);
-	}
-	if constexpr(std::is_same<SOURCE,BatchedPtensors2<TYPE> >::value){
-	  broadcast0(x.reduce0(map.atoms(),map.in()),map.out(),0);
-	  broadcast1(x.reduce1(map.atoms(),map.in()),map.out(),2*nc);
-	}
+
+      if constexpr(std::is_same<SOURCE,BatchedPtensors0<TYPE> >::value){
+	auto pmap=BatchedPgatherMapFactory::gather_map0(map,atoms,x.atoms,1,x.getk());
+	broadcast0(x.reduce0(pmap.in()),pmap.out(),0);
+      }
+
+      if constexpr(std::is_same<SOURCE,BatchedPtensors1<TYPE> >::value){
+	auto pmap0=BatchedPgatherMapFactory::gather_map0(map,atoms,x.atoms,1,x.getk());
+	auto pmap1=BatchedPgatherMapFactory::gather_map1(map,atoms,x.atoms,1,x.getk());
+	broadcast0(x.reduce0(pmap0.in()),pmap0.out(),0);
+	broadcast1(x.reduce1(pmap1.in()),pmap1.out(),nc);
+      }
+
+      if constexpr(std::is_same<SOURCE,BatchedPtensors2<TYPE> >::value){
+	auto pmap0=BatchedPgatherMapFactory::gather_map0(map,atoms,x.atoms,1,x.getk());
+	auto pmap1=BatchedPgatherMapFactory::gather_map1(map,atoms,x.atoms,1,x.getk());
+	broadcast0(x.reduce0(pmap0.in()),pmap0.out(),0);
+	broadcast1(x.reduce1(pmap1.in()),pmap1.out(),2*nc);
+      }
+
     }
 
     template<typename OUTPUT>
-    void add_gather_back(const OUTPUT& x, const BatchedPtensorMap& map){
+    void add_gather_back(const OUTPUT& x, const BatchedLayerMap& map){
       int nc=get_nc();
-      if constexpr(std::is_same<OUTPUT,BatchedPtensors0<TYPE> >::value)
-	broadcast0(x.reduce0(map.atoms(),map.out()),map.in());
+
+      if constexpr(std::is_same<OUTPUT,BatchedPtensors0<TYPE> >::value){
+	auto pmap=BatchedPgatherMapFactory::gather_map0(map,x.atoms,atoms,x.getk(),1);
+	broadcast0(x.reduce0(pmap.out()),pmap.in(),0);
+      }
+
       if constexpr(std::is_same<OUTPUT,BatchedPtensors1<TYPE> >::value){
-	broadcast0(x.reduce0(map.atoms(),map.out(),0,nc),map.in());
-	broadcast1(x.reduce1(map.atoms(),map.out(),nc,nc),map.in());
+	auto pmap0=BatchedPgatherMapFactory::gather_map0(map,x.atoms,atoms,x.getk(),1);
+	auto pmap1=BatchedPgatherMapFactory::gather_map1(map,x.atoms,atoms,x.getk(),1);
+	broadcast0(x.reduce0(pmap0.out(),0,nc),pmap0.in(),0);
+	broadcast1(x.reduce1(pmap1.out(),nc,nc),pmap1.in(),0);
       }
+
       if constexpr(std::is_same<OUTPUT,BatchedPtensors2<TYPE> >::value){
-	broadcast0(x.reduce0_shrink(map.atoms(),map.out(),0,nc),map.in());
-	broadcast1(x.reduce1_shrink(map.atoms(),map.out(),2*nc,nc),map.in());
+	auto pmap0=BatchedPgatherMapFactory::gather_map0(map,x.atoms,atoms,x.getk(),1);
+	auto pmap1=BatchedPgatherMapFactory::gather_map1(map,x.atoms,atoms,x.getk(),1);
+	broadcast0(x.reduce0_shrink(pmap0.out(),0,nc),pmap0.in(),0);
+	broadcast1(x.reduce1_shrink(pmap1.out(),2*nc,nc),pmap1.in(),2*nc);
       }
+
     }
 
     
@@ -418,4 +436,34 @@ namespace ptens{
 }
 
 #endif 
+
+//     template<typename SOURCE>
+//       void add_gather(const SOURCE& x, const BatchedPtensorMap& map){
+//       int nc=x.get_nc();
+// 	if constexpr(std::is_same<SOURCE,BatchedPtensors0<TYPE> >::value)
+// 	  broadcast0(x.reduce0(map.atoms(),map.in()),map.out(),0);
+// 	if constexpr(std::is_same<SOURCE,BatchedPtensors1<TYPE> >::value){
+// 	  broadcast0(x.reduce0(map.atoms(),map.in()),map.out(),0);
+// 	  broadcast1(x.reduce1(map.atoms(),map.in()),map.out(),nc);
+// 	}
+// 	if constexpr(std::is_same<SOURCE,BatchedPtensors2<TYPE> >::value){
+// 	  broadcast0(x.reduce0(map.atoms(),map.in()),map.out(),0);
+// 	  broadcast1(x.reduce1(map.atoms(),map.in()),map.out(),2*nc);
+// 	}
+//     }
+
+//     template<typename OUTPUT>
+//     void add_gather_back(const OUTPUT& x, const BatchedPtensorMap& map){
+//       int nc=get_nc();
+//       if constexpr(std::is_same<OUTPUT,BatchedPtensors0<TYPE> >::value)
+// 	broadcast0(x.reduce0(map.atoms(),map.out()),map.in());
+//       if constexpr(std::is_same<OUTPUT,BatchedPtensors1<TYPE> >::value){
+// 	broadcast0(x.reduce0(map.atoms(),map.out(),0,nc),map.in());
+// 	broadcast1(x.reduce1(map.atoms(),map.out(),nc,nc),map.in());
+//       }
+//       if constexpr(std::is_same<OUTPUT,BatchedPtensors2<TYPE> >::value){
+// 	broadcast0(x.reduce0_shrink(map.atoms(),map.out(),0,nc),map.in());
+// 	broadcast1(x.reduce1_shrink(map.atoms(),map.out(),2*nc,nc),map.in());
+//       }
+//     }
 

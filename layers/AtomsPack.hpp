@@ -209,6 +209,10 @@ namespace ptens{
       return "AtomsPack";
     }
 
+    string repr() const{
+      return "<AtomsPack n="+to_string(size())+">";
+    }
+
     string str(const string indent="") const{
       ostringstream oss;
       oss<<indent<<"(";

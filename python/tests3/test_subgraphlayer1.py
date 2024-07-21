@@ -29,7 +29,7 @@ print(" Linmaps")
 print("---------\n")
 
 print("Linmaps from a 0th order subgraph layer:\n")
-A=p.subgraphlayer0.from_matrix(G,S,M)
+A=p.subgraphlayer0.randn(G,S,3)
 B=p.subgraphlayer0.linmaps(A)
 print(B)
 
@@ -66,5 +66,9 @@ print("Gather from a 2nd order subgraph layer:\n")
 A2=p.subgraphlayer2.randn(G,E,3)
 B2=p.subgraphlayer1.gather(S,A2)
 print(B2)
+
+P=pb.ggraph_preloader(G.obj)
+print(P)
+print("\n")
 
 

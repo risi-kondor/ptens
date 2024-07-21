@@ -125,10 +125,10 @@ namespace ptens{
     }
     */
 
-    const cnine::Ltensor<int>& gpu_gather_map(const int _dev=1){
-      assert(bmap2.get());
-      return bmap2->gpu_format;
-    }
+    //const cnine::Ltensor<int>& gpu_gather_map(const int _dev=1){
+    //assert(bmap2.get());
+    //return bmap2->gpu_format;
+    //}
 
     void push_back(const int tix, vector<int> indices){
       BASE::push_back(tix,indices);

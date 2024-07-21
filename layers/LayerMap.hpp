@@ -42,7 +42,7 @@ namespace ptens{
     }
 
     string repr() const{
-      return "LayerMap";
+      return "<LayerMap>";
     }
 
     string str(const string indent="") const{

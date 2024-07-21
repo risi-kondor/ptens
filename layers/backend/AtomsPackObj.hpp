@@ -42,6 +42,9 @@ namespace ptens{
   class AtomsPackTagObj1;
   class AtomsPackTagObj2;
 
+  //class LayerMapObj;
+  class PgatherMapObj;
+
 
   class AtomsPackObj: public cnine::array_pool<int>, public cnine::observable<AtomsPackObj>{
   public:
@@ -57,6 +60,10 @@ namespace ptens{
     mutable shared_ptr<AtomsPackTagObj0> cached_tag0;
     mutable shared_ptr<AtomsPackTagObj1> cached_tag1;
     mutable shared_ptr<AtomsPackTagObj2> cached_tag2;
+
+    //mutable vector<weak_ptr<LayerMapObj> > related_layermaps;
+    mutable vector<weak_ptr<PgatherMapObj> > related_gatherplans;
+
 
     cnine::monitored<cnine::Ltensor<int> > gpu_offsets1=
       cnine::monitored<cnine::Ltensor<int> >(ptens_global::atomspack_offsets1_monitor,[this](){
@@ -492,6 +499,10 @@ namespace ptens{
 
     string classname() const{
       return "AtomsPackObj";
+    }
+
+    string repr() const{
+      return "<AtomsPackObj n="+to_string(size())+">";
     }
 
     string str(const string indent="") const{

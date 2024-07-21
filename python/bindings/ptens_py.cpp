@@ -4,10 +4,12 @@
 #include "Ptens_base.cpp"
 #include "SimpleMemoryManager.hpp"
 
+#include "PtensSession.hpp"
 #include "Ggraph.hpp"
 #include "Subgraph.hpp"
 
 #include "LayerMap.hpp"
+#include "GgraphPreloader.hpp"
 
 #include "Ptensor0.hpp"
 #include "Ptensor1.hpp"
@@ -21,6 +23,7 @@
 #include "BatchedAtomsPack.hpp"
 #include "BatchedAindexPack.hpp"
 #include "BatchedPtensorMap.hpp"
+#include "BatchedLayerMap.hpp"
 
 #include "BatchedPtensors0.hpp"
 #include "BatchedPtensors1.hpp"
@@ -55,6 +58,7 @@ PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
 
 
   typedef BatchedPtensorMap BPmap;
+  typedef BatchedLayerMap BLmap;
 
   typedef BatchedPtensors0<float> BPtensors0f;
   typedef BatchedPtensors1<float> BPtensors1f;
@@ -70,6 +74,7 @@ PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
 #include "Subgraph_py.cpp"
 #include "LayerMap_py.cpp"
 #include "TensorLevelMap_py.cpp"
+#include "GgraphPreloader_py.cpp"
 
 #include "SimpleMemoryManager_py.cpp"
 #include "GgraphCache_py.cpp"
@@ -90,6 +95,7 @@ PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
 #include "BatchedAtomsPack_py.cpp"
 #include "BatchedAindexPack_py.cpp"
 #include "BatchedPtensorMap_py.cpp"
+#include "BatchedLayerMap_py.cpp"
 
 #include "BatchedPtensors0_py.cpp"
 #include "BatchedPtensors1_py.cpp"

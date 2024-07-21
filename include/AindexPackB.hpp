@@ -21,6 +21,7 @@
 #include "Atoms.hpp"
 #include "GatherMapB.hpp"
 #include "Ltensor.hpp"
+#include "RemoteCopy.hpp"
 
 
 namespace ptens{
@@ -29,20 +30,32 @@ namespace ptens{
   class AindexPackB: public cnine::Ltensor<int>{
   public:
 
-    typedef cnine::Ltensor<int> TENSOR;
+    //typedef cnine::Ltensor<int> TENSOR;
+    typedef cnine::Ltensor<int> ITENSOR;
 
     int _max_nix=0;
+
     int nrows=0;
+    int n_input_rows=0;
+    int n_gather_lists=0;
 
     int count1=0;
     int count2=0;
+
+    cnine::GatherMapB gather_map;
+
+    cnine::RemoteCopy<int,ITENSOR> on_device=cnine::RemoteCopy<int,ITENSOR>([this](const int& _dev){
+	return to_share(new ITENSOR(*this,_dev));});
+
+    cnine::RemoteCopy<int,ITENSOR> gmap_on_device=cnine::RemoteCopy<int,ITENSOR>([this](const int& _dev){
+	return to_share(new ITENSOR(gather_map.arr.to_tensor(_dev)));});
 
 
   public: // ---- Constructors ------------------------------------------------------------------------------
 
 
     AindexPackB(const int n, const int maxn):
-      TENSOR({n,maxn+4}){}
+      ITENSOR({n,maxn+4}){}
 
 
   public: // ---- Copying -----------------------------------------------------------------------------------
@@ -71,7 +84,7 @@ namespace ptens{
 
     
     int size() const{
-      return TENSOR::dim(0);
+      return ITENSOR::dim(0);
     }
 
     int toffset(const int i) const{
@@ -105,12 +118,17 @@ namespace ptens{
     void set(const int i, const int _toffset, const int _nix, const int _soffset, const int _ssize, const vector<int> v){
       PTENS_ASSRT(i<dim(0));
       PTENS_ASSRT(v.size()<=dim(1)-4);
-      TENSOR::set(i,0,_toffset);
-      TENSOR::set(i,1,_nix);
-      TENSOR::set(i,2,_soffset);
-      TENSOR::set(i,3,_ssize);
+      ITENSOR::set(i,0,_toffset);
+      ITENSOR::set(i,1,_nix);
+      ITENSOR::set(i,2,_soffset);
+      ITENSOR::set(i,3,_ssize);
       for(int j=0; j<v.size(); j++)
-	TENSOR::set(i,j+4,v[j]);
+	ITENSOR::set(i,j+4,v[j]);
+    }
+
+    void preload(const int _dev) const{
+      on_device(_dev);
+      gmap_on_device(_dev);
     }
 
     cnine::Rtensor1_view chunk0(const cnine::Ltensor<float>& x, const int i) const{

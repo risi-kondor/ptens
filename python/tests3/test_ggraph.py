@@ -76,3 +76,16 @@ for c in C:
     print(c)
     print(C[c])
     print("\n")
+
+
+print("\n-----------")
+print(" Preloader")
+print("-----------\n")
+
+print("The preloader can enumerate all objects that were constructed from G:\n")
+
+P=pb.ggraph_preloader(G.obj)
+print(P)
+print("\n")
+
+

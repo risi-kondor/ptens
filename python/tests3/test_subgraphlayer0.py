@@ -72,5 +72,10 @@ A2=p.subgraphlayer2.randn(G,E,3)
 B2=p.subgraphlayer0.gather(S,A2)
 print(B2)
 
+P=pb.ggraph_preloader(G.obj)
+print(P)
+print("\n")
+
+
 
 
