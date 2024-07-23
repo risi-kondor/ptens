@@ -25,7 +25,7 @@
 #include "AtomsPackTag.hpp"
 #include "PtensorMap.hpp"
 #include "PtensorMapFactory.hpp"
-#include "PgatherMapFactory.hpp"
+#include "GatherPlanFactory.hpp"
 
 
 namespace ptens{
@@ -321,7 +321,7 @@ namespace ptens{
 
     template<typename SOURCE>
       void add_gather(const SOURCE& x, const LayerMap& map){
-      auto plan=PgatherMapFactory::gather_map0(map,atoms,x.atoms,0,x.getk());
+      auto plan=GatherPlanFactory::gather_map0(map,atoms,x.atoms,0,x.getk());
       if constexpr(std::is_same<SOURCE,Ptensors0<TYPE> >::value)
 	broadcast0(x.reduce0(plan.in()),plan.out(),0);
       if constexpr(std::is_same<SOURCE,Ptensors1<TYPE> >::value)
@@ -332,7 +332,7 @@ namespace ptens{
 
     template<typename OUTPUT>
     void add_gather_back(const OUTPUT& x, const LayerMap& map){
-      auto plan=PgatherMapFactory::gather_map0(map,x.atoms,atoms,x.getk(),0);
+      auto plan=GatherPlanFactory::gather_map0(map,x.atoms,atoms,x.getk(),0);
       if constexpr(std::is_same<OUTPUT,Ptensors0<TYPE> >::value)
 	broadcast0(x.reduce0(plan.out()),plan.in(),0);
       if constexpr(std::is_same<OUTPUT,Ptensors1<TYPE> >::value)
@@ -439,7 +439,7 @@ namespace ptens{
 	rmap(x,map)(*this,x);
       }else{
 	if constexpr(std::is_same<SOURCE,Ptensors0<TYPE> >::value || std::is_same<SOURCE,Ptensors1<TYPE> >::value){
-	  auto pmap=PgatherMapFactory::gather_map0(map,atoms,x.atoms,0,x.getk());
+	  auto pmap=GatherPlanFactory::gather_map0(map,atoms,x.atoms,0,x.getk());
 	  broadcast0(x.reduce0(pmap.in()),pmap.out(),0);
 	}
       }
@@ -458,7 +458,7 @@ namespace ptens{
       if(ptens_global::row_level_operations){
 	x.rmap(*this,map).inv()(*this,x);
       }else{
-	auto pmap=PgatherMapFactory::gather_map0(map,atoms,x.atoms,0,x.getk());
+	auto pmap=GatherPlanFactory::gather_map0(map,atoms,x.atoms,0,x.getk());
 	if constexpr(std::is_same<OUTPUT,Ptensors0<TYPE> >::value)
 	  broadcast0(x.reduce0(pmap.in()),pmap.out(),0);
 	if constexpr(std::is_same<OUTPUT,Ptensors1<TYPE> >::value)

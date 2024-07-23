@@ -12,53 +12,54 @@
  *
  */
 
-#ifndef _ptens_PgatherMap
-#define _ptens_PgatherMap
+#ifndef _ptens_GatherPlanObj
+#define _ptens_GatherPlanObj
 
-#include "PgatherMapObj.hpp"
-#include "AtomsPack.hpp"
+#include "observable.hpp"
+#include "AindexPackB.hpp"
+#include "GatherMapB.hpp"
+#include "flog.hpp"
 
 
 namespace ptens{
 
-  //class AtomsPackObj;
 
-
-  class PgatherMap{
+  class GatherPlanObj: public cnine::observable<GatherPlanObj>{
   public:
-    
-    shared_ptr<PgatherMapObj> obj;
 
-    PgatherMap(){
-      PTENS_ASSRT(false);}
+    shared_ptr<AindexPackB> out_map;
+    shared_ptr<AindexPackB> in_map;
 
-    PgatherMap(const shared_ptr<PgatherMapObj>& x):
-      obj(x){}
+    GatherPlanObj():
+      observable(this){}
 
-    const AindexPackB& in() const{
-      return *obj->in_map;
-    }
+    GatherPlanObj(const shared_ptr<AindexPackB>& out, const shared_ptr<AindexPackB>& in):
+      observable(this),
+      out_map(out),
+      in_map(in){}
 
-    const AindexPackB& out() const{
-      return *obj->out_map;
-    }
 
   public: // ---- I/O ----------------------------------------------------------------------------------------
 
 
     static string classname(){
-      return "PgatherMap";
+      return "GatherPlanObj";
     }
 
     string repr() const{
-      return "PgatherMap";
+      return "<GatherPlanObj>";
     }
 
     string str(const string indent="") const{
-      return obj->str(indent);
+      ostringstream oss;
+      oss<<"In:"<<endl;
+      oss<<in_map->str(indent+"  ");
+      oss<<"Out:"<<endl;
+      oss<<out_map->str(indent+"  ");
+      return oss.str();
     }
 
-    friend ostream& operator<<(ostream& stream, const PgatherMap& v){
+    friend ostream& operator<<(ostream& stream, const GatherPlanObj& v){
       stream<<v.str(); return stream;}
 
 

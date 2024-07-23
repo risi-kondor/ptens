@@ -43,7 +43,7 @@ namespace ptens{
   class AtomsPackTagObj2;
 
   //class LayerMapObj;
-  class PgatherMapObj;
+  class GatherPlanObj;
 
 
   class AtomsPackObj: public cnine::array_pool<int>, public cnine::observable<AtomsPackObj>{
@@ -62,7 +62,7 @@ namespace ptens{
     mutable shared_ptr<AtomsPackTagObj2> cached_tag2;
 
     //mutable vector<weak_ptr<LayerMapObj> > related_layermaps;
-    mutable vector<weak_ptr<PgatherMapObj> > related_gatherplans;
+    mutable vector<weak_ptr<GatherPlanObj> > related_gatherplans;
 
 
     cnine::monitored<cnine::Ltensor<int> > gpu_offsets1=

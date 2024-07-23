@@ -87,12 +87,21 @@ namespace ptens{
       return mapcar<BatchedGgraphObj,GgraphObj>([&](const GgraphObj& x){return x.permute(pi);});
     }
 
-    BatchedAtomsPack subgraphs(const shared_ptr<SubgraphObj>& H){
+    /*
+    template<int k>
+    BatchedAtomsPack<k> subgraphs(const shared_ptr<SubgraphObj>& H){
       auto R=new BatchedAtomsPackObj();
       for(auto& p:obj)
 	R->push_back(p->subgraphs(H).obj);
       return R;
-      //return mapcar<BatchedAtomsPackObj,AtomsPack>([&](const GgraphObj& x){return x.subgraphs(H);});
+    }
+    */
+
+    BatchedAtomsPackBase subgraphs(const shared_ptr<SubgraphObj>& H){
+      auto R=new BatchedAtomsPackObj();
+      for(auto& p:obj)
+	R->push_back(p->subgraphs(H).obj);
+      return R;
     }
 
 

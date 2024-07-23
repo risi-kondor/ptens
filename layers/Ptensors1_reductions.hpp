@@ -124,3 +124,17 @@ TENSOR reduce1(const AindexPackB& map, const int offs=0, int nc=0) const{
 }
 
 
+void add_reduce0(const TENSOR& R, const AindexPackB& map, const int offs=0) const{
+  int nc=R.dim(1);
+  if(dev==0) zip0(map,R,[](auto& r, auto& x, int k){x.sum0_into(r);},offs,nc);
+  GPUCODE(CUDA_STREAM(Ptensors1_reduce0_cu(R,*this,map,offs,nc,stream)));
+}
+
+
+void add_reduce1(const TENSOR& R, const AindexPackB& map, const int offs=0) const{
+  int nc=R.dim(1);
+  if(dev==0) zip1(map,R,[](auto& r, auto& x, int k){r+=x;},offs,nc);
+  GPUCODE(CUDA_STREAM(Ptensors1_reduce1_cu(R,*this,map,offs,nc,stream)));
+}
+
+

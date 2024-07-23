@@ -54,6 +54,15 @@ class batched_ggraph:
     def subgraphs(self,H):
         return self.obj.subgraphs(H.obj)
 
+#    def subgraphs0(self,H):
+#        return self.obj.subgraphs0(H.obj)
+
+#    def subgraphs1(self,H):
+#        return self.obj.subgraphs1(H.obj)
+
+#    def subgraphs2(self,H):
+#        return self.obj.subgraphs2(H.obj)
+
 
     # ---- I/O ----------------------------------------------------------------------------------------------
 

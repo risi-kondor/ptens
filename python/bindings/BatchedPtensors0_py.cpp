@@ -1,6 +1,6 @@
 pybind11::class_<BatchedPtensors0<float> >(m,"batched_ptensors0")
 
-  .def_static("view",[](const BatchedAtomsPack& atoms, at::Tensor& x){
+  .def_static("view",[](const BatchedAtomsPackBase& atoms, at::Tensor& x){
       return BatchedPtensors0<float>(atoms,tensorf::view(x));})
 
 

@@ -32,7 +32,7 @@ namespace ptens{
   public: // ---- Named constructors ------------------------------------------------------------------------
 
 
-    static BatchedLayerMap overlaps_map(const BatchedAtomsPack& out, const BatchedAtomsPack& in){
+    static BatchedLayerMap overlaps_map(const BatchedAtomsPackBase& out, const BatchedAtomsPackBase& in){
       PTENS_ASSRT(out.size()==in.size());
       int N=out.size();
       BatchedLayerMap R;

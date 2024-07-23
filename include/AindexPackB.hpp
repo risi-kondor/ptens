@@ -30,7 +30,6 @@ namespace ptens{
   class AindexPackB: public cnine::Ltensor<int>{
   public:
 
-    //typedef cnine::Ltensor<int> TENSOR;
     typedef cnine::Ltensor<int> ITENSOR;
 
     int _max_nix=0;
@@ -59,25 +58,6 @@ namespace ptens{
 
 
   public: // ---- Copying -----------------------------------------------------------------------------------
-
-
-    /*
-    AindexPack(const AindexPack& x):
-      BASE(x){
-      _max_nix=x._max_nix;
-      count1=x.count1;
-      count2=x.count2;
-    }
-
-    AindexPack(AindexPack&& x):
-      BASE(std::move(x)){
-      _max_nix=x._max_nix;
-      count1=x.count1;
-      count2=x.count2;
-    }
-
-    AindexPack& operator=(const AindexPack& x)=delete;
-    */
 
 
   public: // ---- Access -------------------------------------------------------------------------------------
@@ -144,20 +124,6 @@ namespace ptens{
       return cnine::split0(x.rows(toffset(i),k*k).view2(),k,k);
     }
 
-    //const cnine::GatherMap& get_bmap() const{
-    //assert(bmap);
-    //return *bmap;
-    //}
-
-    /*
-    int* get_barr(const int _dev=0) const{
-      assert(bmap);
-      bmap->to_device(_dev);
-      if(_dev==0) return bmap->arr;
-      return bmap->arrg;
-    }
-    */
-
     
   public: // ---- Operations ---------------------------------------------------------------------------------
 
@@ -182,3 +148,55 @@ namespace ptens{
 
 #endif 
  
+    /*
+    AindexPack(const AindexPack& x):
+      BASE(x){
+      _max_nix=x._max_nix;
+      count1=x.count1;
+      count2=x.count2;
+    }
+
+    AindexPack(AindexPack&& x):
+      BASE(std::move(x)){
+      _max_nix=x._max_nix;
+      count1=x.count1;
+      count2=x.count2;
+    }
+
+    AindexPack& operator=(const AindexPack& x)=delete;
+    */
+
+
+    /*
+    AindexPack(const AindexPack& x):
+      BASE(x){
+      _max_nix=x._max_nix;
+      count1=x.count1;
+      count2=x.count2;
+    }
+
+    AindexPack(AindexPack&& x):
+      BASE(std::move(x)){
+      _max_nix=x._max_nix;
+      count1=x.count1;
+      count2=x.count2;
+    }
+
+    AindexPack& operator=(const AindexPack& x)=delete;
+    */
+
+
+    //const cnine::GatherMap& get_bmap() const{
+    //assert(bmap);
+    //return *bmap;
+    //}
+
+    /*
+    int* get_barr(const int _dev=0) const{
+      assert(bmap);
+      bmap->to_device(_dev);
+      if(_dev==0) return bmap->arr;
+      return bmap->arrg;
+    }
+    */
+

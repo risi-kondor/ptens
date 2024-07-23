@@ -42,7 +42,7 @@ namespace ptens{
 
     using TENSOR::dim;
 
-    BatchedAtomsPack atoms;
+    BatchedAtomsPack<2> atoms;
 
 
     ~BatchedPtensors2(){
@@ -55,16 +55,16 @@ namespace ptens{
   public: // ----- Constructors ------------------------------------------------------------------------------
 
 
-    BatchedPtensors2(const BatchedAtomsPack& _atoms, const TENSOR& M):
+    BatchedPtensors2(const BatchedAtomsPack<2>& _atoms, const TENSOR& M):
       BASE(M), atoms(_atoms){}
 
-    BatchedPtensors2(const TENSOR& M, const BatchedAtomsPack& _atoms):
+    BatchedPtensors2(const TENSOR& M, const BatchedAtomsPack<2>& _atoms):
       BASE(M), atoms(_atoms){}
 
-    BatchedPtensors2(const BatchedAtomsPack& _atoms, const int _nc, const int fcode, const int _dev):
+    BatchedPtensors2(const BatchedAtomsPack<2>& _atoms, const int _nc, const int fcode, const int _dev):
       BASE({_atoms.nrows2(),_nc},fcode,_dev), atoms(_atoms){}
 
-    BatchedPtensors2(const BatchedAtomsPack& _atoms, const int _nc, const int _dev):
+    BatchedPtensors2(const BatchedAtomsPack<2>& _atoms, const int _nc, const int _dev):
       BatchedPtensors2(_atoms,_nc,0,_dev){}
 
 
@@ -88,7 +88,7 @@ namespace ptens{
     };      
 
     template<typename... Args>
-    BatchedPtensors2(const BatchedAtomsPack& _atoms, const Args&... args):
+    BatchedPtensors2(const BatchedAtomsPack<2>& _atoms, const Args&... args):
       atoms(_atoms){
       vparams v;
       unroller(v,args...);
@@ -211,59 +211,71 @@ namespace ptens{
 
 
     template<typename SOURCE, typename = typename std::enable_if<std::is_base_of<BatchedPtensors<float>, SOURCE>::value, SOURCE>::type>
-    static BatchedPtensors2<TYPE> gather(const SOURCE& x, const BatchedAtomsPack& a){
+    static BatchedPtensors2<TYPE> gather(const BatchedAtomsPack<2>& a, const SOURCE& x){
       BatchedPtensors2<TYPE> R(a,x.get_nc()*vector<int>({2,5,15})[x.getk()],x.get_dev());
-      R.add_gather(x);
+      R.add_gather(x,BatchedLayerMap::overlaps_map(a,x.atoms));
+      return R;
+    }
+
+    template<typename SOURCE, typename = typename std::enable_if<std::is_base_of<BatchedPtensors<float>, SOURCE>::value, SOURCE>::type>
+    static BatchedPtensors2<TYPE> gather(const BatchedAtomsPack<2>& a, const SOURCE& x, const BatchedLayerMap& map){
+      BatchedPtensors2<TYPE> R(a,x.get_nc()*vector<int>({2,5,15})[x.getk()],x.get_dev());
+      R.add_gather(x,map);
       return R;
     }
 
     template<typename SOURCE>
-    void add_gather(const SOURCE& x,const int min_overlaps=1){
-      add_gather(x,BatchedPtensorMap::overlaps(atoms,x.atoms));
-    }
-
-    template<typename SOURCE>
-    void add_gather_back(const SOURCE& x,const int min_overlaps=1){
-      add_gather_back(x,BatchedPtensorMap::overlaps(x.atoms,atoms));
-    }
-
-    template<typename SOURCE>
-      void add_gather(const SOURCE& x, const BatchedPtensorMap& map){
+      void add_gather(const SOURCE& x, const BatchedLayerMap& map){
       int nc=x.get_nc();
-      if constexpr(std::is_same<SOURCE,BatchedPtensors0<TYPE> >::value)
-	broadcast0(x.reduce0(map.atoms(),map.in()),map.out(),0);
-      if constexpr(std::is_same<SOURCE,BatchedPtensors1<TYPE> >::value){
-	broadcast0(x.reduce0(map.atoms(),map.in()),map.out(),0);
-	broadcast1(x.reduce1(map.atoms(),map.in()),map.out(),2*nc);
+      if constexpr(std::is_same<SOURCE,BatchedPtensors0<TYPE> >::value){
+	auto plan0=BatchedGatherPlanFactory::gather_map0(map,atoms,x.atoms,2,x.getk());
+	broadcast0(x.reduce0(plan0.in()),plan0.out(),0);
       }
-	if constexpr(std::is_same<SOURCE,BatchedPtensors2<TYPE> >::value){
-	  broadcast0(x.reduce0(map.atoms(),map.in()),map.out(),0);
-	  broadcast1(x.reduce1(map.atoms(),map.in()),map.out(),4*nc);
-	  broadcast2(x.reduce2(map.atoms(),map.in()),map.out(),13*nc);
-	}
+      if constexpr(std::is_same<SOURCE,BatchedPtensors1<TYPE> >::value){
+	auto plan0=BatchedGatherPlanFactory::gather_map0(map,atoms,x.atoms,2,x.getk());
+	auto plan1=BatchedGatherPlanFactory::gather_map1(map,atoms,x.atoms,2,x.getk());
+	broadcast0(x.reduce0(plan0.in()),plan0.out(),0);
+	broadcast1(x.reduce1(plan1.in()),plan1.out(),2*nc);
+      }
+      if constexpr(std::is_same<SOURCE,BatchedPtensors2<TYPE> >::value){
+	auto plan0=BatchedGatherPlanFactory::gather_map0(map,atoms,x.atoms,2,x.getk());
+	auto plan1=BatchedGatherPlanFactory::gather_map1(map,atoms,x.atoms,2,x.getk());
+	auto plan2=BatchedGatherPlanFactory::gather_map2(map,atoms,x.atoms,2,x.getk());
+	broadcast0(x.reduce0(plan0.in()),plan0.out(),0);
+	broadcast1(x.reduce1(plan1.in()),plan1.out(),4*nc);
+	broadcast2(x.reduce2(plan2.in()),plan2.out(),13*nc);
+      }
     }
 
     template<typename OUTPUT>
-    void add_gather_back(const OUTPUT& x, const BatchedPtensorMap& map){
+    void add_gather_back(const OUTPUT& x, const BatchedLayerMap& map){
       int nc=get_nc();
-      if constexpr(std::is_same<OUTPUT,BatchedPtensors0<TYPE> >::value)
-	broadcast0_shrink(x.reduce0(map.atoms(),map.out()),map.in());
+      if constexpr(std::is_same<OUTPUT,BatchedPtensors0<TYPE> >::value){
+	auto plan0=BatchedGatherPlanFactory::gather_map0(map,x.atoms,atoms,x.getk(),2);
+	broadcast0_shrink(x.reduce0(plan0.out()),plan0.in());
+      }
       if constexpr(std::is_same<OUTPUT,BatchedPtensors1<TYPE> >::value){
-	broadcast0_shrink(x.reduce0(map.atoms(),map.out(),0,2*nc),map.in());
-	broadcast1_shrink(x.reduce1(map.atoms(),map.out(),2*nc,3*nc),map.in());
+	auto plan0=BatchedGatherPlanFactory::gather_map0(map,x.atoms,atoms,x.getk(),2);
+	auto plan1=BatchedGatherPlanFactory::gather_map1(map,x.atoms,atoms,x.getk(),2);
+	broadcast0_shrink(x.reduce0(plan0.out(),0,2*nc),plan0.in());
+	broadcast1_shrink(x.reduce1(plan1.out(),2*nc,3*nc),plan1.in());
       }
       if constexpr(std::is_same<OUTPUT,BatchedPtensors2<TYPE> >::value){
-	broadcast0_shrink(x.reduce0_shrink(map.atoms(),map.out(),0,2*nc),map.in());
-	broadcast1_shrink(x.reduce1_shrink(map.atoms(),map.out(),4*nc,3*nc),map.in());
-	broadcast2(x.reduce2_shrink(map.atoms(),map.out(),13*nc,nc),map.in());
+	auto plan0=BatchedGatherPlanFactory::gather_map0(map,x.atoms,atoms,x.getk(),2);
+	auto plan1=BatchedGatherPlanFactory::gather_map1(map,x.atoms,atoms,x.getk(),2);
+	auto plan2=BatchedGatherPlanFactory::gather_map2(map,x.atoms,atoms,x.getk(),2);
+	broadcast0_shrink(x.reduce0_shrink(plan0.out(),0,2*nc),plan0.in());
+	broadcast1_shrink(x.reduce1_shrink(plan1.out(),4*nc,3*nc),plan1.in());
+	broadcast2(x.reduce2_shrink(plan2.out(),13*nc,nc),plan2.in());
       }
     }
+
 
     
   public: // ---- Indexed Reductions -------------------------------------------------------------------------
 
 
-    BatchedPtensors0<TYPE> reduce0(const BatchedAtomsPack& _atoms, const BatchedAindexPack& list, const int offs=0, int nc=0) const{
+    BatchedPtensors0<TYPE> reduce0(const BatchedAtomsPack<0>& _atoms, const BatchedAindexPack& list, const int offs=0, int nc=0) const{
       if(nc==0) nc=get_nc();
       PTENS_ASSRT(offs==0);
       PTENS_ASSRT(nc==get_nc());
@@ -274,7 +286,7 @@ namespace ptens{
       return R;
     }
 
-    BatchedPtensors0<TYPE> reduce0_shrink(const BatchedAtomsPack& _atoms, const BatchedAindexPack& list, const int offs, int nc) const{
+    BatchedPtensors0<TYPE> reduce0_shrink(const BatchedAtomsPack<0>& _atoms, const BatchedAindexPack& list, const int offs, int nc) const{
       cnine::using_vram_manager vv(ptens_global::vram_manager);
       BatchedPtensors0<TYPE> R(_atoms,2*nc,0,get_dev());
       for(int i=0; i<size(); i++)
@@ -282,7 +294,7 @@ namespace ptens{
       return R;
     }
 
-    BatchedPtensors1<TYPE> reduce1(const BatchedAtomsPack& _atoms, const BatchedAindexPack& list, const int offs=0, int nc=0) const{
+    BatchedPtensors1<TYPE> reduce1(const BatchedAtomsPack<1>& _atoms, const BatchedAindexPack& list, const int offs=0, int nc=0) const{
       if(nc==0) nc=get_nc();
       PTENS_ASSRT(offs==0);
       PTENS_ASSRT(nc==get_nc());
@@ -293,7 +305,7 @@ namespace ptens{
       return R;
     }
 
-    BatchedPtensors1<TYPE> reduce1_shrink(const BatchedAtomsPack& _atoms, const BatchedAindexPack& list, const int offs, int nc) const{
+    BatchedPtensors1<TYPE> reduce1_shrink(const BatchedAtomsPack<1>& _atoms, const BatchedAindexPack& list, const int offs, int nc) const{
       cnine::using_vram_manager vv(ptens_global::vram_manager);
       BatchedPtensors1<TYPE> R(_atoms,nc,0,get_dev());
       for(int i=0; i<size(); i++)
@@ -301,7 +313,7 @@ namespace ptens{
       return R;
     }
 
-    BatchedPtensors2<TYPE> reduce2(const BatchedAtomsPack& _atoms, const BatchedAindexPack& list, const int offs=0, int nc=0) const{
+    BatchedPtensors2<TYPE> reduce2(const BatchedAtomsPack<2>& _atoms, const BatchedAindexPack& list, const int offs=0, int nc=0) const{
       if(nc==0) nc=get_nc();
       PTENS_ASSRT(offs==0);
       PTENS_ASSRT(nc==get_nc());
@@ -312,13 +324,92 @@ namespace ptens{
       return R;
     }
 
-    BatchedPtensors2<TYPE> reduce2_shrink(const BatchedAtomsPack& _atoms, const BatchedAindexPack& list, const int offs, int nc) const{
+    BatchedPtensors2<TYPE> reduce2_shrink(const BatchedAtomsPack<2>& _atoms, const BatchedAindexPack& list, const int offs, int nc) const{
       cnine::using_vram_manager vv(ptens_global::vram_manager);
       BatchedPtensors2<TYPE> R(_atoms,nc,0,get_dev());
       for(int i=0; i<size(); i++)
 	view_of(i).add_reduce2_shrink_to(R.view_of(i),list[i],offs);
       return R;
     }
+
+
+    TENSOR reduce0(const BatchedAindexPackB& map, const int offs=0, int nc=0) const{
+      TimedFn T("BatchedPtensors2","reduce0",*this,map,map.size()*get_nc());
+      if(nc==0) nc=2*get_nc();
+      cnine::using_vram_manager vv(ptens_global::vram_manager);
+      TENSOR R({map.nrows,nc},0,get_dev());
+      int tail=0;
+      for(int i=0; i<size(); i++){
+	view_of(i).add_reduce0(R.rows(tail,map[i].nrows),map[i],offs);
+	tail+=map[i].nrows;
+      }
+      return R;
+    }
+    
+    TENSOR reduce0_shrink(const BatchedAindexPackB& map, const int offs=0, int nc=0) const{
+      TimedFn T("BatchedPtensors2","reduce0_shrink",*this,map,map.size()*get_nc());
+      if(nc==0) nc=get_nc()/2;
+      cnine::using_vram_manager vv(ptens_global::vram_manager);
+      TENSOR R({map.nrows,nc},0,get_dev());
+      int tail=0;
+      for(int i=0; i<size(); i++){
+	view_of(i).add_reduce0_shrink(R.rows(tail,map[i].nrows),map[i],offs);
+	tail+=map[i].nrows;
+      }
+      return R;
+    }
+    
+    TENSOR reduce1(const BatchedAindexPackB& map, const int offs=0, int nc=0) const{
+      TimedFn T("BatchedPtensors2","reduce1",*this,map,map.size()*get_nc());
+      if(nc==0) nc=get_nc();
+      cnine::using_vram_manager vv(ptens_global::vram_manager);
+      TENSOR R({map.nrows,3*nc},0,get_dev());
+      int tail=0;
+      for(int i=0; i<size(); i++){
+	view_of(i).add_reduce1(R.rows(tail,map[i].nrows),map[i],offs);
+	tail+=map[i].nrows;
+      }
+      return R;
+    }
+    
+    TENSOR reduce1_shrink(const BatchedAindexPackB& map, const int offs=0, int nc=0) const{
+      TimedFn T("BatchedPtensors2","reduce1",*this,map,map.size()*get_nc());
+      if(nc==0) nc=get_nc()/3;
+      cnine::using_vram_manager vv(ptens_global::vram_manager);
+      TENSOR R({map.nrows,nc},0,get_dev());
+      int tail=0;
+      for(int i=0; i<size(); i++){
+	view_of(i).add_reduce1_shrink(R.rows(tail,map[i].nrows),map[i],offs);
+	tail+=map[i].nrows;
+      }
+      return R;
+    }
+    
+    TENSOR reduce2(const BatchedAindexPackB& map, const int offs=0, int nc=0) const{
+      TimedFn T("BatchedPtensors2","reduce2",*this,map,map.size()*get_nc());
+      if(nc==0) nc=get_nc();
+      cnine::using_vram_manager vv(ptens_global::vram_manager);
+      TENSOR R({map.nrows,nc},0,get_dev());
+      int tail=0;
+      for(int i=0; i<size(); i++){
+	view_of(i).add_reduce2(R.rows(tail,map[i].nrows),map[i],offs);
+	tail+=map[i].nrows;
+      }
+      return R;
+    }    
+
+    TENSOR reduce2_shrink(const BatchedAindexPackB& map, const int offs=0, int nc=0) const{
+      TimedFn T("BatchedPtensors2","reduce2_shrink",*this,map,map.size()*get_nc());
+      if(nc==0) nc=get_nc()/2;
+      cnine::using_vram_manager vv(ptens_global::vram_manager);
+      TENSOR R({map.nrows,nc},0,get_dev());
+      int tail=0;
+      for(int i=0; i<size(); i++){
+	view_of(i).add_reduce2_shrink(R.rows(tail,map[i].nrows),map[i],offs);
+	tail+=map[i].nrows;
+      }
+      return R;
+    }    
 
 
  public: // ---- Broadcasting -------------------------------------------------------------------------------
@@ -364,6 +455,46 @@ namespace ptens{
 	view_of(i).broadcast2(x.view_of(i),list[i],offs);
     }
 
+    void broadcast0(const TENSOR& x, const BatchedAindexPackB& map, const int offs=0){
+      int tail=0;
+      for(int i=0; i<size(); i++){
+	view_of(i).broadcast0(x.rows(tail,map[i].nrows),map[i],offs);
+	tail+=map[i].nrows;
+      }
+    }
+
+    void broadcast0_shrink(const TENSOR& x, const BatchedAindexPackB& map, const int offs=0){
+      int tail=0;
+      for(int i=0; i<size(); i++){
+	view_of(i).broadcast0_shrink(x.rows(tail,map[i].nrows),map[i],offs);
+	tail+=map[i].nrows;
+      }
+    }
+
+    void broadcast1(const TENSOR& x, const BatchedAindexPackB& map, const int offs=0){
+      int tail=0;
+      for(int i=0; i<size(); i++){
+	view_of(i).broadcast1(x.rows(tail,map[i].nrows),map[i],offs);
+	tail+=map[i].nrows;
+      }
+    }
+
+    void broadcast1_shrink(const TENSOR& x, const BatchedAindexPackB& map, const int offs=0){
+      int tail=0;
+      for(int i=0; i<size(); i++){
+	view_of(i).broadcast1_shrink(x.rows(tail,map[i].nrows),map[i],offs);
+	tail+=map[i].nrows;
+      }
+    }
+
+    void broadcast2(const TENSOR& x, const BatchedAindexPackB& map, const int offs=0){
+      int tail=0;
+      for(int i=0; i<size(); i++){
+	view_of(i).broadcast2(x.rows(tail,map[i].nrows),map[i],offs);
+	tail+=map[i].nrows;
+      }
+    }
+
 
   public: // ---- I/O ----------------------------------------------------------------------------------------
 
@@ -401,3 +532,34 @@ namespace ptens{
 //       x.backward_program(get_grad(),x.get_grad());
 //     }
 
+//     template<typename SOURCE>
+//       void add_gather(const SOURCE& x, const BatchedPtensorMap& map){
+//       int nc=x.get_nc();
+//       if constexpr(std::is_same<SOURCE,BatchedPtensors0<TYPE> >::value)
+// 	broadcast0(x.reduce0(map.atoms(),map.in()),map.out(),0);
+//       if constexpr(std::is_same<SOURCE,BatchedPtensors1<TYPE> >::value){
+// 	broadcast0(x.reduce0(map.atoms(),map.in()),map.out(),0);
+// 	broadcast1(x.reduce1(map.atoms(),map.in()),map.out(),2*nc);
+//       }
+// 	if constexpr(std::is_same<SOURCE,BatchedPtensors2<TYPE> >::value){
+// 	  broadcast0(x.reduce0(map.atoms(),map.in()),map.out(),0);
+// 	  broadcast1(x.reduce1(map.atoms(),map.in()),map.out(),4*nc);
+// 	  broadcast2(x.reduce2(map.atoms(),map.in()),map.out(),13*nc);
+// 	}
+//     }
+
+//     template<typename OUTPUT>
+//     void add_gather_back(const OUTPUT& x, const BatchedPtensorMap& map){
+//       int nc=get_nc();
+//       if constexpr(std::is_same<OUTPUT,BatchedPtensors0<TYPE> >::value)
+// 	broadcast0_shrink(x.reduce0(map.atoms(),map.out()),map.in());
+//       if constexpr(std::is_same<OUTPUT,BatchedPtensors1<TYPE> >::value){
+// 	broadcast0_shrink(x.reduce0(map.atoms(),map.out(),0,2*nc),map.in());
+// 	broadcast1_shrink(x.reduce1(map.atoms(),map.out(),2*nc,3*nc),map.in());
+//       }
+//       if constexpr(std::is_same<OUTPUT,BatchedPtensors2<TYPE> >::value){
+// 	broadcast0_shrink(x.reduce0_shrink(map.atoms(),map.out(),0,2*nc),map.in());
+// 	broadcast1_shrink(x.reduce1_shrink(map.atoms(),map.out(),4*nc,3*nc),map.in());
+// 	broadcast2(x.reduce2_shrink(map.atoms(),map.out(),13*nc,nc),map.in());
+//       }
+//     }

@@ -42,7 +42,7 @@ class batched_ptensorlayer0(p.batched_ptensorlayer):
     @classmethod
     def from_ptensorlayers(self,list):
         for a in list:
-            assert isinstance(a,p.ptensorlayer0)
+            assert isinstance(a,p.ptensorlayer)
         atoms=pb.batched_atomspack([a.atoms for a in list])
         M=torch.cat(list,0)
         return self.make(atoms,M)
@@ -102,7 +102,7 @@ class batched_ptensorlayer0(p.batched_ptensorlayer):
         else:
             map=args[0]
         assert isinstance(map,pb.batched_layer_map)
-        return batched_ptensorlayer0_gatherFn.apply(atoms,x,args[0])
+        return batched_ptensorlayer0_gatherFn.apply(atoms,x,map)
         
 
     # ---- I/O ----------------------------------------------------------------------------------------------

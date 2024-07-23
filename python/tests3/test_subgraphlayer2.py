@@ -29,7 +29,7 @@ print(" Linmaps")
 print("---------\n")
 
 print("Linmaps from a 0th order subgraph layer:\n")
-A0=p.subgraphlayer0.from_matrix(G,S,M)
+A0=p.subgraphlayer0.randn(G,S,3)
 B=p.subgraphlayer0.linmaps(A0)
 print(B)
 

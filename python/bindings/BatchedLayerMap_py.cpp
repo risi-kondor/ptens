@@ -1,7 +1,26 @@
 pybind11::class_<BatchedLayerMap>(m,"batched_layer_map")
 
-  .def_static("overlaps_map",[](const BatchedAtomsPack& out, const BatchedAtomsPack& in){
+  .def_static("overlaps_map",[](const BatchedAtomsPackBase& out, const BatchedAtomsPackBase& in){
       return BatchedLayerMap::overlaps_map(out,in);})
+
+//   .def_static("overlaps_map",[](const BatchedAtomsPack<0>& out, const BatchedAtomsPack<0>& in){
+//       return BatchedLayerMap::overlaps_map(out,in);})
+//   .def_static("overlaps_map",[](const BatchedAtomsPack<0>& out, const BatchedAtomsPack<1>& in){
+//       return BatchedLayerMap::overlaps_map(out,in);})
+//   .def_static("overlaps_map",[](const BatchedAtomsPack<0>& out, const BatchedAtomsPack<2>& in){
+//       return BatchedLayerMap::overlaps_map(out,in);})
+//   .def_static("overlaps_map",[](const BatchedAtomsPack<1>& out, const BatchedAtomsPack<0>& in){
+//       return BatchedLayerMap::overlaps_map(out,in);})
+//   .def_static("overlaps_map",[](const BatchedAtomsPack<1>& out, const BatchedAtomsPack<1>& in){
+//       return BatchedLayerMap::overlaps_map(out,in);})
+//   .def_static("overlaps_map",[](const BatchedAtomsPack<1>& out, const BatchedAtomsPack<2>& in){
+//       return BatchedLayerMap::overlaps_map(out,in);})
+//   .def_static("overlaps_map",[](const BatchedAtomsPack<2>& out, const BatchedAtomsPack<0>& in){
+//       return BatchedLayerMap::overlaps_map(out,in);})
+//   .def_static("overlaps_map",[](const BatchedAtomsPack<2>& out, const BatchedAtomsPack<1>& in){
+//       return BatchedLayerMap::overlaps_map(out,in);})
+//   .def_static("overlaps_map",[](const BatchedAtomsPack<2>& out, const BatchedAtomsPack<2>& in){
+//       return BatchedLayerMap::overlaps_map(out,in);})
 
   .def("__getitem__",&BatchedLayerMap::operator[])
 

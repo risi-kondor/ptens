@@ -12,26 +12,24 @@
  *
  */
 
-#ifndef _ptens_BatchedPgatherMap
-#define _ptens_BatchedPgatherMap
+#ifndef _ptens_BatchedGatherPlan
+#define _ptens_BatchedGatherPlan
 
-#include "BatchedPgatherMapObj.hpp"
+#include "BatchedGatherPlanObj.hpp"
 
 
 namespace ptens{
 
-  //class AtomsPackObj;
 
-
-  class BatchedPgatherMap{
+  class BatchedGatherPlan{
   public:
     
-    shared_ptr<BatchedPgatherMapObj> obj;
+    shared_ptr<BatchedGatherPlanObj> obj;
 
-    BatchedPgatherMap(){
+    BatchedGatherPlan(){
       PTENS_ASSRT(false);}
 
-    BatchedPgatherMap(const shared_ptr<BatchedPgatherMapObj>& x):
+    BatchedGatherPlan(const shared_ptr<BatchedGatherPlanObj>& x):
       obj(x){}
 
     const BatchedAindexPackB& in() const{
@@ -46,20 +44,19 @@ namespace ptens{
 
 
     static string classname(){
-      return "BatchedPgatherMap";
+      return "BatchedGatherPlan";
     }
 
     string repr() const{
-      return "BatchedPgatherMap";
+      return "BatchedGatherPlan";
     }
 
     string str(const string indent="") const{
       return obj->str(indent);
     }
 
-    friend ostream& operator<<(ostream& stream, const BatchedPgatherMap& v){
+    friend ostream& operator<<(ostream& stream, const BatchedGatherPlan& v){
       stream<<v.str(); return stream;}
-
 
   };
 

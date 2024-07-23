@@ -12,11 +12,11 @@
  *
  */
 
-#ifndef _ptens_PgatherMapFactory
-#define _ptens_PgatherMapFactory
+#ifndef _ptens_GatherPlanFactory
+#define _ptens_GatherPlanFactory
 
 #include "PtensorMap.hpp"
-#include "PgatherMap.hpp"
+#include "GatherPlan.hpp"
 #include "LayerMap.hpp"
 #include "AtomsPack.hpp"
 
@@ -24,27 +24,27 @@
 namespace ptens{
 
 
-  class PgatherMapFactory{
+  class GatherPlanFactory{
   public:
 
 
-    static PgatherMap gather_map0(const LayerMap& map, const AtomsPack& out, const AtomsPack& in, 
+    static GatherPlan gather_map0(const LayerMap& map, const AtomsPack& out, const AtomsPack& in, 
       const int outk=0, const int ink=0){
       return make(*map.obj,*out.obj,*in.obj,outk,ink,0);
     }
 
-    static PgatherMap gather_map1(const LayerMap& map, const AtomsPack& out, const AtomsPack& in, 
+    static GatherPlan gather_map1(const LayerMap& map, const AtomsPack& out, const AtomsPack& in, 
       const int outk=0, const int ink=0){
       return make(*map.obj,*out.obj,*in.obj,outk,ink,1);
     }
 
-    static PgatherMap gather_map2(const LayerMap& map, const AtomsPack& out, const AtomsPack& in, 
+    static GatherPlan gather_map2(const LayerMap& map, const AtomsPack& out, const AtomsPack& in, 
       const int outk=0, const int ink=0){
       return make(*map.obj,*out.obj,*in.obj,outk,ink,2);
     }
 
 
-    static shared_ptr<PgatherMapObj> make(const LayerMapObj& map, 
+    static shared_ptr<GatherPlanObj> make(const LayerMapObj& map, 
       const AtomsPackObj& out, const AtomsPackObj& in, const int outk=0, const int ink=0, const int gatherk=0){
 
       int N=map.tsize();
@@ -94,7 +94,7 @@ namespace ptens{
       if(ink==1) in_pack->n_input_rows=in.nrows1();
       if(ink==2) in_pack->n_input_rows=in.nrows2();
 
-      auto R=new PgatherMapObj(); 
+      auto R=new GatherPlanObj(); 
       R->out_map=to_share(out_pack);
       R->in_map=to_share(in_pack);
 
@@ -108,20 +108,20 @@ namespace ptens{
   public: // -------------------------------------------------------------------------------------------------
 
 
-    static PgatherMap gather_map0(const PtensorMap& pmap, const AtomsPack& out, const AtomsPack& in, const int outk=0, const int ink=0){
+    static GatherPlan gather_map0(const PtensorMap& pmap, const AtomsPack& out, const AtomsPack& in, const int outk=0, const int ink=0){
       return make(*pmap.obj,*out.obj,*in.obj,outk,ink,0);
     }
 
-    static PgatherMap gather_map1(const PtensorMap& pmap, const AtomsPack& out, const AtomsPack& in, const int outk=0, const int ink=0){
+    static GatherPlan gather_map1(const PtensorMap& pmap, const AtomsPack& out, const AtomsPack& in, const int outk=0, const int ink=0){
       return make(*pmap.obj,*out.obj,*in.obj,outk,ink,0);
     }
 
-    static PgatherMap gather_map2(const PtensorMap& pmap, const AtomsPack& out, const AtomsPack& in, const int outk=0, const int ink=0){
+    static GatherPlan gather_map2(const PtensorMap& pmap, const AtomsPack& out, const AtomsPack& in, const int outk=0, const int ink=0){
       return make(*pmap.obj,*out.obj,*in.obj,outk,ink,0);
     }
 
 
-    static shared_ptr<PgatherMapObj> make(const PtensorMapObj& pmap, 
+    static shared_ptr<GatherPlanObj> make(const PtensorMapObj& pmap, 
       const AtomsPackObj& out, const AtomsPackObj& in, const int outk=0, const int ink=0, const int gatherk=0){
 
       int N=pmap.gmap.tsize();
@@ -171,7 +171,7 @@ namespace ptens{
       if(ink==2) in_pack->n_input_rows=in.nrows2();
       in_pack->n_gather_lists=in_lists.size();
 
-      auto R=new PgatherMapObj(); 
+      auto R=new GatherPlanObj(); 
       R->out_map=to_share(out_pack);
       R->in_map=to_share(in_pack);
 

@@ -21,8 +21,7 @@
 
 namespace ptens{
 
-
-  class BatchedAtomsPackBase{
+  class BatchedAtomsPack{
   public:
 
 
@@ -32,26 +31,26 @@ namespace ptens{
   public: // ---- Constructors ------------------------------------------------------------------------------
 
 
-    BatchedAtomsPackBase():
+    BatchedAtomsPack():
       obj(new BatchedAtomsPackObj()){}
 
-    BatchedAtomsPackBase(BatchedAtomsPackObj* _obj):
+    BatchedAtomsPack(BatchedAtomsPackObj* _obj):
       obj(_obj){}
 
-    BatchedAtomsPackBase(BatchedAtomsPackObj&& _obj):
+    BatchedAtomsPack(BatchedAtomsPackObj&& _obj):
       obj(new BatchedAtomsPackObj(_obj)){}
 
-    BatchedAtomsPackBase(shared_ptr<BatchedAtomsPackObj> _obj):
+    BatchedAtomsPack(shared_ptr<BatchedAtomsPackObj> _obj):
       obj(_obj){}
 
-    BatchedAtomsPackBase(const vector<AtomsPack>& x):
-      BatchedAtomsPackBase(new BatchedAtomsPackObj(cnine::mapcar<AtomsPack,shared_ptr<AtomsPackObj> >
+    BatchedAtomsPack(const vector<AtomsPack>& x):
+      BatchedAtomsPack(new BatchedAtomsPackObj(cnine::mapcar<AtomsPack,shared_ptr<AtomsPackObj> >
 	  (x,[](const AtomsPack& y){return y.obj;}))){}
 
-    BatchedAtomsPackBase(const vector<vector<vector<int> > >& x):
+    BatchedAtomsPack(const vector<vector<vector<int> > >& x):
       obj(new BatchedAtomsPackObj(x)){}
 
-    BatchedAtomsPackBase(const initializer_list<initializer_list<initializer_list<int> > >& x):
+    BatchedAtomsPack(const initializer_list<initializer_list<initializer_list<int> > >& x):
       obj(new BatchedAtomsPackObj(x)){}
 
 
@@ -101,7 +100,7 @@ namespace ptens{
     //}
 
 
-    static BatchedAtomsPackBase cat(const vector<BatchedAtomsPackBase >& v){
+    static BatchedAtomsPack cat(const vector<BatchedAtomsPack>& v){
       PTENS_ASSRT(v.size()>0);
       int N=v[0].size();
       auto R=new BatchedAtomsPackObj();
@@ -111,39 +110,26 @@ namespace ptens{
 	  w.push_back((*p.obj)(i));
 	R->push_back(AtomsPackObj::cat(w));
       }
-      return BatchedAtomsPackBase(R);
+      return BatchedAtomsPack(R);
     }
 
 
   public: // ---- I/O ----------------------------------------------------------------------------------------
 
 
-    static string classname(){
-      return "BatchedAtomsPackBase";
+    string classname() const{
+      return "BatchedAtomsPack";
     }
 
     string str(const string indent="") const{
       return obj->str(indent);
     }
 
-    friend ostream& operator<<(ostream& stream, const BatchedAtomsPackBase& v){
+    friend ostream& operator<<(ostream& stream, const BatchedAtomsPack& v){
       stream<<v.str(); return stream;}
 
   };
 
-
-  template<int k>
-  class BatchedAtomsPack: public BatchedAtomsPackBase{
-  public:
-
-    typedef BatchedAtomsPackBase BASE;
-
-    using BASE::BASE;
-
-    BatchedAtomsPack(const BatchedAtomsPackBase& x):
-      BASE(x){}
-
-  };
 
 }
 

@@ -12,8 +12,8 @@
  *
  */
 
-#ifndef _ptens_BatchedPgatherMapObj
-#define _ptens_BatchedPgatherMapObj
+#ifndef _ptens_BatchedGatherPlanObj
+#define _ptens_BatchedGatherPlanObj
 
 #include "observable.hpp"
 #include "BatchedAindexPackB.hpp"
@@ -24,17 +24,17 @@
 namespace ptens{
 
 
-  class BatchedPgatherMapObj: public cnine::observable<BatchedPgatherMapObj>{
+  class BatchedGatherPlanObj: public cnine::observable<BatchedGatherPlanObj>{
   public:
 
     shared_ptr<BatchedAindexPackB> out_map;
     shared_ptr<BatchedAindexPackB> in_map;
 
 
-    BatchedPgatherMapObj():
+    BatchedGatherPlanObj():
       observable(this){}
 
-    BatchedPgatherMapObj(const shared_ptr<BatchedAindexPackB>& out, const shared_ptr<BatchedAindexPackB>& in):
+    BatchedGatherPlanObj(const shared_ptr<BatchedAindexPackB>& out, const shared_ptr<BatchedAindexPackB>& in):
       observable(this),
       out_map(out),
       in_map(in){}
@@ -44,11 +44,11 @@ namespace ptens{
 
 
     static string classname(){
-      return "BatchedPgatherMapObj";
+      return "BatchedGatherPlanObj";
     }
 
     string repr() const{
-      return "<BatchedPgatherMapObj>";
+      return "<BatchedGatherPlanObj>";
     }
 
     string str(const string indent="") const{
@@ -60,7 +60,7 @@ namespace ptens{
       return oss.str();
     }
 
-    friend ostream& operator<<(ostream& stream, const BatchedPgatherMapObj& v){
+    friend ostream& operator<<(ostream& stream, const BatchedGatherPlanObj& v){
       stream<<v.str(); return stream;}
 
 

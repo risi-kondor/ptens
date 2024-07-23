@@ -102,7 +102,7 @@ namespace ptens{
       return BatchedGgraph(new OBJ(obj->permute(pi)));
     }
 
-    BatchedAtomsPack subgraphs(const Subgraph& H) const{
+    BatchedAtomsPackBase subgraphs(const Subgraph& H) const{
       return obj->subgraphs(H.obj);
     }
 

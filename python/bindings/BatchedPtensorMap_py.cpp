@@ -1,7 +1,7 @@
 pybind11::class_<BatchedPtensorMap>(m,"batched_ptensor_map")
 
-  .def_static("overlaps",[](const BatchedAtomsPack& out, const BatchedAtomsPack& in){
-      return BatchedPtensorMap::overlaps(out,in);})
+//.def_static("overlaps",[](const BatchedAtomsPack& out, const BatchedAtomsPack& in){
+//    return BatchedPtensorMap::overlaps(out,in);})
 
   .def_readonly("atoms",&BatchedPtensorMap::_atoms)
   .def_readonly("out_indices",&BatchedPtensorMap::out_indices)

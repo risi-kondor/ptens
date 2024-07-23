@@ -28,7 +28,7 @@ namespace ptens{
 
     BatchedAindexPack in_indices;
     BatchedAindexPack out_indices;
-    BatchedAtomsPack _atoms;
+    BatchedAtomsPack<0> _atoms;
 
 
   public: // ---- Named constructors ------------------------------------------------------------------------
@@ -37,7 +37,7 @@ namespace ptens{
   public: // ---- Access ------------------------------------------------------------------------------------
 
 
-    const BatchedAtomsPack& atoms() const{
+    const BatchedAtomsPack<0>& atoms() const{
       return _atoms;
     }
 
@@ -53,7 +53,8 @@ namespace ptens{
   public: // ---- Operations ---------------------------------------------------------------------------------
 
 
-    static BatchedPtensorMap overlaps(const BatchedAtomsPack& out, const BatchedAtomsPack& in){
+    template<int k, int p>
+    static BatchedPtensorMap overlaps(const BatchedAtomsPack<k>& out, const BatchedAtomsPack<p>& in){
       BatchedPtensorMap R;
       int N=out.size();
 
@@ -65,7 +66,7 @@ namespace ptens{
       vector<AtomsPack> atomsv;
       for(int i=0; i<N; i++)
 	atomsv.push_back(maps[i].atoms());
-      R._atoms=BatchedAtomsPack(atomsv);
+      R._atoms=BatchedAtomsPack<0>(atomsv);
 
       vector<shared_ptr<AindexPack> > inv;
       for(int i=0; i<N; i++)

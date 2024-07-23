@@ -399,20 +399,20 @@ namespace ptens{
       int nc=x.get_nc();
 
       if constexpr(std::is_same<SOURCE,Ptensors0<TYPE> >::value){
-	auto pmap=PgatherMapFactory::gather_map0(map,atoms,x.atoms,1,x.getk());
+	auto pmap=GatherPlanFactory::gather_map0(map,atoms,x.atoms,1,x.getk());
 	broadcast0(x.reduce0(pmap.in()),pmap.out(),0);
       }
 
       if constexpr(std::is_same<SOURCE,Ptensors1<TYPE> >::value){
-	auto pmap0=PgatherMapFactory::gather_map0(map,atoms,x.atoms,1,x.getk());
-	auto pmap1=PgatherMapFactory::gather_map1(map,atoms,x.atoms,1,x.getk());
+	auto pmap0=GatherPlanFactory::gather_map0(map,atoms,x.atoms,1,x.getk());
+	auto pmap1=GatherPlanFactory::gather_map1(map,atoms,x.atoms,1,x.getk());
 	broadcast0(x.reduce0(pmap0.in()),pmap0.out(),0);
 	broadcast1(x.reduce1(pmap1.in()),pmap1.out(),nc);
       }
 
       if constexpr(std::is_same<SOURCE,Ptensors2<TYPE> >::value){
-	auto pmap0=PgatherMapFactory::gather_map0(map,atoms,x.atoms,1,x.getk());
-	auto pmap1=PgatherMapFactory::gather_map1(map,atoms,x.atoms,1,x.getk());
+	auto pmap0=GatherPlanFactory::gather_map0(map,atoms,x.atoms,1,x.getk());
+	auto pmap1=GatherPlanFactory::gather_map1(map,atoms,x.atoms,1,x.getk());
 	broadcast0(x.reduce0(pmap0.in()),pmap0.out(),0);
 	broadcast1(x.reduce1(pmap1.in()),pmap1.out(),2*nc);
       }
@@ -424,20 +424,20 @@ namespace ptens{
       int nc=get_nc();
 
       if constexpr(std::is_same<OUTPUT,Ptensors0<TYPE> >::value){
-	auto pmap=PgatherMapFactory::gather_map0(map,x.atoms,atoms,x.getk(),1);
+	auto pmap=GatherPlanFactory::gather_map0(map,x.atoms,atoms,x.getk(),1);
 	broadcast0(x.reduce0(pmap.out()),pmap.in(),0);
       }
 
       if constexpr(std::is_same<OUTPUT,Ptensors1<TYPE> >::value){
-	auto pmap0=PgatherMapFactory::gather_map0(map,x.atoms,atoms,x.getk(),1);
-	auto pmap1=PgatherMapFactory::gather_map1(map,x.atoms,atoms,x.getk(),1);
+	auto pmap0=GatherPlanFactory::gather_map0(map,x.atoms,atoms,x.getk(),1);
+	auto pmap1=GatherPlanFactory::gather_map1(map,x.atoms,atoms,x.getk(),1);
 	broadcast0(x.reduce0(pmap0.out(),0,nc),pmap0.in(),0);
 	broadcast1(x.reduce1(pmap1.out(),nc,nc),pmap1.in(),0);
       }
 
       if constexpr(std::is_same<OUTPUT,Ptensors2<TYPE> >::value){
-	auto pmap0=PgatherMapFactory::gather_map0(map,x.atoms,atoms,x.getk(),1);
-	auto pmap1=PgatherMapFactory::gather_map1(map,x.atoms,atoms,x.getk(),1);
+	auto pmap0=GatherPlanFactory::gather_map0(map,x.atoms,atoms,x.getk(),1);
+	auto pmap1=GatherPlanFactory::gather_map1(map,x.atoms,atoms,x.getk(),1);
 	broadcast0(x.reduce0_shrink(pmap0.out(),0,nc),pmap0.in(),0);
 	broadcast1(x.reduce1_shrink(pmap1.out(),2*nc,nc),pmap1.in(),2*nc);
       }

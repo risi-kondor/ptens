@@ -16,7 +16,7 @@
 
 #include "Ggraph.hpp"
 #include "AtomsPackObj.hpp"
-#include "PgatherMapObj.hpp"
+#include "GatherPlanObj.hpp"
 
 
 namespace ptens{
