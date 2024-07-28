@@ -51,7 +51,7 @@ PTENS_INCLUDES+=-I$(LAYERSBACKENDDIR)
 PTENS_INCLUDES+=-I$(BATCHEDDIR)
 PTENS_INCLUDES+=-I$(BATCHEDBACKENDDIR)
 
-CFLAGS= -std=c++17 -O3 -ferror-limit=1  
+CFLAGS= -std=c++17 -O3 #-ferror-limit=1  
 INCLUDE= -I $(ROOTDIR)/include 
 LIBS= -lstdc++ -lm -lpthread 
 

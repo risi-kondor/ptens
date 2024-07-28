@@ -16,12 +16,10 @@ must be accompanied by a verbatim copy of the license.
 
 #include <cuda.h>
 #include <cuda_runtime.h>
-#include <thrust/complex.h>
-#include <thrust/tuple.h>
 
 #include "Ptens_base.hpp"
-#include "RtensorPackB.hpp"
-#include "AindexPack.hpp"
+#include "Ltensor.hpp"
+#include "AindexPackB.hpp"
 
 
 __forceinline__ __device__ int load_indices(int* ix, const int* xiarr, const int* xidir, const int q){

@@ -15,8 +15,8 @@ def main():
     # os.environ['CUDA_HOME']='/usr/local/cuda'
     #os.environ["CC"] = "clang"
 
-    compile_with_cuda = False  
-    # compile_with_cuda = True
+    # compile_with_cuda = False  
+    compile_with_cuda = True
 
     copy_warnings = False
     torch_convert_warnings = False
@@ -114,12 +114,12 @@ def main():
             '../../cnine/cuda/TensorView_accumulators.cu',
             '../../cnine/cuda/BasicCtensorProducts.cu',
             '../../cnine/cuda/RtensorUtils.cu',
-            '../../cnine/cuda/RtensorPackUtils.cu',
-            '../../cnine/cuda/gatherRows.cu',
+            #'../../cnine/cuda/RtensorPackUtils.cu',
+            #'../../cnine/cuda/gatherRows.cu',
             '../cuda/Ptensors0.cu',
             '../cuda/Ptensors1.cu',
-            '../cuda/Ptensors2.cu',
-            '../cuda/NodeLayer.cu',
+            #'../cuda/Ptensors2.cu',
+            #'../cuda/NodeLayer.cu',
             'bindings/ptens_py.cpp'
         ],
             include_dirs=_include_dirs,

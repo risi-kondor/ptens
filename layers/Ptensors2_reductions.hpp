@@ -322,7 +322,7 @@ void add_reduce2_to(const Ptensors2<TYPE>& R, const AindexPack& list, const int 
       R.view3_of(i,nc,nc)+=view_of(list.tens(i),list.ix(i)).transp();
     }
   }
-  GPUCODE(CUDA_STREAM(Ptensors2_reduce2B_cu(R,*this,list,offs,n,stream)));
+  GPUCODE(CUDA_STREAM(Ptensors2_reduce2B_cu(R,*this,list,offs,nc,stream)));
 }
 
 
@@ -344,7 +344,7 @@ void add_reduce2_shrink_to(const Ptensors2<TYPE>& R, const AindexPack& list, con
       R.view3_of(i)+=view_of(list.tens(i),list.ix(i),offs+nc,nc).transp();
     }
   }
-  GPUCODE(CUDA_STREAM(Ptensors2_reduce2B_cu(R,*this,list,offs,n,stream)));
+  GPUCODE(CUDA_STREAM(Ptensors2_reduce2B_cu(R,*this,list,offs,nc,stream)));
 }
 
 
