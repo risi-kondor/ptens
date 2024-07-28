@@ -112,7 +112,6 @@ __global__ void Ptensors2_reduce1_kernel(float* rarr, int rs, const float* xarr,
   r+=n;
   for(int i=0; i<k; i++)
     r[i*rs]+=x[ix[i+4]*(m+1)*xs];
-  r[i*rs]+=t;
 }
 
 
@@ -150,7 +149,6 @@ __global__ void Ptensors2_reduce1_shrink_kernel(float* rarr, int rs, const float
   x+=n;
   for(int i=0; i<k; i++)
     r[i*rs]+=x[ix[i+4]*(m+1)*xs];
-  r[i*rs]+=t;
 }
 
 
