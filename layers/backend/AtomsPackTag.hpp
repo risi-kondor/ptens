@@ -145,28 +145,3 @@ namespace ptens{
 }
 
 #endif 
-    //static shared_ptr<AtomsPackTagObj0> make(const shared_ptr<AtomsPackObj>& x){
-    //if(!x->cached_tag0) x->cached_tag0=shared_ptr<AtomsPackTagObj0>(new AtomsPackTagObj0(x));
-    //return x->cached_tag0;
-    //}
-
-    //AtomsPackObj& operator*() const{
-    //return *(obj->atoms.lock());
-    //}
-
-    //AtomsPackObj* operator->() const{
-    //return obj->atoms.lock().get();
-    //}
-    
-    //const AtomsPackObj& get_atoms() const{
-    //return *atoms.lock();
-    //}
-
-    //AtomsPackObj& operator*() const{
-    //return *_atoms.lock();
-    //}
-
-    //AtomsPackObj* operator->() const{
-    //return _atoms.lock().get();
-    //}
-

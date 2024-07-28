@@ -162,13 +162,3 @@ namespace ptens{
 }
 
 #endif 
-    //Ptensors copy(const Ptensors& x){
-      //cnine::using_vram_manager vv(ptens_session->managed_gmem);
-      //return BASE::copy(x); 
-    //}
-
-    //Ptensors zeros_like() const{
-      //cnine::using_vram_manager vv(ptens_session->managed_gmem);
-      //return BASE::zeros_like();
-    //}
-

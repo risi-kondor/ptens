@@ -24,6 +24,7 @@
 #include "Ptensors.hpp"
 #include "AtomsPackTag.hpp"
 #include "Ptensor1view.hpp"
+#include "GatherPlanFactory.hpp"
 
 
 namespace ptens{
@@ -326,9 +327,6 @@ namespace ptens{
     }
 
 
-  public: // ---- Operations ---------------------------------------------------------------------------------
-
-
   public: // ---- Linmaps ----------------------------------------------------------------------------
 
 
@@ -498,9 +496,3 @@ namespace ptens{
 
 #endif 
 
-    //private:
-
-    //template<typename SOURCE>
-    //RowLevelMap& rmap(const SOURCE& x, const PtensorMap& tmap) const{
-    //return *ptens_global::rmap_cache(tag,x.tag,tmap.obj);
-    //}

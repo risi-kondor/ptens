@@ -26,7 +26,7 @@
 #include "cpermutation.hpp"
 #include "map_of_lists.hpp"
 #include "once.hpp"
-#include "monitored.hpp"
+//#include "monitored.hpp"
 #include "Ltensor.hpp"
 
 #include "Atoms.hpp"
@@ -42,7 +42,6 @@ namespace ptens{
   class AtomsPackTagObj1;
   class AtomsPackTagObj2;
 
-  //class LayerMapObj;
   class GatherPlanObj;
 
 
@@ -64,21 +63,6 @@ namespace ptens{
     //mutable vector<weak_ptr<LayerMapObj> > related_layermaps;
     mutable vector<weak_ptr<GatherPlanObj> > related_gatherplans;
 
-
-    cnine::monitored<cnine::Ltensor<int> > gpu_offsets1=
-      cnine::monitored<cnine::Ltensor<int> >(ptens_global::atomspack_offsets1_monitor,[this](){
-	  cnine::Ltensor<int> R(BASE::dir);
-	  return make_shared<cnine::Ltensor<int> >(R,1);
-	});
-
-    cnine::monitored<cnine::Ltensor<int> > gpu_offsets2=
-      cnine::monitored<cnine::Ltensor<int> >(ptens_global::atomspack_offsets2_monitor,[this](){
-	  cnine::Ltensor<int> R({size(),2});
-	  for(int i=0; i<size(); i++){
-	    R.set(i,0,offsets2[i]);
-	    R.set(i,1,size_of(i));
-	  }
-	  return make_shared<cnine::Ltensor<int> >(R,1);});
 
     ~AtomsPackObj(){
     }
@@ -225,11 +209,6 @@ namespace ptens{
   public: // ---- Access -------------------------------------------------------------------------------------
 
 
-    // inherited 
-    //int size_of(const int i) const{
-    //return size_of(i);
-    //}
-
     int getk() const{
       return order;
     }
@@ -273,11 +252,6 @@ namespace ptens{
     //cached_pack2.reset();
     //cache_packs=false;
     //}
-
-
-  public: // ---- 0th order layout -----------------------------------------------------------------------------------
-
-
 
 
   public: // ---- 0th order layout -----------------------------------------------------------------------------------
@@ -488,12 +462,6 @@ namespace ptens{
     }
 
     
-    // create map for messages from y
-    //TensorLevelMap overlaps(const AtomsPackObj& y){
-    //return overlap_maps(y);
-    //}
-
-
   public: // ---- I/O ----------------------------------------------------------------------------------------
 
 
@@ -609,43 +577,19 @@ namespace ptens{
 
 #endif 
 
+    /*
+    cnine::monitored<cnine::Ltensor<int> > gpu_offsets1=
+      cnine::monitored<cnine::Ltensor<int> >(ptens_global::atomspack_offsets1_monitor,[this](){
+	  cnine::Ltensor<int> R(BASE::dir);
+	  return make_shared<cnine::Ltensor<int> >(R,1);
+	});
 
-    //overlap_maps([this](const AtomsPackObj& x)
-    //{return TensorLevelMap(new TensorLevelMapObj<AtomsPackObj>(x,*this));}),
-    //cat_maps([this](const vector<AtomsPackObj*>& v)
-    //{return shared_ptr<AtomsPackObj>(new AtomsPackObj(cat_with(v)));})
-		//overlap_maps([this](const AtomsPackObj& x)
-		//{return TensorLevelMap(new TensorLevelMapObj<AtomsPackObj>(x,*this));}),
-		//cat_maps([this](const vector<AtomsPackObj*>& v)
-		//{return shared_ptr<AtomsPackObj>(new AtomsPackObj(cat_with(v)));})
-		//overlap_maps([this](const AtomsPackObj& x)
-		//{return TensorLevelMap(new TensorLevelMapObj<AtomsPackObj>(x,*this));}),
-		//cat_maps([this](const vector<AtomsPackObj*>& v)
-		//{return shared_ptr<AtomsPackObj>(new AtomsPackObj(cat_with(v)));})
-    //cnine::once<BASE> gpack=cnine::once<BASE>([&](){
-    //BASE R(*this,1);
-    //R.dir.move_to_device(1);
-    //return R;
-    //});
-
-
-    //cnine::once<BASE> gpack=cnine::once<BASE>([&](){
-    //BASE R(*this,1);
-    //R.dir.move_to_device(1);
-    //return R;
-    //});
-
-
-    //cnine::ptr_indexed_object_bank<AtomsPackObj,AtomsPackMatch> overlaps2_mlist=
-    //cnine::ptr_indexed_object_bank<AtomsPackObj,AtomsPackMatch>([this](const AtomsPackObj& x)
-    //{return AtomsPackMatch::overlaps(x,*this,2);});
-
-    //cnine::ptr_indexed_object_bank<AtomsPackObj,TensorLevelMap> overlap_maps=
-    //cnine::ptr_indexed_object_bank<AtomsPackObj,TensorLevelMap>([this](const AtomsPackObj& x)
-    //{return TensorLevelMap(new TensorLevelMapObj<AtomsPackObj>(x,*this));});
-
-    //cnine::ptr_arg_indexed_object_bank<AtomsPackObj,int,AtomsPackMatch> overlaps_mlist=
-    //cnine::ptr_arg_indexed_object_bank<AtomsPackObj,int,AtomsPackMatch>
-    //([this](const AtomsPackObj& x, const int min_overlap){
-      //return AtomsPackMatch::overlaps(x,*this,min_overlap);},1);
-
+    cnine::monitored<cnine::Ltensor<int> > gpu_offsets2=
+      cnine::monitored<cnine::Ltensor<int> >(ptens_global::atomspack_offsets2_monitor,[this](){
+	  cnine::Ltensor<int> R({size(),2});
+	  for(int i=0; i<size(); i++){
+	    R.set(i,0,offsets2[i]);
+	    R.set(i,1,size_of(i));
+	  }
+	  return make_shared<cnine::Ltensor<int> >(R,1);});
+    */

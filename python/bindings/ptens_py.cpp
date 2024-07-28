@@ -21,8 +21,6 @@
 
 #include "BatchedGgraph.hpp"
 #include "BatchedAtomsPack.hpp"
-//#include "BatchedAindexPack.hpp"
-//#include "BatchedPtensorMap.hpp"
 #include "BatchedLayerMap.hpp"
 
 #include "BatchedPtensors0.hpp"
@@ -46,8 +44,6 @@ PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
 
   typedef cnine::Ltensor<float> tensorf;
 
-  //typedef PtensorMap Pmap;
-  
   typedef Ptensor0<float> Ptensor0f;
   typedef Ptensor1<float> Ptensor1f;
   typedef Ptensor2<float> Ptensor2f;
@@ -56,8 +52,6 @@ PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
   typedef Ptensors1<float> Ptensors1f;
   typedef Ptensors2<float> Ptensors2f;
 
-
-  //typedef BatchedPtensorMap BPmap;
   typedef BatchedLayerMap BLmap;
 
   typedef BatchedPtensors0<float> BPtensors0f;
@@ -73,13 +67,11 @@ PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
 #include "Ggraph_py.cpp"
 #include "Subgraph_py.cpp"
 #include "LayerMap_py.cpp"
-  //#include "TensorLevelMap_py.cpp"
 #include "GgraphPreloader_py.cpp"
 
 #include "SimpleMemoryManager_py.cpp"
 #include "GgraphCache_py.cpp"
 #include "SubgraphCache_py.cpp"
-    //#include "OverlapsMmapCache_py.cpp"
 
 #include "Ptensor0_py.cpp"
 #include "Ptensor1_py.cpp"
@@ -92,37 +84,12 @@ PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
 
 #include "BatchedGgraph_py.cpp"
 #include "BatchedAtomsPack_py.cpp"
-  //#include "BatchedAtomsPack0_py.cpp"
-  //#include "BatchedAtomsPack1_py.cpp"
-  //#include "BatchedAtomsPack2_py.cpp"
-    //#include "BatchedAindexPack_py.cpp"
-    //#include "BatchedPtensorMap_py.cpp"
 #include "BatchedLayerMap_py.cpp"
 
 #include "BatchedPtensors0_py.cpp"
 #include "BatchedPtensors1_py.cpp"
 #include "BatchedPtensors2_py.cpp"
 
-
-
-    //#include "MessageList_py.cpp"
-    //#include "AtomsPack0_py.cpp"
-    //#include "MessageMap_py.cpp"
-  
-
-
-    //#include "LinmapFunctions_py.cpp"
-    //#include "MsgFunctions_py.cpp"
-    //#include "OuterFunctions_py.cpp"
-
-    //#include "NodeLayer_py.cpp"
-    //#include "SubgraphLayer0_py.cpp"
-    //#include "SubgraphLayer1_py.cpp"
-    //#include "SubgraphLayer2_py.cpp"
-
-    //#include "Ptensors0_py.cpp"
-    //#include "Ptensors1_py.cpp"
-    //#include "Ptensors2_py.cpp"
 
 /*
 #include "SubgraphLayer0b_py.cpp"

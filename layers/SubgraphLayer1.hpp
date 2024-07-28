@@ -155,6 +155,8 @@ namespace ptens{
       return R;
     }
 
+
+    /*
     void add_linmaps(const Ptensors1<TYPE>& x){
       int nc=x.get_nc();
       broadcast0(x.reduce0());
@@ -186,6 +188,7 @@ namespace ptens{
       PTENS_ASSRT(x.ndims()==2);
       view3(S.getn(),offs,x.dim(1))+=cnine::repeat1(x.view2(),S.getn());
     }
+    */
 
 
   public: // ---- Autobahn -----------------------------------------------------------------------------------

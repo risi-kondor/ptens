@@ -24,7 +24,7 @@
 #include "Ptensors.hpp"
 #include "AtomsPackTag.hpp"
 #include "Ptensor2view.hpp"
-//#include "PtensorMapFactory.hpp"
+#include "GatherPlanFactory.hpp"
 
 
 namespace ptens{

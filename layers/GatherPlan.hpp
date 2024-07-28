@@ -21,8 +21,6 @@
 
 namespace ptens{
 
-  //class AtomsPackObj;
-
 
   class GatherPlan{
   public:

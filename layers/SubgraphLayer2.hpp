@@ -23,10 +23,6 @@
 
 namespace ptens{
 
-  //template<typename TYPE> class SubgraphLayer1;
-  //template<typename TYPE> class SubgraphLayer2;
-  //template<typename TYPE> inline SubgraphLayer1<TYPE> gather(const SubgraphLayer2<TYPE>& x, const Subgraph& _S);
-
 
   template<typename TYPE> 
   class SubgraphLayer2: public Ptensors2<TYPE>{
@@ -38,15 +34,6 @@ namespace ptens{
     using BASE::BASE;
     using BASE::atoms;
     using BASE::add_gather;
-    //using BASE::G;
-    //using BASE::S;
-    //using TLAYER::dev;
-    //using TLAYER::getn;
-    //using TLAYER::get_nc;
-    //using TLAYER::get_grad;
-    //using TLAYER::tensor;
-    //using TLAYER::inp;
-    //using TLAYER::diff2;
 
     const Ggraph G;
     const Subgraph S;
@@ -126,6 +113,30 @@ namespace ptens{
     }
 
 
+
+  };
+
+  template<typename SOURCE>
+  inline SubgraphLayer2<float> sglinmaps2(const SOURCE& x){
+    SubgraphLayer2<float> R(x.get_atoms(),x.get_nc()*vector<int>({2,5,15})[x.getk()],x.get_dev());
+    R.add_linmaps(x);
+    return R;
+  }
+
+  template<typename SOURCE>
+  inline SubgraphLayer2<float> gather2(const SOURCE& x, const Subgraph& _S){
+    SubgraphLayer2<float> R(x.G,_S,x.G.subgraphs(_S),x.get_nc()*vector<int>({2,5,15})[x.getk()],0,x.dev);
+    R.add_gather(x);
+    return R;
+  }
+
+
+
+}
+
+#endif 
+
+
     /*
     SubgraphLayer2(const Ptensors0<TYPE>& x, const Ggraph& g, const Subgraph& s):
       SubgraphLayer2(g,s,g.subgraphs(s),2*x.get_nc(),0,x.dev){
@@ -168,49 +179,3 @@ namespace ptens{
       add_gather(x);
     }
     */
-
-  };
-
-
-
-  template<typename SOURCE>
-  inline SubgraphLayer2<float> sglinmaps2(const SOURCE& x){
-    SubgraphLayer2<float> R(x.get_atoms(),x.get_nc()*vector<int>({2,5,15})[x.getk()],x.get_dev());
-    R.add_linmaps(x);
-    return R;
-  }
-
-  template<typename SOURCE>
-  inline SubgraphLayer2<float> gather2(const SOURCE& x, const Subgraph& _S){
-    SubgraphLayer2<float> R(x.G,_S,x.G.subgraphs(_S),x.get_nc()*vector<int>({2,5,15})[x.getk()],0,x.dev);
-    R.add_gather(x);
-    return R;
-  }
-
-
-
-}
-
-#endif 
-  /*
-  template<typename TYPE>
-  inline SubgraphLayer2<TYPE> gather2(const SubgraphLayer0<TYPE>& x, const Subgraph& _S){
-    SubgraphLayer2<TYPE> R(x.G,_S,x.G.subgraphs(_S),2*x.get_nc(),0,x.dev);
-    R.add_gather(x);
-    return R;
-  }
-
-  template<typename TYPE>
-  inline SubgraphLayer2<TYPE> gather2(const SubgraphLayer1<TYPE>& x, const Subgraph& _S){
-    SubgraphLayer2<TYPE> R(x.G,_S,x.G.subgraphs(_S),5*x.get_nc(),0,x.dev);
-    R.add_gather(x);
-    return R;
-  }
-
-  template<typename TYPE>
-  inline SubgraphLayer2<TYPE> gather2(const SubgraphLayer2<TYPE>& x, const Subgraph& _S){
-    SubgraphLayer2<TYPE> R(x.G,_S,x.G.subgraphs(_S),15*x.get_nc(),0,x.dev);
-    R.add_gather(x);
-    return R;
-  }
-  */

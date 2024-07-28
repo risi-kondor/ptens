@@ -17,14 +17,12 @@
 
 #include "diff_class.hpp"
 #include "Rtensor1_view.hpp"
-#include "Rtensor2_view.hpp"
-#include "Rtensor3_view.hpp"
+//#include "Rtensor2_view.hpp"
+//#include "Rtensor3_view.hpp"
 
 #include "Ptensor0.hpp"
 #include "Ptensors.hpp"
 #include "AtomsPackTag.hpp"
-//#include "PtensorMap.hpp"
-//#include "PtensorMapFactory.hpp"
 #include "GatherPlanFactory.hpp"
 
 
@@ -48,7 +46,7 @@ namespace ptens{
     typedef Ptensors<TYPE> BASE;
     typedef cnine::Ltensor<TYPE> TENSOR;
     typedef cnine::Rtensor1_view Rtensor1_view;
-    typedef cnine::Rtensor2_view Rtensor2_view;
+    //typedef cnine::Rtensor2_view Rtensor2_view;
 
     using cnine::diff_class<Ptensors0<TYPE> >::grad;
     using TENSOR::get_dev;
@@ -341,14 +339,9 @@ namespace ptens{
 	broadcast0(x.reduce0_shrink(plan.out()),plan.in(),0);
     }
 
+
 #include "Ptensors0_reductions.hpp"
 #include "Ptensors0_broadcasting.hpp"
-
-
-  public: // ---- Reductions ---------------------------------------------------------------------------------
-
-
-  public: // ---- Broadcasting -------------------------------------------------------------------------------
 
 
   public: // ---- I/O ----------------------------------------------------------------------------------------
@@ -401,98 +394,3 @@ namespace ptens{
 
 
 #endif 
-//     void add_reduce0_to(const Ptensors0& R, const AindexPack& list) const{
-//       TimedFn T("Ptensors0","reduce0",*this,list,list.size()*get_nc());
-//       if(get_dev()==0){
-// 	int N=list.size();
-// 	for(int i=0; i<N; i++){
-// 	  if(list.nix(i)==0) continue;
-// 	  R.view_of(i)=view_of(list.tix(i));
-// 	}
-//       }
-//       GPUCODE(CUDA_STREAM(Ptensors0_reduce0_cu(R,*this,list,0,nc,stream)));
-//     }
-    /*
-    template<typename SOURCE>
-    void add_gather(const SOURCE& x){
-      //add_gather(x,ptens_global::overlaps_cache(atoms,x.atoms));
-      add_gather(x,PtensorMapFactory::overlaps(atoms,x.atoms));
-    }
-    
-    template<typename OUTPUT>
-    void add_gather_back(const OUTPUT& x){
-      //add_gather_back(x,ptens_global::overlaps_cache(x.atoms,atoms));
-      add_gather_back(x,PtensorMapFactory::overlaps(x.atoms,atoms));
-    }
-
-
-    template<typename SOURCE>
-      void add_gather(const SOURCE& x, const PtensorMap& map){
-      if(ptens_global::row_level_operations){
-	rmap(x,map)(*this,x);
-      }else{
-	if constexpr(std::is_same<SOURCE,Ptensors0<TYPE> >::value || std::is_same<SOURCE,Ptensors1<TYPE> >::value){
-	  auto pmap=GatherPlanFactory::gather_map0(map,atoms,x.atoms,0,x.getk());
-	  broadcast0(x.reduce0(pmap.in()),pmap.out(),0);
-	}
-      }
-    }
-    */
-// 	  if constexpr(std::is_same<SOURCE,Ptensors0<TYPE> >::value)
-// 	    broadcast0(x.reduce0(map.atoms(),map.in()),map.out(),0);
-// 	  if constexpr(std::is_same<SOURCE,Ptensors1<TYPE> >::value)
-// 	    broadcast0(x.reduce0(map.atoms(),map.in()),map.out(),0);
-// 	  if constexpr(std::is_same<SOURCE,Ptensors2<TYPE> >::value)
-// 	    broadcast0(x.reduce0(map.atoms(),map.in()),map.out(),0);
-
-   /*
-    template<typename OUTPUT>
-    void add_gather_back(const OUTPUT& x, const PtensorMap& map){
-      if(ptens_global::row_level_operations){
-	x.rmap(*this,map).inv()(*this,x);
-      }else{
-	auto pmap=GatherPlanFactory::gather_map0(map,atoms,x.atoms,0,x.getk());
-	if constexpr(std::is_same<OUTPUT,Ptensors0<TYPE> >::value)
-	  broadcast0(x.reduce0(pmap.in()),pmap.out(),0);
-	if constexpr(std::is_same<OUTPUT,Ptensors1<TYPE> >::value)
-	  broadcast0(x.reduce0(pmap.in()),pmap.out(),0);
-	//if constexpr(std::is_same<OUTPUT,Ptensors2<TYPE> >::value)
-	//broadcast0(x.reduce0_shrink(map.in()),map.out(),0);
-      }
-    }
-    */
-      //if constexpr(std::is_same<OUTPUT,Ptensors0<TYPE> >::value)
-      //    broadcast0(x.reduce0(map.atoms(),map.out()),map.in());
-      //  if constexpr(std::is_same<OUTPUT,Ptensors1<TYPE> >::value)
-      //    broadcast0(x.reduce0(map.atoms(),map.out()),map.in());
-	  //if constexpr(std::is_same<OUTPUT,Ptensors2<TYPE> >::value)
-	  //broadcast0(x.reduce0_shrink(map.atoms(),map.out()),map.in());
-    //template<typename SOURCE>
-    //void add_gather(const SOURCE& x){
-    //add_gather(x,LayerMap::overlaps_map(atoms,x.atoms));
-    //}
-    
-    //template<typename OUTPUT>
-    //void add_gather_back(const OUTPUT& x){
-    //add_gather_back(x,LayerMap::overlaps_map(x.atoms,atoms));
-    //}
-
-      //if(get_dev()==0){
-      //int N=map.size();
-      //for(int i=0; i<N; i++){
-      //if(map.nix(i)==0) continue;
-      //map.chunk0(R,i)+=view_of(map,i);
-      //}
-      //}
-      //if(get_dev()==0){
-      //int N=map.size();
-      //const int nc=x.dim(1);
-      //for(int i=0; i<N; i++)
-      //view_of(map,i,offs,nc)+=map.chunk0(x,i);
-      //}
-    //private:
-
-    //template<typename SOURCE>
-    //RowLevelMap& rmap(const SOURCE& x, const PtensorMap& tmap) const{
-    //return *ptens_global::rmap_cache(tag,x.tag,tmap.obj);
-    //}
