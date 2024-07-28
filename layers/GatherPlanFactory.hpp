@@ -15,7 +15,6 @@
 #ifndef _ptens_GatherPlanFactory
 #define _ptens_GatherPlanFactory
 
-#include "PtensorMap.hpp"
 #include "GatherPlan.hpp"
 #include "LayerMap.hpp"
 #include "AtomsPack.hpp"
@@ -103,11 +102,16 @@ namespace ptens{
       return r;
     }
     
+  };
+
+}
+
+#endif 
 
 
-  public: // -------------------------------------------------------------------------------------------------
+//public: // -------------------------------------------------------------------------------------------------
 
-
+/*
     static GatherPlan gather_map0(const PtensorMap& pmap, const AtomsPack& out, const AtomsPack& in, const int outk=0, const int ink=0){
       return make(*pmap.obj,*out.obj,*in.obj,outk,ink,0);
     }
@@ -179,12 +183,4 @@ namespace ptens{
       out.related_gatherplans.emplace_back(r);
       return r;
     }
-
-  };
-
-
-
-
-}
-
-#endif 
+*/

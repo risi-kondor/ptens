@@ -213,6 +213,142 @@ void add_reduce2_shrink_to(const BASE& R, const int offs) const{
 public: // ---- Indexed reductions -------------------------------------------------------------------------
 
 
+TENSOR reduce0(const AindexPackB& map, const int offs=0, int nc=0) const{
+  PTENS_CPUONLY();
+  TimedFn T("Ptensors2","reduce0",*this,map,(map.count2+map.count1)*get_nc());
+  if (nc==0) nc=get_nc()-offs;
+  cnine::using_vram_manager vv(ptens_global::vram_manager);
+  TENSOR R({map.nrows,2*nc},0,dev);
+  if(dev==0) zip0(map,R,[nc](auto& r, auto& x, int k){
+      x.sum01_into(r.block(0,nc));
+      x.diag01().sum0_into(r.block(nc,nc));
+    },offs,nc);
+  return R;
+}
+
+void add_reduce0(const TENSOR& R, const AindexPackB& map, const int offs=0) const{
+  PTENS_CPUONLY();
+  int nc=R.dim(1)/2;
+  if(dev==0) zip0(map,R,[nc](auto& r, auto& x, int k){
+      x.sum01_into(r.block(0,nc));
+      x.diag01().sum0_into(r.block(nc,nc));
+    },offs,nc);
+}
+
+TENSOR reduce0_shrink(const AindexPackB& map, const int offs=0, int nc=0) const{
+  PTENS_CPUONLY();
+  TimedFn T("Ptensors2","reduce0",*this,map,(map.count2+map.count1)*nc);
+  if(nc==0) nc=(get_nc()-offs)/2;
+  cnine::using_vram_manager vv(ptens_global::vram_manager);
+  TENSOR R({map.nrows,nc},0,dev);
+  if(dev==0) zip0(map,R,[nc](auto& r, auto& x, int k){
+      x.cols(0,nc).sum01_into(r);
+      x.cols(nc,nc).diag01().sum0_into(r);
+    },offs,nc);
+  return R;
+}
+
+void add_reduce0_shrink(const TENSOR& R, const AindexPackB& map, const int offs=0) const{
+  PTENS_CPUONLY();
+  int nc=R.dim(1);
+  if(dev==0) zip0(map,R,[nc](auto& r, auto& x, int k){
+      x.cols(0,nc).sum01_into(r);
+      x.cols(nc,nc).diag01().sum0_into(r);
+    },offs,nc);
+}
+
+TENSOR reduce1(const AindexPackB& map, const int offs=0, int nc=0) const{
+  PTENS_CPUONLY();
+  TimedFn T("Ptensors2","reduce1",*this,map,(map.count1+2*map.count2)*get_nc());
+  if (nc==0) nc=get_nc()-offs;
+  cnine::using_vram_manager vv(ptens_global::vram_manager);
+  TENSOR R({map.nrows,3*nc},0,dev);
+  if(dev==0) zip1(map,R,[nc](auto& r, auto& x, int k){
+      x.sum0_into(r.cols(0,nc));
+      x.sum1_into(r.cols(nc,nc));
+      r.cols(2*nc,nc)+=x.diag01();
+    },offs,nc);
+  return R;
+}
+
+void add_reduce1(const TENSOR& R, const AindexPackB& map, const int offs=0) const{
+  PTENS_CPUONLY();
+  int nc=R.dim(1)/3;
+  if(dev==0) zip1(map,R,[nc](auto& r, auto& x, int k){
+      x.sum0_into(r.cols(0,nc));
+      x.sum1_into(r.cols(nc,nc));
+      r.cols(2*nc,nc)+=x.diag01();
+    },offs,nc);
+}
+
+TENSOR reduce1_shrink(const AindexPackB& map, const int offs=0, int nc=0) const{
+  PTENS_CPUONLY();
+  TimedFn T("Ptensors2","reduce1",*this,map,(map.count1+2*map.count2)*nc);
+  if(nc==0) nc=(get_nc()-offs)/3;
+  cnine::using_vram_manager vv(ptens_global::vram_manager);
+  TENSOR R({map.nrows,nc},0,dev);
+  if(dev==0) zip1(map,R,[nc](auto& r, auto& x, int k){
+      x.cols(0,nc).sum0_into(r);
+      x.cols(nc,nc).sum1_into(r);
+      r+=x.cols(2*nc,nc).diag01();
+    },offs,nc);
+  return R;
+}
+
+
+void add_reduce1_shrink(const TENSOR& R, const AindexPackB& map, const int offs=0) const{
+  PTENS_CPUONLY();
+  int nc=R.dim(1);
+  if(dev==0) zip1(map,R,[nc](auto& r, auto& x, int k){
+      x.cols(0,nc).sum0_into(r);
+      x.cols(nc,nc).sum1_into(r);
+      r+=x.cols(2*nc,nc).diag01();
+    },offs,nc);
+}
+
+
+TENSOR reduce2(const AindexPackB& map, const int offs=0, int nc=0) const{
+  PTENS_CPUONLY();
+  TimedFn T("Ptensors2","reduce2",*this,map,(map.count1+2*map.count2)*nc);
+  if(nc==0) nc=(get_nc()-offs);
+  cnine::using_vram_manager vv(ptens_global::vram_manager);
+  TENSOR R({map.nrows,nc},0,dev);
+  if(dev==0) zip2(map,R,[](auto& r, auto& x, int k){r+=x;},offs,nc);
+  return R;
+}
+
+
+void add_reduce2(const TENSOR& R, const AindexPackB& map, const int offs=0) const{
+  PTENS_CPUONLY();
+  int nc=R.dim(1);
+  if(dev==0) zip2(map,R,[](auto& r, auto& x, int k){r+=x;},offs,nc);
+}
+
+
+TENSOR reduce2_shrink(const AindexPackB& map, const int offs=0, int nc=0) const{
+  PTENS_CPUONLY();
+  TimedFn T("Ptensors2","reduce2",*this,map,(map.count1+2*map.count2)*nc);
+  if(nc==0) nc=(get_nc()-offs)/2;
+  cnine::using_vram_manager vv(ptens_global::vram_manager);
+  TENSOR R({map.nrows,nc},0,dev);
+  if(dev==0) zip2(map,R,[](auto& r, auto& x, int k){r+=x;},offs,nc);
+  if(dev==0) zip2(map,R,[](auto& r, auto& x, int k){r+=x.transp();},offs+nc,nc);
+  return R;
+}
+
+
+void add_reduce2_shrink(const TENSOR& R, const AindexPackB& map, const int offs=0) const{
+  PTENS_CPUONLY();
+  int nc=R.dim(1);
+  if(dev==0) zip2(map,R,[](auto& r, auto& x, int k){r+=x;},offs,nc);
+  if(dev==0) zip2(map,R,[](auto& r, auto& x, int k){r+=x.transp();},offs+nc,nc);
+}
+
+
+
+public: // ---- Deprecated Indexed reductions -------------------------------------------------------------------------
+
+/*
 Ptensors0<TYPE> reduce0(const AtomsPack& _atoms, const AindexPack& list, const int offs=0) const{
   TimedFn T("Ptensors2","reduce0",*this,list,(list.count2+list.count1)*get_nc());
   int nc=get_nc();
@@ -346,126 +482,4 @@ void add_reduce2_shrink_to(const Ptensors2<TYPE>& R, const AindexPack& list, con
   }
   GPUCODE(CUDA_STREAM(Ptensors2_reduce2B_cu(R,*this,list,offs,n,stream)));
 }
-
-
-public: // ---- Indexed reductions -------------------------------------------------------------------------
-
-
-TENSOR reduce0(const AindexPackB& map, const int offs=0, int nc=0) const{
-  TimedFn T("Ptensors2","reduce0",*this,map,(map.count2+map.count1)*get_nc());
-  if (nc==0) nc=get_nc()-offs;
-  cnine::using_vram_manager vv(ptens_global::vram_manager);
-  TENSOR R({map.nrows,2*nc},0,dev);
-  if(dev==0) zip0(map,R,[nc](auto& r, auto& x, int k){
-      x.sum01_into(r.block(0,nc));
-      x.diag01().sum0_into(r.block(nc,nc));
-    },offs,nc);
-  return R;
-}
-
-void add_reduce0(const TENSOR& R, const AindexPackB& map, const int offs=0) const{
-  int nc=R.dim(1)/2;
-  if(dev==0) zip0(map,R,[nc](auto& r, auto& x, int k){
-      x.sum01_into(r.block(0,nc));
-      x.diag01().sum0_into(r.block(nc,nc));
-    },offs,nc);
-}
-
-TENSOR reduce0_shrink(const AindexPackB& map, const int offs=0, int nc=0) const{
-  TimedFn T("Ptensors2","reduce0",*this,map,(map.count2+map.count1)*nc);
-  if(nc==0) nc=(get_nc()-offs)/2;
-  cnine::using_vram_manager vv(ptens_global::vram_manager);
-  TENSOR R({map.nrows,nc},0,dev);
-  if(dev==0) zip0(map,R,[nc](auto& r, auto& x, int k){
-      x.cols(0,nc).sum01_into(r);
-      x.cols(nc,nc).diag01().sum0_into(r);
-    },offs,nc);
-  return R;
-}
-
-void add_reduce0_shrink(const TENSOR& R, const AindexPackB& map, const int offs=0) const{
-  int nc=R.dim(1);
-  if(dev==0) zip0(map,R,[nc](auto& r, auto& x, int k){
-      x.cols(0,nc).sum01_into(r);
-      x.cols(nc,nc).diag01().sum0_into(r);
-    },offs,nc);
-}
-
-TENSOR reduce1(const AindexPackB& map, const int offs=0, int nc=0) const{
-  TimedFn T("Ptensors2","reduce1",*this,map,(map.count1+2*map.count2)*get_nc());
-  if (nc==0) nc=get_nc()-offs;
-  cnine::using_vram_manager vv(ptens_global::vram_manager);
-  TENSOR R({map.nrows,3*nc},0,dev);
-  if(dev==0) zip1(map,R,[nc](auto& r, auto& x, int k){
-      x.sum0_into(r.cols(0,nc));
-      x.sum1_into(r.cols(nc,nc));
-      r.cols(2*nc,nc)+=x.diag01();
-    },offs,nc);
-  return R;
-}
-
-void add_reduce1(const TENSOR& R, const AindexPackB& map, const int offs=0) const{
-  int nc=R.dim(1)/3;
-  if(dev==0) zip1(map,R,[nc](auto& r, auto& x, int k){
-      x.sum0_into(r.cols(0,nc));
-      x.sum1_into(r.cols(nc,nc));
-      r.cols(2*nc,nc)+=x.diag01();
-    },offs,nc);
-}
-
-TENSOR reduce1_shrink(const AindexPackB& map, const int offs=0, int nc=0) const{
-  TimedFn T("Ptensors2","reduce1",*this,map,(map.count1+2*map.count2)*nc);
-  if(nc==0) nc=(get_nc()-offs)/3;
-  cnine::using_vram_manager vv(ptens_global::vram_manager);
-  TENSOR R({map.nrows,nc},0,dev);
-  if(dev==0) zip1(map,R,[nc](auto& r, auto& x, int k){
-      x.cols(0,nc).sum0_into(r);
-      x.cols(nc,nc).sum1_into(r);
-      r+=x.cols(2*nc,nc).diag01();
-    },offs,nc);
-  return R;
-}
-
-
-void add_reduce1_shrink(const TENSOR& R, const AindexPackB& map, const int offs=0) const{
-  int nc=R.dim(1);
-  if(dev==0) zip1(map,R,[nc](auto& r, auto& x, int k){
-      x.cols(0,nc).sum0_into(r);
-      x.cols(nc,nc).sum1_into(r);
-      r+=x.cols(2*nc,nc).diag01();
-    },offs,nc);
-}
-
-
-TENSOR reduce2(const AindexPackB& map, const int offs=0, int nc=0) const{
-  TimedFn T("Ptensors2","reduce2",*this,map,(map.count1+2*map.count2)*nc);
-  if(nc==0) nc=(get_nc()-offs);
-  cnine::using_vram_manager vv(ptens_global::vram_manager);
-  TENSOR R({map.nrows,nc},0,dev);
-  if(dev==0) zip2(map,R,[](auto& r, auto& x, int k){r+=x;},offs,nc);
-  return R;
-}
-
-
-void add_reduce2(const TENSOR& R, const AindexPackB& map, const int offs=0) const{
-  int nc=R.dim(1);
-  if(dev==0) zip2(map,R,[](auto& r, auto& x, int k){r+=x;},offs,nc);
-}
-
-
-TENSOR reduce2_shrink(const AindexPackB& map, const int offs=0, int nc=0) const{
-  TimedFn T("Ptensors2","reduce2",*this,map,(map.count1+2*map.count2)*nc);
-  if(nc==0) nc=(get_nc()-offs)/2;
-  cnine::using_vram_manager vv(ptens_global::vram_manager);
-  TENSOR R({map.nrows,nc},0,dev);
-  if(dev==0) zip2(map,R,[](auto& r, auto& x, int k){r+=x;},offs,nc);
-  if(dev==0) zip2(map,R,[](auto& r, auto& x, int k){r+=x.transp();},offs+nc,nc);
-  return R;
-}
-
-
-void add_reduce2_shrink(const TENSOR& R, const AindexPackB& map, const int offs=0) const{
-  int nc=R.dim(1);
-  if(dev==0) zip2(map,R,[](auto& r, auto& x, int k){r+=x;},offs,nc);
-  if(dev==0) zip2(map,R,[](auto& r, auto& x, int k){r+=x.transp();},offs+nc,nc);
-}
+*/

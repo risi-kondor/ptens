@@ -24,8 +24,6 @@
 #include "Ptensors.hpp"
 #include "AtomsPackTag.hpp"
 #include "Ptensor1view.hpp"
-#include "PtensorMap.hpp"
-#include "PtensorMapFactory.hpp"
 
 
 namespace ptens{
@@ -72,7 +70,6 @@ namespace ptens{
     using BASE::get_nc;
 
 
-    //AtomsPack atoms;
     AtomsPackTag1 tag;
 
 
@@ -445,13 +442,6 @@ namespace ptens{
     }
     
 
-    //private:
-
-    //template<typename SOURCE>
-    //RowLevelMap& rmap(const SOURCE& x, const PtensorMap& tmap) const{
-    //return *ptens_global::rmap_cache(tag,x.tag,tmap.obj);
-    //}
-
 #include "Ptensors1_reductions.hpp"
 #include "Ptensors1_broadcasting.hpp"
 
@@ -508,3 +498,9 @@ namespace ptens{
 
 #endif 
 
+    //private:
+
+    //template<typename SOURCE>
+    //RowLevelMap& rmap(const SOURCE& x, const PtensorMap& tmap) const{
+    //return *ptens_global::rmap_cache(tag,x.tag,tmap.obj);
+    //}

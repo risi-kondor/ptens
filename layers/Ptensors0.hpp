@@ -23,8 +23,8 @@
 #include "Ptensor0.hpp"
 #include "Ptensors.hpp"
 #include "AtomsPackTag.hpp"
-#include "PtensorMap.hpp"
-#include "PtensorMapFactory.hpp"
+//#include "PtensorMap.hpp"
+//#include "PtensorMapFactory.hpp"
 #include "GatherPlanFactory.hpp"
 
 
@@ -344,13 +344,6 @@ namespace ptens{
 #include "Ptensors0_reductions.hpp"
 #include "Ptensors0_broadcasting.hpp"
 
-    //private:
-
-    //template<typename SOURCE>
-    //RowLevelMap& rmap(const SOURCE& x, const PtensorMap& tmap) const{
-    //return *ptens_global::rmap_cache(tag,x.tag,tmap.obj);
-    //}
-
 
   public: // ---- Reductions ---------------------------------------------------------------------------------
 
@@ -497,3 +490,9 @@ namespace ptens{
       //for(int i=0; i<N; i++)
       //view_of(map,i,offs,nc)+=map.chunk0(x,i);
       //}
+    //private:
+
+    //template<typename SOURCE>
+    //RowLevelMap& rmap(const SOURCE& x, const PtensorMap& tmap) const{
+    //return *ptens_global::rmap_cache(tag,x.tag,tmap.obj);
+    //}

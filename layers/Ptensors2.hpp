@@ -24,7 +24,7 @@
 #include "Ptensors.hpp"
 #include "AtomsPackTag.hpp"
 #include "Ptensor2view.hpp"
-#include "PtensorMapFactory.hpp"
+//#include "PtensorMapFactory.hpp"
 
 
 namespace ptens{
@@ -62,8 +62,6 @@ namespace ptens{
     using BASE::atoms_of;
     using BASE::get_nc;
 
-    //AtomsPack atoms;
-    //shared_ptr<PtensorsJig2<int> > jig;
     AtomsPackTag2 tag;
 
 
@@ -184,13 +182,6 @@ namespace ptens{
   public: // ----- Conversions -------------------------------------------------------------------------------
 
 
-    //Ptensors2(const Ptensors2& x):
-    //BASE(cnine::Gdims({x.tail/x.nc,x.nc})),
-    //atoms(x.atoms){
-    //BASE::view2().set(x.view_as_matrix().view2());
-    //}
-
-
   public: // ---- Transport ----------------------------------------------------------------------------------
 
 
@@ -219,25 +210,9 @@ namespace ptens{
       return 2;
     }
 
-    //int size() const{
-    //return atoms.size();
-    //}
-
-    //int get_nc() const{
-    //return BASE::dim(1);
-    //}
-
-    //int nchannels() const{
-    //return BASE::dim(1);
-    //}
-
     int size_of(const int i) const{
       return atoms.size_of(i);
     }
-
-    //AtomsPack get_atoms() const{
-    //return atoms;
-    //}
 
     int offset(const int i) const{
       return atoms.row_offset2(i);
@@ -247,10 +222,6 @@ namespace ptens{
       return atoms.row_offset1(i);
     }
 
-    //Atoms atoms_of(const int i) const{
-    //return atoms(i);
-    //}
-    
     TENSOR tensor_of(const int i) const{
       int k=size_of(i);
       return TENSOR::rows(offset(i),k*k).reshape({k,k,get_nc()});
@@ -450,11 +421,6 @@ namespace ptens{
 
   private:
 
-    //template<typename SOURCE>
-    //RowLevelMap& rmap(const SOURCE& x, const PtensorMap& tmap) const{
-    //return *ptens_global::rmap_cache(tag,x.tag,tmap.obj);
-    //}
-
     #include "Ptensors2_reductions.hpp"
     #include "Ptensors2_broadcasting.hpp"
 
@@ -520,3 +486,8 @@ namespace ptens{
       }
     }
     */
+    //template<typename SOURCE>
+    //RowLevelMap& rmap(const SOURCE& x, const PtensorMap& tmap) const{
+    //return *ptens_global::rmap_cache(tag,x.tag,tmap.obj);
+    //}
+

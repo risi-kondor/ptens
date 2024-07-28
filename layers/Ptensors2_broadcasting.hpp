@@ -102,9 +102,73 @@ void broadcast2(const BASE& X, const int offs=0){
 }
 
 
-public: // ---- Idexed broadcasting -------------------------------------------------------------------------------
 
 
+// ---- Indexed broadcasting -----------------------------------------------------------------------
+
+
+void broadcast0(const TENSOR& x, const AindexPackB& map, const int offs=0){
+  PTENS_CPUONLY();
+  TimedFn T("Ptensors2","broadcast0",*this,x,map,map.count1*x.dim(1));
+  int nc=x.dim(1);
+  if(dev==0){
+    zip0(map,x,[](auto& r, auto& x, int k){x+=repeat0(repeat0(r,k),k);},offs,nc);
+    zip0(map,x,[](auto& r, auto& x, int k){x.diag01()+=repeat0(r,k);},offs+nc,nc);
+  }
+  //GPUCODE(CUDA_STREAM(Ptensors2_broadcast0_cu(*this,x,map,offs,stream)));
+}
+
+void broadcast0_shrink(const TENSOR& x, const AindexPackB& map, const int offs=0){
+  PTENS_CPUONLY();
+  TimedFn T("Ptensors2","broadcast0",*this,x,map,map.count1*x.dim(1));
+  int nc=x.dim(1)/2;
+  if(dev==0){
+    zip0(map,x,[nc](auto& r, auto& x, int k){x+=repeat0(repeat0(r.block(0,nc),k),k);},offs,nc);
+    zip0(map,x,[nc](auto& r, auto& x, int k){x.diag01()+=repeat0(r.block(nc,nc),k);},offs,nc);
+  }
+  //GPUCODE(CUDA_STREAM(Ptensors2_broadcast0_cu(*this,x,map,offs,stream)));
+}
+
+void broadcast1(const TENSOR& x, const AindexPackB& map, const int offs=0){
+  PTENS_CPUONLY();
+  TimedFn T("Ptensors2","broadcast1",*this,x,map,map.count1*x.dim(1));
+  int nc=x.dim(1);
+  if(dev==0){
+    zip1(map,x,[](auto& r, auto& x, int k){x+=repeat0(r,k);},offs,nc);
+    zip1(map,x,[](auto& r, auto& x, int k){x+=repeat1(r,k);},offs+nc,nc);
+    zip1(map,x,[](auto& r, auto& x, int k){x.diag01()+=r;},offs+2*nc,nc);
+  }
+  //GPUCODE(CUDA_STREAM(Ptensors2_broadcast1_cu(*this,x,map,offs,stream)));
+}
+
+void broadcast1_shrink(const TENSOR& x, const AindexPackB& map, const int offs=0){
+  PTENS_CPUONLY();
+  TimedFn T("Ptensors2","broadcast1",*this,x,map,map.count1*x.dim(1));
+  int nc=x.dim(1)/3;
+  if(dev==0){
+    zip1(map,x,[nc](auto& r, auto& x, int k){x+=repeat0(r.cols(0,nc),k);},offs,nc);
+    zip1(map,x,[nc](auto& r, auto& x, int k){x+=repeat1(r.cols(nc,nc),k);},offs,nc);
+    zip1(map,x,[nc](auto& r, auto& x, int k){x.diag01()+=r.cols(2*nc,nc);},offs,nc);
+  }
+  //GPUCODE(CUDA_STREAM(Ptensors2_broadcast1_cu(*this,x,map,offs,stream)));
+}
+
+void broadcast2(const TENSOR& x, const AindexPackB& map, const int offs=0){
+  PTENS_CPUONLY();
+  TimedFn T("Ptensors2","broadcast2",*this,x,map,map.count1*x.dim(1));
+  int nc=x.dim(1);
+  if(dev==0){
+    zip2(map,x,[](auto& r, auto& x, int k){x+=r;},offs,nc);
+    zip2(map,x,[](auto& r, auto& x, int k){x.transp()+=r;},offs+nc,nc);
+  }
+  //GPUCODE(CUDA_STREAM(Ptensors2_broadcast1_cu(*this,x,map,offs,stream)));
+}
+
+
+public: // ---- Deprecated Idexed broadcasting -------------------------------------------------------------------------------
+
+
+/*
 void broadcast0(const Ptensors0<TYPE>& x, const AindexPack& list, const int offs=0){
   TimedFn T("Ptensors2","broadcast0",*this,x,list,(list.count1+list.count2)*x.get_nc());
   if(dev==0){
@@ -177,6 +241,7 @@ void broadcast1_shrink(const Ptensors1<TYPE>& x, const AindexPack& list, const i
   }
   GPUCODE(CUDA_STREAM(Ptensors2_broadcast1_cu(*this,x,list,offs,stream)));
 }
+*/
 
 /*
   void broadcast2_shrink(const Ptensors2<TYPE>& x, const AindexPack& list, const int offs=0){
@@ -193,59 +258,3 @@ void broadcast1_shrink(const Ptensors1<TYPE>& x, const AindexPack& list, const i
   GPUCODE(CUDA_STREAM(Ptensors2_broadcast2_cu(*this,x,list,offs,stream)));
   }
 */
-
-
-// ---- Indexed broadcasting -----------------------------------------------------------------------
-
-
-void broadcast0(const TENSOR& x, const AindexPackB& map, const int offs=0){
-  TimedFn T("Ptensors2","broadcast0",*this,x,map,map.count1*x.dim(1));
-  int nc=x.dim(1);
-  if(dev==0){
-    zip0(map,x,[](auto& r, auto& x, int k){x+=repeat0(repeat0(r,k),k);},offs,nc);
-    zip0(map,x,[](auto& r, auto& x, int k){x.diag01()+=repeat0(r,k);},offs+nc,nc);
-  }
-  GPUCODE(CUDA_STREAM(Ptensors2_broadcast0_cu(*this,x,map,offs,stream)));
-}
-
-void broadcast0_shrink(const TENSOR& x, const AindexPackB& map, const int offs=0){
-  TimedFn T("Ptensors2","broadcast0",*this,x,map,map.count1*x.dim(1));
-  int nc=x.dim(1)/2;
-  if(dev==0){
-    zip0(map,x,[nc](auto& r, auto& x, int k){x+=repeat0(repeat0(r.block(0,nc),k),k);},offs,nc);
-    zip0(map,x,[nc](auto& r, auto& x, int k){x.diag01()+=repeat0(r.block(nc,nc),k);},offs,nc);
-  }
-  GPUCODE(CUDA_STREAM(Ptensors2_broadcast0_cu(*this,x,map,offs,stream)));
-}
-
-void broadcast1(const TENSOR& x, const AindexPackB& map, const int offs=0){
-  TimedFn T("Ptensors2","broadcast1",*this,x,map,map.count1*x.dim(1));
-  int nc=x.dim(1);
-  if(dev==0){
-    zip1(map,x,[](auto& r, auto& x, int k){x+=repeat0(r,k);},offs,nc);
-    zip1(map,x,[](auto& r, auto& x, int k){x+=repeat1(r,k);},offs+nc,nc);
-    zip1(map,x,[](auto& r, auto& x, int k){x.diag01()+=r;},offs+2*nc,nc);
-  }
-  GPUCODE(CUDA_STREAM(Ptensors2_broadcast1_cu(*this,x,map,offs,stream)));
-}
-
-void broadcast1_shrink(const TENSOR& x, const AindexPackB& map, const int offs=0){
-  TimedFn T("Ptensors2","broadcast1",*this,x,map,map.count1*x.dim(1));
-  int nc=x.dim(1)/3;
-  if(dev==0){
-    zip1(map,x,[nc](auto& r, auto& x, int k){x+=repeat0(r.cols(0,nc),k);},offs,nc);
-    zip1(map,x,[nc](auto& r, auto& x, int k){x+=repeat1(r.cols(nc,nc),k);},offs,nc);
-    zip1(map,x,[nc](auto& r, auto& x, int k){x.diag01()+=r.cols(2*nc,nc);},offs,nc);
-  }
-  GPUCODE(CUDA_STREAM(Ptensors2_broadcast1_cu(*this,x,map,offs,stream)));
-}
-
-void broadcast2(const TENSOR& x, const AindexPackB& map, const int offs=0){
-  TimedFn T("Ptensors2","broadcast2",*this,x,map,map.count1*x.dim(1));
-  int nc=x.dim(1);
-  if(dev==0){
-    zip2(map,x,[](auto& r, auto& x, int k){x+=r;},offs,nc);
-    zip2(map,x,[](auto& r, auto& x, int k){x.transp()+=r;},offs+nc,nc);
-  }
-  GPUCODE(CUDA_STREAM(Ptensors2_broadcast1_cu(*this,x,map,offs,stream)));
-}
