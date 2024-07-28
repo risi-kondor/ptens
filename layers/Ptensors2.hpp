@@ -32,6 +32,31 @@ namespace ptens{
   template<typename TYPE> class Ptensors0;
   template<typename TYPE> class Ptensors1;
 
+  #ifdef _WITH_CUDA
+  extern void Ptensors2_reduce0_cu(const cnine::Ltensor<float>& r, const cnine::Ltensor<float>& x, const AindexPackB& map, 
+    int offs, int n, const cudaStream_t& stream);
+  extern void Ptensors2_reduce0_shrink_cu(const cnine::Ltensor<float>& r, const cnine::Ltensor<float>& x, const AindexPackB& map, 
+    int offs, int n, const cudaStream_t& stream);
+  extern void Ptensors2_reduce1_cu(const cnine::Ltensor<float>& r, const cnine::Ltensor<float>& x, const AindexPackB& map, 
+    int offs, int n, const cudaStream_t& stream);
+  extern void Ptensors2_reduce1_shrink_cu(const cnine::Ltensor<float>& r, const cnine::Ltensor<float>& x, const AindexPackB& map, 
+    int offs, int n, const cudaStream_t& stream);
+  extern void Ptensors2_reduce2_cu(const cnine::Ltensor<float>& r, const cnine::Ltensor<float>& x, const AindexPackB& map, 
+    int offs, int n, const cudaStream_t& stream);
+  extern void Ptensors2_reduce2_shrink_cu(const cnine::Ltensor<float>& r, const cnine::Ltensor<float>& x, const AindexPackB& map, 
+    int offs, int n, const cudaStream_t& stream);
+  extern void Ptensors2_broadcast0_cu(const cnine::Ltensor<float>& r, const cnine::Ltensor<float>& x, const AindexPackB& map, 
+    const int offs, const cudaStream_t& stream);
+  extern void Ptensors2_broadcast0_shrink_cu(const cnine::Ltensor<float>& r, const cnine::Ltensor<float>& x, const AindexPackB& map, 
+    const int offs, const cudaStream_t& stream);
+  extern void Ptensors2_broadcast1_cu(const cnine::Ltensor<float>& r, const cnine::Ltensor<float>& x, const AindexPackB& map, 
+    const int offs, const cudaStream_t& stream);
+  extern void Ptensors2_broadcast1_shrink_cu(const cnine::Ltensor<float>& r, const cnine::Ltensor<float>& x, const AindexPackB& map, 
+    const int offs, const cudaStream_t& stream);
+  extern void Ptensors2_broadcast2_cu(const cnine::Ltensor<float>& r, const cnine::Ltensor<float>& x, const AindexPackB& map, 
+    const int offs, const cudaStream_t& stream);
+  #endif 
+
 
   template<typename TYPE>
   class Ptensors2: public Ptensors<TYPE>, public cnine::diff_class<Ptensors2<TYPE> >{

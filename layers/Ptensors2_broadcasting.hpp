@@ -115,7 +115,7 @@ void broadcast0(const TENSOR& x, const AindexPackB& map, const int offs=0){
     zip0(map,x,[](auto& r, auto& x, int k){x+=repeat0(repeat0(r,k),k);},offs,nc);
     zip0(map,x,[](auto& r, auto& x, int k){x.diag01()+=repeat0(r,k);},offs+nc,nc);
   }
-  //GPUCODE(CUDA_STREAM(Ptensors2_broadcast0_cu(*this,x,map,offs,stream)));
+  GPUCODE(CUDA_STREAM(Ptensors2_broadcast0_cu(*this,x,map,offs,stream)));
 }
 
 void broadcast0_shrink(const TENSOR& x, const AindexPackB& map, const int offs=0){
@@ -126,7 +126,7 @@ void broadcast0_shrink(const TENSOR& x, const AindexPackB& map, const int offs=0
     zip0(map,x,[nc](auto& r, auto& x, int k){x+=repeat0(repeat0(r.block(0,nc),k),k);},offs,nc);
     zip0(map,x,[nc](auto& r, auto& x, int k){x.diag01()+=repeat0(r.block(nc,nc),k);},offs,nc);
   }
-  //GPUCODE(CUDA_STREAM(Ptensors2_broadcast0_cu(*this,x,map,offs,stream)));
+  GPUCODE(CUDA_STREAM(Ptensors2_broadcast0_shrink_cu(*this,x,map,offs,stream)));
 }
 
 void broadcast1(const TENSOR& x, const AindexPackB& map, const int offs=0){
@@ -138,7 +138,7 @@ void broadcast1(const TENSOR& x, const AindexPackB& map, const int offs=0){
     zip1(map,x,[](auto& r, auto& x, int k){x+=repeat1(r,k);},offs+nc,nc);
     zip1(map,x,[](auto& r, auto& x, int k){x.diag01()+=r;},offs+2*nc,nc);
   }
-  //GPUCODE(CUDA_STREAM(Ptensors2_broadcast1_cu(*this,x,map,offs,stream)));
+  GPUCODE(CUDA_STREAM(Ptensors2_broadcast1_cu(*this,x,map,offs,stream)));
 }
 
 void broadcast1_shrink(const TENSOR& x, const AindexPackB& map, const int offs=0){
@@ -150,7 +150,7 @@ void broadcast1_shrink(const TENSOR& x, const AindexPackB& map, const int offs=0
     zip1(map,x,[nc](auto& r, auto& x, int k){x+=repeat1(r.cols(nc,nc),k);},offs,nc);
     zip1(map,x,[nc](auto& r, auto& x, int k){x.diag01()+=r.cols(2*nc,nc);},offs,nc);
   }
-  //GPUCODE(CUDA_STREAM(Ptensors2_broadcast1_cu(*this,x,map,offs,stream)));
+  GPUCODE(CUDA_STREAM(Ptensors2_broadcast1_shrink_cu(*this,x,map,offs,stream)));
 }
 
 void broadcast2(const TENSOR& x, const AindexPackB& map, const int offs=0){
@@ -161,6 +161,6 @@ void broadcast2(const TENSOR& x, const AindexPackB& map, const int offs=0){
     zip2(map,x,[](auto& r, auto& x, int k){x+=r;},offs,nc);
     zip2(map,x,[](auto& r, auto& x, int k){x.transp()+=r;},offs+nc,nc);
   }
-  //GPUCODE(CUDA_STREAM(Ptensors2_broadcast1_cu(*this,x,map,offs,stream)));
+  GPUCODE(CUDA_STREAM(Ptensors2_broadcast2_cu(*this,x,map,offs,stream)));
 }
 

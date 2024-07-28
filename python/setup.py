@@ -119,7 +119,7 @@ def main():
             #'../../cnine/cuda/gatherRows.cu',
             '../cuda/Ptensors0.cu',
             '../cuda/Ptensors1.cu',
-            #'../cuda/Ptensors2.cu',
+            '../cuda/Ptensors2.cu',
             #'../cuda/NodeLayer.cu',
             'bindings/ptens_py.cpp'
         ],
