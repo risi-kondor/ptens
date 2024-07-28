@@ -42,21 +42,21 @@ namespace ptens{
   public: // ---- Access -----------------------------------------------------------------------------------------
 
 
-    void row_level_operations(const bool x){
-      ptens_global::row_level_operations=x;
-    }
+    //    void row_level_operations(const bool x){
+    //ptens_global::row_level_operations=x;
+    //}
 
     void cache_atomspack_cats(const bool x){
       ptens_global::cache_atomspack_cats=x;
     }
 
-    void cache_overlap_maps(const bool x){
-      ptens_global::cache_overlap_maps=x;
-    }
+    //void cache_overlap_maps(const bool x){
+    //ptens_global::cache_overlap_maps=x;
+    //}
 
-    void cache_rmaps(const bool x){
-      ptens_global::cache_rmaps=x;
-    }
+    //void cache_rmaps(const bool x){
+    //ptens_global::cache_rmaps=x;
+    //}
 
 
   public: // ---- I/O --------------------------------------------------------------------------------------------
@@ -105,14 +105,14 @@ namespace ptens{
       oss<<" Ptens 0.0 "<<endl;
       cout<<endl;
       oss<<" CUDA support:                     "<<on_off(with_cuda)<<endl;
-      oss<<" Row level gather operations:      "<<on_off(ptens_global::row_level_operations)<<endl;
+      //oss<<" Row level gather operations:      "<<on_off(ptens_global::row_level_operations)<<endl;
       oss<<endl;
       oss<<" AtomsPack cat cache:                "<<
 	size_or_off(ptens_global::cache_atomspack_cats, ptens_global::atomspack_cat_cache.size())<<endl;
-      oss<<" Overlap maps cache:                 "<<
-	size_or_off(ptens_global::cache_overlap_maps, ptens_global::overlaps_cache.size())<<endl;
-      oss<<" Row level map cache:                "<<
-	size_or_off(ptens_global::cache_rmaps, ptens_global::rmap_cache.size())<<endl;
+      //oss<<" Overlap maps cache:                 "<<
+      //size_or_off(ptens_global::cache_overlap_maps, ptens_global::overlaps_cache.size())<<endl;
+      //oss<<" Row level map cache:                "<<
+      //size_or_off(ptens_global::cache_rmaps, ptens_global::rmap_cache.size())<<endl;
       oss<<" Graph cache:                        "<<
 	print_size(ptens_global::graph_cache.size())<<endl;
       oss<<" Graph elist cache:                  "<<

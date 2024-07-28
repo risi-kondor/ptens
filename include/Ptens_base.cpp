@@ -16,8 +16,8 @@ namespace ptens{
 }
 
 #include "AtomsPackCatCache.hpp"
-#include "OverlapsMmapCache.hpp"
-#include "RowLevelMapCache.hpp"
+//#include "OverlapsMmapCache.hpp"
+//#include "RowLevelMapCache.hpp"
 
 #include "GgraphCache.hpp"
 #include "SubgraphCache.hpp"
@@ -36,11 +36,11 @@ namespace ptens{
     bool cache_atomspack_cats=true;
     AtomsPackCatCache atomspack_cat_cache; 
 
-    bool cache_overlap_maps=false;
-    OverlapsMmapCache overlaps_cache;
+    //bool cache_overlap_maps=false;
+    //OverlapsMmapCache overlaps_cache;
 
-    bool cache_rmaps=false;
-    RowLevelMapCache rmap_cache;
+    //bool cache_rmaps=false;
+    //RowLevelMapCache rmap_cache;
 
     GgraphCache graph_cache;
 

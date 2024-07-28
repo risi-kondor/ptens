@@ -19,6 +19,7 @@ must be accompanied by a verbatim copy of the license.
 
 #include "Ptens_base.hpp"
 #include "Ltensor.hpp"
+#include "AindexPackB.hpp"
 
 
 typedef cnine::Ltensor<float> TENSOR;
@@ -70,7 +71,7 @@ __global__ void Ptensors1_reduce1_kernel(float* rarr, int rs, const float* xarr,
 
 
 __global__ void Ptensors1_broadcast0_kernel(float* rarr, const int rs, 
-  const float* xarr, const int xs, const int* maparr, const int maps, const int n, const int* bmap){
+  const float* xarr, const int xs, const int* maparr, const int maps, const int* bmap, const int n){
   extern __shared__ unsigned char _shared[]; 
   int* ix=reinterpret_cast<int*>(_shared);
 
@@ -100,7 +101,7 @@ __global__ void Ptensors1_broadcast0_kernel(float* rarr, const int rs,
 
 
 __global__ void Ptensors1_broadcast1_kernel(float* rarr, const int rs, 
-  const float* xarr, const int xs, const int* maparr, const int maps, const int n, const int* bmap){
+  const float* xarr, const int xs, const int* maparr, const int maps, const int* bmap, const int n){
   extern __shared__ unsigned char _shared[]; 
   int* ix=reinterpret_cast<int*>(_shared);
 
@@ -120,7 +121,7 @@ __global__ void Ptensors1_broadcast1_kernel(float* rarr, const int rs,
 
     if(c>=n) continue;
     //assert(ix[2]==target);
-    float* x=xarr+ix[0]*xs+c;
+    const float* x=xarr+ix[0]*xs+c;
     float* r=rarr+ix[2]*rs+c;
     for(int i=0; i<k; i++){
       r[ix[i+4]*rs]+=x[i*xs];
@@ -135,7 +136,7 @@ __global__ void Ptensors1_broadcast1_kernel(float* rarr, const int rs,
 namespace ptens{
 
 
-  void Ptensors1_reduce0_cu(TENSOR& r, const TENSOR& x, const AindexPackB& map, 
+  void Ptensors1_reduce0_cu(const TENSOR& r, const TENSOR& x, const AindexPackB& map, 
     int offs, int n, const cudaStream_t& stream){
     int dev=r.dev;
     PTENS_ASSRT(x.dev==dev);
@@ -146,7 +147,7 @@ namespace ptens{
       (r.get_arr(),r.stride(0),x.get_arr()+offs,x.stride(0),map.on_device(dev).get_arr(),map.stride(0),n);
   }
 
-  void Ptensors1_reduce1_cu(TENSOR& r, const TENSOR& x, const AindexPackB& map, 
+  void Ptensors1_reduce1_cu(const TENSOR& r, const TENSOR& x, const AindexPackB& map, 
     int offs, int n, const cudaStream_t& stream){
     int dev=r.dev;
     PTENS_ASSRT(x.dev==dev);
@@ -156,30 +157,30 @@ namespace ptens{
       (r.get_arr(),r.stride(0),x.get_arr()+offs,x.stride(0),map.on_device(dev).get_arr(),map.stride(0),n);
   }
 
-   void Ptensors1_broadcast0_cu(TENSOR& r, const TENSOR& x, const AindexPackB& map, 
+   void Ptensors1_broadcast0_cu(const TENSOR& r, const TENSOR& x, const AindexPackB& map, 
     const int offs, const cudaStream_t& stream){
     int dev=r.dev;
     PTENS_ASSRT(x.dev==dev);
-    PTENS_ASSRT(map.dev==dev);
+    //PTENS_ASSRT(map.dev==dev);
     int n=x.dim(1);
 
     int nthrd=cnine::roundup(std::max(n,map.dim(1)),32);
-    Ptensors1_broadcast0_kernel<<<map.get_bmap().n,nthrd,map.dim(1)*4,stream>>> 
+    Ptensors1_broadcast0_kernel<<<map.n_gather_lists,nthrd,map.dim(1)*4,stream>>> 
       (r.get_arr()+offs,r.stride(0),x.get_arr(),x.stride(0),map.on_device(dev).get_arr(),map.stride(0),
-	map.gmap_on_device(dev));
+	map.gmap_on_device(dev).get_arr(),n);
   }
 
-  void Ptensors1_broadcast1_cu(TENSOR& r, const TENSOR& x, const AindexPackB& map, 
+  void Ptensors1_broadcast1_cu(const TENSOR& r, const TENSOR& x, const AindexPackB& map, 
     const int offs, const cudaStream_t& stream){
     int dev=r.dev;
     PTENS_ASSRT(x.dev==dev);
-    PTENS_ASSRT(map.dev==dev);
+    //PTENS_ASSRT(map.dev==dev);
     int n=x.dim(1);
 
     int nthrd=cnine::roundup(std::max(n,map.dim(1)),32);
-    Ptensors1_broadcast1_kernel<<<map.get_bmap().n,nthrd,map.dim(1)*4,stream>>> 
+    Ptensors1_broadcast1_kernel<<<map.n_gather_lists,nthrd,map.dim(1)*4,stream>>> 
       (r.get_arr()+offs,r.stride(0),x.get_arr(),x.stride(0),map.on_device(dev).get_arr(),map.stride(0),
-	map.gmap_on_device(dev));
+	map.gmap_on_device(dev).get_arr(),n);
   }
 
 }

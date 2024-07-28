@@ -94,6 +94,7 @@ pybind11::class_<Ptensors2<float> >(m,"ptensors2")
 // ---- Indexed Reductions -----------------------------------------------------------------------------------
 
 
+/*
   .def("add_reduce0_to",[](const Ptensors2f& obj, const Ptensors0f& r, const AindexPack& list){
       obj.add_reduce0_to(r,list);})
   .def("add_reduce1_to",[](const Ptensors2f& obj, const Ptensors1f& r, const AindexPack& list){
@@ -107,11 +108,13 @@ pybind11::class_<Ptensors2<float> >(m,"ptensors2")
       obj.add_reduce1_to(r,list);})
   .def("add_reduce2_shrink_to",[](const Ptensors2f& obj, const Ptensors2f& r, const AindexPack& list){
       obj.add_reduce2_to(r,list);})
+*/
 
   
 // ---- Indexed Broadcasting ---------------------------------------------------------------------------------
 
 
+/*
   .def("broadcast0",[](Ptensors2f& obj, const Ptensors0f& x, const AindexPack& list, const int offs){
       obj.broadcast0(x,list,offs);},py::arg("x"),py::arg("list"),py::arg("offs")=0)
   .def("broadcast1",[](Ptensors2f& obj, const Ptensors1f& x, const AindexPack& list, const int offs){
@@ -123,6 +126,7 @@ pybind11::class_<Ptensors2<float> >(m,"ptensors2")
       obj.broadcast0(x,list,offs);},py::arg("x"),py::arg("list"),py::arg("offs")=0)
   .def("broadcast1_shrink",[](Ptensors2f& obj, const Ptensors1f& x, const AindexPack& list, const int offs){
       obj.broadcast1(x,list,offs);},py::arg("x"),py::arg("list"),py::arg("offs")=0)
+*/
 
 
 // ---- I/O ------------------------------------------------------------------------------------------

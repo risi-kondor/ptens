@@ -31,10 +31,10 @@
 namespace ptens{
 
   #ifdef _WITH_CUDA 
-  extern void Ptensors0_reduce0_cu(cnine::Ltensor<float>& R, const cnine::Ltensor<float>& x, 
-    const AindexPackB& map, int offs, int n, const cudaStream_t& stream){
-  extern void Ptensors0_broadcast0_cu(cnine::Ltensor<float>& x, const cnine::Ltensor<float>& R, 
-    const AindexPackB& map, const int offs, const cudaStream_t& stream){
+  extern void Ptensors0_reduce0_cu(const cnine::Ltensor<float>& R, const cnine::Ltensor<float>& x, 
+    const AindexPackB& map, int offs, int n, const cudaStream_t& stream);
+  extern void Ptensors0_broadcast0_cu(const cnine::Ltensor<float>& x, const cnine::Ltensor<float>& R, 
+    const AindexPackB& map, const int offs, const cudaStream_t& stream);
   #endif 
 
 

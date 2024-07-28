@@ -15,7 +15,7 @@
 #ifndef _ptens_BatchedGatherPlanFactory
 #define _ptens_BatchedGatherPlanFactory
 
-#include "PtensorMap.hpp"
+//#include "PtensorMap.hpp"
 #include "BatchedGatherPlan.hpp"
 #include "LayerMap.hpp"
 #include "AtomsPack.hpp"
@@ -26,6 +26,25 @@ namespace ptens{
 
   class BatchedGatherPlanFactory{
   public:
+
+
+    template<int outk, int ink>
+    static BatchedGatherPlan gather_map0(const BatchedLayerMap& map, const BatchedAtomsPack<outk>& out, 
+      const BatchedAtomsPack<ink>& in){
+      return make<outk,ink>(map,*out.obj,*in.obj,0);
+    }
+
+    template<int outk, int ink>
+    static BatchedGatherPlan gather_map1(const BatchedLayerMap& map, const BatchedAtomsPack<outk>& out, 
+      const BatchedAtomsPack<ink>& in){
+      return make<outk,ink>(map,*out.obj,*in.obj,1);
+    }
+
+    template<int outk, int ink>
+    static BatchedGatherPlan gather_map2(const BatchedLayerMap& map, const BatchedAtomsPack<outk>& out, 
+      const BatchedAtomsPack<ink>& in){
+      return make<outk,ink>(map,*out.obj,*in.obj,2);
+    }
 
 
     template<int aoutk, int aink>

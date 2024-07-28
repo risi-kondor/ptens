@@ -19,7 +19,7 @@
 #include "object_pack.hpp"
 
 #include "BatchedAtomsPack.hpp"
-#include "BatchedPtensorMap.hpp"
+//#include "BatchedPtensorMap.hpp"
 #include "Ptensors0.hpp"
 #include "BatchedPtensors.hpp"
 #include "MultiLoop.hpp"
@@ -254,16 +254,6 @@ namespace ptens{
       return *this;
     }
 
-    BatchedPtensors0 reduce0(const BatchedAtomsPack<0>& _atoms, const BatchedAindexPack& list) const{
-      PTENS_DEPRECATED();
-      TimedFn T("BatchedPtensors0","reduce0",*this,list,list.size()*get_nc());
-      cnine::using_vram_manager vv(ptens_global::vram_manager);
-      BatchedPtensors0 R(_atoms,get_nc(),0,get_dev());
-      for(int i=0; i<size(); i++){
-	R.view_of(i)+=view_of(i).reduce0(_atoms[i],list[i]);
-      }
-      return R;
-    }
 
     TENSOR reduce0(const BatchedAindexPackB& map, const int offs=0, int nc=0) const{
       TimedFn T("BatchedPtensors0","reduce0",*this,map,map.size()*get_nc());
@@ -284,12 +274,6 @@ namespace ptens{
 
     void broadcast0(const TENSOR& x, const int offs=0){
       TENSOR::view2().cols(offs,x.dim(1))+=x.view2();
-    }
-
-    void broadcast0(const BatchedPtensors0& x, const BatchedAindexPack& list, const int offs=0){
-      PTENS_DEPRECATED();
-      for(int i=0; i<size(); i++)
-	view_of(i).broadcast0(x.view_of(i),list[i],offs);
     }
 
     void broadcast0(const TENSOR& x, const BatchedAindexPackB& map, const int offs=0){

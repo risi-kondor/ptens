@@ -140,3 +140,44 @@ void add_reduce1_to(const Ptensors1& R, const AindexPack& list, const int offs=0
 */
 
     
+/*
+public: // ---- Indexed Reductions -------------------------------------------------------------------------
+
+TENSOR reduce0(const AindexPackB& map, const int offs=0, int nc=0) const{
+  TimedFn T("Ptensors1","reduce0",*this,map,map.count1*nc);
+  if(nc==0) nc=get_nc();
+  cnine::using_vram_manager vv(ptens_global::vram_manager);
+  TENSOR R({map.nrows,nc},0,get_dev());
+  if(dev==0) zip0(map,R,[](auto& r, auto& x, int k){
+      x.sum0_into(r);
+    },offs,nc);
+  GPUCODE(CUDA_STREAM(Ptensors1_reduce0_cu(R,*this,map,offs,nc,stream)));
+  return R;
+}
+
+
+TENSOR reduce1(const AindexPackB& map, const int offs=0, int nc=0) const{
+  TimedFn T("Ptensors1","reduce1",*this,map,map.count1*nc);
+  if(nc==0) nc=get_nc();
+  cnine::using_vram_manager vv(ptens_global::vram_manager);
+  TENSOR R({map.nrows,nc},0,get_dev());
+  if(dev==0) zip1(map,R,[](auto& r, auto& x, int k){r+=x;},offs,nc);
+  GPUCODE(CUDA_STREAM(Ptensors1_reduce1_cu(R,*this,map,offs,nc,stream)));
+  return R;
+}
+
+
+void add_reduce0(TENSOR& R, const AindexPackB& map, const int offs=0) const{
+  int nc=R.dim(1);
+  if(dev==0) zip0(map,R,[](auto& r, auto& x, int k){x.sum0_into(r);},offs,nc);
+  GPUCODE(CUDA_STREAM(Ptensors1_reduce0_cu(R,*this,map,offs,nc,stream)));
+}
+
+
+void add_reduce1(TENSOR& R, const AindexPackB& map, const int offs=0) const{
+  int nc=R.dim(1);
+  if(dev==0) zip1(map,R,[](auto& r, auto& x, int k){r+=x;},offs,nc);
+  GPUCODE(CUDA_STREAM(Ptensors1_reduce1_cu(R,*this,map,offs,nc,stream)));
+}
+*/
+

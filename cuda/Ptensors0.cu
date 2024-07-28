@@ -37,6 +37,8 @@ __global__ void Ptensors0_reduce0_kernel(float* rarr, const int rs, const float*
 
 __global__ void Ptensors0_broadcast0_kernel(float* rarr, const int rs, const float* xarr, const int xs, 
   const int* map, const int maps, const int* bmap){
+  //extern __shared__ unsigned char _shared[]; 
+  //int* ix=reinterpret_cast<int*>(_shared);
   const int b=blockIdx.x;
   const int c=threadIdx.x;
   const int boffs=bmap[b+1];
@@ -48,11 +50,11 @@ __global__ void Ptensors0_broadcast0_kernel(float* rarr, const int rs, const flo
   int target=0;
   for(int s=0; s<N; s++){
     const int row=bmap[boffs+s];
-    if(c<maps) ix[c]=maparr[row*maps+c];
-    __syncthreads();
+    //if(c<maps) ix[c]=map[row*maps+c];
+    //__syncthreads();
 
-    if(s==0) target=ix[2];
-    t+=xarr[ix[0]*xs+c];
+    if(s==0) target=map[row*maps+2];
+    t+=xarr[map[row*maps]*xs+c];
   }
   rarr[target*rs+c]+=t;
 }
@@ -64,23 +66,22 @@ __global__ void Ptensors0_broadcast0_kernel(float* rarr, const int rs, const flo
 namespace ptens{
 
 
-  void Ptensors0_reduce0_cu(TENSOR& R, const TENSOR& x, const AindexPackB& map, int offs, int n, const cudaStream_t& stream){
+  void Ptensors0_reduce0_cu(const TENSOR& R, const TENSOR& x, const AindexPackB& map, int offs, int n, const cudaStream_t& stream){
     int dev=R.get_dev();
     PTENS_ASSRT(R.get_dev()==1);
     PTENS_ASSRT(x.get_dev()==1);
-    const_cast<AindexPack&>(list).to_device(1);
-    if(R.size()==0) return;
-    Ptensors0_reduce0_kernel<<<R.size(),n,0,stream>>>(R.arrg,R.dir.garr(dev),x.arrg+offs,x.dir.garr(dev),list.get_arrg(),list.dir.garr(dev),n);
+    if(map.dim(0)==0) return;
+    Ptensors0_reduce0_kernel<<<map.dim(0),n,0,stream>>>(R.get_arr(),R.stride(0),x.get_arr()+offs,x.stride(0),map.on_device(dev).get_arr(),map.stride(0),n);
   }
 
-  void Ptensors0_broadcast0_cu(TENSOR& x, const TENSOR& R, const AindexPackB& map, const int offs, const cudaStream_t& stream){
-    int dev=R.get_dev();
-    PTENS_ASSRT(R.get_dev()==1);
-    PTENS_ASSRT(x.get_dev()==1);
-    if(list.get_bmap().n==0) return;
-    const_cast<AindexPack&>(list).to_device(1);
-    Ptensors0_broadcast0_kernel<<<list.get_bmap().n,R.nc,0,stream>>>
-      (x.arrg+offs,x.dir.garr(dev),list.get_arrg(),list.dir.garr(dev),R.arrg,R.dir.garr(dev),list.get_barr(1));
+  void Ptensors0_broadcast0_cu(TENSOR& r, const TENSOR& x, const AindexPackB& map, const int offs, const cudaStream_t& stream){
+    int dev=r.dev;
+    PTENS_ASSRT(x.dev==dev);
+    int n=x.dim(1);
+    int nthrd=cnine::roundup(std::max(n,map.dim(1)),32);
+    Ptensors0_broadcast0_kernel<<<map.n_gather_lists,nthrd,map.dim(1)*4,stream>>> 
+      (r.get_arr()+offs,r.stride(0),x.get_arr(),x.stride(0),map.on_device(dev).get_arr(),map.stride(0),
+	map.gmap_on_device(dev).get_arr());
   }
 
 
