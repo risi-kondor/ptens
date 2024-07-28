@@ -67,9 +67,9 @@ void broadcast1_shrink(const BASE& X, const int offs=0){
   PTENS_ASSRT(X.dim(1)==3*nc);
   PTENS_ASSRT(offs==0);
   Rtensor2_view x=X.view2();
-  Rtensor2_view x0=x.block(0,0,X.dim(0),nc);
-  Rtensor2_view x1=x.block(0,nc,X.dim(0),nc);
-  Rtensor2_view x2=x.block(0,2*nc,X.dim(0),nc);
+  //Rtensor2_view x0=x.block(0,0,X.dim(0),nc);
+  //Rtensor2_view x1=x.block(0,nc,X.dim(0),nc);
+  //Rtensor2_view x2=x.block(0,2*nc,X.dim(0),nc);
       
 
   if(dev==0){

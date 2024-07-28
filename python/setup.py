@@ -15,8 +15,8 @@ def main():
     # os.environ['CUDA_HOME']='/usr/local/cuda'
     #os.environ["CC"] = "clang"
 
-    compile_with_cuda = False  
-    # compile_with_cuda = True
+    # compile_with_cuda = False  
+    compile_with_cuda = True
 
     copy_warnings = False
     torch_convert_warnings = False
@@ -77,6 +77,7 @@ def main():
                           '-D_DEF_CGCMEM',
                           '-DWITH_FAKE_GRAD',
                           '-DCNINE_FUNCTION_TRACING',
+                          '-std=c++17',
                           '--default-stream=per-thread'
                           # '-rdc=true'
                           ]

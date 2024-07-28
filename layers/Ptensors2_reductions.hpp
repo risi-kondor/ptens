@@ -118,7 +118,7 @@ void add_reduce0_to(const BASE& R) const{
   PTENS_CPUONLY();
   int N=size();
   int dev=get_dev();
-  Rtensor2_view r=R.view2();
+  //Rtensor2_view r=R.view2();
   if(dev==0){
     Rtensor2_view r0=R.block(0,0,N,nc);
     Rtensor2_view r1=R.block(0,nc,N,nc);
