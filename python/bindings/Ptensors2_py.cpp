@@ -16,11 +16,11 @@ pybind11::class_<Ptensors2<float> >(m,"ptensors2")
       return obj.add_linmaps(x);}) 
   
   .def("add_linmaps_back",[](Ptensors2f& obj, const Ptensors0f& x){
-      return obj.add_linmaps(x);}) 
+      return obj.add_linmaps_back(x);}) 
   .def("add_linmaps_back",[](Ptensors2f& obj, const Ptensors1f& x){
-      return obj.add_linmaps(x);}) 
+      return obj.add_linmaps_back(x);}) 
   .def("add_linmaps_back",[](Ptensors2f& obj, const Ptensors2f& x){
-      return obj.add_linmaps(x);}) 
+      return obj.add_linmaps_back(x);}) 
   
 
 // ---- Gather ----------------------------------------------------------------------------------------------

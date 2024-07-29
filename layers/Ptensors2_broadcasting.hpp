@@ -9,6 +9,12 @@ void broadcast0(const BASE& X, const int offs=0){
   PTENS_ASSRT(X.dim(0)==N);
   Rtensor2_view x=X.view2();
       
+  if(atoms.constk()>0){
+    view4(offs,nc).fuse({1,2}).add_broadcast(1,X);
+    view4(offs+nc,nc).diag({1,2}).add_broadcast(1,X);
+    return;
+  }
+
   if(dev==0){
     for(int i=0; i<N; i++){
       int n=size_of(i);
@@ -30,6 +36,12 @@ void broadcast0_shrink(const BASE& X, int offs=0){
   Rtensor2_view x0=x.block(0,0,N,nc);
   Rtensor2_view x1=x.block(0,nc,N,nc);
       
+  if(atoms.constk()>0){
+    view4(offs,nc).fuse({1,2}).add_broadcast(1,X.cols(0,nc));
+    view4(offs,nc).diag({1,2}).add_broadcast(1,X.cols(nc,nc));
+    return;
+  }
+
   if(dev==0){
     for(int i=0; i<N; i++){
       int n=size_of(i);
@@ -46,6 +58,14 @@ void broadcast1(const BASE& X, const int offs=0){
   int dev=get_dev();
   int nc=X.dim(1);
   Rtensor2_view x=X.view2();
+
+  if(atoms.constk()>0){
+    int k=atoms.constk();
+    view4(offs,nc).add_broadcast(1,X.split(0,k));
+    view4(offs+nc,nc).add_broadcast(2,X.split(0,k));
+    view4(offs+2*nc,nc).diag({1,2})+=X.split(0,k);
+    return;
+  }
 
   if(dev==0){
     for(int i=0; i<N; i++){
@@ -71,6 +91,13 @@ void broadcast1_shrink(const BASE& X, const int offs=0){
   //Rtensor2_view x1=x.block(0,nc,X.dim(0),nc);
   //Rtensor2_view x2=x.block(0,2*nc,X.dim(0),nc);
       
+  if(atoms.constk()>0){
+    int k=atoms.constk();
+    view4(offs,nc).add_broadcast(1,X.cols(0,nc).split(0,k));
+    view4(offs,nc).add_broadcast(2,X.cols(nc,nc).split(0,k));
+    view4(offs,nc).diag({1,2})+=X.cols(2*nc,nc).split(0,k);
+    return;
+  }
 
   if(dev==0){
     for(int i=0; i<N; i++){
@@ -91,6 +118,13 @@ void broadcast2(const BASE& X, const int offs=0){
   int nc=X.dim(1);
   Rtensor2_view x=X.view2();
       
+  if(atoms.constk()>0){
+    int k=atoms.constk();
+    cols(offs,nc)+=X;
+    view4(offs+nc,nc)+=X.split(0,k).split(0,k).transp(1,2);
+    return;
+  }
+
   if(dev==0){
     for(int i=0; i<N; i++){
       int roffs=offset(i);

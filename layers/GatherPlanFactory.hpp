@@ -18,6 +18,7 @@
 #include "GatherPlan.hpp"
 #include "LayerMap.hpp"
 #include "AtomsPack.hpp"
+#include "ptr_triple_indexed_cache.hpp"
 
 
 namespace ptens{
@@ -26,20 +27,45 @@ namespace ptens{
   class GatherPlanFactory{
   public:
 
+    //typedef ptr_triple_indexed_cache<LayerMapObj,AtomsPackTagObj,AtomsPackTagObj,shared_ptr<GatherPlanObj> > GplanCache;
+    //GplanCache cache=GplanCache([](const LayerMapObj& map, const AtomsPackTagObj& out_tag, 
+    //const AtomsPackTagObj& in_tag){
+    //return make(map,out_tag.get_atoms(),in_tag.get_atoms(),}
+
+//     typedef cnine::ptr_triple_arg_indexed_cache<LayerMapObj,AtomsPackTagObj,AtomsPackTagObj,int,shared_ptr<GatherPlanObj> > GplanCache;
+//     GplanCache cache=GplanCache([](const LayerMapObj& map, const AtomsPackObj& out, 
+// 	const AtomsPackObj& in, const int& code){
+// 	int outk=code/9; 
+// 	int ink=(code%9)/3;
+// 	int gatherk=code%3;
+// 	return make(map,out,in,outk,ink,gatherk);
+//       });
+
 
     static GatherPlan gather_map0(const LayerMap& map, const AtomsPack& out, const AtomsPack& in, 
       const int outk=0, const int ink=0){
-      return make(*map.obj,*out.obj,*in.obj,outk,ink,0);
+      return make_or_cached(*map.obj,*out.obj,*in.obj,outk,ink,0);
     }
 
     static GatherPlan gather_map1(const LayerMap& map, const AtomsPack& out, const AtomsPack& in, 
       const int outk=0, const int ink=0){
-      return make(*map.obj,*out.obj,*in.obj,outk,ink,1);
+      return make_or_cached(*map.obj,*out.obj,*in.obj,outk,ink,1);
     }
 
     static GatherPlan gather_map2(const LayerMap& map, const AtomsPack& out, const AtomsPack& in, 
       const int outk=0, const int ink=0){
-      return make(*map.obj,*out.obj,*in.obj,outk,ink,2);
+      return make_or_cached(*map.obj,*out.obj,*in.obj,outk,ink,2);
+    }
+
+    static shared_ptr<GatherPlanObj> make_or_cached(const LayerMapObj& map, 
+      const AtomsPackObj& out, const AtomsPackObj& in, const int outk=0, const int ink=0, const int gatherk=0){
+
+      if(ptens_global::gather_plan_cache.contains(map,out,in,9*outk+3*ink+gatherk))
+	return ptens_global::gather_plan_cache(map,out,in,9*outk+3*ink+gatherk);
+
+      auto R=make(map,out,in,outk,ink,gatherk);
+      ptens_global::gather_plan_cache.insert(map,out,in,9*outk+3*ink+gatherk,R);
+      return R;
     }
 
 

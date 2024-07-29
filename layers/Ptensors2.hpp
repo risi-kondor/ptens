@@ -289,6 +289,12 @@ namespace ptens{
       return Ptensor2view<TYPE>(const_cast<TYPE*>(get_arr())+apack.soffset(i)*nc+offs,n,k*nc,nc,1,apack.ix(i),get_dev());
     }
 
+    TENSOR view4(int offs=0, int nc=0) const{
+      PTENS_ASSRT(atoms.constk()>0);
+      if(nc==0) nc=dim(1);
+      return cols(offs,nc).split(0,atoms.constk()).split(0,atoms.constk());
+    }
+
     void zip0(const AindexPackB& map, const TENSOR& M, 
       const std::function<void(const Rtensor1_view&,const Ptensor2view<TYPE>&, int)>& lambda, const int offset=0, int n=0) const{
       int N=map.size();

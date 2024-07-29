@@ -6,10 +6,16 @@ BASE reduce0() const{
   int N=size();
   int nc=get_nc();
   int dev=get_dev();
-  PTENS_CPUONLY();
-      
   cnine::using_vram_manager vv(ptens_global::vram_manager);
   BASE R({N,2*nc},0,dev);
+
+  if(atoms.constk()>0){
+    R.cols(0,nc)+=view4().sum(1).sum(1);
+    R.cols(nc,nc)+=view4().diag({1,2}).sum(1);
+    return R;
+  }
+
+  PTENS_CPUONLY();
   Rtensor2_view r=R.view2();
   if(dev==0){
     Rtensor2_view r0=R.block(0,0,N,nc);
@@ -22,15 +28,22 @@ BASE reduce0() const{
   return R;
 }
 
+
 BASE reduce0_shrink(const int offs, const int nc) const{
   TimedFn T("Ptensors2","reduce0_shrink",*this);
   int N=size();
   int dev=get_dev();
-  PTENS_CPUONLY();
-      
   cnine::using_vram_manager vv(ptens_global::vram_manager);
   BASE R({N,nc},0,dev);
   Rtensor2_view r=R.view2();
+
+  if(atoms.constk()>0){
+    R+=view4().cols(offs,nc).sum(1).sum(1);
+    R+=view4().cols(offs+nc,nc).diag({1,2}).sum(1);
+    return R;
+  }
+
+  PTENS_CPUONLY();
   if(dev==0){
     for(int i=0; i<N; i++){
       view3_of(i,offs,nc).sum01_into(r.slice0(i));
@@ -46,11 +59,18 @@ BASE reduce1() const{
   int N=size();
   int nc=get_nc();
   int dev=get_dev();
-  PTENS_CPUONLY();
-
   cnine::using_vram_manager vv(ptens_global::vram_manager);
   BASE R({atoms.nrows1(),3*nc},0,dev);
   Rtensor2_view r=R.view2();
+
+  if(atoms.constk()>0){
+    R.cols(0,nc)+=view4().sum(1).fuse({0,1});
+    R.cols(nc,nc)+=view4().sum(2).fuse({0,1});
+    R.cols(2*nc,nc)+=view4().diag({1,2}).fuse({0,1});
+    return R;
+  }
+
+  PTENS_CPUONLY();
   if(dev==0){
     for(int i=0; i<N; i++){
       int roffs=offset1(i);
@@ -68,11 +88,19 @@ BASE reduce1_shrink(const int offs, const int nc) const{
   TimedFn T("Ptensors2","reduce1_shrink",*this);
   int N=size();
   int dev=get_dev();
-  PTENS_CPUONLY();
 
   cnine::using_vram_manager vv(ptens_global::vram_manager);
   BASE R({atoms.nrows1(),nc},0,dev);
   Rtensor2_view r=R.view2();
+
+  if(atoms.constk()>0){
+    R+=view4().cols(offs,nc).sum(1).fuse({0,1});
+    R+=view4().cols(offs+nc,nc).sum(1).fuse({0,1});
+    R+=view4().cols(offs+2*nc,nc).diag({1,2}).fuse({0,1});
+    return R;
+  }
+
+  PTENS_CPUONLY();
   if(dev==0){
     for(int i=0; i<N; i++){
       int roffs=offset1(i);
@@ -90,11 +118,18 @@ BASE reduce2_shrink(const int offs, const int nc) const{
   TimedFn T("Ptensors2","reduce2_shrink",*this);
   int N=size();
   int dev=get_dev();
-  PTENS_CPUONLY();
       
   cnine::using_vram_manager vv(ptens_global::vram_manager);
   BASE R({dim(0),nc},0,dev);
   Rtensor2_view r=R.view2();
+
+  if(atoms.constk()>0){
+    R+=view4().cols(offs,nc);
+    R+=view4().cols(offs+nc,nc).transp(1,2);
+    return R;
+  }
+
+  PTENS_CPUONLY();
   if(dev==0){
     for(int i=0; i<N; i++){
       int roffs=offset(i);

@@ -15,11 +15,11 @@ pybind11::class_<BatchedPtensors0<float> >(m,"batched_ptensors0")
       return obj.add_linmaps(x);}) 
   
   .def("add_linmaps_back",[](BPtensors0f& obj, const BPtensors0f& x){
-      return obj.add_linmaps(x);}) 
+      return obj.add_linmaps_back(x);}) 
   .def("add_linmaps_back",[](BPtensors0f& obj, const BPtensors1f& x){
-      return obj.add_linmaps(x);}) 
+      return obj.add_linmaps_back(x);}) 
   .def("add_linmaps_back",[](BPtensors0f& obj, const BPtensors2f& x){
-      return obj.add_linmaps(x);}) 
+      return obj.add_linmaps_back(x);}) 
   
 
 // ---- Gather ----------------------------------------------------------------------------------------------

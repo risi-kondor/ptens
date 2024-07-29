@@ -139,9 +139,13 @@ class ptensorlayer1(ptensorlayer):
 
 
     def __repr__(self):
+        if not hasattr(self,'atoms'): 
+            return super().__repr__()
         return "ptensorlayer1(len="+str(len(self.atoms))+",nc="+str(self.size(1))+")"
 
     def __str__(self,indent=""):
+        if not hasattr(self,'atoms'): 
+            return super().__str__()
         r=indent+self.__repr__()+"\n"
         r=r+self.backend().__str__(indent+"  ")
         return r

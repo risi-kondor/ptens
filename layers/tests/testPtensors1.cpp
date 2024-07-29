@@ -50,7 +50,7 @@ int main(int argc, char** argv){
   cout<<X2ga<<endl;
 
   AtomsPack yatoms=AtomsPack::random(N,N,0.5);
-  cout<<X0<<endl;
+  auto lmap=LayerMap::overlaps_map(yatoms,xatoms);
   auto Y0=Ptens1::gather(yatoms,X0);
   auto Y1=Ptens1::gather(yatoms,X1);
   auto Y2=Ptens1::gather(yatoms,X2);
@@ -67,17 +67,15 @@ int main(int argc, char** argv){
   Ptens1& a=Y1.get_grad();
   Ptens1 b(a);
 
-
-
   Ptens0 X0g=Ptens0::zeros_like(X0);
   Ptens1 X1g=Ptens1::zeros_like(X1);
   Ptens2 X2g=Ptens2::zeros_like(X2);
 
-  X0g.add_gather_back(Y0);
+  X0g.add_gather_back(Y0,lmap);
   cout<<X0g<<endl;
-  X1g.add_gather_back(Y1);
+  X1g.add_gather_back(Y1,lmap);
   cout<<X1g<<endl;
-  X2g.add_gather_back(Y2);
+  X2g.add_gather_back(Y2,lmap);
   cout<<X2g<<endl;
 
   exit(0);

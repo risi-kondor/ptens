@@ -273,25 +273,31 @@ namespace ptens{
       return Ptensor1(TENSOR(TENSOR::rows(offset(i),size_of(i))),atoms_of(i));
     }
 
-    const cnine::Rtensor3_view view3(const int K) const{
-      int nc=get_nc();
-      return cnine::Rtensor3_view(const_cast<float*>(get_arr()),dim(0)/K,K,nc,K*nc,nc,1,get_dev());
+    TENSOR view3(int offs=0, int nc=0) const{
+      PTENS_ASSRT(atoms.constk()>0);
+      if(nc==0) nc=dim(1);
+      return cols(offs,nc).split(0,atoms.constk());
     }
 
-    cnine::Rtensor3_view view3(const int K){
-      int nc=get_nc();
-      return cnine::Rtensor3_view(get_arr(),dim(0)/K,K,nc,K*nc,nc,1,get_dev());
-    }
+    //const cnine::Rtensor3_view view3(const int K) const{
+    //int nc=get_nc();
+    //return cnine::Rtensor3_view(const_cast<float*>(get_arr()),dim(0)/K,K,nc,K*nc,nc,1,get_dev());
+    //}
 
-    const cnine::Rtensor3_view view3(const int K, const int offs, const int nc) const{
-      int _nc=get_nc();
-      return cnine::Rtensor3_view(const_cast<float*>(get_arr())+offs,dim(0)/K,K,nc,K*_nc,_nc,1,get_dev());
-    }
+//     cnine::Rtensor3_view view3(const int K){
+//       int nc=get_nc();
+//       return cnine::Rtensor3_view(get_arr(),dim(0)/K,K,nc,K*nc,nc,1,get_dev());
+//     }
 
-    cnine::Rtensor3_view view3(const int K, const int offs, const int nc){
-      int _nc=get_nc();
-      return cnine::Rtensor3_view(get_arr()+offs,dim(0)/K,K,nc,K*_nc,_nc,1,get_dev());
-    }
+//     const cnine::Rtensor3_view view3(const int K, const int offs, const int nc) const{
+//       int _nc=get_nc();
+//       return cnine::Rtensor3_view(const_cast<float*>(get_arr())+offs,dim(0)/K,K,nc,K*_nc,_nc,1,get_dev());
+//     }
+
+//     cnine::Rtensor3_view view3(const int K, const int offs, const int nc){
+//       int _nc=get_nc();
+//       return cnine::Rtensor3_view(get_arr()+offs,dim(0)/K,K,nc,K*_nc,_nc,1,get_dev());
+//     }
 
 
     Ptensor1view<TYPE> view_of(const AindexPackB& apack, const int i) const{

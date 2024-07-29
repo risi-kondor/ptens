@@ -6,9 +6,13 @@ void broadcast0(const TENSOR& X, const int offs=0){
   int N=size();
   int nc=X.dim(1);
   PTENS_ASSRT(X.dim(0)==N);
-  Rtensor2_view x=X.view2();
-  for(int i=0; i<N; i++)
-    view_of(i,offs,nc)+=cnine::repeat0(x.slice0(i),size_of(i));
+  if(atoms.constk()>0){
+    view3(offs,nc).add_broadcast(1,X);
+  }else{
+    Rtensor2_view x=X.view2();
+    for(int i=0; i<N; i++)
+      view_of(i,offs,nc)+=cnine::repeat0(x.slice0(i),size_of(i));
+  }
 }
 
 void broadcast1(const TENSOR& X, const int offs=0){

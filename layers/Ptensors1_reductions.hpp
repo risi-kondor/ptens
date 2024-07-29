@@ -6,6 +6,11 @@ TENSOR reduce0(const int offs=0, int nc=0) const{
   int N=size();
   int dev=get_dev();
   if(nc==0) nc=get_nc()-offs;
+
+  if(atoms.constk()>0){
+    return view3(offs,nc).sum(1);
+  }
+
   cnine::using_vram_manager vv(ptens_global::vram_manager);
   TENSOR R({N,nc},0,dev);
   Rtensor2_view r=R.view2();
@@ -24,6 +29,12 @@ void add_reduce0_to(const TENSOR& R, const int offs=0) const{
   PTENS_CPUONLY();
   int N=size();
   int nc=R.dim(1);
+
+  if(atoms.constk()>0){
+    R+=view3(offs,nc).sum(1);
+    return;
+  }
+
   Rtensor2_view r=R.view2();
   for(int i=0; i<N; i++)
     view_of(i,offs,nc).sum0_into(r.slice0(i));
