@@ -18,7 +18,12 @@ B2=p.ptensorlayer1.gather(atoms2,A2)
 A0g=A0.to(device)
 A1g=A1.to(device)
 A2g=A2.to(device)
-print(A0+A0)
+print(A0)
+print(A0-A0)
+C=A0-A0
+print(A0.atoms)
+print(C.atoms)
+print(C)
 
 B0g=p.ptensorlayer1.gather(atoms2,A0g)
 B1g=p.ptensorlayer1.gather(atoms2,A1g)

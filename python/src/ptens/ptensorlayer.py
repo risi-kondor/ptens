@@ -19,29 +19,29 @@ import ptens_base as pb
 
 class ptensorlayer(torch.Tensor):
 
-    covariant_functions=[torch.Tensor.to]
+    covariant_functions=[torch.Tensor.to,torch.Tensor.add,torch.Tensor.sub]
 
     @classmethod
     def __torch_function__(cls, func, types, args=(), kwargs=None):
         if kwargs is None:
             kwargs = {}
-        
-        r= super().__torch_function__(func, types, args, kwargs)
-        #if func in ptensorlayer.covariant_functions:
-        #    return r
-        if isinstance(r,ptensorlayer) and not(func in ptensorlayer.covariant_functions):
-            r=torch.Tensor(r)
+        if func in ptensorlayer.covariant_functions:
+            r= super().__torch_function__(func, types, args, kwargs)
+            r.atoms=args[0].atoms
+        else:
+            r= super().__torch_function__(func, types, args, kwargs)
+            if isinstance(r,torch.Tensor):
+                r=torch.Tensor(r)
         return r
-        #return func(*args,**kwargs)
 
 
     # ---- Operations ----------------------------------------------------------------------------------------
 
 
-    def __add__(self,y):
-        assert self.size()==y.size()
-        assert self.atoms==y.atoms
-        return self.from_matrix(self.atoms,super().__add__(y))
+    #def __add__(self,y):
+    #    assert self.size()==y.size()
+    #    assert self.atoms==y.atoms
+    #    return self.from_matrix(self.atoms,super().__add__(y))
 
 
 def matmul(x,y):
