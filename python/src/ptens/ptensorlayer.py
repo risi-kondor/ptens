@@ -13,14 +13,26 @@
 #
 
 import torch
+import ptens as p 
 import ptens_base as pb 
+
 
 class ptensorlayer(torch.Tensor):
 
-    #def clone(self):
-    #    r=ptensorlayerc(super().clone())
-    #    r.atoms=self.atoms
-    #    return r
+    covariant_functions=[torch.Tensor.to]
+
+    @classmethod
+    def __torch_function__(cls, func, types, args=(), kwargs=None):
+        if kwargs is None:
+            kwargs = {}
+        
+        r= super().__torch_function__(func, types, args, kwargs)
+        #if func in ptensorlayer.covariant_functions:
+        #    return r
+        if isinstance(r,ptensorlayer) and not(func in ptensorlayer.covariant_functions):
+            r=torch.Tensor(r)
+        return r
+        #return func(*args,**kwargs)
 
 
     # ---- Operations ----------------------------------------------------------------------------------------
