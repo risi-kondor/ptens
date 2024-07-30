@@ -42,14 +42,14 @@ __global__ void Ptensors0_broadcast0_kernel(float* rarr, const int rs, const flo
   const int b=blockIdx.x;
   const int c=threadIdx.x;
   const int boffs=bmap[b+1];
-  const int N=bmap[b+2]-bmap[b+1];
+  const int N=bmap[b+2]-bmap[b+1]-1;
   if(N==0) return;
   //const int target=bmap[3*b+2];
 
   float t=0;
   int target=0;
   for(int s=0; s<N; s++){
-    const int row=bmap[boffs+s];
+    const int row=bmap[boffs+s+1];
     //if(c<maps) ix[c]=map[row*maps+c];
     //__syncthreads();
 
@@ -79,6 +79,7 @@ namespace ptens{
     PTENS_ASSRT(x.dev==dev);
     int n=x.dim(1);
     int nthrd=cnine::roundup(std::max(n,map.dim(1)),32);
+    cout<<map.gmap_on_device(dev)<<endl;
     if(map.n_gather_lists==0) return;
     Ptensors0_broadcast0_kernel<<<map.n_gather_lists,nthrd,map.dim(1)*4,stream>>> 
       (r.get_arr()+offs,r.stride(0),x.get_arr(),x.stride(0),map.on_device(dev).get_arr(),map.stride(0),
