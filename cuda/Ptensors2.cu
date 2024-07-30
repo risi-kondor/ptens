@@ -208,12 +208,12 @@ __global__ void Ptensors2_broadcast0_kernel(float* rarr, const int rs,
   assert(b<bmap[0]);
   const int c=threadIdx.x;
   const int boffs=bmap[b+1];
-  const int N=bmap[b+2]-bmap[b+1];
-  const int target=bmap[boffs];
-  float* r=rarr+target*rs+c;
+  const int N=bmap[b+2]-bmap[b+1]-1;
+  //const int target=bmap[boffs];
+  //float* r=rarr+target*rs+c;
 
   for(int s=0; s<N; s++){
-    const int row=bmap[boffs+s];
+    const int row=bmap[boffs+s+1];
     if(c<maps) ix[c]=maparr[row*maps+c];
     __syncthreads();
     if(c>=n) continue;
@@ -240,12 +240,12 @@ __global__ void Ptensors2_broadcast0_shrink_kernel(float* rarr, const int rs,
   assert(b<bmap[0]);
   const int c=threadIdx.x;
   const int boffs=bmap[b+1];
-  const int N=bmap[b+2]-bmap[b+1];
-  const int target=bmap[boffs];
-  float* r=rarr+target*rs+c;
+  const int N=bmap[b+2]-bmap[b+1]-1;
+  //const int target=bmap[boffs];
+  //float* r=rarr+target*rs+c;
 
   for(int s=0; s<N; s++){
-    const int row=bmap[boffs+s];
+    const int row=bmap[boffs+s+1];
     if(c<maps) ix[c]=maparr[row*maps+c];
     __syncthreads();
     if(c>=n) continue;
@@ -274,12 +274,12 @@ __global__ void Ptensors2_broadcast1_kernel(float* rarr, const int rs,
   assert(b<bmap[0]);
   const int c=threadIdx.x;
   const int boffs=bmap[b+1];
-  const int N=bmap[b+2]-bmap[b+1];
+  const int N=bmap[b+2]-bmap[b+1]-1;
   //const int target=bmap[boffs];
   //float* r=rarr+target*rs+c;
 
   for(int s=0; s<N; s++){
-    const int row=bmap[boffs+s];
+    const int row=bmap[boffs+s+1];
     if(c<maps) ix[c]=maparr[row*maps+c];
     __syncthreads();
     if(c>=n) continue;
@@ -309,12 +309,12 @@ __global__ void Ptensors2_broadcast1_shrink_kernel(float* rarr, const int rs,
   assert(b<bmap[0]);
   const int c=threadIdx.x;
   const int boffs=bmap[b+1];
-  const int N=bmap[b+2]-bmap[b+1];
+  const int N=bmap[b+2]-bmap[b+1]-1;
   //const int target=bmap[boffs];
   //float* r=rarr+target*rs+c;
 
   for(int s=0; s<N; s++){
-    const int row=bmap[boffs+s];
+    const int row=bmap[boffs+s+1];
     if(c<maps) ix[c]=maparr[row*maps+c];
     __syncthreads();
     if(c>=n) continue;
@@ -345,10 +345,10 @@ __global__ void Ptensors2_broadcast2_kernel(float* rarr, const int rs,
   assert(b<bmap[0]);
   const int c=threadIdx.x;
   const int boffs=bmap[b+1];
-  const int N=bmap[b+2]-bmap[b+1];
+  const int N=bmap[b+2]-bmap[b+1]-1;
 
   for(int s=0; s<N; s++){
-    const int row=bmap[boffs+s];
+    const int row=bmap[boffs+s+1];
     if(c<maps) ix[c]=maparr[row*maps+c];
     __syncthreads();
     if(c>=n) continue;
@@ -360,8 +360,8 @@ __global__ void Ptensors2_broadcast2_kernel(float* rarr, const int rs,
     for(int i=0; i<k; i++)
       for(int j=0; j<k; j++){
 	float t=x[(i*k+j)*xs];
-	r[(ix[i+4]+ix[j+4]*m)*rs]+=t;
-	r[(ix[j+4]+ix[i+4]*m)*rs+n]+=t;
+	r[(ix[i+4]*m+ix[j+4])*rs]+=t;
+	r[(ix[j+4]*m+ix[i+4])*rs+n]+=t;
       }
   }
 }

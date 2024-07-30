@@ -10,7 +10,6 @@ TENSOR reduce0(const AindexPackB& map, const int offs=0, int nc=0) const{
   TENSOR R({map.nrows,nc},0,get_dev());
   if(dev==0) zip0(map,R,[](auto& r, auto& x, int k){r+=x;},offs,nc);
   GPUCODE(CUDA_STREAM(Ptensors0_reduce0_cu(R,*this,map,offs,nc,stream)));
-  cout<<R<<endl;
   return R;
 }
 
