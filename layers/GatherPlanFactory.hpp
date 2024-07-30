@@ -110,11 +110,13 @@ namespace ptens{
       in_pack->gather_map=cnine::GatherMapB(in_lists);
 
       out_pack->nrows=toffset;
+      out_pack->n_gather_lists=out_lists.size();
       if(outk==0) out_pack->n_input_rows=out.nrows0();
       if(outk==1) out_pack->n_input_rows=out.nrows1();
       if(outk==2) out_pack->n_input_rows=out.nrows2();
 
       in_pack->nrows=toffset;
+      in_pack->n_gather_lists=in_lists.size();
       if(ink==0) in_pack->n_input_rows=in.nrows0();
       if(ink==1) in_pack->n_input_rows=in.nrows1();
       if(ink==2) in_pack->n_input_rows=in.nrows2();
