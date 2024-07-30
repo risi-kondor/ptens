@@ -142,7 +142,6 @@ void broadcast2(const BASE& X, const int offs=0){
 
 
 void broadcast0(const TENSOR& x, const AindexPackB& map, const int offs=0){
-  PTENS_CPUONLY();
   TimedFn T("Ptensors2","broadcast0",*this,x,map,map.count1*x.dim(1));
   int nc=x.dim(1);
   if(dev==0){
@@ -153,7 +152,6 @@ void broadcast0(const TENSOR& x, const AindexPackB& map, const int offs=0){
 }
 
 void broadcast0_shrink(const TENSOR& x, const AindexPackB& map, const int offs=0){
-  PTENS_CPUONLY();
   TimedFn T("Ptensors2","broadcast0",*this,x,map,map.count1*x.dim(1));
   int nc=x.dim(1)/2;
   if(dev==0){
@@ -164,7 +162,6 @@ void broadcast0_shrink(const TENSOR& x, const AindexPackB& map, const int offs=0
 }
 
 void broadcast1(const TENSOR& x, const AindexPackB& map, const int offs=0){
-  PTENS_CPUONLY();
   TimedFn T("Ptensors2","broadcast1",*this,x,map,map.count1*x.dim(1));
   int nc=x.dim(1);
   if(dev==0){
@@ -176,7 +173,6 @@ void broadcast1(const TENSOR& x, const AindexPackB& map, const int offs=0){
 }
 
 void broadcast1_shrink(const TENSOR& x, const AindexPackB& map, const int offs=0){
-  PTENS_CPUONLY();
   TimedFn T("Ptensors2","broadcast1",*this,x,map,map.count1*x.dim(1));
   int nc=x.dim(1)/3;
   if(dev==0){
@@ -188,7 +184,6 @@ void broadcast1_shrink(const TENSOR& x, const AindexPackB& map, const int offs=0
 }
 
 void broadcast2(const TENSOR& x, const AindexPackB& map, const int offs=0){
-  PTENS_CPUONLY();
   TimedFn T("Ptensors2","broadcast2",*this,x,map,map.count1*x.dim(1));
   int nc=x.dim(1);
   if(dev==0){
