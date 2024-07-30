@@ -115,7 +115,7 @@ class ptensorlayer2(p.ptensorlayer):
             N=T.size(0)
             k=T.size(1)
             nc=T.size(3)
-            R=torch.zeros([N,2*nc])
+            R=torch.zeros([N,2*nc],device=x.device)
             R[:,0:nc]=T.reshape(N,k*k,nc).sum(1)
             R[:,nc:2*nc]=torch.einsum("ijjc->ic",T)
             return p.ptensorlayer0.make(self.atoms,R)
@@ -128,7 +128,7 @@ class ptensorlayer2(p.ptensorlayer):
             N=T.size(0)
             k=T.size(1)
             nc=T.size(3)
-            R=torch.zeros([N,k,3*nc])
+            R=torch.zeros([N,k,3*nc],device=x.device)
             R[:,:,0:nc]=T.sum(1)
             R[:,:,nc:2*nc]=T.sum(2)
             R[:,:,2*nc:3*nc]+=torch.einsum("biic->bic",T)
@@ -150,7 +150,7 @@ class ptensorlayer2(p.ptensorlayer):
             N=x.size(0)
             k=x.atoms.constk()
             nc=x.size(1)
-            R=torch.zeros([N,k,k,2*nc])
+            R=torch.zeros([N,k,k,2*nc],device=x.device)
             S=x.unsqueeze(1).expand(N,k,nc)
             R[:,:,:,0:nc]=S.unsqueeze(1).expand(N,k,k,nc)
             U=R[:,:,:,nc:2*nc].diagonal(0,1,2).permute(0,2,1)
@@ -166,7 +166,7 @@ class ptensorlayer2(p.ptensorlayer):
             N=T.size(0)
             k=T.size(1)
             nc=T.size(2)
-            R=torch.zeros([N,k,k,3*nc])
+            R=torch.zeros([N,k,k,3*nc],device=x.device)
             R[:,:,:,0:nc]=T.unsqueeze(1).expand(N,k,k,nc)
             R[:,:,:,nc:2*nc]=T.unsqueeze(2).expand(N,k,k,nc)
             U=R[:,:,:,2*nc:3*nc].diagonal(0,1,2).permute(0,2,1)
@@ -182,7 +182,7 @@ class ptensorlayer2(p.ptensorlayer):
             N=T.size(0)
             k=T.size(1)
             nc=T.size(3)
-            R=torch.zeros([N,k,k,2*nc])
+            R=torch.zeros([N,k,k,2*nc],device=x.device)
             R[:,:,:,0:nc]=T
             R[:,:,:,nc:2*nc]=torch.einsum("bijc->bjic",T)
             return self.make(x.atoms,R.reshape(N*k*k,2*nc))
@@ -247,7 +247,7 @@ class ptensorlayer2_reduce0Fn(torch.autograd.Function):
     @staticmethod
     def forward(ctx,x):
         ctx.x=x
-        r=p.ptensorlayer0.zeros(x.atoms,x.get_nc()*2)
+        r=p.ptensorlayer0.zeros(x.atoms,x.get_nc()*2,device=x.device)
         x.backend().add_reduce0_to(r)
         return r
 
@@ -263,7 +263,7 @@ class ptensorlayer2_reduce1Fn(torch.autograd.Function):
     @staticmethod
     def forward(ctx,x):
         ctx.x=x
-        r=p.ptensorlayer1.zeros(x.atoms,x.get_nc()*3)
+        r=p.ptensorlayer1.zeros(x.atoms,x.get_nc()*3,device=x.device)
         x.backend().add_reduce1_to(r)
         return r
 
@@ -279,7 +279,7 @@ class ptensorlayer2_broadcast0Fn(torch.autograd.Function):
     @staticmethod
     def forward(ctx,x):
         ctx.x=x
-        r=p.ptensorlayer2.zeros(x.atoms,x.get_nc()*2)
+        r=p.ptensorlayer2.zeros(x.atoms,x.get_nc()*2,device=x.device)
         r.backend().broadcast0(x)
         return r
 
@@ -295,7 +295,7 @@ class ptensorlayer2_broadcast1Fn(torch.autograd.Function):
     @staticmethod
     def forward(ctx,x):
         ctx.x=x
-        r=p.ptensorlayer2.zeros(x.atoms,x.get_nc()*3)
+        r=p.ptensorlayer2.zeros(x.atoms,x.get_nc()*3,device=x.device)
         r.backend().broadcast1(x)
         return r
 
@@ -311,7 +311,7 @@ class ptensorlayer2_broadcast2Fn(torch.autograd.Function):
     @staticmethod
     def forward(ctx,x):
         ctx.x=x
-        r=p.ptensorlayer2.zeros(x.atoms,x.get_nc()*2)
+        r=p.ptensorlayer2.zeros(x.atoms,x.get_nc()*2,device=x.device)
         r.backend().broadcast2(x)
         return r
 

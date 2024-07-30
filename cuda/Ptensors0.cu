@@ -79,6 +79,7 @@ namespace ptens{
     PTENS_ASSRT(x.dev==dev);
     int n=x.dim(1);
     int nthrd=cnine::roundup(std::max(n,map.dim(1)),32);
+    if(map.n_gather_lists==0) return;
     Ptensors0_broadcast0_kernel<<<map.n_gather_lists,nthrd,map.dim(1)*4,stream>>> 
       (r.get_arr()+offs,r.stride(0),x.get_arr(),x.stride(0),map.on_device(dev).get_arr(),map.stride(0),
 	map.gmap_on_device(dev).get_arr());

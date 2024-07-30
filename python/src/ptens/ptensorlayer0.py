@@ -115,7 +115,7 @@ class ptensorlayer0_linmapsFn(torch.autograd.Function):
 
     @staticmethod
     def forward(ctx,x):
-        r=ptensorlayer0.zeros(x.atoms,x.get_nc()*([1,1,2][x.getk()]))
+        r=ptensorlayer0.zeros(x.atoms,x.get_nc()*([1,1,2][x.getk()]),device=x.device)
         r.backend().add_linmaps(x.backend())
         ctx.x=x
         return r
@@ -131,7 +131,7 @@ class ptensorlayer0_gatherFn(torch.autograd.Function):
 
     @staticmethod
     def forward(ctx,atoms,x,map):
-        r=ptensorlayer0.zeros(atoms,x.get_nc()*([1,1,2][x.getk()]))
+        r=ptensorlayer0.zeros(atoms,x.get_nc()*([1,1,2][x.getk()]),device=x.device)
         r.backend().add_gather(x.backend(),map)
         ctx.x=x
         ctx.map=map
