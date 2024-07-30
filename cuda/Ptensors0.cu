@@ -31,7 +31,7 @@ __global__ void Ptensors0_reduce0_kernel(float* rarr, const int rs, const float*
   const int* map, const int maps, const int n){
   const int b=blockIdx.x;
   const int c=threadIdx.x;
-  rarr[map[b*maps]+c]+=xarr[map[b*maps+2]+c];
+  rarr[map[b*maps]*rs+c]+=xarr[map[b*maps+2]*xs+c];
 }
 
 
