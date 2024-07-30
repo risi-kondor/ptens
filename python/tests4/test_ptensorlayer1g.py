@@ -2,7 +2,7 @@ import torch
 import ptens_base as pb
 import ptens as p
 
-device='cpu'
+device='cuda'
 
 atoms=pb.atomspack.from_list([[1,3,4],[2,5],[0,2]])
 atoms2=pb.atomspack.random(5,5,0.6)
@@ -18,19 +18,19 @@ B2=p.ptensorlayer1.gather(atoms2,A2)
 A0g=A0.to(device)
 A1g=A1.to(device)
 A2g=A2.to(device)
-print(A0)
-print(A0-A0)
-C=A0-A0
-print(A0.atoms)
-print(C.atoms)
-print(C)
+#print(A0)
+#print(A0-A0)
+#C=A0-A0
+#print(A0.atoms)
+#print(C.atoms)
+#print(C)
 
-B0g=p.ptensorlayer1.gather(atoms2,A0g)
+#B0g=p.ptensorlayer1.gather(atoms2,A0g)
 B1g=p.ptensorlayer1.gather(atoms2,A1g)
-B2g=p.ptensorlayer1.gather(atoms2,A2g)
+#B2g=p.ptensorlayer1.gather(atoms2,A2g)
 
 #print(torch.norm(torch.tensor(B0g-B0)))
-print(torch.norm(B0g-B0))
-print(torch.norm(B1g-B1))
-print(torch.norm(B2g-B2))
+#print(torch.norm(B0g-B0))
+#print(torch.norm(B1g-B1))
+#print(torch.norm(B2g-B2))
 

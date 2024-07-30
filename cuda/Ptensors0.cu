@@ -74,7 +74,7 @@ namespace ptens{
     Ptensors0_reduce0_kernel<<<map.dim(0),n,0,stream>>>(R.get_arr(),R.stride(0),x.get_arr()+offs,x.stride(0),map.on_device(dev).get_arr(),map.stride(0),n);
   }
 
-  void Ptensors0_broadcast0_cu(TENSOR& r, const TENSOR& x, const AindexPackB& map, const int offs, const cudaStream_t& stream){
+  void Ptensors0_broadcast0_cu(const TENSOR& r, const TENSOR& x, const AindexPackB& map, const int offs, const cudaStream_t& stream){
     int dev=r.dev;
     PTENS_ASSRT(x.dev==dev);
     int n=x.dim(1);
