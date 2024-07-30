@@ -2,7 +2,7 @@ import torch
 import ptens_base as pb
 import ptens as p
 
-device='cpu'
+device='cuda'
 
 atoms=pb.atomspack.from_list([[1,3,4],[2,5],[0,2]])
 atoms2=pb.atomspack.random(5,5,0.6)
