@@ -27,14 +27,9 @@ under a custom license that can be found in the file LICENSE.TXT
    ptensork.rst
    ptensorsk.rst
    linmaps.rst
-   transfer.rst
+   gather.rst
    graph.rst
-   gather.rst 
-   unite.rst
-
-   ggraph.rst
    subgraph.rst
-   subgraph_layer0.rst
 
 
 Indices and tables

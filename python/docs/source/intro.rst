@@ -4,14 +4,13 @@ Installation
 
 `ptens` is installed as a PyTorch C++ (or CUDA) extension and requires the following: 
 
-#. C++14 or higher
+#. C++17 or higher
 #. PyTorch
 #. `cnine` (see below) 
 
 ptens is easiest to install with ``pip``:
 
 #. Download the `cnine <https://github.com/risi-kondor/cnine>`_  library 
-   and install it on your system
 #. Download `ptens` from `github <https://github.com/risi-kondor/ptens>`_. 
    By default, it is assumed that cnine and ptens are downloaded to the same directory 
    (e.g., ``Downloads``).      

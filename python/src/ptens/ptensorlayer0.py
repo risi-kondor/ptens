@@ -24,30 +24,41 @@ class ptensorlayer0(ptensorlayer):
 
     @classmethod
     def make(self,atoms,M):
+        if isinstance(atoms,list):
+           atoms=pb.atomspack(atoms)
+        assert isinstance(atoms,pb.atomspack)
         R=ptensorlayer0(M)
         R.atoms=atoms
         return R
 
     @classmethod
     def zeros(self,atoms,nc,device='cpu'):
+        if isinstance(atoms,list):
+           atoms=pb.atomspack(atoms)
         assert isinstance(atoms,pb.atomspack)
         assert isinstance(nc,int)
         return self.make(atoms,torch.zeros([len(atoms),nc],device=device))
 
     @classmethod
     def randn(self,atoms,nc,device='cpu'):
+        if isinstance(atoms,list):
+           atoms=pb.atomspack(atoms)
         assert isinstance(atoms,pb.atomspack)
         assert isinstance(nc,int)
         return self.make(atoms,torch.randn([len(atoms),nc],device=device))
 
     @classmethod
     def sequential(self,atoms,nc,device='cpu'):
+        if isinstance(atoms,list):
+           atoms=pb.atomspack(atoms)
         assert isinstance(atoms,pb.atomspack)
         assert isinstance(nc,int)
         return self.make(atoms,torch.tensor([i for i in range (0,atoms.nrows0()*nc)],dtype=torch.float,device=device).reshape(atoms.nrows0(),nc))
 
     @classmethod
     def from_matrix(self,atoms,M):
+        if isinstance(atoms,list):
+           atoms=pb.atomspack(atoms)
         assert isinstance(atoms,pb.atomspack)
         assert isinstance(M,torch.Tensor)
         assert M.dim()==2
@@ -107,7 +118,7 @@ class ptensorlayer0(ptensorlayer):
         return "ptensorlayer0(len="+str(self.size(0))+",nc="+str(self.size(1))+")"
 
     def __str__(self,indent=""):
-        r=indent+self.__repr__()+"\n"
+        r=indent+"Ptensorlayer0:\n"
         r=r+self.backend().__str__(indent+"  ")
         return r
 

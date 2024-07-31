@@ -27,12 +27,9 @@ author = 'Risi Kondor'
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
-extensions = ['sphinx.ext.autodoc',
-              #'sphinx.ext.intersphinx',
-              'sphinx.ext.autosummary',
-              'sphinx.ext.napoleon',
+extensions = ['sphinx.ext.autodoc','sphinx.ext.intersphinx','sphinx.ext.autosummary','sphinx.ext.napoleon',
               'sphinx.ext.imgmath'
-              ,'sphinx_copybutton'
+              #,'sphinx_copybutton'
               ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -51,15 +48,6 @@ exclude_patterns = []
 #
 html_theme = 'furo'
 
-html_theme_options = {
-    "light_css_variables": {
-        "font-stack": "Arial, sans-serif",
-        "font-stack--monospace": "Courier, monospace",
-        "font-stack--headings": "Geneva, sans-serif",
-        "font-weight--headings":"light"
-    },
-}
-
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
@@ -71,7 +59,7 @@ imgmath_image_format = 'svg'
 
 #imgmath_image_format = 'png'
 #imgmath_dvipng_args=['-gamma', '1.5', '-D', '110', '-bg', 'Transparent']
-#imgmath_use_preview=True
+imgmath_use_preview=True
 
 imgmath_font_size = 14
 

@@ -35,6 +35,12 @@ class ptensor0(ptensor):
         return self.make(_atoms,torch.randn([_nc],device=device))
 
     @classmethod
+    def sequential(self,atoms,nc,device='cpu'):
+        assert isinstance(nc,int)
+        return self.make(atoms,torch.tensor([i for i in range (0,nc)],
+                                            dtype=torch.float,device=device))
+
+    @classmethod
     def from_tensor(self, _atoms, M):
         return self.make(_atoms,M)
 
