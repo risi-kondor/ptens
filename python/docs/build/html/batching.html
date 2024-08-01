@@ -258,13 +258,14 @@
         <article role="main" id="furo-main-content">
           <section id="batching">
 <h1>Batching<a class="headerlink" href="#batching" title="Link to this heading">¶</a></h1>
-<p>Fully taking advantage of the computational capacity of GPUs in neural networks typically requires
+<p>Fully taking advantage of the computational capacity of GPUs in neural networks usually requires
 combining training instances into so-called minibatches. This is equally true of equivarant message passing
 networks. However, due to the variety of cached helper objects involved in this case (<code class="docutils literal notranslate"><span class="pre">atomspack</span></code>s,
-<code class="docutils literal notranslate"><span class="pre">layer_map</span></code>s and <a href="#id1"><span class="problematic" id="id2">``</span></a>gather_plan``s) batching cannot simply be accomplished by concatenating tensors.
-Instead, <cite>ptens</cite> provides specialized <cite>batched_ptensorlayer</cite> and <cite>batched_subgraphlayer</cite> classes.</p>
-<section id="batches-ptensor-layers">
-<h2>Batches Ptensor layers<a class="headerlink" href="#batches-ptensor-layers" title="Link to this heading">¶</a></h2>
+<code class="docutils literal notranslate"><span class="pre">layer_map</span></code>s and <code class="docutils literal notranslate"><span class="pre">gather_plan</span></code>s) batching cannot simply be accomplished by concatenating tensors.
+Instead, <cite>ptens</cite> provides the specialized classes <code class="docutils literal notranslate"><span class="pre">batched_ggraph</span></code>, <code class="docutils literal notranslate"><span class="pre">batched_atomspack</span></code>,
+<code class="docutils literal notranslate"><span class="pre">batched_ptensorlayer</span></code>, <code class="docutils literal notranslate"><span class="pre">batched_subgraphlayer</span></code> and so on for this purpose.</p>
+<section id="batched-ptensor-layers">
+<h2>Batched Ptensor layers<a class="headerlink" href="#batched-ptensor-layers" title="Link to this heading">¶</a></h2>
 <p>A batched Ptensor layer can be constructed from <code class="docutils literal notranslate"><span class="pre">N</span></code> individual Ptensor layer objects.
 For example, the following constructs a batch consisting of 3 copies of the same first order layer
 <code class="docutils literal notranslate"><span class="pre">a</span></code>:</p>
@@ -311,14 +312,64 @@ For example, the following constructs a batch consisting of 3 copies of the same
       <span class="p">[</span> <span class="o">-</span><span class="mf">0.753351</span> <span class="mf">1.37246</span> <span class="mf">0.488635</span> <span class="p">]</span>
 </pre></div>
 </div>
+<p>Alternatively, it can be initilized from a <code class="docutils literal notranslate"><span class="pre">batched_atomspack</span></code> object using the usual <code class="docutils literal notranslate"><span class="pre">zeros</span></code>,
+<code class="docutils literal notranslate"><span class="pre">randn</span></code> or <code class="docutils literal notranslate"><span class="pre">sequential</span></code> constructors or from a large matrix that holds the concatenation of
+each of the layers:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;&gt;</span> <span class="n">atoms</span><span class="o">=</span><span class="n">ptens_base</span><span class="o">.</span><span class="n">batched_atomspack</span><span class="p">([</span><span class="n">subatoms</span><span class="p">,</span><span class="n">subatoms</span><span class="p">,</span><span class="n">subatoms</span><span class="p">])</span>
+<span class="o">&gt;&gt;</span> <span class="n">M</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">randn</span><span class="p">([</span><span class="n">atoms</span><span class="o">.</span><span class="n">nrows1</span><span class="p">(),</span><span class="mi">3</span><span class="p">])</span>
+<span class="o">&gt;&gt;</span> <span class="n">A</span><span class="o">=</span><span class="n">ptens</span><span class="o">.</span><span class="n">batched_ptensorlayer1</span><span class="o">.</span><span class="n">from_matrix</span><span class="p">(</span><span class="n">atoms</span><span class="p">,</span><span class="n">M</span><span class="p">)</span>
+</pre></div>
+</div>
 <p>Batched layers store their data in a single matrix consisting of the concatenation of the individual
-layers. Therefore most generic equivariant operations (linear maps, <a href="#id3"><span class="problematic" id="id4">`</span></a>relu`_s, etc.) can be applied
+layers. Therefore, many generic operations (linear maps, <code class="docutils literal notranslate"><span class="pre">relu</span></code>s, etc.) can be applied
 to them just as if they were a single layer.</p>
-<p>The syntax of <code class="docutils literal notranslate"><span class="pre">linmaps</span></code> and <code class="docutils literal notranslate"><span class="pre">gather</span></code> operations is also identical to the syntax of the same operations
-on individal layers. For example,</p>
+<p>In contrast, to avoid excessive coping, unlike in some other packages such as Pytorch Geometric,
+the batched control data structures such as <code class="docutils literal notranslate"><span class="pre">batched_atomspack</span></code> and <code class="docutils literal notranslate"><span class="pre">batched_atomspack</span></code>, etc.,
+just hold pointers to the underlying objects rather than explicitly concatenating them.
+However, the interface of these classes exactly mirrors the interface of their non-batched versions.
+For example, the following code creates the overlap maps between two batches of <code class="docutils literal notranslate"><span class="pre">atomspack</span></code>s:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;&gt;</span> <span class="n">a1</span><span class="o">=</span><span class="n">ptens_base</span><span class="o">.</span><span class="n">atomspack</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">6</span><span class="p">,</span><span class="mf">0.5</span><span class="p">)</span>
+<span class="o">&gt;&gt;</span> <span class="n">a2</span><span class="o">=</span><span class="n">ptens_base</span><span class="o">.</span><span class="n">atomspack</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span><span class="mi">6</span><span class="p">,</span><span class="mf">0.5</span><span class="p">)</span>
+<span class="o">&gt;&gt;</span> <span class="n">batched_atoms1</span><span class="o">=</span><span class="n">ptens_base</span><span class="o">.</span><span class="n">batched_atomspack</span><span class="p">([</span><span class="n">a1</span><span class="p">,</span><span class="n">a1</span><span class="p">,</span><span class="n">a1</span><span class="p">])</span>
+<span class="o">&gt;&gt;</span> <span class="n">batched_atoms2</span><span class="o">=</span><span class="n">ptens_base</span><span class="o">.</span><span class="n">batched_atomspack</span><span class="p">([</span><span class="n">a2</span><span class="p">,</span><span class="n">a2</span><span class="p">,</span><span class="n">a2</span><span class="p">])</span>
+<span class="o">&gt;&gt;</span> <span class="n">L</span><span class="o">=</span><span class="n">ptens_base</span><span class="o">.</span><span class="n">batched_layer_map</span><span class="o">.</span><span class="n">overlaps_map</span><span class="p">(</span><span class="n">batched_atoms2</span><span class="p">,</span><span class="n">batched_atoms1</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The syntax of the <code class="docutils literal notranslate"><span class="pre">linmaps</span></code> and <code class="docutils literal notranslate"><span class="pre">gather</span></code> operations is also the same as for individual layers:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;&gt;</span> <span class="n">A</span><span class="o">=</span><span class="n">ptens</span><span class="o">.</span><span class="n">batched_ptensorlayer1</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="n">batched_atoms1</span><span class="p">,</span><span class="mi">3</span><span class="p">)</span>
+<span class="o">&gt;&gt;</span> <span class="n">B</span><span class="o">=</span><span class="n">ptens</span><span class="o">.</span><span class="n">batched_ptensorlayer1</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span><span class="n">batched_atoms2</span><span class="p">,</span><span class="n">A</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The performance gains of batching come largely from the fact that on the backend <cite>ptens</cite> can perform these
+operations in single CUDA kernel call.</p>
 </section>
-<section id="batches-subgraph-layers">
-<h2>Batches subgraph layers<a class="headerlink" href="#batches-subgraph-layers" title="Link to this heading">¶</a></h2>
+<section id="batched-subgraph-layers">
+<h2>Batched subgraph layers<a class="headerlink" href="#batched-subgraph-layers" title="Link to this heading">¶</a></h2>
+<p>Just like batched atomspacks, batched <code class="docutils literal notranslate"><span class="pre">ggraph</span></code> instances are easy to create:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;&gt;</span> <span class="n">G0</span><span class="o">=</span><span class="n">ptens</span><span class="o">.</span><span class="n">ggraph</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span><span class="mf">0.5</span><span class="p">)</span>
+<span class="o">&gt;&gt;</span> <span class="n">G1</span><span class="o">=</span><span class="n">ptens</span><span class="o">.</span><span class="n">ggraph</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span><span class="mf">0.5</span><span class="p">)</span>
+<span class="o">&gt;&gt;</span> <span class="n">G2</span><span class="o">=</span><span class="n">ptens</span><span class="o">.</span><span class="n">ggraph</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span><span class="mf">0.5</span><span class="p">)</span>
+<span class="o">&gt;&gt;</span> <span class="n">G</span><span class="o">=</span><span class="n">ptens</span><span class="o">.</span><span class="n">batched_ggraph</span><span class="o">.</span><span class="n">from_graphs</span><span class="p">([</span><span class="n">G0</span><span class="p">,</span><span class="n">G1</span><span class="p">,</span><span class="n">G2</span><span class="p">])</span>
+</pre></div>
+</div>
+<p>We can then create a <code class="docutils literal notranslate"><span class="pre">batched_subgraphlayer</span></code> for a given subgraph <code class="docutils literal notranslate"><span class="pre">S</span></code> using one of the usual constructors:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;&gt;</span> <span class="n">A</span><span class="o">=</span><span class="n">p</span><span class="o">.</span><span class="n">batched_subgraphlayer1</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="n">G</span><span class="p">,</span><span class="n">S</span><span class="p">,</span><span class="mi">3</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>or from a PyTorch matrix:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;&gt;</span> <span class="n">M</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">randn</span><span class="p">([</span><span class="n">G</span><span class="o">.</span><span class="n">subgraphs</span><span class="p">(</span><span class="n">S</span><span class="p">)</span><span class="o">.</span><span class="n">nrows1</span><span class="p">(),</span><span class="mi">3</span><span class="p">])</span>
+<span class="o">&gt;&gt;</span> <span class="n">A</span><span class="o">=</span><span class="n">p</span><span class="o">.</span><span class="n">batched_subgraphlayer1</span><span class="o">.</span><span class="n">from_matrix</span><span class="p">(</span><span class="n">G</span><span class="p">,</span><span class="n">S</span><span class="p">,</span><span class="n">M</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Note that the <cite>subgraph</cite> object is not batched and all the subgraphlayers in the batch must correspond to
+the <cite>same</cite> subgraph. The <code class="docutils literal notranslate"><span class="pre">linmaps</span></code> and <code class="docutils literal notranslate"><span class="pre">gather</span></code> operations generalize to batched subgraphlayers as
+expected, for example we can write:</p>
+<blockquote>
+<div><p>&gt;&gt; T=ptens.subgraph.triangle()
+&gt;&gt; B1=ptens.batched_subgraphlayer1.gather(T,A)</p>
+</div></blockquote>
+<p>Just as for the <code class="docutils literal notranslate"><span class="pre">batched_ptensorlayer</span></code> classes, <cite>ptens</cite> executes these operations on GPUs in a
+highly optimized way, parallelizing over both members of the batch and the individual Ptensors inside them.</p>
 </section>
 </section>
 
@@ -378,8 +429,8 @@ on individal layers. For example,</p>
           <div class="toc-tree">
             <ul>
 <li><a class="reference internal" href="#">Batching</a><ul>
-<li><a class="reference internal" href="#batches-ptensor-layers">Batches Ptensor layers</a></li>
-<li><a class="reference internal" href="#batches-subgraph-layers">Batches subgraph layers</a></li>
+<li><a class="reference internal" href="#batched-ptensor-layers">Batched Ptensor layers</a></li>
+<li><a class="reference internal" href="#batched-subgraph-layers">Batched subgraph layers</a></li>
 </ul>
 </li>
 </ul>
