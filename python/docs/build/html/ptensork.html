@@ -209,9 +209,11 @@
 <li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Ptensors</a></li>
 <li class="toctree-l1"><a class="reference internal" href="ptensorsk.html">Ptensor layers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="linmaps.html">Linmaps</a></li>
-<li class="toctree-l1"><a class="reference internal" href="gather.html">Gather maps</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gather.html">Message passing between Ptensors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gatherlayers.html">Message passing between Ptensor layers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="graph.html">Graphs</a></li>
 <li class="toctree-l1"><a class="reference internal" href="subgraph.html">Subgraphs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="subgraph_layer0.html">Subgraph layers</a></li>
 </ul>
 
 </div>
@@ -278,7 +280,7 @@ For example,</p>
 </pre></div>
 </div>
 <p>creates a zeroth order PTensor with reference domain <img class="math" src="_images/math/6091bd5095af79dd7d7533c2c8fd17cd6b1eb976.svg" alt="(2)"/> and 5 channels.
-Printing out the Ptensor returns both its contents and its reference domain:</p>
+Printing out the Ptensor prints both its contents and its reference domain:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;&gt;</span> <span class="nb">print</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
 
 <span class="n">Ptensor0</span> <span class="p">[</span><span class="mi">2</span><span class="p">]:</span>
@@ -339,11 +341,11 @@ size of the reference domain. For example, the following creates a first order P
 </pre></div>
 </div>
 <p>By default Ptensors are placed on the host (CPU). To instead create the Ptensor on the
-GPU, similarly to PyTorch, a <code class="docutils literal notranslate"><span class="pre">device</span></code> argument can be used:</p>
+GPU, similarly to PyTorch, one can add a <code class="docutils literal notranslate"><span class="pre">device</span></code> argument:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;&gt;</span> <span class="n">A</span><span class="o">=</span><span class="n">ptens</span><span class="o">.</span><span class="n">ptensor1</span><span class="o">.</span><span class="n">sequential</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">],</span><span class="mi">5</span><span class="p">,</span><span class="n">device</span><span class="o">=</span><span class="s1">&#39;cuda&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>Furthermore, tensors can be moved back and forth between the CPU and the GPU using the <code class="docutils literal notranslate"><span class="pre">to</span></code> method:</p>
+<p>Further, Ptensors can be moved back and forth between the CPU and the GPU using the <code class="docutils literal notranslate"><span class="pre">to</span></code> method:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;&gt;</span> <span class="n">B</span><span class="o">=</span><span class="n">A</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="s1">&#39;cpu&#39;</span><span class="p">)</span>
 </pre></div>
 </div>

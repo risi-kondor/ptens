@@ -94,7 +94,7 @@ class batched_subgraphlayer1(p.subgraphlayer,p.batched_ptensorlayer1):
 
 
     def __repr__(self):
-        return "batched_subgraphlayer1(N="+str(len(self))+",nc="+str(self.size(1))+")"
+        return "batched_subgraphlayer1(size="+str(len(self))+",nc="+str(self.size(1))+")"
 
     def __str__(self,indent=""):
         r=indent+self.__repr__()+":\n"

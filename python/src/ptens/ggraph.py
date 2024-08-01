@@ -52,7 +52,7 @@ class ggraph:
     # ---- Access --------------------------------------------------------------------------------------------
 
 
-    def torch(self):
+    def adjacency_matrix(self):
         return self.obj.dense()
 
     def is_labeled(self):

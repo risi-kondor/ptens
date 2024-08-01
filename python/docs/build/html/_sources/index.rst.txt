@@ -28,8 +28,12 @@ under a custom license that can be found in the file LICENSE.TXT
    ptensorsk.rst
    linmaps.rst
    gather.rst
+   gatherlayers.rst
    graph.rst
    subgraph.rst
+   subgraph_layer0.rst
+   batching.rst 
+   global.rst
 
 
 Indices and tables

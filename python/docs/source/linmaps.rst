@@ -2,9 +2,10 @@
 Linmaps
 *******
 
-The neurons in permutation equivariant networks implement learnable equivariant maps between Ptensors. 
-The ``linmaps`` functions described in this section are equivariant linear maps between two Ptensors 
-with the *same* reference domain. 
+In a seminal paper Maron et al.[] have shown that the number of linearly independent linear maps 
+from a :math"`k_1` 'th order permutation equivariant tensor to a :math:`k_2` 'th order permutation 
+equivariant tensor with the `same` reference domain is given by the Bell number :math:`B(k_1+k_2)`. 
+The `linmaps` functions described in this section implement these linear maps. 
 
 ========================
 Linmaps between Ptensors
@@ -33,7 +34,7 @@ ptensor are multiples of the identity:
  Ptensor0 [1,2,3]:
    [ 0 1 2 3 4 ]
 
-There is only on way (up to scaling) to map a 1'st order Ptensor to 0'th order ptensor, and that 
+There is only one way (up to scaling) to map a 1'st order Ptensor to 0'th order ptensor, and that 
 is to sum the input along the atom dimension, i.e., :math:`B_c=\sum_i A_{i,c}`:
 
 .. code-block:: python
@@ -62,8 +63,9 @@ Consequently, when applied to a ``ptensor2``, ``ptensor0.linmaps`` doubles its n
 
 .. code-block:: python
 
- >>> A=ptens.ptensor2.sequential([1,2,3],3)
- >>> print(A)
+ >> A=ptens.ptensor2.sequential([1,2,3],3)
+ >> print(A)
+
  Ptensor2 [1,2,3]:
  channel 0:
    [ 0 3 6 ]
@@ -80,8 +82,9 @@ Consequently, when applied to a ``ptensor2``, ``ptensor0.linmaps`` doubles its n
    [ 11 14 17 ]
    [ 20 23 26 ]
 
- >>> B=ptens.ptensor0.linmaps(A)
- >>> print(B)
+ >> B=ptens.ptensor0.linmaps(A)
+ >> print(B)
+
  Ptensor0 [1,2,3]:
    [ 108 117 126 36 39 42 ]
 
@@ -93,12 +96,15 @@ The only equivariant map from a ``ptensor0`` to ``ptensor1`` is :math:`B_{i,c}=A
 
 .. code-block:: python
 
- >>> A=ptens.ptensor0.sequential([1,2,3],3)
- >>> print(A)
+ >> A=ptens.ptensor0.sequential([1,2,3],3)
+ >> print(A)
+
  Ptensor0 [1,2,3]:
    [ 0 1 2 ]
- >>> B=ptens.ptensor1.linmaps(A)
- >>> print(B)
+
+ >> B=ptens.ptensor1.linmaps(A)
+ >> print(B)
+
  Ptensor1 [1,2,3]:
    [ 0 1 2 ]
    [ 0 1 2 ]
@@ -110,14 +116,17 @@ Therefore, the number of channels doubles:
 
 .. code-block:: python
 
- >>> A=ptens.ptensor1.sequential([1,2,3],3)
- >>> print(A)
+ >> A=ptens.ptensor1.sequential([1,2,3],3)
+ >> print(A)
+
  Ptensor1 [1,2,3]:
    [ 0 1 2 ]
    [ 3 4 5 ]
    [ 6 7 8 ]
- >>> B=ptens.ptensor1.linmaps(A)
- >>> print(B)
+
+ >> B=ptens.ptensor1.linmaps(A)
+ >> print(B)
+
  Ptensor1(1,2,3):
    [ 9 12 15 0 1 2 ]
    [ 9 12 15 3 4 5 ]
@@ -134,8 +143,9 @@ Therefore , this map multiplies the number of channels five-fold.
 
 .. code-block:: python
 
- >>> A=ptens.ptensor2.sequential([1,2,3],3)
- >>> print(A)
+ >> A=ptens.ptensor2.sequential([1,2,3],3)
+ >> print(A)
+
  Ptensor2 [1,2,3]:
    channel 0:
      [ 0 3 6 ]
@@ -152,8 +162,9 @@ Therefore , this map multiplies the number of channels five-fold.
      [ 11 14 17 ]
      [ 20 23 26 ]
 
- >>> B=ptens.ptensor1.linmaps(A)
- >>> print(B)
+ >> B=ptens.ptensor1.linmaps(A)
+ >> print(B)
+
  Ptensor1 [1,2,3]:
    [ 108 117 126 36 39 42 27 30 33 9 12 15 0 1 2 ]
    [ 108 117 126 36 39 42 36 39 42 36 39 42 12 13 14 ]
@@ -170,13 +181,15 @@ In the :math:`\mathcal{P}_0\to\mathcal{P}_2` case there are two maps to consider
 
 .. code-block:: python
 
- >>> A=ptens.ptensor0.sequential([1,2,3],3)
- >>> print(A)
+ >> A=ptens.ptensor0.sequential([1,2,3],3)
+ >> print(A)
+
  Ptensor0 [1,2,3]:
    [ 0 1 2 ]
 
- >>> C=ptens.ptensor2.linmaps(A)
- >>> print(C)
+ >> C=ptens.ptensor2.linmaps(A)
+ >> print(C)
+
  Ptensor2 [1,2,3]:
    channel 0:
      [ 0 0 0 ]
@@ -217,15 +230,17 @@ There are a total of five equivariant maps from a 1'st order Ptensor to a 2'nd o
 
 .. code-block:: python
 
- >>> A=ptens.ptensor1.sequential([1,2,3],3)
- >>> print(A)
+ >> A=ptens.ptensor1.sequential([1,2,3],3)
+ >> print(A)
+
  Ptensor1 [1,2,3]:
  [ 0 1 2 ]
  [ 3 4 5 ]
  [ 6 7 8 ]
 
- >>> B=ptens.ptensor2.linmaps(A)
- >>> print(B)
+ >> B=ptens.ptensor2.linmaps(A)
+ >> print(B)
+
  Ptensor2 [1,2,3]:
    channel 0:
      [ 9 9 9 ]
@@ -307,9 +322,10 @@ Finally, the space of equivariant maps from a second order Ptensor to a second o
 
 .. code-block:: python
 
- >>> A=ptens.ptensor2.sequential([1,2,3],3)
- >>> B=ptens.linmaps2(A)
- >>> print(B)
+ >> A=ptens.ptensor2.sequential([1,2,3],3)
+ >> B=ptens.linmaps2(A)
+ >> print(B)
+
  Ptensor2 [1,2,3]:
    channel 0:
      [ 108 108 108 ]
@@ -356,18 +372,16 @@ Finally, the space of equivariant maps from a second order Ptensor to a second o
 Linmaps between Ptensor layers
 ==============================
 
-In permutation equivariant nets, linmaps are often applied to an entire layer of Ptensors, i.e., 
-to every Ptensor in the layer. `ptens` can accomplish this in a single function call. 
+In permutation equivariant neural networks, linmaps are often applied to an entire layer of Ptensors, i.e., 
+to every Ptensor in the layer. `ptens` accomplishes this in a single function call. 
 When working on the GPU, the operation is automatically parallelized across Ptensors. 
-
-..
- As a simple example:
-
+The following is an example mapping a first order Ptensor layer to another first order layer: 
 
 .. code-block:: python
 
- >>> A=ptens.ptensorlayer1.randn([[1,2],[2,3],[4]],2)
- >>> print(A)
+ >> A=ptens.ptensorlayer1.randn([[1,2],[2,3],[4]],2)
+ >> print(A)
+
  Ptensor1 [1,2]:
    [ -0.87019 0.410812 ]
    [ 0.391992 -0.44689 ] 
@@ -379,8 +393,9 @@ When working on the GPU, the operation is automatically parallelized across Pten
  Ptensor1 [4]:
    [ -0.576893 -0.397062 ]
 
- >>> B=ptensorlayer1..linmaps(A)
- >>> print(B)
+ >> B=ptensorlayer1.linmaps(A)
+ >> print(B)
+
  Ptensor1 [1,2]:
    [ -0.478197 -0.0360771 -0.87019 0.410812 ]
    [ -0.478197 -0.0360771 0.391992 -0.44689 ]
@@ -391,3 +406,4 @@ When working on the GPU, the operation is automatically parallelized across Pten
  
  Ptensor1 [4]:
    [ -0.576893 -0.397062 -0.576893 -0.397062 ]
+

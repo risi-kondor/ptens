@@ -209,9 +209,11 @@
 <li class="toctree-l1"><a class="reference internal" href="ptensork.html">Ptensors</a></li>
 <li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Ptensor layers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="linmaps.html">Linmaps</a></li>
-<li class="toctree-l1"><a class="reference internal" href="gather.html">Gather maps</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gather.html">Message passing between Ptensors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gatherlayers.html">Message passing between Ptensor layers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="graph.html">Graphs</a></li>
 <li class="toctree-l1"><a class="reference internal" href="subgraph.html">Subgraphs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="subgraph_layer0.html">Subgraph layers</a></li>
 </ul>
 
 </div>
@@ -256,8 +258,9 @@
 <h1>Ptensor layers<a class="headerlink" href="#ptensor-layers" title="Link to this heading">¶</a></h1>
 <p>In most applications, Ptensors are organized into layers, represented by the
 <code class="docutils literal notranslate"><span class="pre">ptensorlayer0</span></code>, <code class="docutils literal notranslate"><span class="pre">ptensorlayer1</span></code> and <code class="docutils literal notranslate"><span class="pre">ptensorlayer2</span></code> classes.
-A key feature of <cite>ptens</cite> is that it can operate
-on all the Ptensors in a given layer <em>in parallel</em>, even if their reference domains are of different sizes.</p>
+A key feature of <cite>ptens</cite> is that when the Ptensor layers are on the GPU,
+all operations on them are parallelized across the individual Ptensors that they contain,
+even if the reference domains of the individual Ptensors are of different sizes.</p>
 <section id="defining-ptensor-layers">
 <h2>Defining Ptensor layers<a class="headerlink" href="#defining-ptensor-layers" title="Link to this heading">¶</a></h2>
 <p>The reference domains of a Ptensor layer are stored in a <code class="docutils literal notranslate"><span class="pre">ptens_base.atomspack</span></code> object, for example:</p>
@@ -300,8 +303,10 @@ on all the Ptensors in a given layer <em>in parallel</em>, even if their referen
     <span class="p">[</span> <span class="mf">1.26059</span> <span class="mf">0.753664</span> <span class="o">-</span><span class="mf">0.743881</span> <span class="p">]</span>
 </pre></div>
 </div>
-<p>The <code class="docutils literal notranslate"><span class="pre">ptensorlayer0</span></code>, <code class="docutils literal notranslate"><span class="pre">ptensorlayer1</span></code> and <code class="docutils literal notranslate"><span class="pre">tensorlayer2</span></code> classes are subclasses of
-<code class="docutils literal notranslate"><span class="pre">torch.Tensor</span></code> and the layers are stored as matrices:</p>
+<p>For ease of compatibility with PyTorch’s own functionality and some other libraries,
+the <code class="docutils literal notranslate"><span class="pre">ptensorlayer0</span></code>, <code class="docutils literal notranslate"><span class="pre">ptensorlayer1</span></code> and <code class="docutils literal notranslate"><span class="pre">tensorlayer2</span></code> classes are implemented as subclasses of
+<code class="docutils literal notranslate"><span class="pre">torch.Tensor</span></code> and all the Ptensors in a given layer are stacked into a single matrix
+where the columns correspond to the channels:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;&gt;</span> <span class="nb">print</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">(</span><span class="n">A</span><span class="p">))</span>
 
 <span class="n">tensor</span><span class="p">([[</span> <span class="mf">0.7727</span><span class="p">,</span>  <span class="mf">1.0236</span><span class="p">,</span>  <span class="mf">1.4135</span><span class="p">],</span>
@@ -312,7 +317,7 @@ on all the Ptensors in a given layer <em>in parallel</em>, even if their referen
         <span class="p">[</span> <span class="mf">1.2606</span><span class="p">,</span>  <span class="mf">0.7537</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.7439</span><span class="p">]])</span>
 </pre></div>
 </div>
-<p>Another way to initialize a Ptensor layer is to provide this matrix and the reference domains:</p>
+<p>A Ptensor layer can also be constructed directly from this matrix:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;&gt;</span> <span class="n">M</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span><span class="mi">3</span><span class="p">)</span>
 <span class="o">&gt;&gt;</span> <span class="n">A</span><span class="o">=</span><span class="n">ptens</span><span class="o">.</span><span class="n">ptensorlayer1</span><span class="o">.</span><span class="n">from_matrix</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">],[</span><span class="mi">3</span><span class="p">,</span><span class="mi">5</span><span class="p">],[</span><span class="mi">2</span><span class="p">]],</span><span class="n">M</span><span class="p">)</span>
 <span class="o">&gt;&gt;</span> <span class="nb">print</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
@@ -336,10 +341,67 @@ All operations on GPU-resident layers are performed on the GPU.</p>
 <section id="getters-and-setters">
 <h2>Getters and setters<a class="headerlink" href="#getters-and-setters" title="Link to this heading">¶</a></h2>
 <p>Individual Ptensors in a given layer can be accessed by subscripting:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">A</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
-<span class="go">Ptensor1 [3,5]:</span>
-<span class="go">  [ -1.25401 -0.245323 -0.377335 ]</span>
-<span class="go">  [ 0.962375 1.16961 0.93007 ]</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;&gt;</span> <span class="nb">print</span><span class="p">(</span><span class="n">A</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+
+<span class="n">Ptensor1</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span><span class="mi">5</span><span class="p">]:</span>
+  <span class="p">[</span> <span class="o">-</span><span class="mf">1.25401</span> <span class="o">-</span><span class="mf">0.245323</span> <span class="o">-</span><span class="mf">0.377335</span> <span class="p">]</span>
+  <span class="p">[</span> <span class="mf">0.962375</span> <span class="mf">1.16961</span> <span class="mf">0.93007</span> <span class="p">]</span>
+</pre></div>
+</div>
+</section>
+<section id="equivariant-operations-on-ptensor-layers">
+<h2>Equivariant operations on Ptensor layers<a class="headerlink" href="#equivariant-operations-on-ptensor-layers" title="Link to this heading">¶</a></h2>
+<p>The fact that Ptensor layers are stored by stacking their individual Ptensors in a single matrix makes
+some common equivariant operations on them easy to implement. For example, linear layers
+simply correspond to matrix multiplication from the right, followed by adding constants to the columns,
+just like in many other standard architectures, allowing us to reuse PyTorch’s <code class="docutils literal notranslate"><span class="pre">linear</span></code> module.
+Elementwise operations such as <code class="docutils literal notranslate"><span class="pre">relu</span></code> are equally easy to apply:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;&gt;</span> <span class="n">A</span><span class="o">=</span><span class="n">ptens</span><span class="o">.</span><span class="n">ptensorlayer1</span><span class="o">.</span><span class="n">randn</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">],[</span><span class="mi">3</span><span class="p">,</span><span class="mi">5</span><span class="p">],[</span><span class="mi">2</span><span class="p">]],</span><span class="mi">3</span><span class="p">)</span>
+<span class="o">&gt;&gt;</span> <span class="n">B</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">relu</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+<span class="o">&gt;&gt;</span> <span class="nb">print</span><span class="p">(</span><span class="n">B</span><span class="p">)</span>
+
+<span class="n">Ptensorlayer1</span><span class="p">:</span>
+  <span class="n">Ptensor1</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">]:</span>
+    <span class="p">[</span> <span class="mi">0</span> <span class="mf">0.637496</span> <span class="mi">0</span> <span class="p">]</span>
+    <span class="p">[</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mf">1.62583</span> <span class="p">]</span>
+    <span class="p">[</span> <span class="mf">0.303279</span> <span class="mi">0</span> <span class="mf">0.15176</span> <span class="p">]</span>
+  <span class="n">Ptensor1</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span><span class="mi">5</span><span class="p">]:</span>
+    <span class="p">[</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mf">0.246751</span> <span class="p">]</span>
+    <span class="p">[</span> <span class="mi">0</span> <span class="mf">0.299123</span> <span class="mf">1.52228</span> <span class="p">]</span>
+  <span class="n">Ptensor1</span> <span class="p">[</span><span class="mi">2</span><span class="p">]:</span>
+    <span class="p">[</span> <span class="mi">0</span> <span class="mf">0.0121746</span> <span class="mf">0.452276</span> <span class="p">]</span>
+</pre></div>
+</div>
+<p>In general, any operation that returns a data structure that transforms as a Ptensor layer
+will return a <code class="docutils literal notranslate"><span class="pre">ptensorlayer0</span></code>, <code class="docutils literal notranslate"><span class="pre">ptensorlayer1</span></code> or <code class="docutils literal notranslate"><span class="pre">ptensorlayer2</span></code> object, as appropriate.
+Operations that are equivariant but do not result in a Ptensors return an ordinary PyTorch tensor, for
+example:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;&gt;</span> <span class="n">A</span><span class="o">=</span><span class="n">ptens</span><span class="o">.</span><span class="n">ptensorlayer1</span><span class="o">.</span><span class="n">randn</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">],[</span><span class="mi">3</span><span class="p">,</span><span class="mi">5</span><span class="p">],[</span><span class="mi">2</span><span class="p">]],</span><span class="mi">3</span><span class="p">)</span>
+<span class="o">&gt;&gt;</span> <span class="nb">print</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">A</span><span class="p">))</span>
+
+<span class="n">tensor</span><span class="p">(</span><span class="mf">2.5625</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="atomspacks">
+<h2>Atomspacks<a class="headerlink" href="#atomspacks" title="Link to this heading">¶</a></h2>
+<p>To implement operations on Ptensor layers that manipulate individual Ptensors or individual rows
+corresponding to specific elements of their reference domain it might be necessary to access the
+<code class="docutils literal notranslate"><span class="pre">atomspack</span></code> object stored in the layer’s <code class="docutils literal notranslate"><span class="pre">atoms</span></code> variable.
+The reference domain of the <code class="docutils literal notranslate"><span class="pre">i</span></code>’th Ptensor can be extracted from the <code class="docutils literal notranslate"><span class="pre">atomspack</span></code> by subscripting:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;&gt;</span> <span class="nb">print</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+
+<span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">5</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>The number of rows allocated to the <code class="docutils literal notranslate"><span class="pre">i</span></code>’th Ptensor and the corresponding row offset is accessed
+via the <code class="docutils literal notranslate"><span class="pre">norws0</span></code>, <code class="docutils literal notranslate"><span class="pre">nrows1</span></code>, <code class="docutils literal notranslate"><span class="pre">nrows2</span></code> and <code class="docutils literal notranslate"><span class="pre">row_offset0</span></code>, <code class="docutils literal notranslate"><span class="pre">row_offset1</span></code> ` <code class="docutils literal notranslate"><span class="pre">row_offset2</span></code> methods
+respectively depending on whether the underlying object is a zeroth, first, or second order layer:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;&gt;</span> <span class="nb">print</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="n">atoms</span><span class="o">.</span><span class="n">nrows1</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
+<span class="o">&gt;&gt;</span> <span class="nb">print</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="n">atoms</span><span class="o">.</span><span class="n">row_offset1</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
+
+<span class="mi">2</span>
+<span class="mi">3</span>
 </pre></div>
 </div>
 </section>
@@ -403,6 +465,8 @@ All operations on GPU-resident layers are performed on the GPU.</p>
 <li><a class="reference internal" href="#">Ptensor layers</a><ul>
 <li><a class="reference internal" href="#defining-ptensor-layers">Defining Ptensor layers</a></li>
 <li><a class="reference internal" href="#getters-and-setters">Getters and setters</a></li>
+<li><a class="reference internal" href="#equivariant-operations-on-ptensor-layers">Equivariant operations on Ptensor layers</a></li>
+<li><a class="reference internal" href="#atomspacks">Atomspacks</a></li>
 </ul>
 </li>
 </ul>

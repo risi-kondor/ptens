@@ -1,9 +1,14 @@
-*************
-Gather maps
-*************
+********************************
+Message passing between Ptensors
+********************************
 
-When passing messages between Ptensors whose reference domains are different, instead of the ``linmaps`` 
-functions, the ``gather`` functions must be used. 
+Hands et al. [] extended the notion of message passing between permutation equivariant tensors 
+(Ptensors) to the case when the reference domains of the source and destination tensors 
+are not necessarily the same. In this case the number of possible linearly independent 
+linear maps increases because for each summation or broadcast operation we can consider summing/broadcasting 
+over all elements of reference domain or only the intersection of the reference domains of the sending 
+and receiving P-tensors. 
+These linear maps in `ptens` are called ``gather`` operations.  
 
 ==============================
 Gather maps between Ptensors
@@ -336,40 +341,4 @@ Ptensors to second order Ptensors is 2,5 and 15, respectively:
    [ 0 76 0 ]
    [ 0 0 0 ]
 
-
-====================================
-Gather maps between Ptensor layers
-====================================
-
-When gatherring messages between Ptensor layers, we must specify two things: the reference domains 
-of every tensor in the second layer, and the graph that defines which Ptensors send messages to which Ptensors 
-(see the section on Graphs): 
-
-
-.. code-block:: python
-
- >> A=ptens.ptensors1.randn([[1,2],[3]],3)
- >> G=ptens.graph.from_matrix(torch.ones(3,2))
- >> print(A)
-
- Ptensor1 [1,2]:
- [ -1.23974 -0.407472 1.61201 ]
- [ 0.399771 1.3828 0.0523187 ]
-
- Ptensor1 [3]:
- [ -0.904146 1.87065 -1.66043 ]
-
- >> B=ptens.gather1(A,[[1],[2,3],[1,3]],G)
- >> print(B)
-
- Ptensor1 [1]:
- [ -1.23974 -0.407472 1.61201 -1.23974 -0.407472 1.61201 ]
-
- Ptensor1 [2,3]:
- [ 0.399771 1.3828 0.0523187 0.399771 1.3828 0.0523187 ]
- [ -0.904146 1.87065 -1.66043 -0.904146 1.87065 -1.66043 ]
-
- Ptensor1 [1,3]:
- [ -1.23974 -0.407472 1.61201 -1.23974 -0.407472 1.61201 ]
- [ -0.904146 1.87065 -1.66043 -0.904146 1.87065 -1.66043 ]
 

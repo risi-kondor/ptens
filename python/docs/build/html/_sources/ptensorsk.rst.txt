@@ -4,8 +4,9 @@ Ptensor layers
 
 In most applications, Ptensors are organized into layers, represented by the 
 ``ptensorlayer0``, ``ptensorlayer1`` and ``ptensorlayer2`` classes.  
-A key feature of `ptens` is that it can operate  
-on all the Ptensors in a given layer *in parallel*, even if their reference domains are of different sizes. 
+A key feature of `ptens` is that when the Ptensor layers are on the GPU, 
+all operations on them are parallelized across the individual Ptensors that they contain, 
+even if the reference domains of the individual Ptensors are of different sizes. 
 
 =======================
 Defining Ptensor layers
@@ -57,8 +58,10 @@ For convenience, the layer can also be constructed directly from the list of ref
    Ptensor1 [2]:
      [ 1.26059 0.753664 -0.743881 ]
 
-The ``ptensorlayer0``, ``ptensorlayer1`` and ``tensorlayer2`` classes are subclasses of 
-``torch.Tensor`` and the layers are stored as matrices:
+For ease of compatibility with PyTorch's own functionality and some other libraries, 
+the ``ptensorlayer0``, ``ptensorlayer1`` and ``tensorlayer2`` classes are implemented as subclasses of 
+``torch.Tensor`` and all the Ptensors in a given layer are stacked into a single matrix 
+where the columns correspond to the channels:
 
 .. code-block:: python
 
@@ -71,7 +74,7 @@ The ``ptensorlayer0``, ``ptensorlayer1`` and ``tensorlayer2`` classes are subcla
 	 [-1.0282,  0.3802, -1.7350],
 	 [ 1.2606,  0.7537, -0.7439]])
 
-Another way to initialize a Ptensor layer is to provide this matrix and the reference domains:
+A Ptensor layer can also be constructed directly from this matrix: 
 
 .. code-block:: python
 
@@ -95,7 +98,6 @@ Similarly to individual Ptensors, Ptensor layers can be created on the GPU by ad
 argument to their constructor and can be moved to/from the GPU using the ``to`` method. 
 All operations on GPU-resident layers are performed on the GPU.
 
-
 ===================
 Getters and setters
 ===================
@@ -104,14 +106,82 @@ Individual Ptensors in a given layer can be accessed by subscripting:
 
 .. code-block:: python
 
- >>> print(A[1])
+ >> print(A[1])
+
  Ptensor1 [3,5]:
    [ -1.25401 -0.245323 -0.377335 ]
    [ 0.962375 1.16961 0.93007 ]
 
-..
- Accessing individual tensors, as well as the constructor and ``torch()`` methods for ``ptensors0`` 
- described above are differentiable operations.
+
+========================================
+Equivariant operations on Ptensor layers
+========================================
+
+The fact that Ptensor layers are stored by stacking their individual Ptensors in a single matrix makes 
+some common equivariant operations on them easy to implement. For example, linear layers 
+simply correspond to matrix multiplication from the right, followed by adding constants to the columns, 
+just like in many other standard architectures, allowing us to reuse PyTorch's ``linear`` module. 
+Elementwise operations such as ``relu`` are equally easy to apply:
+
+.. code-block:: python
+
+ >> A=ptens.ptensorlayer1.randn([[1,2,3],[3,5],[2]],3)
+ >> B=torch.relu(A)
+ >> print(B)
+
+ Ptensorlayer1:
+   Ptensor1 [1,2,3]:
+     [ 0 0.637496 0 ]
+     [ 0 0 1.62583 ]
+     [ 0.303279 0 0.15176 ]
+   Ptensor1 [3,5]:
+     [ 0 0 0.246751 ]
+     [ 0 0.299123 1.52228 ]
+   Ptensor1 [2]:
+     [ 0 0.0121746 0.452276 ]
+
+In general, any operation that returns a data structure that transforms as a Ptensor layer 
+will return a ``ptensorlayer0``, ``ptensorlayer1`` or ``ptensorlayer2`` object, as appropriate. 
+Operations that are equivariant but do not result in a Ptensors return an ordinary PyTorch tensor, for 
+example:
+
+.. code-block:: python
+
+ >> A=ptens.ptensorlayer1.randn([[1,2,3],[3,5],[2]],3)
+ >> print(torch.norm(A))
+
+ tensor(2.5625)
+ 
+==========
+Atomspacks
+==========
+
+To implement operations on Ptensor layers that manipulate individual Ptensors or individual rows 
+corresponding to specific elements of their reference domain it might be necessary to access the   
+``atomspack`` object stored in the layer's ``atoms`` variable. 
+The reference domain of the ``i``'th Ptensor can be extracted from the ``atomspack`` by subscripting:
+
+.. code-block:: python
+
+ >> print(A.atoms[1])
+
+ [3, 5]
+
+The number of rows allocated to the ``i``'th Ptensor and the corresponding row offset is accessed 
+via the ``norws0``, ``nrows1``, ``nrows2`` and ``row_offset0``, ``row_offset1`` ` ``row_offset2`` methods 
+respectively depending on whether the underlying object is a zeroth, first, or second order layer:
+
+.. code-block:: python
+
+ >> print(A.atoms.nrows1(1))
+ >> print(A.atoms.row_offset1(1))
+
+ 2
+ 3
+
+
+
+
 
 .. 
  ========================================

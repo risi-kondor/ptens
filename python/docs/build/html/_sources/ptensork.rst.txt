@@ -35,7 +35,7 @@ For example,
  >> A=ptens.ptensor0.randn([2],5)
 
 creates a zeroth order PTensor with reference domain :math:`(2)` and 5 channels. 
-Printing out the Ptensor returns both its contents and its reference domain:
+Printing out the Ptensor prints both its contents and its reference domain:
 
 .. code-block:: python
 
@@ -104,13 +104,13 @@ For debugging purposes `ptens` also provides a ``sequential`` initializer, e.g.:
    [ 10 11 12 13 14 ]
 
 By default Ptensors are placed on the host (CPU). To instead create the Ptensor on the 
-GPU, similarly to PyTorch, a ``device`` argument can be used:
+GPU, similarly to PyTorch, one can add a ``device`` argument:
 
 .. code-block:: python
 
  >> A=ptens.ptensor1.sequential([1,2,3],5,device='cuda')
 
-Furthermore, tensors can be moved back and forth between the CPU and the GPU using the ``to`` method:
+Further, Ptensors can be moved back and forth between the CPU and the GPU using the ``to`` method:
 
 .. code-block:: python
 

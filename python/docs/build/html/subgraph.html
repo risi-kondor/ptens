@@ -3,7 +3,7 @@
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
-<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="prev" title="Graphs" href="graph.html" />
+<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Subgraph layers" href="subgraph_layer0.html" /><link rel="prev" title="Graphs" href="graph.html" />
 
     <!-- Generated with Sphinx 7.4.7 and Furo 2024.07.18 -->
         <title>Subgraphs - ptens documentation</title>
@@ -209,9 +209,11 @@
 <li class="toctree-l1"><a class="reference internal" href="ptensork.html">Ptensors</a></li>
 <li class="toctree-l1"><a class="reference internal" href="ptensorsk.html">Ptensor layers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="linmaps.html">Linmaps</a></li>
-<li class="toctree-l1"><a class="reference internal" href="gather.html">Gather maps</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gather.html">Message passing between Ptensors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gatherlayers.html">Message passing between Ptensor layers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="graph.html">Graphs</a></li>
 <li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Subgraphs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="subgraph_layer0.html">Subgraph layers</a></li>
 </ul>
 
 </div>
@@ -254,7 +256,7 @@
         <article role="main" id="furo-main-content">
           <section id="subgraphs">
 <h1>Subgraphs<a class="headerlink" href="#subgraphs" title="Link to this heading">¶</a></h1>
-<p>In GNN applications, Ptensors are often associated to subgraphs of the full graph <code class="docutils literal notranslate"><span class="pre">G</span></code>.
+<p>In GNN applications, Ptensors are often associated to subgraphs of the underlying graph <code class="docutils literal notranslate"><span class="pre">G</span></code>.
 <cite>ptens</cite> provides a separate class for defining these subgraphs.</p>
 <p>Some simple categories of subgraphs are predefined:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;&gt;</span> <span class="n">E</span><span class="o">=</span><span class="n">ptens</span><span class="o">.</span><span class="n">subgraph</span><span class="o">.</span><span class="n">edge</span><span class="p">()</span>
@@ -290,7 +292,7 @@
   <span class="p">[</span> <span class="mi">1</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="p">]</span>
 </pre></div>
 </div>
-<p>Similarly to <a href="#id1"><span class="problematic" id="id2">``</span></a>ggraph``s, <a href="#id3"><span class="problematic" id="id4">``</span></a>subgraph``s can also be defined from their adjacency matrix:</p>
+<p>Similarly to <code class="docutils literal notranslate"><span class="pre">ggraph</span></code>s, <code class="docutils literal notranslate"><span class="pre">subgraph</span></code>s can also be defined from their adjacency matrix:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;&gt;</span> <span class="n">M</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">],[</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">],[</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">]],</span><span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">float</span><span class="p">)</span>
 <span class="o">&gt;&gt;</span> <span class="n">S</span><span class="o">=</span><span class="n">ptens</span><span class="o">.</span><span class="n">subgraph</span><span class="o">.</span><span class="n">from_matrix</span><span class="p">(</span><span class="n">M</span><span class="p">)</span>
 <span class="o">&gt;&gt;</span> <span class="nb">print</span><span class="p">(</span><span class="n">S</span><span class="p">)</span>
@@ -316,7 +318,7 @@
 <section id="finding-subgraphs">
 <h2>Finding subgraphs<a class="headerlink" href="#finding-subgraphs" title="Link to this heading">¶</a></h2>
 <p>The primary purpose of defining a <code class="docutils literal notranslate"><span class="pre">subgaph</span></code> object <code class="docutils literal notranslate"><span class="pre">S</span></code> is to find all occurrences of <code class="docutils literal notranslate"><span class="pre">S</span></code>
-in a graph <code class="docutils literal notranslate"><span class="pre">G</span></code> (or a collection of graphs).  This can be done with the <code class="docutils literal notranslate"><span class="pre">ggraph</span></code> class’s
+in a graph <code class="docutils literal notranslate"><span class="pre">G</span></code> (or a collection of graphs).  This is done with the <code class="docutils literal notranslate"><span class="pre">ggraph</span></code> class’s
 <code class="docutils literal notranslate"><span class="pre">subgraph</span></code> method:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;&gt;</span> <span class="n">G</span><span class="o">=</span><span class="n">ptens</span><span class="o">.</span><span class="n">ggraph</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span><span class="mf">0.5</span><span class="p">)</span>
 <span class="o">&gt;&gt;</span> <span class="n">S</span><span class="o">=</span><span class="n">ptens</span><span class="o">.</span><span class="n">subgraph</span><span class="o">.</span><span class="n">triangle</span><span class="p">()</span>
@@ -346,7 +348,7 @@ in a graph <code class="docutils literal notranslate"><span class="pre">G</span>
 </pre></div>
 </div>
 <p>Finding subgraphs is a relatively expensive computation that has to be performed on the CPU.
-Therefore the result of the operation is automatically cached, i.e., as long as the backend objects of
+Therefore, the result of the operation is automatically cached, i.e., as long as the backend objects of
 <code class="docutils literal notranslate"><span class="pre">G</span></code> and <code class="docutils literal notranslate"><span class="pre">S</span></code> are in scope, if the subgraphs isomorphic to <code class="docutils literal notranslate"><span class="pre">S</span></code> in <code class="docutils literal notranslate"><span class="pre">G</span></code> need to be found again, <cite>ptens</cite>
 will return the cached result. We can inspect all cached subgraph lists associated with a given <code class="docutils literal notranslate"><span class="pre">G</span></code>:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;&gt;</span> <span class="n">C</span><span class="o">=</span><span class="n">G</span><span class="o">.</span><span class="n">cached_subgraph_lists</span><span class="p">()</span>
@@ -358,18 +360,20 @@ will return the cached result. We can inspect all cached subgraph lists associat
    <span class="p">:</span> <span class="p">([</span><span class="mi">0</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span><span class="mi">6</span><span class="p">],[</span><span class="mi">4</span><span class="p">,</span><span class="mi">7</span><span class="p">,</span><span class="mi">6</span><span class="p">],[</span><span class="mi">4</span><span class="p">,</span><span class="mi">6</span><span class="p">,</span><span class="mi">5</span><span class="p">])}</span>
 </pre></div>
 </div>
+<p>One of the purposes of saving <code class="docutils literal notranslate"><span class="pre">ggraph</span></code> s in a cache (see <a class="reference external" href="graph.html#caching">previous section</a>)
+is to ensure that they remain in scope, and consequently
+all the subgraph lists that have been computed for them also remain cached for future use.</p>
 </section>
 <section id="caching">
 <h2>Caching<a class="headerlink" href="#caching" title="Link to this heading">¶</a></h2>
-<p>Typical applications only involve a relatively small number of distinct subgraphs.
+<p>Typical GNN applications only involve a relatively small number of distinct subgraphs.
 Therefore, by default, <cite>ptens</cite> automatically caches the backend data structures corresponding to <code class="docutils literal notranslate"><span class="pre">subgraph</span></code>
 objects for the entirety of the library’s run time time.</p>
 <p>For example, if a subgraph <code class="docutils literal notranslate"><span class="pre">S1</span></code> is defined from its adjacency matrix,
 and at some later point a second subgraph <code class="docutils literal notranslate"><span class="pre">S2</span></code> is defined with the same adjacency matrix,
 then <cite>ptens</cite> will make sure that <code class="docutils literal notranslate"><span class="pre">S1</span></code> and <code class="docutils literal notranslate"><span class="pre">S2</span></code> will point to the same underlying backend object.
 This makes it possible to reuse a variety of information related to <code class="docutils literal notranslate"><span class="pre">S1</span></code>,
-for example where <code class="docutils literal notranslate"><span class="pre">S1</span></code> appears in various graphs, as well as
-the corresponding <code class="docutils literal notranslate"><span class="pre">layermap</span></code> and <cite>gather_plan`</cite>.</p>
+including the related subgraph lists, layer maps and gather plans.</p>
 <p>The subgraph cache can be accessed via the <code class="docutils literal notranslate"><span class="pre">ptens_base.subgraph_cache</span></code> class:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;&gt;</span> <span class="n">C</span><span class="o">=</span><span class="n">pb</span><span class="o">.</span><span class="n">subgraph_cache</span><span class="o">.</span><span class="n">torch</span><span class="p">()</span>
 <span class="o">&gt;&gt;</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">C</span><span class="p">:</span>
@@ -418,7 +422,15 @@ the corresponding <code class="docutils literal notranslate"><span class="pre">l
       <footer>
         
         <div class="related-pages">
-          
+          <a class="next-page" href="subgraph_layer0.html">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title">Subgraph layers</div>
+              </div>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+            </a>
           <a class="prev-page" href="graph.html">
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
               <div class="page-info">

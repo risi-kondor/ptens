@@ -16,7 +16,8 @@ G2=p.ggraph.random(6,0.5)
 G2.cache(4)
 print(G2)
 
-H=pb.ggraph_cache.graph(3)
+#H=pb.ggraph_cache.graph(3)
+H=p.ggraph.from_cache(3) 
 print(H)
 
 print("Number of cached graphs: ",pb.ggraph_cache.size(),"\n")

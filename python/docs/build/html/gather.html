@@ -3,10 +3,10 @@
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
-<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Graphs" href="graph.html" /><link rel="prev" title="Linmaps" href="linmaps.html" />
+<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Message passing between Ptensor layers" href="gatherlayers.html" /><link rel="prev" title="Linmaps" href="linmaps.html" />
 
     <!-- Generated with Sphinx 7.4.7 and Furo 2024.07.18 -->
-        <title>Gather maps - ptens documentation</title>
+        <title>Message passing between Ptensors - ptens documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=a746c00c" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=613ab9ff" />
     <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
@@ -209,9 +209,11 @@
 <li class="toctree-l1"><a class="reference internal" href="ptensork.html">Ptensors</a></li>
 <li class="toctree-l1"><a class="reference internal" href="ptensorsk.html">Ptensor layers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="linmaps.html">Linmaps</a></li>
-<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Gather maps</a></li>
+<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Message passing between Ptensors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gatherlayers.html">Message passing between Ptensor layers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="graph.html">Graphs</a></li>
 <li class="toctree-l1"><a class="reference internal" href="subgraph.html">Subgraphs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="subgraph_layer0.html">Subgraph layers</a></li>
 </ul>
 
 </div>
@@ -252,10 +254,15 @@
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <section id="gather-maps">
-<h1>Gather maps<a class="headerlink" href="#gather-maps" title="Link to this heading">¶</a></h1>
-<p>When passing messages between Ptensors whose reference domains are different, instead of the <code class="docutils literal notranslate"><span class="pre">linmaps</span></code>
-functions, the <code class="docutils literal notranslate"><span class="pre">gather</span></code> functions must be used.</p>
+          <section id="message-passing-between-ptensors">
+<h1>Message passing between Ptensors<a class="headerlink" href="#message-passing-between-ptensors" title="Link to this heading">¶</a></h1>
+<p>Hands et al. [] extended the notion of message passing between permutation equivariant tensors
+(Ptensors) to the case when the reference domains of the source and destination tensors
+are not necessarily the same. In this case the number of possible linearly independent
+linear maps increases because for each summation or broadcast operation we can consider summing/broadcasting
+over all elements of reference domain or only the intersection of the reference domains of the sending
+and receiving P-tensors.
+These linear maps in <cite>ptens</cite> are called <code class="docutils literal notranslate"><span class="pre">gather</span></code> operations.</p>
 <section id="gather-maps-between-ptensors">
 <h2>Gather maps between Ptensors<a class="headerlink" href="#gather-maps-between-ptensors" title="Link to this heading">¶</a></h2>
 <section id="gather0">
@@ -557,38 +564,6 @@ Ptensors to second order Ptensors is 2,5 and 15, respectively:</p>
 </div>
 </section>
 </section>
-<section id="gather-maps-between-ptensor-layers">
-<h2>Gather maps between Ptensor layers<a class="headerlink" href="#gather-maps-between-ptensor-layers" title="Link to this heading">¶</a></h2>
-<p>When gatherring messages between Ptensor layers, we must specify two things: the reference domains
-of every tensor in the second layer, and the graph that defines which Ptensors send messages to which Ptensors
-(see the section on Graphs):</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;&gt;</span> <span class="n">A</span><span class="o">=</span><span class="n">ptens</span><span class="o">.</span><span class="n">ptensors1</span><span class="o">.</span><span class="n">randn</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">],[</span><span class="mi">3</span><span class="p">]],</span><span class="mi">3</span><span class="p">)</span>
-<span class="o">&gt;&gt;</span> <span class="n">G</span><span class="o">=</span><span class="n">ptens</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">from_matrix</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">2</span><span class="p">))</span>
-<span class="o">&gt;&gt;</span> <span class="nb">print</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
-
-<span class="n">Ptensor1</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">]:</span>
-<span class="p">[</span> <span class="o">-</span><span class="mf">1.23974</span> <span class="o">-</span><span class="mf">0.407472</span> <span class="mf">1.61201</span> <span class="p">]</span>
-<span class="p">[</span> <span class="mf">0.399771</span> <span class="mf">1.3828</span> <span class="mf">0.0523187</span> <span class="p">]</span>
-
-<span class="n">Ptensor1</span> <span class="p">[</span><span class="mi">3</span><span class="p">]:</span>
-<span class="p">[</span> <span class="o">-</span><span class="mf">0.904146</span> <span class="mf">1.87065</span> <span class="o">-</span><span class="mf">1.66043</span> <span class="p">]</span>
-
-<span class="o">&gt;&gt;</span> <span class="n">B</span><span class="o">=</span><span class="n">ptens</span><span class="o">.</span><span class="n">gather1</span><span class="p">(</span><span class="n">A</span><span class="p">,[[</span><span class="mi">1</span><span class="p">],[</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">],[</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">]],</span><span class="n">G</span><span class="p">)</span>
-<span class="o">&gt;&gt;</span> <span class="nb">print</span><span class="p">(</span><span class="n">B</span><span class="p">)</span>
-
-<span class="n">Ptensor1</span> <span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
-<span class="p">[</span> <span class="o">-</span><span class="mf">1.23974</span> <span class="o">-</span><span class="mf">0.407472</span> <span class="mf">1.61201</span> <span class="o">-</span><span class="mf">1.23974</span> <span class="o">-</span><span class="mf">0.407472</span> <span class="mf">1.61201</span> <span class="p">]</span>
-
-<span class="n">Ptensor1</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">]:</span>
-<span class="p">[</span> <span class="mf">0.399771</span> <span class="mf">1.3828</span> <span class="mf">0.0523187</span> <span class="mf">0.399771</span> <span class="mf">1.3828</span> <span class="mf">0.0523187</span> <span class="p">]</span>
-<span class="p">[</span> <span class="o">-</span><span class="mf">0.904146</span> <span class="mf">1.87065</span> <span class="o">-</span><span class="mf">1.66043</span> <span class="o">-</span><span class="mf">0.904146</span> <span class="mf">1.87065</span> <span class="o">-</span><span class="mf">1.66043</span> <span class="p">]</span>
-
-<span class="n">Ptensor1</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">]:</span>
-<span class="p">[</span> <span class="o">-</span><span class="mf">1.23974</span> <span class="o">-</span><span class="mf">0.407472</span> <span class="mf">1.61201</span> <span class="o">-</span><span class="mf">1.23974</span> <span class="o">-</span><span class="mf">0.407472</span> <span class="mf">1.61201</span> <span class="p">]</span>
-<span class="p">[</span> <span class="o">-</span><span class="mf">0.904146</span> <span class="mf">1.87065</span> <span class="o">-</span><span class="mf">1.66043</span> <span class="o">-</span><span class="mf">0.904146</span> <span class="mf">1.87065</span> <span class="o">-</span><span class="mf">1.66043</span> <span class="p">]</span>
-</pre></div>
-</div>
-</section>
 </section>
 
         </article>
@@ -596,12 +571,12 @@ of every tensor in the second layer, and the graph that defines which Ptensors s
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="graph.html">
+          <a class="next-page" href="gatherlayers.html">
               <div class="page-info">
                 <div class="context">
                   <span>Next</span>
                 </div>
-                <div class="title">Graphs</div>
+                <div class="title">Message passing between Ptensor layers</div>
               </div>
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
             </a>
@@ -646,14 +621,13 @@ of every tensor in the second layer, and the graph that defines which Ptensors s
         <div class="toc-tree-container">
           <div class="toc-tree">
             <ul>
-<li><a class="reference internal" href="#">Gather maps</a><ul>
+<li><a class="reference internal" href="#">Message passing between Ptensors</a><ul>
 <li><a class="reference internal" href="#gather-maps-between-ptensors">Gather maps between Ptensors</a><ul>
 <li><a class="reference internal" href="#gather0">gather0</a></li>
 <li><a class="reference internal" href="#gather1">gather1</a></li>
 <li><a class="reference internal" href="#gather2">gather2</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#gather-maps-between-ptensor-layers">Gather maps between Ptensor layers</a></li>
 </ul>
 </li>
 </ul>

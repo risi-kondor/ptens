@@ -3,7 +3,7 @@
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
-<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Gather maps" href="gather.html" /><link rel="prev" title="Ptensor layers" href="ptensorsk.html" />
+<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Message passing between Ptensors" href="gather.html" /><link rel="prev" title="Ptensor layers" href="ptensorsk.html" />
 
     <!-- Generated with Sphinx 7.4.7 and Furo 2024.07.18 -->
         <title>Linmaps - ptens documentation</title>
@@ -209,9 +209,11 @@
 <li class="toctree-l1"><a class="reference internal" href="ptensork.html">Ptensors</a></li>
 <li class="toctree-l1"><a class="reference internal" href="ptensorsk.html">Ptensor layers</a></li>
 <li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Linmaps</a></li>
-<li class="toctree-l1"><a class="reference internal" href="gather.html">Gather maps</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gather.html">Message passing between Ptensors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gatherlayers.html">Message passing between Ptensor layers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="graph.html">Graphs</a></li>
 <li class="toctree-l1"><a class="reference internal" href="subgraph.html">Subgraphs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="subgraph_layer0.html">Subgraph layers</a></li>
 </ul>
 
 </div>
@@ -254,9 +256,10 @@
         <article role="main" id="furo-main-content">
           <section id="linmaps">
 <h1>Linmaps<a class="headerlink" href="#linmaps" title="Link to this heading">¶</a></h1>
-<p>The neurons in permutation equivariant networks implement learnable equivariant maps between Ptensors.
-The <code class="docutils literal notranslate"><span class="pre">linmaps</span></code> functions described in this section are equivariant linear maps between two Ptensors
-with the <em>same</em> reference domain.</p>
+<p>In a seminal paper Maron et al.[] have shown that the number of linearly independent linear maps
+from a :math”<cite>k_1</cite> ‘th order permutation equivariant tensor to a <img class="math" src="_images/math/11b67c4db3ebff2160fb4d7145ae6b0ce5b852ef.svg" alt="k_2"/> ‘th order permutation
+equivariant tensor with the <cite>same</cite> reference domain is given by the Bell number <img class="math" src="_images/math/0e2bc85d2395167c6e78d0dd946c7632aa8fcb91.svg" alt="B(k_1+k_2)"/>.
+The <cite>linmaps</cite> functions described in this section implement these linear maps.</p>
 <section id="linmaps-between-ptensors">
 <h2>Linmaps between Ptensors<a class="headerlink" href="#linmaps-between-ptensors" title="Link to this heading">¶</a></h2>
 <section id="linmaps-to-0th-order-ptensors">
@@ -277,7 +280,7 @@ ptensor are multiples of the identity:</p>
   <span class="p">[</span> <span class="mi">0</span> <span class="mi">1</span> <span class="mi">2</span> <span class="mi">3</span> <span class="mi">4</span> <span class="p">]</span>
 </pre></div>
 </div>
-<p>There is only on way (up to scaling) to map a 1’st order Ptensor to 0’th order ptensor, and that
+<p>There is only one way (up to scaling) to map a 1’st order Ptensor to 0’th order ptensor, and that
 is to sum the input along the atom dimension, i.e., <img class="math" src="_images/math/16004891bc9fd8d7c0854176ae3a6fdba72f7cc9.svg" alt="B_c=\sum_i A_{i,c}"/>:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;&gt;</span> <span class="n">A</span><span class="o">=</span><span class="n">ptens</span><span class="o">.</span><span class="n">ptensor1</span><span class="o">.</span><span class="n">sequential</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">],</span><span class="mi">3</span><span class="p">)</span>
 <span class="o">&gt;&gt;</span> <span class="nb">print</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
@@ -297,61 +300,69 @@ is to sum the input along the atom dimension, i.e., <img class="math" src="_imag
 <p>In contrast, there are two linearly independent ways to map a 2’nd order Ptensor to a 0’th order Ptensor:
 <img class="math" src="_images/math/88135612f72fa7d4cb637881794a4d3bd581fce9.svg" alt="B^1_{c}=\sum_i \sum_j A_{i,j,c}"/> and <img class="math" src="_images/math/82960c8d307d62e0d2dd12b6b986318fbe031af3.svg" alt="B^2_{c}=\sum_i A_{i,i,c}"/>.
 Consequently, when applied to a <code class="docutils literal notranslate"><span class="pre">ptensor2</span></code>, <code class="docutils literal notranslate"><span class="pre">ptensor0.linmaps</span></code> doubles its number of channels:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">A</span><span class="o">=</span><span class="n">ptens</span><span class="o">.</span><span class="n">ptensor2</span><span class="o">.</span><span class="n">sequential</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">],</span><span class="mi">3</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
-<span class="go">Ptensor2 [1,2,3]:</span>
-<span class="go">channel 0:</span>
-<span class="go">  [ 0 3 6 ]</span>
-<span class="go">  [ 9 12 15 ]</span>
-<span class="go">  [ 18 21 24 ]</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;&gt;</span> <span class="n">A</span><span class="o">=</span><span class="n">ptens</span><span class="o">.</span><span class="n">ptensor2</span><span class="o">.</span><span class="n">sequential</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">],</span><span class="mi">3</span><span class="p">)</span>
+<span class="o">&gt;&gt;</span> <span class="nb">print</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
 
-<span class="go">channel 1:</span>
-<span class="go">  [ 1 4 7 ]</span>
-<span class="go">  [ 10 13 16 ]</span>
-<span class="go">  [ 19 22 25 ]</span>
+<span class="n">Ptensor2</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">]:</span>
+<span class="n">channel</span> <span class="mi">0</span><span class="p">:</span>
+  <span class="p">[</span> <span class="mi">0</span> <span class="mi">3</span> <span class="mi">6</span> <span class="p">]</span>
+  <span class="p">[</span> <span class="mi">9</span> <span class="mi">12</span> <span class="mi">15</span> <span class="p">]</span>
+  <span class="p">[</span> <span class="mi">18</span> <span class="mi">21</span> <span class="mi">24</span> <span class="p">]</span>
 
-<span class="go">channel 2:</span>
-<span class="go">  [ 2 5 8 ]</span>
-<span class="go">  [ 11 14 17 ]</span>
-<span class="go">  [ 20 23 26 ]</span>
+<span class="n">channel</span> <span class="mi">1</span><span class="p">:</span>
+  <span class="p">[</span> <span class="mi">1</span> <span class="mi">4</span> <span class="mi">7</span> <span class="p">]</span>
+  <span class="p">[</span> <span class="mi">10</span> <span class="mi">13</span> <span class="mi">16</span> <span class="p">]</span>
+  <span class="p">[</span> <span class="mi">19</span> <span class="mi">22</span> <span class="mi">25</span> <span class="p">]</span>
 
-<span class="gp">&gt;&gt;&gt; </span><span class="n">B</span><span class="o">=</span><span class="n">ptens</span><span class="o">.</span><span class="n">ptensor0</span><span class="o">.</span><span class="n">linmaps</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">B</span><span class="p">)</span>
-<span class="go">Ptensor0 [1,2,3]:</span>
-<span class="go">  [ 108 117 126 36 39 42 ]</span>
+<span class="n">channel</span> <span class="mi">2</span><span class="p">:</span>
+  <span class="p">[</span> <span class="mi">2</span> <span class="mi">5</span> <span class="mi">8</span> <span class="p">]</span>
+  <span class="p">[</span> <span class="mi">11</span> <span class="mi">14</span> <span class="mi">17</span> <span class="p">]</span>
+  <span class="p">[</span> <span class="mi">20</span> <span class="mi">23</span> <span class="mi">26</span> <span class="p">]</span>
+
+<span class="o">&gt;&gt;</span> <span class="n">B</span><span class="o">=</span><span class="n">ptens</span><span class="o">.</span><span class="n">ptensor0</span><span class="o">.</span><span class="n">linmaps</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+<span class="o">&gt;&gt;</span> <span class="nb">print</span><span class="p">(</span><span class="n">B</span><span class="p">)</span>
+
+<span class="n">Ptensor0</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">]:</span>
+  <span class="p">[</span> <span class="mi">108</span> <span class="mi">117</span> <span class="mi">126</span> <span class="mi">36</span> <span class="mi">39</span> <span class="mi">42</span> <span class="p">]</span>
 </pre></div>
 </div>
 </section>
 <section id="linmaps-to-1st-order-ptensors">
 <h3>linmaps to 1st order Ptensors<a class="headerlink" href="#linmaps-to-1st-order-ptensors" title="Link to this heading">¶</a></h3>
 <p>The only equivariant map from a <code class="docutils literal notranslate"><span class="pre">ptensor0</span></code> to <code class="docutils literal notranslate"><span class="pre">ptensor1</span></code> is <img class="math" src="_images/math/5b18692a6d5a9331f3f62fc38c10b4eddcc6a4b8.svg" alt="B_{i,c}=A_c"/>:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">A</span><span class="o">=</span><span class="n">ptens</span><span class="o">.</span><span class="n">ptensor0</span><span class="o">.</span><span class="n">sequential</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">],</span><span class="mi">3</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
-<span class="go">Ptensor0 [1,2,3]:</span>
-<span class="go">  [ 0 1 2 ]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">B</span><span class="o">=</span><span class="n">ptens</span><span class="o">.</span><span class="n">ptensor1</span><span class="o">.</span><span class="n">linmaps</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">B</span><span class="p">)</span>
-<span class="go">Ptensor1 [1,2,3]:</span>
-<span class="go">  [ 0 1 2 ]</span>
-<span class="go">  [ 0 1 2 ]</span>
-<span class="go">  [ 0 1 2 ]</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;&gt;</span> <span class="n">A</span><span class="o">=</span><span class="n">ptens</span><span class="o">.</span><span class="n">ptensor0</span><span class="o">.</span><span class="n">sequential</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">],</span><span class="mi">3</span><span class="p">)</span>
+<span class="o">&gt;&gt;</span> <span class="nb">print</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+
+<span class="n">Ptensor0</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">]:</span>
+  <span class="p">[</span> <span class="mi">0</span> <span class="mi">1</span> <span class="mi">2</span> <span class="p">]</span>
+
+<span class="o">&gt;&gt;</span> <span class="n">B</span><span class="o">=</span><span class="n">ptens</span><span class="o">.</span><span class="n">ptensor1</span><span class="o">.</span><span class="n">linmaps</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+<span class="o">&gt;&gt;</span> <span class="nb">print</span><span class="p">(</span><span class="n">B</span><span class="p">)</span>
+
+<span class="n">Ptensor1</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">]:</span>
+  <span class="p">[</span> <span class="mi">0</span> <span class="mi">1</span> <span class="mi">2</span> <span class="p">]</span>
+  <span class="p">[</span> <span class="mi">0</span> <span class="mi">1</span> <span class="mi">2</span> <span class="p">]</span>
+  <span class="p">[</span> <span class="mi">0</span> <span class="mi">1</span> <span class="mi">2</span> <span class="p">]</span>
 </pre></div>
 </div>
 <p>There are two ways of mapping a 1’st order Ptensor to a 1’st order Ptensor:
 <img class="math" src="_images/math/d8536b52a39833e5fc6972cd7bedbb6a3951797d.svg" alt="B_{i,c}=\sum_i A_{i,c}"/> and <img class="math" src="_images/math/1791e0832d223b39a2e3d871b6f31393643eb548.svg" alt="B_{i,c}=A_{i,c}"/>.
 Therefore, the number of channels doubles:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">A</span><span class="o">=</span><span class="n">ptens</span><span class="o">.</span><span class="n">ptensor1</span><span class="o">.</span><span class="n">sequential</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">],</span><span class="mi">3</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
-<span class="go">Ptensor1 [1,2,3]:</span>
-<span class="go">  [ 0 1 2 ]</span>
-<span class="go">  [ 3 4 5 ]</span>
-<span class="go">  [ 6 7 8 ]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">B</span><span class="o">=</span><span class="n">ptens</span><span class="o">.</span><span class="n">ptensor1</span><span class="o">.</span><span class="n">linmaps</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">B</span><span class="p">)</span>
-<span class="go">Ptensor1(1,2,3):</span>
-<span class="go">  [ 9 12 15 0 1 2 ]</span>
-<span class="go">  [ 9 12 15 3 4 5 ]</span>
-<span class="go">   [ 9 12 15 6 7 8 ]</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;&gt;</span> <span class="n">A</span><span class="o">=</span><span class="n">ptens</span><span class="o">.</span><span class="n">ptensor1</span><span class="o">.</span><span class="n">sequential</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">],</span><span class="mi">3</span><span class="p">)</span>
+<span class="o">&gt;&gt;</span> <span class="nb">print</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+
+<span class="n">Ptensor1</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">]:</span>
+  <span class="p">[</span> <span class="mi">0</span> <span class="mi">1</span> <span class="mi">2</span> <span class="p">]</span>
+  <span class="p">[</span> <span class="mi">3</span> <span class="mi">4</span> <span class="mi">5</span> <span class="p">]</span>
+  <span class="p">[</span> <span class="mi">6</span> <span class="mi">7</span> <span class="mi">8</span> <span class="p">]</span>
+
+<span class="o">&gt;&gt;</span> <span class="n">B</span><span class="o">=</span><span class="n">ptens</span><span class="o">.</span><span class="n">ptensor1</span><span class="o">.</span><span class="n">linmaps</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+<span class="o">&gt;&gt;</span> <span class="nb">print</span><span class="p">(</span><span class="n">B</span><span class="p">)</span>
+
+<span class="n">Ptensor1</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">):</span>
+  <span class="p">[</span> <span class="mi">9</span> <span class="mi">12</span> <span class="mi">15</span> <span class="mi">0</span> <span class="mi">1</span> <span class="mi">2</span> <span class="p">]</span>
+  <span class="p">[</span> <span class="mi">9</span> <span class="mi">12</span> <span class="mi">15</span> <span class="mi">3</span> <span class="mi">4</span> <span class="mi">5</span> <span class="p">]</span>
+   <span class="p">[</span> <span class="mi">9</span> <span class="mi">12</span> <span class="mi">15</span> <span class="mi">6</span> <span class="mi">7</span> <span class="mi">8</span> <span class="p">]</span>
 </pre></div>
 </div>
 <p>The space of equivariant maps from a second order Ptensor to a first order Ptensor is spanned by
@@ -361,30 +372,32 @@ Therefore, the number of channels doubles:</p>
 <img class="math" src="_images/math/586821e7d3f80d2e89de530e67ba9fbb13639357.svg" alt="B^4_{i,c}=\sum_j A_{j,i,c}"/>, and
 <img class="math" src="_images/math/9d56b1b1def6e01ee172b45d63f6546ef482c0ae.svg" alt="B^5_{i,c}=\sum_j A_{i,i,c}"/>.
 Therefore , this map multiplies the number of channels five-fold.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">A</span><span class="o">=</span><span class="n">ptens</span><span class="o">.</span><span class="n">ptensor2</span><span class="o">.</span><span class="n">sequential</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">],</span><span class="mi">3</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
-<span class="go">Ptensor2 [1,2,3]:</span>
-<span class="go">  channel 0:</span>
-<span class="go">    [ 0 3 6 ]</span>
-<span class="go">    [ 9 12 15 ]</span>
-<span class="go">    [ 18 21 24 ]</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;&gt;</span> <span class="n">A</span><span class="o">=</span><span class="n">ptens</span><span class="o">.</span><span class="n">ptensor2</span><span class="o">.</span><span class="n">sequential</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">],</span><span class="mi">3</span><span class="p">)</span>
+<span class="o">&gt;&gt;</span> <span class="nb">print</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
 
-<span class="go">  channel 1:</span>
-<span class="go">    [ 1 4 7 ]</span>
-<span class="go">    [ 10 13 16 ]</span>
-<span class="go">    [ 19 22 25 ]</span>
+<span class="n">Ptensor2</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">]:</span>
+  <span class="n">channel</span> <span class="mi">0</span><span class="p">:</span>
+    <span class="p">[</span> <span class="mi">0</span> <span class="mi">3</span> <span class="mi">6</span> <span class="p">]</span>
+    <span class="p">[</span> <span class="mi">9</span> <span class="mi">12</span> <span class="mi">15</span> <span class="p">]</span>
+    <span class="p">[</span> <span class="mi">18</span> <span class="mi">21</span> <span class="mi">24</span> <span class="p">]</span>
 
-<span class="go">  channel 2:</span>
-<span class="go">    [ 2 5 8 ]</span>
-<span class="go">    [ 11 14 17 ]</span>
-<span class="go">    [ 20 23 26 ]</span>
+  <span class="n">channel</span> <span class="mi">1</span><span class="p">:</span>
+    <span class="p">[</span> <span class="mi">1</span> <span class="mi">4</span> <span class="mi">7</span> <span class="p">]</span>
+    <span class="p">[</span> <span class="mi">10</span> <span class="mi">13</span> <span class="mi">16</span> <span class="p">]</span>
+    <span class="p">[</span> <span class="mi">19</span> <span class="mi">22</span> <span class="mi">25</span> <span class="p">]</span>
 
-<span class="gp">&gt;&gt;&gt; </span><span class="n">B</span><span class="o">=</span><span class="n">ptens</span><span class="o">.</span><span class="n">ptensor1</span><span class="o">.</span><span class="n">linmaps</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">B</span><span class="p">)</span>
-<span class="go">Ptensor1 [1,2,3]:</span>
-<span class="go">  [ 108 117 126 36 39 42 27 30 33 9 12 15 0 1 2 ]</span>
-<span class="go">  [ 108 117 126 36 39 42 36 39 42 36 39 42 12 13 14 ]</span>
-<span class="go">  [ 108 117 126 36 39 42 45 48 51 63 66 69 24 25 26 ]</span>
+  <span class="n">channel</span> <span class="mi">2</span><span class="p">:</span>
+    <span class="p">[</span> <span class="mi">2</span> <span class="mi">5</span> <span class="mi">8</span> <span class="p">]</span>
+    <span class="p">[</span> <span class="mi">11</span> <span class="mi">14</span> <span class="mi">17</span> <span class="p">]</span>
+    <span class="p">[</span> <span class="mi">20</span> <span class="mi">23</span> <span class="mi">26</span> <span class="p">]</span>
+
+<span class="o">&gt;&gt;</span> <span class="n">B</span><span class="o">=</span><span class="n">ptens</span><span class="o">.</span><span class="n">ptensor1</span><span class="o">.</span><span class="n">linmaps</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+<span class="o">&gt;&gt;</span> <span class="nb">print</span><span class="p">(</span><span class="n">B</span><span class="p">)</span>
+
+<span class="n">Ptensor1</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">]:</span>
+  <span class="p">[</span> <span class="mi">108</span> <span class="mi">117</span> <span class="mi">126</span> <span class="mi">36</span> <span class="mi">39</span> <span class="mi">42</span> <span class="mi">27</span> <span class="mi">30</span> <span class="mi">33</span> <span class="mi">9</span> <span class="mi">12</span> <span class="mi">15</span> <span class="mi">0</span> <span class="mi">1</span> <span class="mi">2</span> <span class="p">]</span>
+  <span class="p">[</span> <span class="mi">108</span> <span class="mi">117</span> <span class="mi">126</span> <span class="mi">36</span> <span class="mi">39</span> <span class="mi">42</span> <span class="mi">36</span> <span class="mi">39</span> <span class="mi">42</span> <span class="mi">36</span> <span class="mi">39</span> <span class="mi">42</span> <span class="mi">12</span> <span class="mi">13</span> <span class="mi">14</span> <span class="p">]</span>
+  <span class="p">[</span> <span class="mi">108</span> <span class="mi">117</span> <span class="mi">126</span> <span class="mi">36</span> <span class="mi">39</span> <span class="mi">42</span> <span class="mi">45</span> <span class="mi">48</span> <span class="mi">51</span> <span class="mi">63</span> <span class="mi">66</span> <span class="mi">69</span> <span class="mi">24</span> <span class="mi">25</span> <span class="mi">26</span> <span class="p">]</span>
 </pre></div>
 </div>
 </section>
@@ -393,43 +406,45 @@ Therefore , this map multiplies the number of channels five-fold.</p>
 <p><code class="docutils literal notranslate"><span class="pre">ptensor2.linmaps</span></code> maps a 0’th, 1’st or 2’nd order Ptensor to a 2’nd  order Ptensor.
 In the <img class="math" src="_images/math/249aeb429c9b9d0a114b2983588d46d9be76b6c3.svg" alt="\mathcal{P}_0\to\mathcal{P}_2"/> case there are two maps to consider:
 <img class="math" src="_images/math/475239c95804517a5f7ef242c266180d26a2b092.svg" alt="C^1_{i,j,c}=A_c"/> and <img class="math" src="_images/math/3578c588fa9ebb8814f7f71491b04a90fc6be4ea.svg" alt="C^2_{i,j,c}=\delta_{i,j} A_c"/>:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">A</span><span class="o">=</span><span class="n">ptens</span><span class="o">.</span><span class="n">ptensor0</span><span class="o">.</span><span class="n">sequential</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">],</span><span class="mi">3</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
-<span class="go">Ptensor0 [1,2,3]:</span>
-<span class="go">  [ 0 1 2 ]</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;&gt;</span> <span class="n">A</span><span class="o">=</span><span class="n">ptens</span><span class="o">.</span><span class="n">ptensor0</span><span class="o">.</span><span class="n">sequential</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">],</span><span class="mi">3</span><span class="p">)</span>
+<span class="o">&gt;&gt;</span> <span class="nb">print</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
 
-<span class="gp">&gt;&gt;&gt; </span><span class="n">C</span><span class="o">=</span><span class="n">ptens</span><span class="o">.</span><span class="n">ptensor2</span><span class="o">.</span><span class="n">linmaps</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">C</span><span class="p">)</span>
-<span class="go">Ptensor2 [1,2,3]:</span>
-<span class="go">  channel 0:</span>
-<span class="go">    [ 0 0 0 ]</span>
-<span class="go">    [ 0 0 0 ]</span>
-<span class="go">    [ 0 0 0 ]</span>
+<span class="n">Ptensor0</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">]:</span>
+  <span class="p">[</span> <span class="mi">0</span> <span class="mi">1</span> <span class="mi">2</span> <span class="p">]</span>
 
-<span class="go">  channel 1:</span>
-<span class="go">    [ 1 1 1 ]</span>
-<span class="go">    [ 1 1 1 ]</span>
-<span class="go">    [ 1 1 1 ]</span>
+<span class="o">&gt;&gt;</span> <span class="n">C</span><span class="o">=</span><span class="n">ptens</span><span class="o">.</span><span class="n">ptensor2</span><span class="o">.</span><span class="n">linmaps</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+<span class="o">&gt;&gt;</span> <span class="nb">print</span><span class="p">(</span><span class="n">C</span><span class="p">)</span>
 
-<span class="go">  channel 2:</span>
-<span class="go">    [ 2 2 2 ]</span>
-<span class="go">    [ 2 2 2 ]</span>
-<span class="go">    [ 2 2 2 ]</span>
+<span class="n">Ptensor2</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">]:</span>
+  <span class="n">channel</span> <span class="mi">0</span><span class="p">:</span>
+    <span class="p">[</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="p">]</span>
+    <span class="p">[</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="p">]</span>
+    <span class="p">[</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="p">]</span>
 
-<span class="go">  channel 3:</span>
-<span class="go">    [ 0 0 0 ]</span>
-<span class="go">    [ 0 0 0 ]</span>
-<span class="go">    [ 0 0 0 ]</span>
+  <span class="n">channel</span> <span class="mi">1</span><span class="p">:</span>
+    <span class="p">[</span> <span class="mi">1</span> <span class="mi">1</span> <span class="mi">1</span> <span class="p">]</span>
+    <span class="p">[</span> <span class="mi">1</span> <span class="mi">1</span> <span class="mi">1</span> <span class="p">]</span>
+    <span class="p">[</span> <span class="mi">1</span> <span class="mi">1</span> <span class="mi">1</span> <span class="p">]</span>
 
-<span class="go">  channel 4:</span>
-<span class="go">    [ 1 0 0 ]</span>
-<span class="go">    [ 0 1 0 ]</span>
-<span class="go">    [ 0 0 1 ]</span>
+  <span class="n">channel</span> <span class="mi">2</span><span class="p">:</span>
+    <span class="p">[</span> <span class="mi">2</span> <span class="mi">2</span> <span class="mi">2</span> <span class="p">]</span>
+    <span class="p">[</span> <span class="mi">2</span> <span class="mi">2</span> <span class="mi">2</span> <span class="p">]</span>
+    <span class="p">[</span> <span class="mi">2</span> <span class="mi">2</span> <span class="mi">2</span> <span class="p">]</span>
 
-<span class="go">  channel 5:</span>
-<span class="go">    [ 2 0 0 ]</span>
-<span class="go">    [ 0 2 0 ]</span>
-<span class="go">    [ 0 0 2 ]</span>
+  <span class="n">channel</span> <span class="mi">3</span><span class="p">:</span>
+    <span class="p">[</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="p">]</span>
+    <span class="p">[</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="p">]</span>
+    <span class="p">[</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="p">]</span>
+
+  <span class="n">channel</span> <span class="mi">4</span><span class="p">:</span>
+    <span class="p">[</span> <span class="mi">1</span> <span class="mi">0</span> <span class="mi">0</span> <span class="p">]</span>
+    <span class="p">[</span> <span class="mi">0</span> <span class="mi">1</span> <span class="mi">0</span> <span class="p">]</span>
+    <span class="p">[</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">1</span> <span class="p">]</span>
+
+  <span class="n">channel</span> <span class="mi">5</span><span class="p">:</span>
+    <span class="p">[</span> <span class="mi">2</span> <span class="mi">0</span> <span class="mi">0</span> <span class="p">]</span>
+    <span class="p">[</span> <span class="mi">0</span> <span class="mi">2</span> <span class="mi">0</span> <span class="p">]</span>
+    <span class="p">[</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">2</span> <span class="p">]</span>
 </pre></div>
 </div>
 <p>There are a total of five equivariant maps from a 1’st order Ptensor to a 2’nd order Ptensor:
@@ -438,171 +453,177 @@ In the <img class="math" src="_images/math/249aeb429c9b9d0a114b2983588d46d9be76b
 <img class="math" src="_images/math/20645be39b9076a2c98bdf28bfc79eae2102fcba.svg" alt="B_{i,j,c}=A_{i,c}"/>,
 <img class="math" src="_images/math/c4820948f34cb6a73058c3153c7bd10685a0dd91.svg" alt="B_{j,i,c}=A_{i,c}"/> and
 <img class="math" src="_images/math/addad6e2f187be3362cd0023a1807d046af5dbb6.svg" alt="B_{i,j,c}=\delta_{i,j} A_{i,c}"/>.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">A</span><span class="o">=</span><span class="n">ptens</span><span class="o">.</span><span class="n">ptensor1</span><span class="o">.</span><span class="n">sequential</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">],</span><span class="mi">3</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
-<span class="go">Ptensor1 [1,2,3]:</span>
-<span class="go">[ 0 1 2 ]</span>
-<span class="go">[ 3 4 5 ]</span>
-<span class="go">[ 6 7 8 ]</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;&gt;</span> <span class="n">A</span><span class="o">=</span><span class="n">ptens</span><span class="o">.</span><span class="n">ptensor1</span><span class="o">.</span><span class="n">sequential</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">],</span><span class="mi">3</span><span class="p">)</span>
+<span class="o">&gt;&gt;</span> <span class="nb">print</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
 
-<span class="gp">&gt;&gt;&gt; </span><span class="n">B</span><span class="o">=</span><span class="n">ptens</span><span class="o">.</span><span class="n">ptensor2</span><span class="o">.</span><span class="n">linmaps</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">B</span><span class="p">)</span>
-<span class="go">Ptensor2 [1,2,3]:</span>
-<span class="go">  channel 0:</span>
-<span class="go">    [ 9 9 9 ]</span>
-<span class="go">    [ 9 9 9 ]</span>
-<span class="go">    [ 9 9 9 ]</span>
+<span class="n">Ptensor1</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">]:</span>
+<span class="p">[</span> <span class="mi">0</span> <span class="mi">1</span> <span class="mi">2</span> <span class="p">]</span>
+<span class="p">[</span> <span class="mi">3</span> <span class="mi">4</span> <span class="mi">5</span> <span class="p">]</span>
+<span class="p">[</span> <span class="mi">6</span> <span class="mi">7</span> <span class="mi">8</span> <span class="p">]</span>
 
-<span class="go">  channel 1:</span>
-<span class="go">    [ 10 10 10 ]</span>
-<span class="go">    [ 10 10 10 ]</span>
-<span class="go">    [ 10 10 10 ]</span>
+<span class="o">&gt;&gt;</span> <span class="n">B</span><span class="o">=</span><span class="n">ptens</span><span class="o">.</span><span class="n">ptensor2</span><span class="o">.</span><span class="n">linmaps</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+<span class="o">&gt;&gt;</span> <span class="nb">print</span><span class="p">(</span><span class="n">B</span><span class="p">)</span>
 
-<span class="go">  channel 2:</span>
-<span class="go">    [ 15 15 15 ]</span>
-<span class="go">    [ 15 15 15 ]</span>
-<span class="go">    [ 15 15 15 ]</span>
+<span class="n">Ptensor2</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">]:</span>
+  <span class="n">channel</span> <span class="mi">0</span><span class="p">:</span>
+    <span class="p">[</span> <span class="mi">9</span> <span class="mi">9</span> <span class="mi">9</span> <span class="p">]</span>
+    <span class="p">[</span> <span class="mi">9</span> <span class="mi">9</span> <span class="mi">9</span> <span class="p">]</span>
+    <span class="p">[</span> <span class="mi">9</span> <span class="mi">9</span> <span class="mi">9</span> <span class="p">]</span>
 
-<span class="go">  channel 3:</span>
-<span class="go">    [ 9 0 0 ]</span>
-<span class="go">    [ 0 9 0 ]</span>
-<span class="go">    [ 0 0 9 ]</span>
+  <span class="n">channel</span> <span class="mi">1</span><span class="p">:</span>
+    <span class="p">[</span> <span class="mi">10</span> <span class="mi">10</span> <span class="mi">10</span> <span class="p">]</span>
+    <span class="p">[</span> <span class="mi">10</span> <span class="mi">10</span> <span class="mi">10</span> <span class="p">]</span>
+    <span class="p">[</span> <span class="mi">10</span> <span class="mi">10</span> <span class="mi">10</span> <span class="p">]</span>
 
-<span class="go">  channel 4:</span>
-<span class="go">    [ 10 0 0 ]</span>
-<span class="go">    [ 0 10 0 ]</span>
-<span class="go">    [ 0 0 10 ]</span>
+  <span class="n">channel</span> <span class="mi">2</span><span class="p">:</span>
+    <span class="p">[</span> <span class="mi">15</span> <span class="mi">15</span> <span class="mi">15</span> <span class="p">]</span>
+    <span class="p">[</span> <span class="mi">15</span> <span class="mi">15</span> <span class="mi">15</span> <span class="p">]</span>
+    <span class="p">[</span> <span class="mi">15</span> <span class="mi">15</span> <span class="mi">15</span> <span class="p">]</span>
 
-<span class="go">  channel 5:</span>
-<span class="go">    [ 15 0 0 ]</span>
-<span class="go">    [ 0 15 0 ]</span>
-<span class="go">    [ 0 0 15 ]</span>
+  <span class="n">channel</span> <span class="mi">3</span><span class="p">:</span>
+    <span class="p">[</span> <span class="mi">9</span> <span class="mi">0</span> <span class="mi">0</span> <span class="p">]</span>
+    <span class="p">[</span> <span class="mi">0</span> <span class="mi">9</span> <span class="mi">0</span> <span class="p">]</span>
+    <span class="p">[</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">9</span> <span class="p">]</span>
 
-<span class="go">  channel 6:</span>
-<span class="go">    [ 0 3 6 ]</span>
-<span class="go">    [ 0 3 6 ]</span>
-<span class="go">    [ 0 3 6 ]</span>
+  <span class="n">channel</span> <span class="mi">4</span><span class="p">:</span>
+    <span class="p">[</span> <span class="mi">10</span> <span class="mi">0</span> <span class="mi">0</span> <span class="p">]</span>
+    <span class="p">[</span> <span class="mi">0</span> <span class="mi">10</span> <span class="mi">0</span> <span class="p">]</span>
+    <span class="p">[</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">10</span> <span class="p">]</span>
 
-<span class="go">  channel 7:</span>
-<span class="go">    [ 1 4 7 ]</span>
-<span class="go">    [ 1 4 7 ]</span>
-<span class="go">    [ 1 4 7 ]</span>
+  <span class="n">channel</span> <span class="mi">5</span><span class="p">:</span>
+    <span class="p">[</span> <span class="mi">15</span> <span class="mi">0</span> <span class="mi">0</span> <span class="p">]</span>
+    <span class="p">[</span> <span class="mi">0</span> <span class="mi">15</span> <span class="mi">0</span> <span class="p">]</span>
+    <span class="p">[</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">15</span> <span class="p">]</span>
 
-<span class="go">  channel 8:</span>
-<span class="go">    [ 2 5 8 ]</span>
-<span class="go">    [ 2 5 8 ]</span>
-<span class="go">    [ 2 5 8 ]</span>
+  <span class="n">channel</span> <span class="mi">6</span><span class="p">:</span>
+    <span class="p">[</span> <span class="mi">0</span> <span class="mi">3</span> <span class="mi">6</span> <span class="p">]</span>
+    <span class="p">[</span> <span class="mi">0</span> <span class="mi">3</span> <span class="mi">6</span> <span class="p">]</span>
+    <span class="p">[</span> <span class="mi">0</span> <span class="mi">3</span> <span class="mi">6</span> <span class="p">]</span>
 
-<span class="go">  channel 9:</span>
-<span class="go">    [ 0 0 0 ]</span>
-<span class="go">    [ 3 3 3 ]</span>
-<span class="go">    [ 6 6 6 ]</span>
+  <span class="n">channel</span> <span class="mi">7</span><span class="p">:</span>
+    <span class="p">[</span> <span class="mi">1</span> <span class="mi">4</span> <span class="mi">7</span> <span class="p">]</span>
+    <span class="p">[</span> <span class="mi">1</span> <span class="mi">4</span> <span class="mi">7</span> <span class="p">]</span>
+    <span class="p">[</span> <span class="mi">1</span> <span class="mi">4</span> <span class="mi">7</span> <span class="p">]</span>
 
-<span class="go">  channel 10:</span>
-<span class="go">    [ 1 1 1 ]</span>
-<span class="go">    [ 4 4 4 ]</span>
-<span class="go">    [ 7 7 7 ]</span>
+  <span class="n">channel</span> <span class="mi">8</span><span class="p">:</span>
+    <span class="p">[</span> <span class="mi">2</span> <span class="mi">5</span> <span class="mi">8</span> <span class="p">]</span>
+    <span class="p">[</span> <span class="mi">2</span> <span class="mi">5</span> <span class="mi">8</span> <span class="p">]</span>
+    <span class="p">[</span> <span class="mi">2</span> <span class="mi">5</span> <span class="mi">8</span> <span class="p">]</span>
 
-<span class="go">  channel 11:</span>
-<span class="go">    [ 2 2 2 ]</span>
-<span class="go">    [ 5 5 5 ]</span>
-<span class="go">    [ 8 8 8 ]</span>
+  <span class="n">channel</span> <span class="mi">9</span><span class="p">:</span>
+    <span class="p">[</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="p">]</span>
+    <span class="p">[</span> <span class="mi">3</span> <span class="mi">3</span> <span class="mi">3</span> <span class="p">]</span>
+    <span class="p">[</span> <span class="mi">6</span> <span class="mi">6</span> <span class="mi">6</span> <span class="p">]</span>
 
-<span class="go">  channel 12:</span>
-<span class="go">    [ 0 0 0 ]</span>
-<span class="go">    [ 0 3 0 ]</span>
-<span class="go">    [ 0 0 6 ]</span>
+  <span class="n">channel</span> <span class="mi">10</span><span class="p">:</span>
+    <span class="p">[</span> <span class="mi">1</span> <span class="mi">1</span> <span class="mi">1</span> <span class="p">]</span>
+    <span class="p">[</span> <span class="mi">4</span> <span class="mi">4</span> <span class="mi">4</span> <span class="p">]</span>
+    <span class="p">[</span> <span class="mi">7</span> <span class="mi">7</span> <span class="mi">7</span> <span class="p">]</span>
 
-<span class="go">  channel 13:</span>
-<span class="go">    [ 1 0 0 ]</span>
-<span class="go">    [ 0 4 0 ]</span>
-<span class="go">    [ 0 0 7 ]</span>
+  <span class="n">channel</span> <span class="mi">11</span><span class="p">:</span>
+    <span class="p">[</span> <span class="mi">2</span> <span class="mi">2</span> <span class="mi">2</span> <span class="p">]</span>
+    <span class="p">[</span> <span class="mi">5</span> <span class="mi">5</span> <span class="mi">5</span> <span class="p">]</span>
+    <span class="p">[</span> <span class="mi">8</span> <span class="mi">8</span> <span class="mi">8</span> <span class="p">]</span>
 
-<span class="go">  channel 14:</span>
-<span class="go">    [ 2 0 0 ]</span>
-<span class="go">    [ 0 5 0 ]</span>
-<span class="go">    [ 0 0 8 ]</span>
+  <span class="n">channel</span> <span class="mi">12</span><span class="p">:</span>
+    <span class="p">[</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="p">]</span>
+    <span class="p">[</span> <span class="mi">0</span> <span class="mi">3</span> <span class="mi">0</span> <span class="p">]</span>
+    <span class="p">[</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">6</span> <span class="p">]</span>
+
+  <span class="n">channel</span> <span class="mi">13</span><span class="p">:</span>
+    <span class="p">[</span> <span class="mi">1</span> <span class="mi">0</span> <span class="mi">0</span> <span class="p">]</span>
+    <span class="p">[</span> <span class="mi">0</span> <span class="mi">4</span> <span class="mi">0</span> <span class="p">]</span>
+    <span class="p">[</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">7</span> <span class="p">]</span>
+
+  <span class="n">channel</span> <span class="mi">14</span><span class="p">:</span>
+    <span class="p">[</span> <span class="mi">2</span> <span class="mi">0</span> <span class="mi">0</span> <span class="p">]</span>
+    <span class="p">[</span> <span class="mi">0</span> <span class="mi">5</span> <span class="mi">0</span> <span class="p">]</span>
+    <span class="p">[</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">8</span> <span class="p">]</span>
 </pre></div>
 </div>
 <p>Finally, the space of equivariant maps from a second order Ptensor to a second order Ptensor is spanned by
 15 different maps (output truncated).</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">A</span><span class="o">=</span><span class="n">ptens</span><span class="o">.</span><span class="n">ptensor2</span><span class="o">.</span><span class="n">sequential</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">],</span><span class="mi">3</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">B</span><span class="o">=</span><span class="n">ptens</span><span class="o">.</span><span class="n">linmaps2</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">B</span><span class="p">)</span>
-<span class="go">Ptensor2 [1,2,3]:</span>
-<span class="go">  channel 0:</span>
-<span class="go">    [ 108 108 108 ]</span>
-<span class="go">    [ 108 108 108 ]</span>
-<span class="go">    [ 108 108 108 ]</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;&gt;</span> <span class="n">A</span><span class="o">=</span><span class="n">ptens</span><span class="o">.</span><span class="n">ptensor2</span><span class="o">.</span><span class="n">sequential</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">],</span><span class="mi">3</span><span class="p">)</span>
+<span class="o">&gt;&gt;</span> <span class="n">B</span><span class="o">=</span><span class="n">ptens</span><span class="o">.</span><span class="n">linmaps2</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+<span class="o">&gt;&gt;</span> <span class="nb">print</span><span class="p">(</span><span class="n">B</span><span class="p">)</span>
 
-<span class="go">  channel 1:</span>
-<span class="go">    [ 117 117 117 ]</span>
-<span class="go">    [ 117 117 117 ]</span>
-<span class="go">    [ 117 117 117 ]</span>
+<span class="n">Ptensor2</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">]:</span>
+  <span class="n">channel</span> <span class="mi">0</span><span class="p">:</span>
+    <span class="p">[</span> <span class="mi">108</span> <span class="mi">108</span> <span class="mi">108</span> <span class="p">]</span>
+    <span class="p">[</span> <span class="mi">108</span> <span class="mi">108</span> <span class="mi">108</span> <span class="p">]</span>
+    <span class="p">[</span> <span class="mi">108</span> <span class="mi">108</span> <span class="mi">108</span> <span class="p">]</span>
 
-<span class="go">  channel 2:</span>
-<span class="go">    [ 126 126 126 ]</span>
-<span class="go">    [ 126 126 126 ]</span>
-<span class="go">    [ 126 126 126 ]</span>
+  <span class="n">channel</span> <span class="mi">1</span><span class="p">:</span>
+    <span class="p">[</span> <span class="mi">117</span> <span class="mi">117</span> <span class="mi">117</span> <span class="p">]</span>
+    <span class="p">[</span> <span class="mi">117</span> <span class="mi">117</span> <span class="mi">117</span> <span class="p">]</span>
+    <span class="p">[</span> <span class="mi">117</span> <span class="mi">117</span> <span class="mi">117</span> <span class="p">]</span>
 
-<span class="go">  channel 3:</span>
-<span class="go">    [ 36 36 36 ]</span>
-<span class="go">    [ 36 36 36 ]</span>
-<span class="go">    [ 36 36 36 ]</span>
+  <span class="n">channel</span> <span class="mi">2</span><span class="p">:</span>
+    <span class="p">[</span> <span class="mi">126</span> <span class="mi">126</span> <span class="mi">126</span> <span class="p">]</span>
+    <span class="p">[</span> <span class="mi">126</span> <span class="mi">126</span> <span class="mi">126</span> <span class="p">]</span>
+    <span class="p">[</span> <span class="mi">126</span> <span class="mi">126</span> <span class="mi">126</span> <span class="p">]</span>
 
-<span class="go">  channel 4:</span>
-<span class="go">    [ 39 39 39 ]</span>
-<span class="go">    [ 39 39 39 ]</span>
-<span class="go">    [ 39 39 39 ]</span>
+  <span class="n">channel</span> <span class="mi">3</span><span class="p">:</span>
+    <span class="p">[</span> <span class="mi">36</span> <span class="mi">36</span> <span class="mi">36</span> <span class="p">]</span>
+    <span class="p">[</span> <span class="mi">36</span> <span class="mi">36</span> <span class="mi">36</span> <span class="p">]</span>
+    <span class="p">[</span> <span class="mi">36</span> <span class="mi">36</span> <span class="mi">36</span> <span class="p">]</span>
 
-<span class="go">  channel 5:</span>
-<span class="go">    [ 42 42 42 ]</span>
-<span class="go">    [ 42 42 42 ]</span>
-<span class="go">    [ 42 42 42 ]</span>
+  <span class="n">channel</span> <span class="mi">4</span><span class="p">:</span>
+    <span class="p">[</span> <span class="mi">39</span> <span class="mi">39</span> <span class="mi">39</span> <span class="p">]</span>
+    <span class="p">[</span> <span class="mi">39</span> <span class="mi">39</span> <span class="mi">39</span> <span class="p">]</span>
+    <span class="p">[</span> <span class="mi">39</span> <span class="mi">39</span> <span class="mi">39</span> <span class="p">]</span>
 
-<span class="go">  channel 6:</span>
-<span class="go">    [ 108 0 0 ]</span>
-<span class="go">    [ 0 108 0 ]</span>
-<span class="go">    [ 0 0 108 ]</span>
+  <span class="n">channel</span> <span class="mi">5</span><span class="p">:</span>
+    <span class="p">[</span> <span class="mi">42</span> <span class="mi">42</span> <span class="mi">42</span> <span class="p">]</span>
+    <span class="p">[</span> <span class="mi">42</span> <span class="mi">42</span> <span class="mi">42</span> <span class="p">]</span>
+    <span class="p">[</span> <span class="mi">42</span> <span class="mi">42</span> <span class="mi">42</span> <span class="p">]</span>
 
-<span class="go">  channel 7:</span>
-<span class="go">    [ 117 0 0 ]</span>
-<span class="go">    [ 0 117 0 ]</span>
-<span class="go">    [ 0 0 117 ]</span>
+  <span class="n">channel</span> <span class="mi">6</span><span class="p">:</span>
+    <span class="p">[</span> <span class="mi">108</span> <span class="mi">0</span> <span class="mi">0</span> <span class="p">]</span>
+    <span class="p">[</span> <span class="mi">0</span> <span class="mi">108</span> <span class="mi">0</span> <span class="p">]</span>
+    <span class="p">[</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">108</span> <span class="p">]</span>
+
+  <span class="n">channel</span> <span class="mi">7</span><span class="p">:</span>
+    <span class="p">[</span> <span class="mi">117</span> <span class="mi">0</span> <span class="mi">0</span> <span class="p">]</span>
+    <span class="p">[</span> <span class="mi">0</span> <span class="mi">117</span> <span class="mi">0</span> <span class="p">]</span>
+    <span class="p">[</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">117</span> <span class="p">]</span>
 </pre></div>
 </div>
 </section>
 </section>
 <section id="linmaps-between-ptensor-layers">
 <h2>Linmaps between Ptensor layers<a class="headerlink" href="#linmaps-between-ptensor-layers" title="Link to this heading">¶</a></h2>
-<p>In permutation equivariant nets, linmaps are often applied to an entire layer of Ptensors, i.e.,
-to every Ptensor in the layer. <cite>ptens</cite> can accomplish this in a single function call.
-When working on the GPU, the operation is automatically parallelized across Ptensors.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">A</span><span class="o">=</span><span class="n">ptens</span><span class="o">.</span><span class="n">ptensorlayer1</span><span class="o">.</span><span class="n">randn</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">],[</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">],[</span><span class="mi">4</span><span class="p">]],</span><span class="mi">2</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
-<span class="go">Ptensor1 [1,2]:</span>
-<span class="go">  [ -0.87019 0.410812 ]</span>
-<span class="go">  [ 0.391992 -0.44689 ]</span>
+<p>In permutation equivariant neural networks, linmaps are often applied to an entire layer of Ptensors, i.e.,
+to every Ptensor in the layer. <cite>ptens</cite> accomplishes this in a single function call.
+When working on the GPU, the operation is automatically parallelized across Ptensors.
+The following is an example mapping a first order Ptensor layer to another first order layer:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;&gt;</span> <span class="n">A</span><span class="o">=</span><span class="n">ptens</span><span class="o">.</span><span class="n">ptensorlayer1</span><span class="o">.</span><span class="n">randn</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">],[</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">],[</span><span class="mi">4</span><span class="p">]],</span><span class="mi">2</span><span class="p">)</span>
+<span class="o">&gt;&gt;</span> <span class="nb">print</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
 
-<span class="go">Ptensor1 [2,3]:</span>
-<span class="go">  [ -0.195719 -1.67327 ]</span>
-<span class="go">  [ -1.12695 -2.06142 ]</span>
+<span class="n">Ptensor1</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">]:</span>
+  <span class="p">[</span> <span class="o">-</span><span class="mf">0.87019</span> <span class="mf">0.410812</span> <span class="p">]</span>
+  <span class="p">[</span> <span class="mf">0.391992</span> <span class="o">-</span><span class="mf">0.44689</span> <span class="p">]</span>
 
-<span class="go">Ptensor1 [4]:</span>
-<span class="go">  [ -0.576893 -0.397062 ]</span>
+<span class="n">Ptensor1</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">]:</span>
+  <span class="p">[</span> <span class="o">-</span><span class="mf">0.195719</span> <span class="o">-</span><span class="mf">1.67327</span> <span class="p">]</span>
+  <span class="p">[</span> <span class="o">-</span><span class="mf">1.12695</span> <span class="o">-</span><span class="mf">2.06142</span> <span class="p">]</span>
 
-<span class="gp">&gt;&gt;&gt; </span><span class="n">B</span><span class="o">=</span><span class="n">ptensorlayer1</span><span class="o">..</span><span class="n">linmaps</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">B</span><span class="p">)</span>
-<span class="go">Ptensor1 [1,2]:</span>
-<span class="go">  [ -0.478197 -0.0360771 -0.87019 0.410812 ]</span>
-<span class="go">  [ -0.478197 -0.0360771 0.391992 -0.44689 ]</span>
+<span class="n">Ptensor1</span> <span class="p">[</span><span class="mi">4</span><span class="p">]:</span>
+  <span class="p">[</span> <span class="o">-</span><span class="mf">0.576893</span> <span class="o">-</span><span class="mf">0.397062</span> <span class="p">]</span>
 
-<span class="go">Ptensor1 [2,3]:</span>
-<span class="go">  [ -1.32267 -3.73469 -0.195719 -1.67327 ]</span>
-<span class="go">  [ -1.32267 -3.73469 -1.12695 -2.06142 ]</span>
+<span class="o">&gt;&gt;</span> <span class="n">B</span><span class="o">=</span><span class="n">ptensorlayer1</span><span class="o">.</span><span class="n">linmaps</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+<span class="o">&gt;&gt;</span> <span class="nb">print</span><span class="p">(</span><span class="n">B</span><span class="p">)</span>
 
-<span class="go">Ptensor1 [4]:</span>
-<span class="go">  [ -0.576893 -0.397062 -0.576893 -0.397062 ]</span>
+<span class="n">Ptensor1</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">]:</span>
+  <span class="p">[</span> <span class="o">-</span><span class="mf">0.478197</span> <span class="o">-</span><span class="mf">0.0360771</span> <span class="o">-</span><span class="mf">0.87019</span> <span class="mf">0.410812</span> <span class="p">]</span>
+  <span class="p">[</span> <span class="o">-</span><span class="mf">0.478197</span> <span class="o">-</span><span class="mf">0.0360771</span> <span class="mf">0.391992</span> <span class="o">-</span><span class="mf">0.44689</span> <span class="p">]</span>
+
+<span class="n">Ptensor1</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">]:</span>
+  <span class="p">[</span> <span class="o">-</span><span class="mf">1.32267</span> <span class="o">-</span><span class="mf">3.73469</span> <span class="o">-</span><span class="mf">0.195719</span> <span class="o">-</span><span class="mf">1.67327</span> <span class="p">]</span>
+  <span class="p">[</span> <span class="o">-</span><span class="mf">1.32267</span> <span class="o">-</span><span class="mf">3.73469</span> <span class="o">-</span><span class="mf">1.12695</span> <span class="o">-</span><span class="mf">2.06142</span> <span class="p">]</span>
+
+<span class="n">Ptensor1</span> <span class="p">[</span><span class="mi">4</span><span class="p">]:</span>
+  <span class="p">[</span> <span class="o">-</span><span class="mf">0.576893</span> <span class="o">-</span><span class="mf">0.397062</span> <span class="o">-</span><span class="mf">0.576893</span> <span class="o">-</span><span class="mf">0.397062</span> <span class="p">]</span>
 </pre></div>
 </div>
 </section>
@@ -618,7 +639,7 @@ When working on the GPU, the operation is automatically parallelized across Pten
                 <div class="context">
                   <span>Next</span>
                 </div>
-                <div class="title">Gather maps</div>
+                <div class="title">Message passing between Ptensors</div>
               </div>
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
             </a>

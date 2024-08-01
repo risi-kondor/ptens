@@ -3,7 +3,7 @@
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
-<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Subgraphs" href="subgraph.html" /><link rel="prev" title="Gather maps" href="gather.html" />
+<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Subgraphs" href="subgraph.html" /><link rel="prev" title="Message passing between Ptensor layers" href="gatherlayers.html" />
 
     <!-- Generated with Sphinx 7.4.7 and Furo 2024.07.18 -->
         <title>Graphs - ptens documentation</title>
@@ -209,9 +209,11 @@
 <li class="toctree-l1"><a class="reference internal" href="ptensork.html">Ptensors</a></li>
 <li class="toctree-l1"><a class="reference internal" href="ptensorsk.html">Ptensor layers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="linmaps.html">Linmaps</a></li>
-<li class="toctree-l1"><a class="reference internal" href="gather.html">Gather maps</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gather.html">Message passing between Ptensors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gatherlayers.html">Message passing between Ptensor layers</a></li>
 <li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Graphs</a></li>
 <li class="toctree-l1"><a class="reference internal" href="subgraph.html">Subgraphs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="subgraph_layer0.html">Subgraph layers</a></li>
 </ul>
 
 </div>
@@ -294,10 +296,10 @@ the number of vertices and the probability of there being an edge beween any two
         <span class="p">[</span><span class="mf">1.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">1.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">1.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">]])</span>
 </pre></div>
 </div>
-<p><code class="docutils literal notranslate"><span class="pre">ggraph</span></code> s are stored in a custom sparse data structure, allowing <cite>ptens</cite> to handle graphs with
-a large number of vertices. The adjacency matrix can be recovered in dense format using the
-<code class="docutils literal notranslate"><span class="pre">torch()</span></code>  method:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;&gt;</span> <span class="n">G</span><span class="o">.</span><span class="n">torch</span><span class="p">()</span>
+<p><cite>Ptens</cite> stores <code class="docutils literal notranslate"><span class="pre">ggraph</span></code> s in a custom sparse data structure, making it possible to
+handle graphs with a large number of vertices.
+The adjacency matrix can be extracted using the <code class="docutils literal notranslate"><span class="pre">adjacency_matrix()</span></code>  method:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;&gt;</span> <span class="n">G</span><span class="o">.</span><span class="n">adjacency_matrix</span><span class="p">()</span>
 
 <span class="n">tensor</span><span class="p">([[</span><span class="mf">0.</span><span class="p">,</span> <span class="mf">1.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">1.</span><span class="p">],</span>
         <span class="p">[</span><span class="mf">1.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">1.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">],</span>
@@ -307,6 +309,45 @@ a large number of vertices. The adjacency matrix can be recovered in dense forma
 </div>
 <section id="caching">
 <h2>Caching<a class="headerlink" href="#caching" title="Link to this heading">¶</a></h2>
+<p>Graph neural network applications often involve learning from data on a large number of distinct graphs.
+For each graph, <cite>ptens</cite> needs to compute various objects such as the subgraph lists, layer maps, and so on.
+To reduce the burden of continually recomputing these objects, <cite>ptens</cite> makes it possible to cache the graphs,
+as well as most of the derived data structures.</p>
+<p>To add a given graph to <cite>ptens</cite> ‘s global graph cache, we simply need to assign it an id and call
+the <code class="docutils literal notranslate"><span class="pre">cache</span></code> method:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;&gt;</span> <span class="n">G1</span><span class="o">=</span><span class="n">ptens</span><span class="o">.</span><span class="n">ggraph</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span><span class="mf">0.5</span><span class="p">)</span>
+<span class="o">&gt;&gt;</span> <span class="nb">print</span><span class="p">(</span><span class="n">G1</span><span class="p">)</span>
+<span class="o">&gt;&gt;</span> <span class="n">G1</span><span class="o">.</span><span class="n">cache</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+
+<span class="n">Ggraph</span> <span class="n">on</span> <span class="mi">6</span> <span class="n">vertices</span><span class="p">:</span>
+  <span class="p">[</span> <span class="mi">0</span> <span class="mi">1</span> <span class="mi">0</span> <span class="mi">1</span> <span class="mi">0</span> <span class="mi">1</span> <span class="p">]</span>
+  <span class="p">[</span> <span class="mi">1</span> <span class="mi">0</span> <span class="mi">1</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="p">]</span>
+  <span class="p">[</span> <span class="mi">0</span> <span class="mi">1</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="p">]</span>
+  <span class="p">[</span> <span class="mi">1</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="p">]</span>
+  <span class="p">[</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">1</span> <span class="p">]</span>
+  <span class="p">[</span> <span class="mi">1</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">1</span> <span class="mi">0</span> <span class="p">]</span>
+</pre></div>
+</div>
+<p>The graph can then be retrieved at any later point using the <code class="docutils literal notranslate"><span class="pre">from_cache</span></code> constructor:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;&gt;</span> <span class="n">G2</span><span class="o">=</span><span class="n">ptens</span><span class="o">.</span><span class="n">from_cache</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+<span class="o">&gt;&gt;</span> <span class="nb">print</span><span class="p">(</span><span class="n">G2</span><span class="p">)</span>
+
+<span class="n">Ggraph</span> <span class="n">on</span> <span class="mi">6</span> <span class="n">vertices</span><span class="p">:</span>
+  <span class="p">[</span> <span class="mi">0</span> <span class="mi">1</span> <span class="mi">0</span> <span class="mi">1</span> <span class="mi">0</span> <span class="mi">1</span> <span class="p">]</span>
+  <span class="p">[</span> <span class="mi">1</span> <span class="mi">0</span> <span class="mi">1</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="p">]</span>
+  <span class="p">[</span> <span class="mi">0</span> <span class="mi">1</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="p">]</span>
+  <span class="p">[</span> <span class="mi">1</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="p">]</span>
+  <span class="p">[</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">1</span> <span class="p">]</span>
+  <span class="p">[</span> <span class="mi">1</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">1</span> <span class="mi">0</span> <span class="p">]</span>
+</pre></div>
+</div>
+<p>The actual graph cache is an object called <code class="docutils literal notranslate"><span class="pre">ptens_base.ggraph_cache</span></code>.
+We can check the number of cached graphs with its <code class="docutils literal notranslate"><span class="pre">size</span></code> method:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;&gt;</span> <span class="nb">print</span><span class="p">(</span><span class="n">ptens_base</span><span class="o">..</span><span class="n">ggraph_cache</span><span class="o">.</span><span class="n">size</span><span class="p">())</span>
+
+<span class="mi">1</span>
+</pre></div>
+</div>
 </section>
 </section>
 
@@ -324,14 +365,14 @@ a large number of vertices. The adjacency matrix can be recovered in dense forma
               </div>
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
             </a>
-          <a class="prev-page" href="gather.html">
+          <a class="prev-page" href="gatherlayers.html">
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
               <div class="page-info">
                 <div class="context">
                   <span>Previous</span>
                 </div>
                 
-                <div class="title">Gather maps</div>
+                <div class="title">Message passing between Ptensor layers</div>
                 
               </div>
             </a>

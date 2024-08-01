@@ -108,7 +108,7 @@ class batched_ptensorlayer1(p.batched_ptensorlayer):
 
 
     def __repr__(self):
-        return "batched_ptensorlayer1(len="+str(len(self))+",nc="+str(self.size(1))+")"
+        return "batched_ptensorlayer1(size="+str(len(self))+",nc="+str(self.size(1))+")"
 
     def __str__(self,indent=""):
         r=""

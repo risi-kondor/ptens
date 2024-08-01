@@ -19,7 +19,7 @@ import ptens_base as pb
 
 class ptensorlayer(torch.Tensor):
 
-    covariant_functions=[torch.Tensor.to,torch.Tensor.add,torch.Tensor.sub]
+    covariant_functions=[torch.Tensor.to,torch.Tensor.add,torch.Tensor.sub,torch.relu]
 
     @classmethod
     def __torch_function__(cls, func, types, args=(), kwargs=None):

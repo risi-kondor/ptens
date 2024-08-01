@@ -2,7 +2,7 @@
 Subgraphs
 *********
 
-In GNN applications, Ptensors are often associated to subgraphs of the full graph ``G``. 
+In GNN applications, Ptensors are often associated to subgraphs of the underlying graph ``G``. 
 `ptens` provides a separate class for defining these subgraphs. 
 
 Some simple categories of subgraphs are predefined:
@@ -41,7 +41,7 @@ Some simple categories of subgraphs are predefined:
     [ 1 0 0 0 0 ]
     [ 1 0 0 0 0 ]
 
-Similarly to ``ggraph``s, ``subgraph``s can also be defined from their adjacency matrix: 
+Similarly to ``ggraph``\s, ``subgraph``\s can also be defined from their adjacency matrix: 
 
 .. code-block:: python
 
@@ -73,7 +73,7 @@ Finding subgraphs
 =================
 
 The primary purpose of defining a ``subgaph`` object ``S`` is to find all occurrences of ``S`` 
-in a graph ``G`` (or a collection of graphs).  This can be done with the ``ggraph`` class's 
+in a graph ``G`` (or a collection of graphs).  This is done with the ``ggraph`` class's 
 ``subgraph`` method: 
 
 .. code-block:: python
@@ -107,7 +107,7 @@ The resulting ``atomspack`` object can be directly used to define a correspondin
      [ -0.349507 -1.41685 -0.111342 ]
 
 Finding subgraphs is a relatively expensive computation that has to be performed on the CPU. 
-Therefore the result of the operation is automatically cached, i.e., as long as the backend objects of 
+Therefore, the result of the operation is automatically cached, i.e., as long as the backend objects of 
 ``G`` and ``S`` are in scope, if the subgraphs isomorphic to ``S`` in ``G`` need to be found again, `ptens` 
 will return the cached result. We can inspect all cached subgraph lists associated with a given ``G``:  
 
@@ -121,12 +121,15 @@ will return the cached result. We can inspect all cached subgraph lists associat
     [ 1 1 0 ]
     : ([0,5,6],[4,7,6],[4,6,5])}
 
+One of the purposes of saving ``ggraph`` s in a cache (see `previous section <graph.html#caching>`_)  
+is to ensure that they remain in scope, and consequently 
+all the subgraph lists that have been computed for them also remain cached for future use. 
 
 =======
 Caching
 =======
 
-Typical applications only involve a relatively small number of distinct subgraphs. 
+Typical GNN applications only involve a relatively small number of distinct subgraphs. 
 Therefore, by default, `ptens` automatically caches the backend data structures corresponding to ``subgraph`` 
 objects for the entirety of the library's run time time. 
 
@@ -134,8 +137,7 @@ For example, if a subgraph ``S1`` is defined from its adjacency matrix,
 and at some later point a second subgraph ``S2`` is defined with the same adjacency matrix, 
 then `ptens` will make sure that ``S1`` and ``S2`` will point to the same underlying backend object. 
 This makes it possible to reuse a variety of information related to ``S1``, 
-for example where ``S1`` appears in various graphs, as well as 
-the corresponding ``layermap`` and `gather_plan``.
+including the related subgraph lists, layer maps and gather plans. 
 
 The subgraph cache can be accessed via the ``ptens_base.subgraph_cache`` class:
 
