@@ -12,11 +12,11 @@
  *
  */
 
-#ifndef _ptens_Ptensors1
-#define _ptens_Ptensors1
+#ifndef _ptens_CompressedPtensors2
+#define _ptens_CompressedPtensors2
 
 #include "diff_class.hpp"
-#include "Ptensors1.hpp"
+#include "Ptensors2.hpp"
 #include "CompressedPtensors.hpp"
 #include "BlockCsparseMatrix.hpp"
 
@@ -28,18 +28,16 @@ namespace ptens{
 
 
   template<typename TYPE>
-  class CompressedPtensors1: public CompressedPtensors<TYPE>, public cnine::diff_class<Ptensors1<TYPE> >{
+  class CompressedPtensors2: public CompressedPtensors<TYPE>, public cnine::diff_class<CompressedPtensors2<TYPE> >{
   public:
 
     //friend class Ptensors0<TYPE>;
     //friend class CompressedPtensors2<TYPE>;
 
-    typedef Ptensors<TYPE> BASE;
+    typedef CompressedPtensors<TYPE> BASE;
     typedef cnine::Ltensor<TYPE> TENSOR;
-    typedef cnine::Rtensor1_view Rtensor1_view;
-    typedef cnine::Rtensor2_view Rtensor2_view;
 
-    using cnine::diff_class<Ptensors1<TYPE> >::grad;
+    using cnine::diff_class<CompressedPtensors2<TYPE> >::grad;
 
     using BASE::get_dev;
     using TENSOR::dim;
@@ -49,15 +47,16 @@ namespace ptens{
     using TENSOR::strides;
     using TENSOR::get_arr;
     using TENSOR::cols;
+    using TENSOR::slice;
 
     using BASE::nc;
     using BASE::atoms;
     using BASE::size;
-    using BASE::atoms_of;
+    //using BASE::atoms_of;
     using BASE::get_nc;
 
 
-    ~Ptensors1(){
+    ~CompressedPtensors2(){
 #ifdef WITH_FAKE_GRAD
       if(grad) delete grad;
 #endif 
@@ -67,11 +66,46 @@ namespace ptens{
   public: // ----- Constructors ------------------------------------------------------------------------------
 
 
+    CompressedPtensors2(const CompressedAtomsPack& _atoms, const int nc, const int fcode=0, const int _dev=0):
+      BASE(_atoms,TENSOR({_atoms.size(),_atoms.nvecs(),_atoms.nvecs(),nc},fcode,_dev)){}
+
+
+  public: // ---- Transport ----------------------------------------------------------------------------------
+
+    
+    CompressedPtensors2(const CompressedPtensors2& x, const int _dev):
+      BASE(x.atoms,TENSOR(x,_dev)){}
+
+
+  public: // ---- Conversions --------------------------------------------------------------------------------
+
+
+    CompressedPtensors2(const CompressedAtomsPack& _atoms, const Ptensors2<TYPE>& x):
+      BASE(_atoms,TENSOR({_atoms.size(),_atoms.nvecs(),_atoms.nvecs(),x.get_nc()},0,x.get_dev())){
+      PTENS_ASSRT(*x.atoms.obj==*atoms->atoms);
+      int N=size();
+      for(int i=0; i<N; i++)
+	(*this)(i).add_mprod((*atoms)(i).transp(), x(i)*((*atoms)(i))); // TODO 
+    }
+
+    Ptensors2<TYPE> uncompress(){
+      Ptensors2<TYPE> R(AtomsPack(atoms->atoms),get_nc(),get_dev());
+      int N=size();
+      for(int i=0; i<N; i++)
+	R(i).add_mprod((*atoms)(i)*(*this)(i),(*atoms)(i)); // TODO 
+      return R;
+    }
+
+
   public: // ---- Access -------------------------------------------------------------------------------------
 
 
-    int constk() const{
-      return _atoms.constk();
+    //int constk() const{
+    //return _atoms.constk();
+    //}
+
+    TENSOR operator()(const int i) const{
+      return slice(0,i);
     }
 
 
@@ -79,8 +113,8 @@ namespace ptens{
 
 
     template<typename SOURCE>
-    static CompressedPtensors1<float> linmaps(const SpectralAtomsPack& _atoms, const SOURCE& x){
-      CompressedPtensors1<float> R(_atoms,x.get_nc()*vector<int>({1,2,5})[x.getk()],x.get_dev());
+    static CompressedPtensors2 linmaps(const CompressedAtomsPack& _atoms, const SOURCE& x){
+      CompressedPtensors2 R(_atoms,x.get_nc()*vector<int>({1,2,5})[x.getk()],x.get_dev());
       R.add_linmaps(x);
       return R;
     }
@@ -89,7 +123,7 @@ namespace ptens{
       broadcast0(x);
     }
 
-    void add_linmaps(const Ptensors1<TYPE>& x){
+    void add_linmaps(const Ptensors2<TYPE>& x){
       int nc=x.get_nc();
       broadcast0(x.reduce0());
       cols(nc,nc)+=x;
@@ -109,16 +143,16 @@ namespace ptens{
 
 
     string classname() const{
-      return "CompressedPtensors1";
+      return "CompressedPtensors2";
     }
 
     string repr() const{
-      return "<CompressedPtensors1[N="+to_string(size())+"]>";
+      return "<CompressedPtensors2[N="+to_string(size())+"]>";
     }
 
     string str(const string indent="") const{
       if(get_dev()>0){
-	CompressedPtensors1 y(*this,0);
+	CompressedPtensors2 y(*this,0);
 	return y.str();
       }
       ostringstream oss;
@@ -128,7 +162,7 @@ namespace ptens{
       return oss.str();
     }
 
-    friend ostream& operator<<(ostream& stream, const CompressedPtensors1& x){
+    friend ostream& operator<<(ostream& stream, const CompressedPtensors2& x){
       stream<<x.str(); return stream;}
 
 

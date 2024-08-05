@@ -13,7 +13,9 @@
  */
 
 #include "Ptens_base.cpp"
-#include "SpectralAtomsPack.hpp"
+#include "CompressedAtomsPack.hpp"
+#include "CompressedPtensors2.hpp"
+#include "PtensSession.hpp"
 
 using namespace ptens;
 using namespace cnine;
@@ -23,9 +25,16 @@ PtensSession ptens_session;
 
 int main(int argc, char** argv){
 
-  AtomsPack _atoms(6,6,0.5);
-  SpectralAtomsPack atoms(_atoms,4,2);
+  AtomsPack _atoms=AtomsPack::random(6,6,0.5);
+  CompressedAtomsPack atoms(_atoms,4,3);
   cout<<atoms<<endl;
 
-}
+  CompressedPtensors2<float> A(atoms,3,3);
+  cout<<A<<endl;
 
+
+  //Ptensors1<float> b(_atoms,3,3);
+  //CompressedPtensors1<float> B(atoms,b);
+  //cout<<B<<endl;
+
+}

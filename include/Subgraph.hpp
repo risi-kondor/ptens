@@ -141,6 +141,11 @@ namespace ptens{
       return obj->dense();
     }
 
+    cnine::Ltensor<float> evecs(){
+      make_eigenbasis();
+      return obj->evecs;
+    }
+
     void make_eigenbasis() const{
       const_cast<SubgraphObj&>(*obj).make_eigenbasis();
     }

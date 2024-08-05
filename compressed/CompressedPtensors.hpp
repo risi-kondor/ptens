@@ -18,7 +18,7 @@
 #include "diff_class.hpp"
 #include "PtensLoggedTimer.hpp"
 #include "Ltensor.hpp"
-#include "SpectralAtomsPack.hpp"
+#include "CompressedAtomsPack.hpp"
 
 
 namespace ptens{
@@ -34,7 +34,7 @@ namespace ptens{
     using BASE::zeros_like;
     using BASE::dim;
 
-    SpectralAtomsPack atoms;
+    CompressedAtomsPack atoms;
     int nc=0;
 
     virtual ~CompressedPtensors(){}
@@ -46,16 +46,16 @@ namespace ptens{
   public: // ---- Constructors -------------------------------------------------------------------------------------
 
 
-    CompressedPtensors(const SpectralAtomsPack& _atoms):
+    CompressedPtensors(const CompressedAtomsPack& _atoms):
       atoms(_atoms){}
 
-    CompressedPtensors(const SpectralAtomsPack& _atoms, const BASE& x):
+    CompressedPtensors(const CompressedAtomsPack& _atoms, const TENSOR& x):
       BASE(x),
       atoms(_atoms){
       nc=TENSOR::dim(1);
     }
 
-    CompressedPtensors(const SpectralAtomsPack& _atoms, const cnine::Gdims& _dims, const int fcode, const int _dev):
+    CompressedPtensors(const CompressedAtomsPack& _atoms, const cnine::Gdims& _dims, const int fcode, const int _dev):
       BASE(_dims,fcode,_dev),
       atoms(_atoms){
       nc=TENSOR::dim(1);
@@ -69,6 +69,10 @@ namespace ptens{
       return atoms.size();
     }
 
+    int constk() const{
+      return atoms.constk();
+    }
+
     //Atoms atoms_of(const int i) const{
     //return atoms(i);
     //}
@@ -78,9 +82,9 @@ namespace ptens{
       //return TENSOR::dim(1);
     }
 
-    const SpectralAtomsPack& get_atoms() const{
-      return atoms;
-    }
+    //const CompressedAtomsPack& get_atoms() const{
+    //return atoms;
+    //}
 
 
   public: // ---- Operations ---------------------------------------------------------------------------------
@@ -88,3 +92,8 @@ namespace ptens{
 
 
   };
+
+
+}
+
+#endif 
