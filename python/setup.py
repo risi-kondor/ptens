@@ -15,8 +15,8 @@ def main():
     # os.environ['CUDA_HOME']='/usr/local/cuda'
     #os.environ["CC"] = "clang"
 
-    # compile_with_cuda = False  
-    compile_with_cuda = True
+    compile_with_cuda = False  
+    # compile_with_cuda = True
 
     copy_warnings = False
     torch_convert_warnings = False
@@ -68,14 +68,14 @@ def main():
                          '-DCNINE_RANGE_CHECKING',
                          '-DCNINE_SIZE_CHECKING',
                          '-DCNINE_DEVICE_CHECKING',
-                         #'-DWITH_FAKE_GRAD',
+                         '-DWITH_FAKE_GRAD',
                          '-DCNINE_FUNCTION_TRACING'
                          ]
 
     _nvcc_compile_args = ['-D_WITH_CUDA',
                           '-D_WITH_CUBLAS',
                           '-D_DEF_CGCMEM',
-                          # '-DWITH_FAKE_GRAD',
+                          '-DWITH_FAKE_GRAD',
                           '-DCNINE_FUNCTION_TRACING',
                           '-std=c++17',
                           '--default-stream=per-thread'
