@@ -94,11 +94,11 @@ namespace ptens{
       tag(_tag){}
 
     Ptensors0(const AtomsPack& _atoms, const int nc, const int _dev=0):
-      BASE(_atoms,cnine::Gdims(_atoms.size(),nc),0,_dev),
+      BASE(_atoms,cnine::Gdims({_atoms.size(),nc}),0,_dev),
       tag(_atoms){}
 
     Ptensors0(const AtomsPack& _atoms, const int nc, const int fcode, const int _dev):
-      BASE(_atoms,cnine::Gdims(_atoms.size(),nc),fcode,_dev),
+      BASE(_atoms,cnine::Gdims({_atoms.size(),nc}),fcode,_dev),
       tag(_atoms){}
 
 

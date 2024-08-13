@@ -68,8 +68,8 @@ namespace ptens{
 	auto M=p->on_device(dev);
 	if(M.dim(1)==max_width) ipack->rows(tail,M.dim(0))+=M;
 	else ipack->block(tail,0,M.dim(0),M.dim(1))+=M;
-	//ipack->block(tail,0,M.dim(0),1)+=roffs;
-	//ipack->block(tail,2,M.dim(0),1)+=xoffs;
+	ipack->rows(tail,M.dim(0)).col(0)+=roffs;
+	ipack->rows(tail,M.dim(0)).col(2)+=xoffs;
 	tail+=M.dim(0);
 	roffs+=p->nrows;
 	xoffs+=p->n_input_rows;
@@ -92,11 +92,11 @@ namespace ptens{
 
 	int n_lists=p->n_gather_lists;
 	gmap->block(index_tail,n_lists)=M.block(1,n_lists);
-	//gmap.block(index_tail,n_lists)+=data_tail-(n_lists+2);
+	gmap->block(index_tail,n_lists)+=data_tail-(n_lists+2);
 
 	int n_data=M.dim(0)-n_lists-2;
 	gmap->block(data_tail,n_data)=M.block(n_lists+2,n_data);
-	//gmap.block(data_tail,n_data)+=p.dim(0);
+	gmap->block(data_tail,n_data)+=p->dim(0);
 
 	index_tail+=n_lists;
 	data_tail+=n_data;

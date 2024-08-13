@@ -115,6 +115,7 @@ def main():
             '../../cnine/cuda/TensorView_accumulators.cu',
             '../../cnine/cuda/BasicCtensorProducts.cu',
             '../../cnine/cuda/RtensorUtils.cu',
+            '../../cnine/cuda/LtensorBLAS.cu',
             #'../../cnine/cuda/RtensorPackUtils.cu',
             #'../../cnine/cuda/gatherRows.cu',
             '../cuda/Ptensors0.cu',

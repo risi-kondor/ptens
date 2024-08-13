@@ -48,7 +48,7 @@ namespace ptens{
 
 
     Ptensor1(const Atoms& _atoms, const int _nc, const int _fcode, const int _dev=0):
-      BASE(cnine::Gdims(_atoms.size(),_nc),_fcode,_dev),
+      BASE(cnine::dims(_atoms.size(),_nc),_fcode,_dev),
       atoms(_atoms),
       k(_atoms.size()), 
       nc(_nc){
@@ -56,7 +56,7 @@ namespace ptens{
 
     template<typename FILLTYPE, typename = typename std::enable_if<std::is_base_of<cnine::fill_pattern, FILLTYPE>::value, FILLTYPE>::type>
     Ptensor1(const Atoms& _atoms, const int _nc, const FILLTYPE& dummy, const int _dev=0):
-      BASE(cnine::Gdims(_atoms.size(),_nc),dummy,_dev),
+      BASE(cnine::dims(_atoms.size(),_nc),dummy,_dev),
       atoms(_atoms),
       k(_atoms.size()), 
       nc(_nc){
