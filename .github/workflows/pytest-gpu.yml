@@ -53,7 +53,7 @@ jobs:
           cd /tmp/
           git clone https://github.com/risi-kondor/cnine.git
           cd cnine
-          git checkout master
+          git checkout main
           pip install python
           cd ..
           rm -r cnine
