@@ -54,9 +54,7 @@ jobs:
           export CUDA_HOME=$CONDA_PREFIX
           # Pretending we have a CUDA capable card on the runner
           export TORCH_CUDA_ARCH_LIST="7.5"
-          git clone https://github.com/risi-kondor/cnine.git
-          pip install cnine/python
-          rm -rf cnine
+          pip install git+https://github.com/risi-kondor/cnine.git@main
       - name: Install and build
         run: |
           export WITH_CUDA=True

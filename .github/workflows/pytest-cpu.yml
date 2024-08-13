@@ -49,9 +49,8 @@ jobs:
         run: conda install pytest
       - name: Install cnine
         run: |
-          git clone https://github.com/risi-kondor/cnine.git
-          pip install cnine/python
-          rm -rf cnine
+          pip install git+https://github.com/risi-kondor/cnine.git@main
+
       - name: Install and build
         run: |
           pip install python/
