@@ -49,15 +49,14 @@ jobs:
         run: conda install pytest
       - name: Install cnine
         run: |
-          cd /tmp/
           git clone https://github.com/risi-kondor/cnine.git
           cd cnine
           git checkout main
           pip install python/
           cd ..
-          rm -r cnine
       - name: Install and build
         run: |
+          export CNINE_FOLDER="/cnine/"
           pip install python/
       # TODO activate pytests when ready
       # - name: Test with pytest

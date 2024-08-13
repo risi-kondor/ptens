@@ -19,7 +19,7 @@ def main():
 
     copy_warnings=os.environ.get("COPY_WARNING", False)
     torch_convert_warnings=os.environ.get("TORCH_CONVERT_WARNINGS", False)
-
+    cnine_folder = os.environ.get(CNINE_FOLDER, "/../../cnine/")
     # ------------------------------------------------------------------------------------------------------------
 
     #if 'CUDAHOME' in os.environ:
@@ -32,7 +32,7 @@ def main():
         compile_with_cuda=False
 
     cwd = os.getcwd()
-    cnine_folder = "/../../cnine/"
+
 
     _include_dirs = [cwd + cnine_folder + '/include',
 		     cwd + cnine_folder + '/combinatorial',
