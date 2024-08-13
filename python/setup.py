@@ -15,14 +15,13 @@ def main():
     # os.environ['CUDA_HOME']='/usr/local/cuda'
     #os.environ["CC"] = "clang"
 
-    compile_with_cuda = False  
-    # compile_with_cuda = True
+    compile_with_cuda=os.environ.get("WITH_CUDA", False)
 
-    copy_warnings = False
-    torch_convert_warnings = False
+    copy_warnings=os.environ.get("COPY_WARNING", False)
+    torch_convert_warnings=os.environ.get("TORCH_CONVERT_WARNINGS", False)
 
     # ------------------------------------------------------------------------------------------------------------
-    
+
     #if 'CUDAHOME' in os.environ:
         #print("CUDA found at "+os.environ['CUDAHOME'])
 
@@ -156,4 +155,3 @@ def main():
 if __name__ == "__main__":
     main()
     print("Compilation finished:", time.ctime(time.time()))
-
