@@ -54,7 +54,7 @@ jobs:
           git clone https://github.com/risi-kondor/cnine.git
           cd cnine
           git checkout main
-          pip install python
+          pip install python/
           cd ..
           rm -r cnine
       - name: Install and build
