@@ -50,11 +50,13 @@ jobs:
         run: pip install pytest
       - name: Install cnine
         run: |
-          export WITH_CUDA=False
-          export CUDA_HOME=$CONDA_PREFIX
-          # Pretending we have a CUDA capable card on the runner
-          export TORCH_CUDA_ARCH_LIST="7.5"
-          pip install git+https://github.com/risi-kondor/cnine/python@main
+          cd /tmp/
+          git clone https://github.com/risi-kondor/cnine.git
+          cd cnine
+          git checkout master
+          pip install python
+          cd ..
+          rm -r cnine
       - name: Install and build
         run: |
           export WITH_CUDA=True
