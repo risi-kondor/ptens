@@ -56,7 +56,7 @@ jobs:
           cd ..
       - name: Install and build
         run: |
-          export CNINE_FOLDER="/cnine/"
+          export CNINE_FOLDER="/../cnine/"
           pip install python/
       # TODO activate pytests when ready
       # - name: Test with pytest

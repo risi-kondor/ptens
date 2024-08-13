@@ -57,7 +57,7 @@ jobs:
           cd ..
       - name: Install and build
         run: |
-          export CNINE_FOLDER="/cnine/"
+          export CNINE_FOLDER="/../cnine/"
           export WITH_CUDA=True
           export CUDA_HOME=$CONDA_PREFIX
           # Pretending we have a CUDA capable card on the runner
