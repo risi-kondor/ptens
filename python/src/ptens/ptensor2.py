@@ -1,14 +1,14 @@
 #
-# This file is part of ptens, a C++/CUDA library for permutation 
-# equivariant message passing. 
-#  
+# This file is part of ptens, a C++/CUDA library for permutation
+# equivariant message passing.
+#
 # Copyright (c) 2023, Imre Risi Kondor
 #
-# This source code file is subject to the terms of the noncommercial 
-# license distributed with cnine in the file LICENSE.TXT. Commercial 
-# use is prohibited. All redistributed versions of this file (in 
-# original or modified form) must retain this copyright notice and 
-# must be accompanied by a verbatim copy of the license. 
+# This source code file is subject to the terms of the noncommercial
+# license distributed with cnine in the file LICENSE.TXT. Commercial
+# use is prohibited. All redistributed versions of this file (in
+# original or modified form) must retain this copyright notice and
+# must be accompanied by a verbatim copy of the license.
 #
 #
 
@@ -21,28 +21,22 @@ from ptens.ptensor import ptensor
 class ptensor2(ptensor):
 
     @classmethod
-    def make(self,atoms,M):
-        R=ptensor2(M)
-        R.atoms=atoms
-        return R
+    def zeros(cls,atoms,_nc,device='cpu'):
+        return cls.make(atoms,torch.zeros([len(atoms),len(atoms),_nc],device=device))
 
     @classmethod
-    def zeros(self,atoms,_nc,device='cpu'):
-        return self.make(atoms,torch.zeros([len(atoms),len(atoms),_nc],device=device))
+    def randn(cls,atoms,_nc,device='cpu'):
+        return cls.make(atoms,torch.randn([len(atoms),len(atoms),_nc],device=device))
 
     @classmethod
-    def randn(self,atoms,_nc,device='cpu'):
-        return self.make(atoms,torch.randn([len(atoms),len(atoms),_nc],device=device))
-
-    @classmethod
-    def sequential(self,atoms,nc,device='cpu'):
+    def sequential(cls,atoms,nc,device='cpu'):
         assert isinstance(nc,int)
-        return self.make(atoms,torch.tensor([i for i in range (0,len(atoms)*len(atoms)*nc)],
+        return cls.make(atoms,torch.tensor([i for i in range (0,len(atoms)*len(atoms)*nc)],
                                             dtype=torch.float,device=device).reshape(len(atoms),len(atoms),nc))
 
     @classmethod
-    def from_tensor(self, atoms, M):
-        return self.make(atoms,M)
+    def from_tensor(cls, atoms, M):
+        return cls.make(atoms,M)
 
     def backend(self):
         return pb.ptensor2.view(self.atoms,self)
@@ -53,13 +47,13 @@ class ptensor2(ptensor):
 
     def getd(self):
         return self.size(0)
-    
+
     def get_nc(self):
         return self.size(2)
-    
+
 
     # ---- Linmaps -------------------------------------------------------------------------------------------
-    
+
 
     @classmethod
     def linmaps(self,x):
