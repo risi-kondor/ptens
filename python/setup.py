@@ -15,8 +15,8 @@ def main():
     # os.environ['CUDA_HOME']='/usr/local/cuda'
     #os.environ["CC"] = "clang"
 
-    compile_with_cuda = False  
-    # compile_with_cuda = True
+    # compile_with_cuda = False  
+    compile_with_cuda = True
 
     copy_warnings = False
     torch_convert_warnings = False
@@ -112,8 +112,8 @@ def main():
     if compile_with_cuda:
         ext_modules = [CUDAExtension('ptens_base', [
             '../../cnine/include/Cnine_base.cu',
-            '../../cnine/cuda/TensorView_accumulators.cu',
-            '../../cnine/cuda/BasicCtensorProducts.cu',
+            #'../../cnine/cuda/TensorView_accumulators.cu',
+            #'../../cnine/cuda/BasicCtensorProducts.cu',
             '../../cnine/cuda/RtensorUtils.cu',
             '../../cnine/cuda/TensorView_add.cu',
             '../../cnine/cuda/TensorView_assign.cu',
