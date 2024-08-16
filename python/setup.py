@@ -23,9 +23,7 @@ def main():
     # os.environ['CUDA_HOME']='/usr/local/cuda'
     #os.environ["CC"] = "clang"
 
-    # compile_with_cuda = False
     compile_with_cuda = interpret_bool_string(os.environ.get("WITH_CUDA", True))
-
     copy_warnings = False
     torch_convert_warnings = False
 
