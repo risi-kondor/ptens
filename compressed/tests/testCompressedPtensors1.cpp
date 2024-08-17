@@ -37,4 +37,6 @@ int main(int argc, char** argv){
   CompressedPtensors1<float> B(atoms,b);
   cout<<B<<endl;
 
+  auto C=CompressedPtensors1<float>::gather(atoms,A);
+
 }

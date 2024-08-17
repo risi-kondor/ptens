@@ -17,6 +17,7 @@ namespace ptens{
 
 #include "AtomsPackCatCache.hpp"
 #include "GatherPlanCache.hpp"
+#include "CompressedGatherMatrixCache.hpp"
 
 #include "GgraphCache.hpp"
 #include "SubgraphCache.hpp"
@@ -36,6 +37,7 @@ namespace ptens{
     AtomsPackCatCache atomspack_cat_cache; 
 
     GatherPlanCache gather_plan_cache;
+    CompressedGatherMatrixCache gather_matrix_cache;
 
     GgraphCache graph_cache;
     SubgraphCache subgraph_cache;

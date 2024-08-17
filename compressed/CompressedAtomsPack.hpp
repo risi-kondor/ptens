@@ -71,7 +71,7 @@ namespace ptens{
       return obj->nvecs();
     }
 
-    AtomsPack atoms(){
+    AtomsPack atoms() const{
       return obj->atoms;
     }
 

@@ -25,13 +25,13 @@ namespace ptens{
 
 
   template<typename TYPE>
-  class CompressedPtensors: public cnine::Ltensor<TYPE>{
+  class CompressedPtensors: public cnine::TensorView<TYPE>{
   public:
 
-    typedef cnine::Ltensor<TYPE> BASE;
-    typedef cnine::Ltensor<TYPE> TENSOR;
+    typedef cnine::TensorView<TYPE> BASE;
+    typedef cnine::TensorView<TYPE> TENSOR;
     using BASE::BASE;
-    using BASE::zeros_like;
+    //using BASE::zeros_like;
     using BASE::dim;
 
     CompressedAtomsPack atoms;
@@ -78,8 +78,8 @@ namespace ptens{
     //}
     
     int get_nc() const{
-      return nc;
-      //return TENSOR::dim(1);
+      //return nc;
+      return TENSOR::dims.last();
     }
 
     //const CompressedAtomsPack& get_atoms() const{

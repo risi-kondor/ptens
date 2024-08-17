@@ -15,8 +15,8 @@ def main():
     # os.environ['CUDA_HOME']='/usr/local/cuda'
     #os.environ["CC"] = "clang"
 
-    # compile_with_cuda = False  
-    compile_with_cuda = True
+    compile_with_cuda = False  
+    # compile_with_cuda = True
 
     copy_warnings = False
     torch_convert_warnings = False
@@ -52,7 +52,9 @@ def main():
                      cwd + '/../layers',
                      cwd + '/../layers/backend',
                      cwd + '/../batched',
-                     cwd + '/../batched/backend'
+                     cwd + '/../batched/backend',
+                     cwd + '/../compressed',
+                     cwd + '/../compressed/backend'
                      ]
 
 

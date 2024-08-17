@@ -18,7 +18,7 @@
 #include "diff_class.hpp"
 #include "Ptensors2.hpp"
 #include "CompressedPtensors.hpp"
-#include "BlockCsparseMatrix.hpp"
+#include "CompressedGatherMatrixFactory.hpp"
 
 
 namespace ptens{
@@ -100,12 +100,24 @@ namespace ptens{
   public: // ---- Access -------------------------------------------------------------------------------------
 
 
-    //int constk() const{
-    //return _atoms.constk();
-    //}
+    constexpr int getk(){
+      return 2;
+    }
+
+    int nvecs() const{
+      return dim(1);
+    }
 
     TENSOR operator()(const int i) const{
       return slice(0,i);
+    }
+
+    TENSOR channels(const int offs, const int n){
+      return TENSOR::slices(3,offs,n);
+    }
+
+    TENSOR as_matrix(){
+      return TENSOR::fuse(0,1).TENSOR::fuse(0,1);
     }
 
 
@@ -123,19 +135,123 @@ namespace ptens{
       broadcast0(x);
     }
 
-    void add_linmaps(const Ptensors2<TYPE>& x){
+    void add_linmaps(const CompressedPtensors1<TYPE>& x){
       int nc=x.get_nc();
-      broadcast0(x.reduce0());
-      cols(nc,nc)+=x;
+      broadcast0(x.reduce0(),0);
+      broadcast1(x,2*nc);
     }
 
+    void add_linmaps(const CompressedPtensors2<TYPE>& x){
+      int nc=x.get_nc();
+      broadcast0(x.reduce0(),0);
+      broadcast1(x.reduce1(),4*nc);
+      broadcast2(x,13*nc);
+    }
+
+    void add_linmaps_back(const Ptensors0<TYPE>& x){
+      broadcast0_shrink(x);
+    }
+
+    void add_linmaps_back(const CompressedPtensors1<TYPE>& x){
+      int nc=x.get_nc();
+      broadcast0_shrink(x.reduce0(0,2*nc));
+      broadcast1_shrink(x.channels(2*nc,3*nc));
+    }
+
+    void add_linmaps_back(const CompressedPtensors2<TYPE>& x){
+      int nc=x.get_nc();
+      broadcast0_shrink(x.reduce0_shrink(0,nc));
+      broadcast1_shrink(x.reduce1_shrink(4*nc,3*nc));
+      add(x.reduce2_shrink(13*nc,nc));
+    }
+
+
   public: // ---- Reductions ---------------------------------------------------------------------------------
+
+
+    TENSOR reduce0(const int offs=0, int nc=0){
+      if(nc==0) nc=get_nc()-offs;
+      TENSOR R({dim(0),2*nc},get_dev());
+      R.cols(0,nc)+=channels(offs,nc).sum(1).sum(1);
+      R.cols(nc,nc)+=channels(offs,nc).diag({1,2}).sum(1);
+      return R;
+    }
+
+    TENSOR reduce0_shrink(const int offs, const int nc){
+      TENSOR R({dim(0),nc},get_dev());
+      R+=channels(offs,nc).sum(1).sum(1);
+      R+=channels(offs+nc,nc).diag({1,2}).sum(1);
+      return R;
+    }
+
+    TENSOR reduce1(const int offs=0, nc=0){
+      if(nc==0) nc=get_nc()-offs;
+      TENSOR R({dim(0),dim(1),3*nc},get_dev());
+      R.slices(2,0,nc)+=channels(offs,nc).sum(1);
+      R.slices(2,nc,nc)+=channels(offs,nc).sum(2);
+      R.slices(2,2*nc,nc)+=channels(offs,nc).diag({1,2});
+      return R;
+    }
+
+    TENSOR reduce1_shrink(const int offs, const int nc){
+      TENSOR R({dim(0),dim(1),nc},get_dev());
+      R+=channels(offs,nc).sum(1);
+      R+=channels(offs+nc,nc).sum(2);
+      R+=channels(offs+2*nc,nc).diag({1,2});
+      return R;
+    }
+
+    TENSOR reduce2(const int offs=0, nc=0){
+      if(nc==0) nc=get_nc()-offs;
+      return channels(offs,nc);
+    }
+
+    TENSOR reduce2_shrink(const int offs, const int nc){
+      TENSOR R({dim(0),dim(1),dim(1),nc},get_dev());
+      R+=channels(offs,nc);
+      R+=channels(offs+nc,nc).transp(1,2);
+      return R;
+    }
+
 
   public: // ---- Broadcasting -------------------------------------------------------------------------------
 
 
     void broadcast0(const TENSOR& X, const int offs=0){
-      //as_matrix
+      PTENS_ASSRT(X.dim(0)==dim(0));
+      int nc=X.dim(1);
+      channels(offs,nc)+=X.insert_dim(1,nvecs()).insert_dim(1,nvecs());
+      channels(offs+nc,nc).diag({1,2})+=X.insert_dim(1,nvecs());
+    }
+
+    void broadcast0_shrink(const TENSOR& X, const int offs=0){
+      PTENS_ASSRT(X.dim(0)==dim(0));
+      int nc=X.dim(1)/2; // different from Ptensors2
+      channels(offs,nc)+=X.slices(1,0,nc).insert_dim(1,nvecs()).insert_dim(1,nvecs());
+      channels(offs,nc).diag({1,2})+=X.slices(1,0,nc).insert_dim(1,nvecs());
+    }
+
+    void broadcast1(const TENSOR& X, const int offs=0){
+      PTENS_ASSRT(X.dim(0)==dim(0));
+      int nc=X.dim(1);
+      channels(offs,nc)+=X.insert_dim(1,nvecs());
+      channels(offs+nc,nc)+=X.insert_dim(2,nvecs());
+      channels(offs+2*nc,nc).diag({1,2})+=X;
+    }
+
+    void broadcast1_shrink(const TENSOR& X, const int offs=0){
+      PTENS_ASSRT(X.dim(0)==dim(0));
+      int nc=X.dim(1)/3;
+      channels(offs,nc)+=X.slices(2,0,nc).insert_dim(1,nvecs());
+      channels(offs,nc)+=X.slices(2,0,nc).insert_dim(2,nvecs());
+      channels(offs,nc).diag({1,2})+=X.slices(2,0,nc);
+    }
+
+    void broadcast2(const TENSOR& X, const int offs=0){
+      PTENS_ASSRT(X.dim(0)==dim(0));
+      int nc=X.dim(1);
+      channels(offs,nc)+=X;
+      channels(offs+nc,nc)+=X.transp({1,2});
     }
 
 
