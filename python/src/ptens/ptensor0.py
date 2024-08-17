@@ -1,14 +1,14 @@
 #
-# This file is part of ptens, a C++/CUDA library for permutation 
-# equivariant message passing. 
-#  
+# This file is part of ptens, a C++/CUDA library for permutation
+# equivariant message passing.
+#
 # Copyright (c) 2023, Imre Risi Kondor
 #
-# This source code file is subject to the terms of the noncommercial 
-# license distributed with cnine in the file LICENSE.TXT. Commercial 
-# use is prohibited. All redistributed versions of this file (in 
-# original or modified form) must retain this copyright notice and 
-# must be accompanied by a verbatim copy of the license. 
+# This source code file is subject to the terms of the noncommercial
+# license distributed with cnine in the file LICENSE.TXT. Commercial
+# use is prohibited. All redistributed versions of this file (in
+# original or modified form) must retain this copyright notice and
+# must be accompanied by a verbatim copy of the license.
 #
 #
 
@@ -21,47 +21,39 @@ from ptens.ptensor import ptensor
 class ptensor0(ptensor):
 
     @classmethod
-    def make(self,atoms,M):
-        R=ptensor0(M)
-        R.atoms=atoms
-        return R
+    def zeros(cls, _atoms, _nc, device='cpu'):
+        return cls.make(_atoms,torch.zeros([_nc],device=device))
 
     @classmethod
-    def zeros(self, _atoms, _nc, device='cpu'):
-        return self.make(_atoms,torch.zeros([_nc],device=device))
+    def randn(cls, _atoms, _nc, device='cpu'):
+        return cls.make(_atoms,torch.randn([_nc],device=device))
 
     @classmethod
-    def randn(self, _atoms, _nc, device='cpu'):
-        return self.make(_atoms,torch.randn([_nc],device=device))
-
-    @classmethod
-    def sequential(self,atoms,nc,device='cpu'):
+    def sequential(cls,atoms,nc,device='cpu'):
         assert isinstance(nc,int)
-        return self.make(atoms,torch.tensor([i for i in range (0,nc)],
+        return cls.make(atoms,torch.tensor([i for i in range (0,nc)],
                                             dtype=torch.float,device=device))
 
     @classmethod
-    def from_tensor(self, _atoms, M):
-        return self.make(_atoms,M)
+    def from_tensor(cls, _atoms, M):
+        return cls.make(_atoms,M)
 
     def backend(self):
         return pb.ptensor0.view(self.atoms,self)
-    
+
 
     # ----- Access -------------------------------------------------------------------------------------------
 
-
     def getd(self):
         return 1
-    
+
     def get_nc(self):
         return self.size(0)
-    
+
 
     # ---- Linmaps -------------------------------------------------------------------------------------------
-    
 
-    @classmethod
+
     def linmaps(self,x):
         if isinstance(x,ptensor0):
             return x

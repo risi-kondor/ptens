@@ -8,6 +8,15 @@ from os.path import splitext
 from os.path import basename
 from glob import glob
 
+def interpret_bool_string(string:str|bool, _true_values:tuple[str] = ("TRUE", "ON"), _false_values:tuple[str] = ("FAlSE", "OFF")):
+    if isinstance(string, bool):
+        return string
+    if string.strip().upper() in _true_values:
+        return True
+    if string.strip().upper() in _false_values:
+        return False
+    raise ValueError(f"String {string} cannot be interpreted as True or False. Any upper/lower-case version of {_true_values} is True, {_false_values} is False. {string} was neither.")
+
 
 def main():
 
@@ -15,14 +24,12 @@ def main():
     # os.environ['CUDA_HOME']='/usr/local/cuda'
     #os.environ["CC"] = "clang"
 
-    compile_with_cuda = False  
-    # compile_with_cuda = True
-
+    compile_with_cuda = interpret_bool_string(os.environ.get("WITH_CUDA", True))
     copy_warnings = False
     torch_convert_warnings = False
 
     # ------------------------------------------------------------------------------------------------------------
-    
+
     #if 'CUDAHOME' in os.environ:
         #print("CUDA found at "+os.environ['CUDAHOME'])
 
@@ -160,4 +167,3 @@ def main():
 if __name__ == "__main__":
     main()
     print("Compilation finished:", time.ctime(time.time()))
-
