@@ -27,11 +27,9 @@
 #include "BatchedPtensors1.hpp"
 #include "BatchedPtensors2.hpp"
 
-/*
-#include "BatchedSubgraphLayer0b.hpp"
-#include "BatchedSubgraphLayer1b.hpp"
-#include "BatchedSubgraphLayer2b.hpp"
-*/
+#include "CompressedPtensors1.hpp"
+#include "CompressedPtensors2.hpp"
+
 
 ptens::PtensSession ptens_session(1); // Ltensors are not thread safe 
 
@@ -58,11 +56,15 @@ PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
   typedef BatchedPtensors1<float> BPtensors1f;
   typedef BatchedPtensors2<float> BPtensors2f;
 
+  typedef CompressedPtensors1<float> CPtensors1f;
+  typedef CompressedPtensors2<float> CPtensors2f;
+
 
 #include "PtensGlobal_py.cpp"
 
 #include "AtomsPack_py.cpp"
 #include "AindexPack_py.cpp"
+#include "CatomsPack_py.cpp"
 
 #include "Ggraph_py.cpp"
 #include "Subgraph_py.cpp"
@@ -90,20 +92,7 @@ PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
 #include "BatchedPtensors1_py.cpp"
 #include "BatchedPtensors2_py.cpp"
 
+#include "CPtensors1_py.cpp"
+#include "CPtensors2_py.cpp"
 
-/*
-#include "SubgraphLayer0b_py.cpp"
-#include "SubgraphLayer1b_py.cpp"
-#include "SubgraphLayer2b_py.cpp"
-
-
-#include "BatchedPtensors0b_py.cpp"
-#include "BatchedPtensors1b_py.cpp"
-#include "BatchedPtensors2b_py.cpp"
-
-#include "BatchedSubgraphLayer0b_py.cpp"
-#include "BatchedSubgraphLayer1b_py.cpp"
-#include "BatchedSubgraphLayer2b_py.cpp"
-    */
-
-}
+    }

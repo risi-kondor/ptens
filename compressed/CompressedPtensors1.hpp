@@ -67,6 +67,9 @@ namespace ptens{
   public: // ----- Constructors ------------------------------------------------------------------------------
 
 
+    CompressedPtensors1(const CompressedAtomsPack& _atoms, const TENSOR& M):
+      BASE(_atoms,M){}
+
     CompressedPtensors1(const CompressedAtomsPack& _atoms, const int nc, const int fcode=0, const int _dev=0):
       BASE(_atoms,TENSOR({_atoms.size(),_atoms.nvecs(),nc},fcode,_dev)){}
 
@@ -118,6 +121,10 @@ namespace ptens{
     }
 
     TENSOR as_matrix() const{
+      return TENSOR::fuse(0,1);
+    }
+
+    TENSOR as_matrix(const int nc) const{
       return TENSOR::fuse(0,1);
     }
 
@@ -189,22 +196,22 @@ namespace ptens{
       int nc=x.get_nc();
 
       if constexpr(std::is_same<SOURCE,Ptensors0<TYPE> >::value){
-	auto pmap=CompressedGatherMatrixFactory<1,0,0>::gather_matrix(map,atoms,x.atoms,1); //,x.getk());
+	//auto pmap=CompressedGatherMatrixFactory<1,0,0>::gather_matrix(map,atoms,x.atoms);
 	//broadcast0(x.reduce0(pmap.in()),pmap.out(),0);
       }
 
       if constexpr(std::is_same<SOURCE,CompressedPtensors1<TYPE> >::value){
-	auto Q0=CompressedGatherMatrixFactory<1,1,0>::gather_matrix(map,atoms,x.atoms);//,1,x.getk());
-	auto Q1=CompressedGatherMatrixFactory<1,1,1>::gather_matrix(map,atoms,x.atoms);//,1,x.getk());
-	as_matrix().slices(2,0,nc)+=Q0*x.as_matrix();
-	as_matrix().slices(2,nc,nc)+=Q1*x.as_matrix();
+	auto Q0=CompressedGatherMatrixFactory<1,1,0>::gather_matrix(map,atoms,x.atoms);
+	auto Q1=CompressedGatherMatrixFactory<1,1,1>::gather_matrix(map,atoms,x.atoms);
+	Q0.apply(channels(0,nc),x);
+	Q1.apply(channels(nc,nc),x);
       }
 
       if constexpr(std::is_same<SOURCE,CompressedPtensors2<TYPE> >::value){
-	auto Q0=CompressedGatherMatrixFactory<1,2,0>::gather_matrix(map,atoms,x.atoms);//,1,x.getk());
-	auto Q1=CompressedGatherMatrixFactory<1,2,1>::gather_matrix(map,atoms,x.atoms);//,1,x.getk());
-	as_matrix().slices(2,0,2*nc)+=Q0*as_matrix();
-	as_matrix().slices(2,2*nc,3*nc)+=Q1*as_matrix();
+	auto Q0=CompressedGatherMatrixFactory<1,2,0>::gather_matrix(map,atoms,x.atoms);
+	auto Q1=CompressedGatherMatrixFactory<1,2,1>::gather_matrix(map,atoms,x.atoms);
+	Q0.apply(channels(0,2*nc),x);
+	Q1.apply(channels(2*nc,3*nc),x);
       }
 
     }
@@ -219,17 +226,17 @@ namespace ptens{
       }
 
       if constexpr(std::is_same<OUTPUT,CompressedPtensors1<TYPE> >::value){
-	//auto Q0=CompressedGatherMatrixFactory::gather_matrix0(map,x.atoms,atoms,x.getk(),1);
-	//auto Q1=CompressedGatherMatrixFactory::gather_matrix1(map,x.atoms,atoms,x.getk(),1);
-	//add(Q0*x.channels(0,nc).as_matrix());
-	//add(Q1*x.channels(nc,nc).as_matrix());
+	auto Q0=CompressedGatherMatrixFactory<1,1,0>::gather_matrix(map,x.atoms,atoms);
+	auto Q1=CompressedGatherMatrixFactory<1,1,1>::gather_matrix(map,x.atoms,atoms);
+	Q0.apply_back(*this,x.channels(0,nc));
+	Q1.apply_back(*this,x.channels(nc,nc));
       }
 
       if constexpr(std::is_same<OUTPUT,CompressedPtensors2<TYPE> >::value){
-	//auto Q0=CompressedGatherMatrixFactory::gather_matrix0(map,x.atoms,atoms,x.getk(),1);
-	//auto Q1=CompressedGatherMatrixFactory::gather_matrix1(map,x.atoms,atoms,x.getk(),1);
-	//add(Q0*x.channels(0,nc).as_matrix());
-	//add(Q1*x.channels(2*nc,3*nc).as_matrix());
+	auto Q0=CompressedGatherMatrixFactory<2,1,0>::gather_matrix(map,x.atoms,atoms);
+	auto Q1=CompressedGatherMatrixFactory<2,1,1>::gather_matrix(map,x.atoms,atoms);
+	Q0.apply(*this,x.channels(0,2*nc));
+	Q1.apply(*this,x.channels(2*nc,3*nc));
       }
 
     }
@@ -238,12 +245,12 @@ namespace ptens{
   public: // ---- Reductions ---------------------------------------------------------------------------------
 
     
-    TENSOR reduce0(const int offs=0, int nc=0){
+    TENSOR reduce0(const int offs=0, int nc=0) const{
       if(nc==0) nc=get_nc()-offs;
       return channels(offs,nc).sum(1);
     }
 
-    TENSOR reduce1(const int offs=0, int nc=0){
+    TENSOR reduce1(const int offs=0, int nc=0) const{
       if(nc==0) nc=get_nc()-offs;
       return channels(offs,nc);
     }

@@ -28,6 +28,11 @@ namespace ptens{
 
     using BASE::BASE;
 
+    //BSmatrix in_matrix;
+    //BSmatrix out_matrix;
+
+    
+
   };
 
 }

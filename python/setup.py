@@ -8,7 +8,7 @@ from os.path import splitext
 from os.path import basename
 from glob import glob
 
-def interpret_bool_string(string:str|bool, _true_values:tuple[str] = ("TRUE", "ON"), _false_values:tuple[str] = ("FAlSE", "OFF")):
+def interpret_bool_string(string:str|bool, _true_values:tuple[str] = ("TRUE", "ON"), _false_values:tuple[str] = ("FALSE", "OFF")):
     if isinstance(string, bool):
         return string
     if string.strip().upper() in _true_values:
@@ -24,7 +24,7 @@ def main():
     # os.environ['CUDA_HOME']='/usr/local/cuda'
     #os.environ["CC"] = "clang"
 
-    compile_with_cuda = interpret_bool_string(os.environ.get("WITH_CUDA", True))
+    compile_with_cuda = interpret_bool_string(os.environ.get("WITH_CUDA", False))
     copy_warnings = False
     torch_convert_warnings = False
 

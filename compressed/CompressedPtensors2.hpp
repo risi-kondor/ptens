@@ -35,7 +35,7 @@ namespace ptens{
     //friend class CompressedPtensors2<TYPE>;
 
     typedef CompressedPtensors<TYPE> BASE;
-    typedef cnine::Ltensor<TYPE> TENSOR;
+    typedef cnine::TensorView<TYPE> TENSOR;
 
     using cnine::diff_class<CompressedPtensors2<TYPE> >::grad;
 
@@ -65,6 +65,9 @@ namespace ptens{
 
   public: // ----- Constructors ------------------------------------------------------------------------------
 
+
+    CompressedPtensors2(const CompressedAtomsPack& _atoms, const TENSOR& M):
+      BASE(_atoms,M){}
 
     CompressedPtensors2(const CompressedAtomsPack& _atoms, const int nc, const int fcode=0, const int _dev=0):
       BASE(_atoms,TENSOR({_atoms.size(),_atoms.nvecs(),_atoms.nvecs(),nc},fcode,_dev)){}
@@ -112,11 +115,11 @@ namespace ptens{
       return slice(0,i);
     }
 
-    TENSOR channels(const int offs, const int n){
+    TENSOR channels(const int offs, const int n) const{
       return TENSOR::slices(3,offs,n);
     }
 
-    TENSOR as_matrix(){
+    TENSOR as_matrix() const{
       return TENSOR::fuse(0,1).TENSOR::fuse(0,1);
     }
 
@@ -166,10 +169,84 @@ namespace ptens{
     }
 
 
+  public: // ---- Message passing ----------------------------------------------------------------------------
+
+    
+    template<typename SOURCE>
+    static CompressedPtensors2<TYPE> gather(const CompressedAtomsPack& atoms, const SOURCE& x){
+      int nc=x.get_nc()*vector<int>({2,5,15})[x.getk()];
+      CompressedPtensors2<TYPE> R(atoms,nc,x.get_dev());
+      R.add_gather(x,LayerMap::overlaps_map(atoms.atoms(),x.atoms.atoms()));
+      return R;
+    }
+
+    template<typename SOURCE>
+    static CompressedPtensors2<TYPE> gather(const CompressedAtomsPack& a, const SOURCE& x, const LayerMap& map){
+      int nc=x.get_nc()*vector<int>({2,5,15})[x.getk()];
+      CompressedPtensors1<TYPE> R(a,nc,x.get_dev());
+      R.add_gather(x,map);
+      return R;
+    }
+
+    template<typename SOURCE>
+      void add_gather(const SOURCE& x, const LayerMap& map){
+      int nc=x.get_nc();
+
+      if constexpr(std::is_same<SOURCE,Ptensors0<TYPE> >::value){
+	//auto pmap=CompressedGatherMatrixFactory<1,0,0>::gather_matrix(map,atoms,x.atoms);
+	//broadcast0(x.reduce0(pmap.in()),pmap.out(),0);
+      }
+
+      if constexpr(std::is_same<SOURCE,CompressedPtensors1<TYPE> >::value){
+	auto Q0=CompressedGatherMatrixFactory<2,1,0>::gather_matrix(map,atoms,x.atoms);
+	auto Q1=CompressedGatherMatrixFactory<2,1,1>::gather_matrix(map,atoms,x.atoms);
+	Q0.apply(channels(0,2*nc),x);
+	Q1.apply(channels(2*nc,3*nc),x);
+      }
+
+      if constexpr(std::is_same<SOURCE,CompressedPtensors2<TYPE> >::value){
+	auto Q0=CompressedGatherMatrixFactory<2,2,0>::gather_matrix(map,atoms,x.atoms);
+	auto Q1=CompressedGatherMatrixFactory<2,2,1>::gather_matrix(map,atoms,x.atoms);
+	auto Q2=CompressedGatherMatrixFactory<2,2,2>::gather_matrix(map,atoms,x.atoms);
+	Q0.apply(channels(0,2*nc),x);
+	Q1.apply(channels(2*nc,9*nc),x);
+	Q2.apply(channels(13*nc,2*nc),x);
+      }
+
+    }
+
+    template<typename OUTPUT>
+    void add_gather_back(const OUTPUT& x, const LayerMap& map){
+      int nc=get_nc();
+
+      if constexpr(std::is_same<OUTPUT,Ptensors0<TYPE> >::value){
+	//auto pmap=CompressedGatherPlanFactory::gather_matrix0(map,x.atoms,atoms,x.getk(),1);
+	//broadcast0(x.reduce0(pmap.out()),pmap.in(),0);
+      }
+
+      if constexpr(std::is_same<OUTPUT,CompressedPtensors1<TYPE> >::value){
+	auto Q0=CompressedGatherMatrixFactory<2,1,0>::gather_matrix(map,x.atoms,atoms);
+	auto Q1=CompressedGatherMatrixFactory<2,1,1>::gather_matrix(map,x.atoms,atoms);
+	Q0.apply_back(*this,x.channels(0,2*nc));
+	Q1.apply_back(*this,x.channels(2*nc,3*nc));
+      }
+
+      if constexpr(std::is_same<OUTPUT,CompressedPtensors2<TYPE> >::value){
+	auto Q0=CompressedGatherMatrixFactory<2,1,0>::gather_matrix(map,x.atoms,atoms);
+	auto Q1=CompressedGatherMatrixFactory<2,1,1>::gather_matrix(map,x.atoms,atoms);
+	auto Q2=CompressedGatherMatrixFactory<2,2,1>::gather_matrix(map,x.atoms,atoms);
+	Q0.apply(*this,x.channels(0,2*nc));
+	Q1.apply(*this,x.channels(2*nc,9*nc));
+	Q2.apply(*this,x.channels(13*nc,2*nc));
+      }
+
+    }
+
+
   public: // ---- Reductions ---------------------------------------------------------------------------------
 
 
-    TENSOR reduce0(const int offs=0, int nc=0){
+    TENSOR reduce0(const int offs=0, int nc=0) const{
       if(nc==0) nc=get_nc()-offs;
       TENSOR R({dim(0),2*nc},get_dev());
       R.cols(0,nc)+=channels(offs,nc).sum(1).sum(1);
@@ -177,14 +254,14 @@ namespace ptens{
       return R;
     }
 
-    TENSOR reduce0_shrink(const int offs, const int nc){
+    TENSOR reduce0_shrink(const int offs, const int nc) const{
       TENSOR R({dim(0),nc},get_dev());
       R+=channels(offs,nc).sum(1).sum(1);
       R+=channels(offs+nc,nc).diag({1,2}).sum(1);
       return R;
     }
 
-    TENSOR reduce1(const int offs=0, nc=0){
+    TENSOR reduce1(const int offs=0, int nc=0) const{
       if(nc==0) nc=get_nc()-offs;
       TENSOR R({dim(0),dim(1),3*nc},get_dev());
       R.slices(2,0,nc)+=channels(offs,nc).sum(1);
@@ -193,7 +270,7 @@ namespace ptens{
       return R;
     }
 
-    TENSOR reduce1_shrink(const int offs, const int nc){
+    TENSOR reduce1_shrink(const int offs, const int nc) const{
       TENSOR R({dim(0),dim(1),nc},get_dev());
       R+=channels(offs,nc).sum(1);
       R+=channels(offs+nc,nc).sum(2);
@@ -201,12 +278,12 @@ namespace ptens{
       return R;
     }
 
-    TENSOR reduce2(const int offs=0, nc=0){
+    TENSOR reduce2(const int offs=0, int nc=0) const{
       if(nc==0) nc=get_nc()-offs;
       return channels(offs,nc);
     }
 
-    TENSOR reduce2_shrink(const int offs, const int nc){
+    TENSOR reduce2_shrink(const int offs, const int nc) const{
       TENSOR R({dim(0),dim(1),dim(1),nc},get_dev());
       R+=channels(offs,nc);
       R+=channels(offs+nc,nc).transp(1,2);
@@ -251,7 +328,7 @@ namespace ptens{
       PTENS_ASSRT(X.dim(0)==dim(0));
       int nc=X.dim(1);
       channels(offs,nc)+=X;
-      channels(offs+nc,nc)+=X.transp({1,2});
+      channels(offs+nc,nc)+=X.transp(1,2);
     }
 
 

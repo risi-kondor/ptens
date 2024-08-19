@@ -36,8 +36,14 @@ namespace ptens{
   public: // ---- Access -------------------------------------------------------------------------------------
 
 
-    cnine::TensorView<float> operator*(const cnine::TensorView<float>& x) const{
-      return (*obj)*x;
+    void apply(const cnine::TensorView<float>& r, const cnine::TensorView<float>& x) const{
+      int nc=x.dims.last();
+      obj->apply_to(r.reshape({obj->nrows(),nc}),x.reshape({obj->ncols(),nc}));
+    }
+
+    void apply_back(const cnine::TensorView<float>& r, const cnine::TensorView<float>& x) const{
+      int nc=r.dims.last();
+      obj->apply_transp_to(r.reshape({obj->ncols(),nc}),x.reshape({obj->nrows(),nc}));
     }
 
 
