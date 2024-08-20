@@ -127,27 +127,25 @@ namespace ptens{
   OBJ cat_channels(const OBJ& x, const OBJ& y){
     PTENS_ASSRT(x.dim(0)==y.dim(0));
     //cnine::using_vram_manager vv(ptens_session->managed_gmem);
-    OBJ R(typename OBJ::TENSOR(cnine::Gdims(x.dim(0),x.dim(1)+y.dim(1)),0,x.get_dev()),x.atoms);
+    OBJ R(typename OBJ::TENSOR(cnine::dims(x.dim(0),x.dim(1)+y.dim(1)),0,x.get_dev()),x.atoms);
     R.block(0,0,x.dim(0),x.dim(1))+=x;
     R.block(0,x.dim(1),x.dim(0),y.dim(1))+=y;
     return R;
   }
 
+  /*
   template<typename OBJ, typename TYPE>
   OBJ scale_channels(const OBJ& x, const cnine::Ltensor<TYPE>& s){
-    //cnine::using_vram_manager vv(ptens_session->managed_gmem);
     return OBJ(x.scale_columns(s),x.atoms);
   }
 
   template<typename OBJ, typename TYPE>
   OBJ mprod(const OBJ& x, const cnine::Ltensor<TYPE>& y){
-    //cnine::using_vram_manager vv(ptens_session->managed_gmem);
     return OBJ(x*y,x.atoms);
   }
 
   template<typename OBJ, typename TYPE>
   OBJ linear(const OBJ& x, const cnine::Ltensor<TYPE>& w, const cnine::Ltensor<TYPE>& b){
-    //cnine::using_vram_manager vv(ptens_session->managed_gmem);
     OBJ R(x*w,x.atoms);
     R.view2().add_broadcast0(b.view1());
     return R;
@@ -155,9 +153,9 @@ namespace ptens{
 
   template<typename OBJ, typename TYPE>
   OBJ ReLU(const OBJ& x, TYPE alpha){
-    //cnine::using_vram_manager vv(ptens_session->managed_gmem);
     return OBJ(x.ReLU(alpha),x.atoms);
   }
+  */
 
 }
 

@@ -59,7 +59,6 @@ namespace ptens{
     friend ostream& operator<<(ostream& stream, const GatherPlan& v){
       stream<<v.str(); return stream;}
 
-
   };
 
 }

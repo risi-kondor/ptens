@@ -111,25 +111,6 @@ namespace ptens{
       return BASE::size_of(i);
     }
 
-    //const cnine::GatherMap& get_bmap() const{
-    //assert(bmap);
-    //return *bmap;
-    //}
-
-    /*
-    int* get_barr(const int _dev=0) const{
-      assert(bmap);
-      bmap->to_device(_dev);
-      if(_dev==0) return bmap->arr;
-      return bmap->arrg;
-    }
-    */
-
-    //const cnine::Ltensor<int>& gpu_gather_map(const int _dev=1){
-    //assert(bmap2.get());
-    //return bmap2->gpu_format;
-    //}
-
     void push_back(const int tix, vector<int> indices){
       BASE::push_back(tix,indices);
        _max_nix=std::max(_max_nix,(int)indices.size());

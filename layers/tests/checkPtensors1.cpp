@@ -38,18 +38,19 @@ int main(int argc, char** argv){
   Ptens0 X0=Ptens0(xatoms,channels=3,filltype=3);
   Ptens1 X1=Ptens1(xatoms,channels=3,filltype=3);
 
-  auto Y00=Ptens0::gather(X0,yatoms);
-  auto Y01=Ptens0::gather(X1,yatoms);
-  auto Y10=Ptens1::gather(X0,yatoms);
-  auto Y11=Ptens1::gather(X1,yatoms);
+  auto Y00=Ptens0::gather(yatoms,X0);
+  auto Y01=Ptens0::gather(yatoms,X1);
+  auto Y10=Ptens1::gather(yatoms,X0);
+  auto Y11=Ptens1::gather(yatoms,X1);
   cout<<Y00<<endl;
   cout<<Y01<<endl;
   cout<<Y10<<endl;
   cout<<Y11<<endl;
 
-  cout<<"-------------------------------"<<endl;
-  session.row_level_operations(true);
+  //cout<<"-------------------------------"<<endl;
+  //session.row_level_operations(true);
 
+  /*
   auto Y00r=Ptens0::gather(X0,yatoms);
   auto Y01r=Ptens0::gather(X1,yatoms);
   auto Y10r=Ptens1::gather(X0,yatoms);
@@ -58,8 +59,8 @@ int main(int argc, char** argv){
   cout<<Y01r<<endl;
   cout<<Y10r<<endl;
   cout<<Y11r<<endl;
-
-
+  */
+  
 
 
 }

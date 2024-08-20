@@ -133,18 +133,4 @@ namespace ptens{
 #endif 
 
 
-    //typedef ptr_triple_indexed_cache<LayerMapObj,AtomsPackTagObj,AtomsPackTagObj,shared_ptr<GatherPlanObj> > GplanCache;
-    //GplanCache cache=GplanCache([](const LayerMapObj& map, const AtomsPackTagObj& out_tag, 
-    //const AtomsPackTagObj& in_tag){
-    //return make(map,out_tag.get_atoms(),in_tag.get_atoms(),}
-
-//     typedef cnine::ptr_triple_arg_indexed_cache<LayerMapObj,AtomsPackTagObj,AtomsPackTagObj,int,shared_ptr<GatherPlanObj> > GplanCache;
-//     GplanCache cache=GplanCache([](const LayerMapObj& map, const AtomsPackObj& out, 
-// 	const AtomsPackObj& in, const int& code){
-// 	int outk=code/9; 
-// 	int ink=(code%9)/3;
-// 	int gatherk=code%3;
-// 	return make(map,out,in,outk,ink,gatherk);
-//       });
-
 

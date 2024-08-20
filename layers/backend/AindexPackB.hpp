@@ -27,10 +27,10 @@
 namespace ptens{
 
 
-  class AindexPackB: public cnine::Ltensor<int>{
+  class AindexPackB: public cnine::TensorView<int>{
   public:
 
-    typedef cnine::Ltensor<int> ITENSOR;
+    typedef cnine::TensorView<int> ITENSOR;
 
     int _max_nix=0;
 
@@ -111,22 +111,20 @@ namespace ptens{
       gmap_on_device(_dev);
     }
 
-    cnine::Rtensor1_view chunk0(const cnine::Ltensor<float>& x, const int i) const{
-      return x.row(toffset(i)).view1();
-    }
+//     cnine::Rtensor1_view chunk0(const cnine::Ltensor<float>& x, const int i) const{
+//       return x.row(toffset(i)).view1();
+//     }
 
-    cnine::Rtensor2_view chunk1(const cnine::Ltensor<float>& x, const int i) const{
-      return x.rows(toffset(i),nix(i)).view2();
-    }
+//     cnine::Rtensor2_view chunk1(const cnine::Ltensor<float>& x, const int i) const{
+//       return x.rows(toffset(i),nix(i)).view2();
+//     }
     
-    cnine::Rtensor3_view chunk2(const cnine::Ltensor<float>& x, const int i) const{
-      int k=nix(i);
-      return cnine::split0(x.rows(toffset(i),k*k).view2(),k,k);
-    }
+//     cnine::Rtensor3_view chunk2(const cnine::Ltensor<float>& x, const int i) const{
+//       int k=nix(i);
+//       return cnine::split0(x.rows(toffset(i),k*k).view2(),k,k);
+//     }
 
     
-  public: // ---- Operations ---------------------------------------------------------------------------------
-
   public: // ---- I/O ----------------------------------------------------------------------------------------
 
 
@@ -148,55 +146,4 @@ namespace ptens{
 
 #endif 
  
-    /*
-    AindexPack(const AindexPack& x):
-      BASE(x){
-      _max_nix=x._max_nix;
-      count1=x.count1;
-      count2=x.count2;
-    }
-
-    AindexPack(AindexPack&& x):
-      BASE(std::move(x)){
-      _max_nix=x._max_nix;
-      count1=x.count1;
-      count2=x.count2;
-    }
-
-    AindexPack& operator=(const AindexPack& x)=delete;
-    */
-
-
-    /*
-    AindexPack(const AindexPack& x):
-      BASE(x){
-      _max_nix=x._max_nix;
-      count1=x.count1;
-      count2=x.count2;
-    }
-
-    AindexPack(AindexPack&& x):
-      BASE(std::move(x)){
-      _max_nix=x._max_nix;
-      count1=x.count1;
-      count2=x.count2;
-    }
-
-    AindexPack& operator=(const AindexPack& x)=delete;
-    */
-
-
-    //const cnine::GatherMap& get_bmap() const{
-    //assert(bmap);
-    //return *bmap;
-    //}
-
-    /*
-    int* get_barr(const int _dev=0) const{
-      assert(bmap);
-      bmap->to_device(_dev);
-      if(_dev==0) return bmap->arr;
-      return bmap->arrg;
-    }
-    */
-
+ 

@@ -17,8 +17,6 @@
 
 #include "diff_class.hpp"
 #include "Rtensor1_view.hpp"
-//#include "Rtensor2_view.hpp"
-//#include "Rtensor3_view.hpp"
 
 #include "Ptensor0.hpp"
 #include "Ptensors.hpp"
@@ -44,9 +42,9 @@ namespace ptens{
     friend class Ptensors2<TYPE>;
 
     typedef Ptensors<TYPE> BASE;
-    typedef cnine::Ltensor<TYPE> TENSOR;
+    typedef typename BASE::TENSOR TENSOR;
+    //typedef cnine::Ltensor<TYPE> TENSOR;
     typedef cnine::Rtensor1_view Rtensor1_view;
-    //typedef cnine::Rtensor2_view Rtensor2_view;
 
     using cnine::diff_class<Ptensors0<TYPE> >::grad;
     using TENSOR::get_dev;
@@ -107,8 +105,8 @@ namespace ptens{
       for(auto& p:list)
 	v.push_back(p.atoms);
       if(ptens_global::cache_atomspack_cats) 
-	return Ptensors0(cnine::Ltensor<TYPE>::stack(0,list),ptens_global::atomspack_cat_cache(v));
-      return Ptensors0(cnine::Ltensor<TYPE>::stack(0,list),AtomsPack::cat(v));
+	return Ptensors0(TENSOR::stack(0,list),ptens_global::atomspack_cat_cache(v));
+      return Ptensors0(TENSOR::stack(0,list),AtomsPack::cat(v));
     }
 
 

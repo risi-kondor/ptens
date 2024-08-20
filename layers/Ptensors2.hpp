@@ -66,7 +66,8 @@ namespace ptens{
     friend class Ptensors1<TYPE>;
 
     typedef Ptensors<TYPE> BASE;
-    typedef cnine::Ltensor<TYPE> TENSOR;
+    typedef typename BASE::TENSOR TENSOR;
+    //typedef cnine::Ltensor<TYPE> TENSOR;
     typedef cnine::Rtensor1_view Rtensor1_view;
     typedef cnine::Rtensor2_view Rtensor2_view;
     typedef cnine::Rtensor3_view Rtensor3_view;
@@ -133,8 +134,8 @@ namespace ptens{
       for(auto& p:list)
 	v.push_back(p.atoms);
       if(ptens_global::cache_atomspack_cats) 
-	return Ptensors2(cnine::Ltensor<TYPE>::stack(0,list),ptens_global::atomspack_cat_cache(v));
-      return Ptensors2(cnine::Ltensor<TYPE>::stack(0,list),AtomsPack::cat(v));
+	return Ptensors2(TENSOR::stack(0,list),ptens_global::atomspack_cat_cache(v));
+      return Ptensors2(TENSOR::stack(0,list),AtomsPack::cat(v));
     }
 
 
@@ -383,7 +384,7 @@ namespace ptens{
     static Ptensors2<TYPE> gather(const AtomsPack& a, const SOURCE& x){
       int nc=x.get_nc()*vector<int>({2,5,15})[x.getk()];
       Ptensors2<TYPE> R(a,nc,x.get_dev());
-      R.add_gather(x,LayerMap::overlaps_map(atoms,x.atoms));
+      R.add_gather(x,LayerMap::overlaps_map(a,x.atoms));
       return R;
     }
 

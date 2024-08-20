@@ -34,10 +34,10 @@ int main(int argc, char** argv){
 
   int N=6;
 
-  session.row_level_operations(true);
-  session.cache_overlap_maps(true);
-  session.cache_rmaps(true);
-  cout<<session<<endl;
+  //session.row_level_operations(true);
+  //session.cache_overlap_maps(true);
+  //session.cache_rmaps(true);
+  ///cout<<session<<endl;
   
 
   AtomsPack xatoms=AtomsPack::random(N,N,0.5);
@@ -77,9 +77,9 @@ int main(int argc, char** argv){
 
   AtomsPack yatoms=AtomsPack::random(N,N,0.5);
   cout<<"Gather:"<<endl;
-  cout<<Ptens0::gather(X0,yatoms)<<endl;
-  cout<<Ptens0::gather(X1,yatoms)<<endl;
-  cout<<Ptens0::gather(X2,yatoms)<<endl;
+  cout<<Ptens0::gather(yatoms,X0)<<endl;
+  cout<<Ptens0::gather(yatoms,X1)<<endl;
+  cout<<Ptens0::gather(yatoms,X2)<<endl;
 
   cout<<session<<endl;
 

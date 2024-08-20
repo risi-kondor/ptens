@@ -43,6 +43,7 @@ int main(int argc, char** argv){
 
   AtomsPack xatoms=AtomsPack::random(N,N,0.5);
   AtomsPack yatoms=AtomsPack::random(N,N,0.5);
+  LayerMap map=LayerMap::overlaps_map(xatoms,yatoms);
 
   Ptens0 X0=Ptens0(xatoms,channels=nc,filltype=3);
   Ptens1 X1=Ptens1(xatoms,channels=nc,filltype=3);
@@ -54,36 +55,36 @@ int main(int argc, char** argv){
 #endif 
 
 
-  Ptens1 Y0=Ptens1::gather(X0,yatoms); 
-  timed_block("Gather 1<-0 (CPU)",[&](){
-    for(int i=0; i<niter; i++) Y0.add_gather(X0);});
+  Ptens1 Y0=Ptens1::gather(yatoms,X0); 
+  TimedBlock("Gather 1<-0 (CPU)",[&](){
+      for(int i=0; i<niter; i++) Y0.add_gather(X0,map);});
 
 #ifdef _WITH_CUDA
-  Ptens1 Y0g=Ptens1::gather(X0g,yatoms);
-  timed_block("Gather 1<-0 (GPU)",[&](){
-      for(int i=0; i<niter; i++) Y0g.add_gather(X0g);});
+  Ptens1 Y0g=Ptens1::gather(yatoms,X0g);
+  TimedBlock("Gather 1<-0 (GPU)",[&](){
+      for(int i=0; i<niter; i++) Y0g.add_gather(X0g,map);});
 #endif 
 
 
-  Ptens1 Y1=Ptens1::gather(X1,yatoms); 
-  timed_block("Gather 1<-1 (CPU)",[&](){
-      for(int i=0; i<niter; i++) Y1.add_gather(X1);});
+  Ptens1 Y1=Ptens1::gather(yatoms,Y1); 
+  TimedBlock("Gather 1<-1 (CPU)",[&](){
+      for(int i=0; i<niter; i++) Y1.add_gather(X1,map);});
 
 #ifdef _WITH_CUDA
-  Ptens1 Y1g=Ptens1::gather(X1g,yatoms);
-  timed_block("Gather 1<-1 (GPU)",[&](){
-      for(int i=0; i<niter; i++) Y1g.add_gather(X1g);});
+  Ptens1 Y1g=Ptens1::gather(yatoms,Y1g);
+  TimedBlock("Gather 1<-1 (GPU)",[&](){
+      for(int i=0; i<niter; i++) Y1g.add_gather(X1g,map);});
 #endif 
 
 
-  Ptens1 Y2=Ptens1::gather(X2,yatoms); 
-  timed_block("Gather 1<-2 (CPU)",[&](){
-      for(int i=0; i<niter; i++) Y2.add_gather(X2);});
+  Ptens1 Y2=Ptens1::gather(yatoms,X2); 
+  TimedBlock("Gather 1<-2 (CPU)",[&](){
+      for(int i=0; i<niter; i++) Y2.add_gather(X2,map);});
 
 #ifdef _WITH_CUDA
-  Ptens1 Y2g=Ptens1::gather(X2g,yatoms);
-  timed_block("Gather 1<-2 (GPU)",[&](){
-      for(int i=0; i<niter; i++) Y2g.add_gather(X2g);});
+  Ptens1 Y2g=Ptens1::gather(yatoms,X2g);
+  TimedBlock("Gather 1<-2 (GPU)",[&](){
+      for(int i=0; i<niter; i++) Y2g.add_gather(X2g,map);});
 #endif 
 
 

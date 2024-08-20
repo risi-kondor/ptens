@@ -19,16 +19,10 @@
 #include "Subgraph.hpp"
 #include "SubgraphLayer0.hpp"
 #include "Ptensors1.hpp"
-#include "SubgraphLayer.hpp"
-//#include "Rtensor3_view.hpp"
+//#include "SubgraphLayer.hpp"
 
 
 namespace ptens{
-
-  //template<typename TYPE> class SubgraphLayer1;
-  //template<typename TYPE> class SubgraphLayer2;
-
-  //template<typename TYPE> inline SubgraphLayer1<TYPE> gather1(const SubgraphLayer2<TYPE>& x, const Subgraph& _S);
 
 
   template<typename TYPE> 
@@ -36,7 +30,8 @@ namespace ptens{
   public:
 
     typedef Ptensors1<TYPE> BASE;
-    typedef cnine::Ltensor<TYPE> TENSOR;
+    typedef typename BASE::TENSOR TENSOR;
+    //typedef cnine::Ltensor<TYPE> TENSOR;
 
     using BASE::BASE;
     using BASE::atoms;
@@ -115,33 +110,19 @@ namespace ptens{
 
   public: // ---- Access -------------------------------------------------------------------------------------
 
-    /*
-    const cnine::Rtensor3_view view3() const{
-      int K=S.getn();
-      int nc=get_nc();
-      return cnine::Rtensor3_view(const_cast<float*>(get_arr()),dim(0)/K,K,nc,K*nc,nc,1);
-    }
-
-    cnine::Rtensor3_view view3(){
-      int K=S.getn();
-      int nc=get_nc();
-      return cnine::Rtensor3_view(get_arr(),dim(0)/K,K,nc,K*nc,nc,1);
-    }
-    */
-
   public: // ---- Message passing between subgraph layers -----------------------------------------------------
 
 
     template<typename SOURCE>
-    SubgraphLayer1(const SOURCE& x, const Subgraph& _S, const int min_overlaps=1):
+    SubgraphLayer1(const SOURCE& x, const Subgraph& _S)://, const int min_overlaps=1):
       SubgraphLayer1(x.G,_S,x.G.subgraphs(_S),x.get_nc()*vector<int>({1,2,5})[x.getk()],0,x.dev){
-      add_gather(x,min_overlaps);
+      add_gather(x,LayerMap::overlaps_map(atoms,x.atoms));
     }
 
     template<typename SOURCE>
-    SubgraphLayer1(const SOURCE& x, const Ggraph& _G, const Subgraph& _S, const int min_overlaps=1):
+    SubgraphLayer1(const SOURCE& x, const Ggraph& _G, const Subgraph& _S)://, const int min_overlaps=1):
       SubgraphLayer1(_G,_S,_G.subgraphs(_S),x.get_nc()*vector<int>({1,2,5})[x.getk()],0,x.dev){
-      add_gather(x,min_overlaps);
+      add_gather(x,LayerMap::overlaps_map(atoms,x.atoms));
     }
 
 
@@ -156,45 +137,10 @@ namespace ptens{
     }
 
 
-    /*
-    void add_linmaps(const Ptensors1<TYPE>& x){
-      int nc=x.get_nc();
-      broadcast0(x.reduce0());
-      cols(nc,nc)+=x;
-    }
-
-    void add_linmaps_back(const Ptensors1<TYPE>& r){
-      int nc=get_nc();
-      broadcast0(r.reduce0(0,nc));
-      add(r.cols(nc,nc));
-    }
-
-    Ptensors0<TYPE> reduce0() const{
-      TimedFn T("SubgraphLayer1","reduce0",*this);
-      Ptensors0<TYPE> R({size(),get_nc()},0,get_dev());
-      view3(S.getn()).sum1_into(R.view2());
-      return R;
-    }
-
-    Ptensors0<TYPE> reduce0(const int offs, const int nc) const{
-      TimedFn T("SubgraphLayer1","reduce0",*this);
-      Ptensors0<TYPE> R({size(),nc},0,get_dev());
-      view3(S.getn(),offs,nc).sum1_into(R.view2());
-      return R;
-    }
-
-    void broadcast0(const Ptensors0<TYPE>& x, const int offs=0){
-      TimedFn T("SubgraphLayer1","broadcast0",*this);
-      PTENS_ASSRT(x.ndims()==2);
-      view3(S.getn(),offs,x.dim(1))+=cnine::repeat1(x.view2(),S.getn());
-    }
-    */
-
-
   public: // ---- Autobahn -----------------------------------------------------------------------------------
 
 
-    SubgraphLayer1 autobahn(const TENSOR& W, const TENSOR& B) const{
+    SubgraphLayer1 schur(const TENSOR& W, const TENSOR& B) const{
       S.make_eigenbasis();
       int K=S.getn();
       PTENS_ASSRT(W.dims.size()==3);
@@ -214,7 +160,7 @@ namespace ptens{
     }
 
 
-   void add_autobahn_back0(const Ptensors1<TYPE>& r, const TENSOR& W){
+   void add_schur_back0(const Ptensors1<TYPE>& r, const TENSOR& W){
       S.make_eigenbasis();
       int K=S.getn();
       PTENS_ASSRT(W.dims.size()==3);
@@ -229,7 +175,7 @@ namespace ptens{
     }
 
 
-    void add_autobahn_back1_to(const TENSOR& W, const TENSOR& B, const Ptensors1<TYPE>& r){
+    void add_schur_back1_to(const TENSOR& W, const TENSOR& B, const Ptensors1<TYPE>& r){
       S.make_eigenbasis();
       int K=S.getn();
       PTENS_ASSRT(W.dims.size()==3);
@@ -268,10 +214,10 @@ namespace ptens{
       PTENS_ASSRT(E.n1==K);
       PTENS_ASSRT(x.dev==y.dev);
 
-      auto X=cnine::Ltensor<float>({N,K,xnc},0,x.dev);
+      auto X=TENSOR({N,K,xnc},0,x.dev);
       if(!inplace_add) X.view3().add_mprod(E.transp(),x);
 
-      auto Y=cnine::Tensor<float>({N,K,ync},0,x.dev);
+      auto Y=TENSOR({N,K,ync},0,x.dev);
       Y.view3().add_mprod(E.transp(),y);
 
       int offs=0;
@@ -307,7 +253,7 @@ namespace ptens{
   template<typename SOURCE>
   inline SubgraphLayer1<float> gather1(const SOURCE& x, const Subgraph& _S){
     SubgraphLayer1<float> R(x.G,_S,x.G.subgraphs(_S),x.get_nc()*vector<int>({1,2,5})[x.getk()],0,x.dev);
-    R.add_gather(x);
+    R.add_gather(x,LayerMap::overlaps_map(R.atoms,x.atoms));
     return R;
   }
 
@@ -315,70 +261,18 @@ namespace ptens{
 }
 
 #endif 
-  /*
-  template<typename TYPE>
-  inline SubgraphLayer1<TYPE> gather1(const SubgraphLayer0<TYPE>& x, const Subgraph& _S){
-    SubgraphLayer1<TYPE> R(x.G,_S,x.G.subgraphs(_S),1*x.get_nc(),0,x.dev);
-    R.add_gather(x);
-    return R;
-  }
 
-  template<typename TYPE>
-  inline SubgraphLayer1<TYPE> gather1(const SubgraphLayer1<TYPE>& x, const Subgraph& _S){
-    SubgraphLayer1<TYPE> R(x.G,_S,x.G.subgraphs(_S),2*x.get_nc(),0,x.dev);
-    R.add_gather(x);
-    return R;
-  }
-
-  template<typename TYPE>
-  inline SubgraphLayer1<TYPE> gather1(const SubgraphLayer2<TYPE>& x, const Subgraph& _S){
-    SubgraphLayer1<TYPE> R(x.G,_S,x.G.subgraphs(_S),5*x.get_nc(),0,x.dev);
-    R.add_gather(x);
-    return R;
-  }
-  */
     /*
-    SubgraphLayer1(const SubgraphLayer0<float>& x, const Subgraph& _S):
-      SubgraphLayer1(x.G,_S,x.G.subgraphs(_S),x.get_nc(),0,x.dev){
-      add_gather(x);
+    const cnine::Rtensor3_view view3() const{
+      int K=S.getn();
+      int nc=get_nc();
+      return cnine::Rtensor3_view(const_cast<float*>(get_arr()),dim(0)/K,K,nc,K*nc,nc,1);
     }
 
-    SubgraphLayer1(const SubgraphLayer1<float>& x, const Subgraph& _S):
-      SubgraphLayer1(x.G,_S,x.G.subgraphs(_S),2*x.get_nc(),0,x.dev){
-      add_gather(x);
+    cnine::Rtensor3_view view3(){
+      int K=S.getn();
+      int nc=get_nc();
+      return cnine::Rtensor3_view(get_arr(),dim(0)/K,K,nc,K*nc,nc,1);
     }
-
-    SubgraphLayer1(const SubgraphLayer2<TYPE>& x, const Subgraph& _S):
-      SubgraphLayer1(gather1<TYPE>(x,_S)){}
     */
-    //template<typename SOURCE>
-    //inline SubgraphLayer1<float> gather(const SOURCE& x, const Subgraph& _S){
-    //SubgraphLayer1<float> R(x.G,_S,x.G.subgraphs(_S),x.get_nc()*vector<int>({1,2,5})[x.getk()],0,x.dev);
-    //R.add_gather(x);
-    //return R;
-    //}
-
-    //SubgraphLayer1(const Ptensors0<TYPE>& x, const Ggraph& g, const Subgraph& s):
-    //SubgraphLayer1(g,s,g.subgraphs(s),x.get_nc(),0,x.dev){
-    //add_gather(x);
-    //}
-
-    //SubgraphLayer1(const Ptensors1<TYPE>& x, const Ggraph& g, const Subgraph& s):
-    //SubgraphLayer1(g,s,g.subgraphs(s),2*x.get_nc(),0,x.dev){
-      //add_gather(x);
-    //}
-
-    //SubgraphLayer1(const Ptensors2<TYPE>& x, const Ggraph& g, const Subgraph& s):
-    //SubgraphLayer1(g,s,g.subgraphs(s),5*x.get_nc(),0,x.dev){
-    //add_gather(x);
-    ///}
-
-    //SubgraphLayer1(const NodeLayerb<TYPE>& x, const Subgraph& _S):
-    //SubgraphLayer1(x.G,_S,x.G.subgraphs(_S),2*x.get_nc(),x.get_dev()){
-    //add_gather(x);
-    //}
-
-    //void gather_back(NodeLayer& x){
-    //x.get_grad().emp_fromB(get_grad());
-    //}
 
