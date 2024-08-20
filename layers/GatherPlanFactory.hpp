@@ -27,20 +27,6 @@ namespace ptens{
   class GatherPlanFactory{
   public:
 
-    //typedef ptr_triple_indexed_cache<LayerMapObj,AtomsPackTagObj,AtomsPackTagObj,shared_ptr<GatherPlanObj> > GplanCache;
-    //GplanCache cache=GplanCache([](const LayerMapObj& map, const AtomsPackTagObj& out_tag, 
-    //const AtomsPackTagObj& in_tag){
-    //return make(map,out_tag.get_atoms(),in_tag.get_atoms(),}
-
-//     typedef cnine::ptr_triple_arg_indexed_cache<LayerMapObj,AtomsPackTagObj,AtomsPackTagObj,int,shared_ptr<GatherPlanObj> > GplanCache;
-//     GplanCache cache=GplanCache([](const LayerMapObj& map, const AtomsPackObj& out, 
-// 	const AtomsPackObj& in, const int& code){
-// 	int outk=code/9; 
-// 	int ink=(code%9)/3;
-// 	int gatherk=code%3;
-// 	return make(map,out,in,outk,ink,gatherk);
-//       });
-
 
     static GatherPlan gather_map0(const LayerMap& map, const AtomsPack& out, const AtomsPack& in, 
       const int outk=0, const int ink=0){
@@ -86,16 +72,26 @@ namespace ptens{
       map.for_each([&](const int i, const int j){
 	  Atoms in_j=in[j];
 	  Atoms out_i=out[i];
-	  Atoms common=out_i.intersect(in_j);
-	  int nix=common.size();
-	  
-	  if(outk==0) out_pack->set(c,toffset,nix,out.row_offset0(i),out.nrows0(i),out[i](common)); // is this correct?
-	  if(outk==1) out_pack->set(c,toffset,nix,out.row_offset1(i),out.size_of(i),out[i](common));
-	  if(outk==2) out_pack->set(c,toffset,nix,out.row_offset2(i),out.size_of(i),out[i](common));
+	  //Atoms common=out_i.intersect(in_j);
+	  //int nix=common.size();
+	  auto[out_ix,in_ix]=out_i.intersecting(in_j);
+	  int nix=out_ix.size();
 
-	  if(ink==0) in_pack->set(c,toffset,nix,in.row_offset0(j),in.nrows0(j),in[j](common));
-	  if(ink==1) in_pack->set(c,toffset,nix,in.row_offset1(j),in.size_of(j),in[j](common));
-	  if(ink==2) in_pack->set(c,toffset,nix,in.row_offset2(j),in.size_of(j),in[j](common));
+	  //if(outk==0) out_pack->set(c,toffset,nix,out.row_offset0(i),out.nrows0(i),out[i](common)); // is this correct?
+	  //if(outk==1) out_pack->set(c,toffset,nix,out.row_offset1(i),out.size_of(i),out[i](common));
+	  //if(outk==2) out_pack->set(c,toffset,nix,out.row_offset2(i),out.size_of(i),out[i](common));
+
+	  //if(ink==0) in_pack->set(c,toffset,nix,in.row_offset0(j),in.nrows0(j),in[j](common));
+	  //if(ink==1) in_pack->set(c,toffset,nix,in.row_offset1(j),in.size_of(j),in[j](common));
+	  //if(ink==2) in_pack->set(c,toffset,nix,in.row_offset2(j),in.size_of(j),in[j](common));
+
+	  if(outk==0) out_pack->set(c,toffset,nix,out.row_offset0(i),out.nrows0(i),out_ix); // is this correct?
+	  if(outk==1) out_pack->set(c,toffset,nix,out.row_offset1(i),out.size_of(i),out_ix);
+	  if(outk==2) out_pack->set(c,toffset,nix,out.row_offset2(i),out.size_of(i),out_ix);
+
+	  if(ink==0) in_pack->set(c,toffset,nix,in.row_offset0(j),in.nrows0(j),in_ix);
+	  if(ink==1) in_pack->set(c,toffset,nix,in.row_offset1(j),in.size_of(j),in_ix);
+	  if(ink==2) in_pack->set(c,toffset,nix,in.row_offset2(j),in.size_of(j),in_ix);
 
 	  out_lists.push_back((*out_pack)(c,2),c);
 	  in_lists.push_back((*in_pack)(c,2),c);
@@ -135,5 +131,20 @@ namespace ptens{
 }
 
 #endif 
+
+
+    //typedef ptr_triple_indexed_cache<LayerMapObj,AtomsPackTagObj,AtomsPackTagObj,shared_ptr<GatherPlanObj> > GplanCache;
+    //GplanCache cache=GplanCache([](const LayerMapObj& map, const AtomsPackTagObj& out_tag, 
+    //const AtomsPackTagObj& in_tag){
+    //return make(map,out_tag.get_atoms(),in_tag.get_atoms(),}
+
+//     typedef cnine::ptr_triple_arg_indexed_cache<LayerMapObj,AtomsPackTagObj,AtomsPackTagObj,int,shared_ptr<GatherPlanObj> > GplanCache;
+//     GplanCache cache=GplanCache([](const LayerMapObj& map, const AtomsPackObj& out, 
+// 	const AtomsPackObj& in, const int& code){
+// 	int outk=code/9; 
+// 	int ink=(code%9)/3;
+// 	int gatherk=code%3;
+// 	return make(map,out,in,outk,ink,gatherk);
+//       });
 
 
