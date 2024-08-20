@@ -74,6 +74,7 @@ PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
 #include "SimpleMemoryManager_py.cpp"
 #include "GgraphCache_py.cpp"
 #include "SubgraphCache_py.cpp"
+#include "CSubgraphatomsCache_py.cpp"
 
 #include "Ptensor0_py.cpp"
 #include "Ptensor1_py.cpp"

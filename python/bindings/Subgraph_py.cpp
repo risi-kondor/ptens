@@ -21,7 +21,7 @@ pybind11::class_<Subgraph>(m,"subgraph")
 
   .def("has_espaces",&Subgraph::has_espaces)
   .def("n_eblocks",&Subgraph::n_eblocks)
-
+  .def("evecs",[](Subgraph& S){return S.evecs().torch();})
   .def("set_evecs",[](Subgraph& S, const at::Tensor& V, const at::Tensor& E){
       S.set_evecs(V,E);})
 

@@ -85,11 +85,18 @@ class subgraph:
     # ---- Access -----------------------------------------------------------------------------------------------
 
 
+    def has_espaces(self):
+        return self.obj.has_espaces()
+
     def n_espaces(self):
         return self.obj.n_eblocks()
 
+    def evecs(self):
+        self.set_evecs()
+        return self.obj.evecs()
+        
     def set_evecs(self):
-        if self.obj.has_espaces()>0:
+        if self.has_espaces()>0:
             return
         L=self.torch()
         L=torch.diag(torch.sum(L,1))-L

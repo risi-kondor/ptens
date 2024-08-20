@@ -17,10 +17,22 @@ import ptens_base as pb
 
 class subgraphlayer(torch.Tensor):
 
-    #def clone(self):
-    #    r=ptensorlayerc(super().clone())
-    #    r.atoms=self.atoms
-    #    return r
+    covariant_functions=[torch.Tensor.to,torch.Tensor.add,torch.Tensor.sub,torch.relu]
+
+    @classmethod
+    def __torch_function__(cls, func, types, args=(), kwargs=None):
+        if kwargs is None:
+            kwargs = {}
+        if func in cls.covariant_functions:
+            r= super().__torch_function__(func, types, args, kwargs)
+            r.atoms=args[0].atoms
+            r.G=args[0].G
+            r.S=args[0].S
+        else:
+            r= super().__torch_function__(func, types, args, kwargs)
+            if isinstance(r,torch.Tensor):
+                r=torch.Tensor(r)
+        return r
 
 
     # ---- Operations ----------------------------------------------------------------------------------------

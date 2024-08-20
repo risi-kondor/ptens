@@ -1,5 +1,8 @@
 pybind11::class_<CompressedAtomsPack>(m,"catomspack")
 
+  .def(py::init([](const AtomsPack& _atoms, at::Tensor& M){
+	return CompressedAtomsPack(_atoms,tensorf(M));}))
+
   .def_static("random",[](const AtomsPack& _atoms, const int _nvecs){
       return CompressedAtomsPack(_atoms,_nvecs,4);})
 

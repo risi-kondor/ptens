@@ -21,6 +21,7 @@ namespace ptens{
 
 #include "GgraphCache.hpp"
 #include "SubgraphCache.hpp"
+#include "CompressedSubgraphAtomsPackCache.hpp"
 
 
 namespace ptens{
@@ -41,6 +42,8 @@ namespace ptens{
 
     GgraphCache graph_cache;
     SubgraphCache subgraph_cache;
+
+    CompressedSubgraphAtomsPackCache c_subgraphatoms_cache;
 
   }
 

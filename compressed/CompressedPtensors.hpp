@@ -52,13 +52,13 @@ namespace ptens{
     CompressedPtensors(const CompressedAtomsPack& _atoms, const TENSOR& x):
       BASE(x),
       atoms(_atoms){
-      nc=TENSOR::dim(1);
+      nc=TENSOR::dim(2);
     }
 
     CompressedPtensors(const CompressedAtomsPack& _atoms, const cnine::Gdims& _dims, const int fcode, const int _dev):
       BASE(_dims,fcode,_dev),
       atoms(_atoms){
-      nc=TENSOR::dim(1);
+      nc=TENSOR::dim(2);
     }
 
 

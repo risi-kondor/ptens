@@ -35,8 +35,8 @@ namespace ptens{
     using BASE::operator==;
     using BASE::dense;
 
-    cnine::Tensor<float> evecs;
-    vector<int> eblocks;
+    mutable cnine::Tensor<float> evecs;
+    mutable vector<int> eblocks;
 
     SubgraphObj(const SubgraphObj& x):
       BASE(x),
@@ -107,7 +107,12 @@ namespace ptens{
       return eblocks.size()>0;
     }
 
-    void make_eigenbasis(){
+    cnine::Tensor<float> get_evecs() const{
+      make_eigenbasis();
+      return evecs;
+    }
+
+    void make_eigenbasis() const{
       if(eblocks.size()>0) return;
       int n=getn();
 
@@ -129,7 +134,7 @@ namespace ptens{
       const_cast<SubgraphObj&>(*this).make_eblocks(_evals);
     }
 
-    void make_eblocks(const cnine::Tensor<float>& evals){
+    void make_eblocks(const cnine::Tensor<float>& evals) const{
       PTENS_ASSRT(evals.dims.size()==1);
       PTENS_ASSRT(getn()==evals.dims[0]);
       eblocks.clear();

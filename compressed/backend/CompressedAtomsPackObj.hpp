@@ -44,15 +44,18 @@ namespace ptens{
     CompressedAtomsPackObj(const shared_ptr<AtomsPackObj>& _atoms, const TENSOR& M):
       observable(this),
       atoms(_atoms),
-      bases(M){
-      PTENS_ASSRT(bases.ndims()==2);
-      PTENS_ASSRT(bases.dim(1)==nrows1());
+      bases(M.copy()){
+      PTENS_ASSRT(bases.ndims()==2 || bases.ndims()==3);
+      if(bases.ndims()==2){
+	bases.dims=bases.dims.insert(0,atoms->size());
+	bases.strides=bases.strides.insert(0,0);
+      }
     }
 
-    CompressedAtomsPackObj(const TENSOR& M, const shared_ptr<AtomsPackObj>& _atoms):
-      observable(this),
-      atoms(_atoms),
-      bases(M.unsqueeze(0).broadcast(0,_atoms->size()).fuse({0,1})){}
+    //CompressedAtomsPackObj(const TENSOR& M, const shared_ptr<AtomsPackObj>& _atoms):
+    //observable(this),
+    //atoms(_atoms),
+    //bases(M.unsqueeze(0).broadcast(0,_atoms->size()).fuse({0,1})){}
 
     CompressedAtomsPackObj(const shared_ptr<AtomsPackObj>& _atoms, const int _nvecs, const int fcode, const int _dev=0):
       observable(this),
