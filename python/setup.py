@@ -56,6 +56,7 @@ def main():
 
 
     _cxx_compile_args = ['-std=c++17',
+                         '-fvisibility=hidden',
                          '-Wno-sign-compare',
                          '-Wno-deprecated-declarations',
                          '-Wno-unused-variable',
