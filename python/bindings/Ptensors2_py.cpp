@@ -61,7 +61,7 @@ pybind11::class_<Ptensors2<float> >(m,"ptensors2")
 
 // ---- Reductions ------------------------------------------------------------------------------------------
 
-
+/*
   .def("add_reduce0_to",[](const Ptensors2f& obj, at::Tensor& r){
       obj.add_reduce0_to(tensorf::view(r));},py::arg("r"))
   .def("add_reduce1_to",[](const Ptensors2f& obj, at::Tensor& r){
@@ -73,11 +73,11 @@ pybind11::class_<Ptensors2<float> >(m,"ptensors2")
       obj.add_reduce1_shrink_to(tensorf::view(r),offs);},py::arg("r"),py::arg("offs")=0)
   .def("add_reduce2_shrink_to",[](const Ptensors2f& obj, at::Tensor& r, const int offs){
       obj.add_reduce2_shrink_to(tensorf::view(r),offs);},py::arg("r"),py::arg("offs")=0)
-
+*/
 
 // ---- Broadcasting ----------------------------------------------------------------------------------------
 
-
+/*
   .def("broadcast0",[](Ptensors2f& obj, const at::Tensor& x, const int offs){
       obj.broadcast0(tensorf::view(x),offs);},py::arg("x"),py::arg("offs")=0)
   .def("broadcast1",[](Ptensors2f& obj, const at::Tensor& x, const int offs){
@@ -89,7 +89,7 @@ pybind11::class_<Ptensors2<float> >(m,"ptensors2")
       obj.broadcast0_shrink(tensorf::view(x));},py::arg("x"))
   .def("broadcast1_shrink",[](Ptensors2f& obj, const at::Tensor& x){
       obj.broadcast1_shrink(tensorf::view(x));},py::arg("x"))
-
+*/
 
 // ---- Indexed Reductions -----------------------------------------------------------------------------------
 

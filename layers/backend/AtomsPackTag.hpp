@@ -40,9 +40,6 @@ namespace ptens{
 
   protected:
 
-    //AtomsPackTagObj():
-    //observable(this){}
-
     AtomsPackTagObj(const shared_ptr<AtomsPackObj>& x):
       observable(this),
       atoms(x){}

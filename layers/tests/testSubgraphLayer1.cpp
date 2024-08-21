@@ -52,8 +52,8 @@ int main(int argc, char** argv){
   SubgraphLayer1<float> f2=gather1(f1,edge);
   //f2.get_grad()=f2;
 
-  f1.get_grad().add_gather_back(f2);
-  cout<<f1.get_grad()<<endl;
+  //f1.get_grad().add_gather_back(f2);
+  //cout<<f1.get_grad()<<endl;
 
   /*
   Ltensor<float> W({5,5},filltype=4);

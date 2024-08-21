@@ -66,15 +66,6 @@ namespace ptens{
     }
 
 
-  public: // ---- Copying ------------------------------------------------------------------------------------
-
-
-    //AtomsPack& operator=(const AtomsPack& x){
-      //cout<<"AtomsPAck::operator="<<endl;
-      //obj=x.obj;
-      //return *this;
-    //}
-
   public: // ---- Conversions --------------------------------------------------------------------------------
 
 
@@ -83,9 +74,6 @@ namespace ptens{
 
     AtomsPack(const cnine::Tensor<int>& M):
       obj(new AtomsPackObj(M)){}
-
-
-  public: // ---- Views --------------------------------------------------------------------------------------
 
 
   public: // ---- Access -------------------------------------------------------------------------------------
@@ -138,14 +126,6 @@ namespace ptens{
     pair<int*,int*> gpu_arrs(const int dev) const{
       return obj->gpu_arrs(dev);
     }
-
-    //int* gather_to_nodes_map(const int dev) const{
-    //return obj->gather_to_nodes_map()->arrg;
-    //}
-
-    //int gather_to_nodes_map_size(const int dev) const{
-    //return obj->gather_to_nodes_map()->n;
-    //}
 
     bool operator==(const AtomsPack& x) const{
       if(obj.get()==x.obj.get()) return true;
@@ -233,16 +213,4 @@ namespace ptens{
 
 
 #endif 
-
-
-    // create map for messages from y
-    //TensorLevelMap overlaps(const AtomsPack& y){
-    //return obj->overlaps(*y.obj);
-    //}
-
-    // create map for messages from y
-    //AtomsPackMatch overlaps_mlist(const AtomsPack& y, const int min_overlaps=1) const{
-    //return obj->overlaps_mlist(*y.obj,min_overlaps);
-    //}
-
 

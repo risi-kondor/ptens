@@ -16,6 +16,7 @@
 
 #include "Cnine_base.hpp"
 #include <string>
+#include "TensorView.hpp"
 
 #define _PTENS_GEN_ASSERTS
 
@@ -72,6 +73,8 @@ namespace ptens{
   //template<typename DUMMY> class PtensorsJig0;
   //template<typename DUMMY> class PtensorsJig1;
   //template<typename DUMMY> class PtensorsJig2;
+  template<typename TYPE>
+  using PtensTensor=cnine::TensorView<TYPE>;
 
   template<typename TYPE> class Ptensor0;
   template<typename TYPE> class Ptensor1;

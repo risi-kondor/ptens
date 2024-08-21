@@ -27,11 +27,11 @@ namespace ptens{
 
 
   template<typename TYPE>
-  class BatchedPtensors: public cnine::Ltensor<TYPE>{
+  class BatchedPtensors: public PtensTensor<TYPE>{
   public:
 
-    typedef cnine::Ltensor<TYPE> BASE;
-    typedef cnine::Ltensor<TYPE> TENSOR;
+    typedef PtensTensor<TYPE> BASE;
+    typedef PtensTensor<TYPE> TENSOR;
 
     using BASE::BASE;
     using BASE::dims;

@@ -34,6 +34,9 @@ namespace ptens{
     CompressedAtomsPack(const shared_ptr<CompressedAtomsPackObj>& x):
       obj(x){}
 
+    CompressedAtomsPack(const AtomsPack& _atoms, const TENSOR& M):
+      obj(cnine::to_share(new CompressedAtomsPackObj(_atoms.obj,M))){}
+
     CompressedAtomsPack(const AtomsPack& _atoms, const int _nvecs, const int fcode, const int _dev=0):
       obj(cnine::to_share(new CompressedAtomsPackObj(_atoms.obj,_nvecs,fcode,_dev))){}
 
@@ -71,7 +74,7 @@ namespace ptens{
       return obj->nvecs();
     }
 
-    AtomsPack atoms(){
+    AtomsPack atoms() const{
       return obj->atoms;
     }
 

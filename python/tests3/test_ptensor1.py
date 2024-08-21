@@ -12,6 +12,9 @@ M=torch.randn([3,3])
 A=p.ptensor1.from_tensor([2,3,5],M)
 print(A)
 
+V=torch.relu(A)
+print(V)
+
 print("If two ptensors have the same reference domain,\n it is possible to do arithmetic on them:\n")
 # Unfortunately these have to be added manually one-by-one
 B=p.ptensor1.randn([2,3,5],3)

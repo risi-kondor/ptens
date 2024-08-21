@@ -22,6 +22,10 @@ print("Or define it from a torch tensor:\n")
 M=torch.randn([G.subgraphs(S).nrows0(),3])
 A=p.subgraphlayer0.from_matrix(G,S,M)
 print(A)
+z=torch.relu(A)
+print(z)
+print(z.atoms)
+
 
 print("If two ptensors layers have the same reference domains,\nwe can do arithmetic on them:\n")
 # Unfortunately these have to be added manually one-by-one

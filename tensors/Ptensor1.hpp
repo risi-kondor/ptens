@@ -111,6 +111,7 @@ namespace ptens{
       nc=dims.back();
      }
 
+    /*
     Ptensor1(const BASE& x, const Atoms& _atoms):
       BASE(x.copy()),
       atoms(_atoms){
@@ -118,7 +119,17 @@ namespace ptens{
       k=dims(0);
       nc=dims.back();
      }
+    */
 
+    Ptensor1(const cnine::TensorView<TYPE>& x, const Atoms& _atoms):
+      BASE(x.copy()),
+      atoms(_atoms){
+      assert(x.ndims()==2);
+      k=dims(0);
+      nc=dims.back();
+     }
+
+    /*
     Ptensor1(BASE&& x, Atoms&& _atoms):
       BASE(x),
       atoms(std::move(_atoms)){
@@ -126,7 +137,7 @@ namespace ptens{
       k=dims(0);
       nc=dims.back();
      }
-
+    */
 
     #ifdef _WITH_ATEN
     static Ptensor1 view(at::Tensor& x, Atoms&& _atoms){

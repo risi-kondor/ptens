@@ -49,7 +49,8 @@ namespace ptens{
     friend class Ptensors2<TYPE>;
 
     typedef Ptensors<TYPE> BASE;
-    typedef cnine::Ltensor<TYPE> TENSOR;
+    typedef typename BASE::TENSOR TENSOR;
+    //typedef cnine::Ltensor<TYPE> TENSOR;
     typedef cnine::Rtensor1_view Rtensor1_view;
     typedef cnine::Rtensor2_view Rtensor2_view;
 
@@ -90,9 +91,9 @@ namespace ptens{
       BASE(_atoms,M),
       tag(_atoms){}
 
-    Ptensors1(const AtomsPack& _atoms, const cnine::TensorView<TYPE>& M):
-      BASE(_atoms,M),
-      tag(_atoms){}
+    //Ptensors1(const AtomsPack& _atoms, const cnine::TensorView<TYPE>& M):
+    //BASE(_atoms,M),
+    //tag(_atoms){}
 
     Ptensors1(const TENSOR& M, const AtomsPack& _atoms):
       BASE(_atoms,M),
@@ -116,8 +117,8 @@ namespace ptens{
       for(auto& p:list)
 	v.push_back(p.atoms);
       if(ptens_global::cache_atomspack_cats) 
-	return Ptensors1(cnine::Ltensor<TYPE>::stack(0,list),ptens_global::atomspack_cat_cache(v));
-      return Ptensors1(cnine::Ltensor<TYPE>::stack(0,list),AtomsPack::cat(v));
+	return Ptensors1(TENSOR::stack(0,list),ptens_global::atomspack_cat_cache(v));
+      return Ptensors1(TENSOR::stack(0,list),AtomsPack::cat(v));
     }
 
 

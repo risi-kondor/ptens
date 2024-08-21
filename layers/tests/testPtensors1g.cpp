@@ -50,13 +50,13 @@ int main(int argc, char** argv){
   Ptens2 X2g(X2,1); 
 
   AtomsPack yatoms=AtomsPack::random(4,4,0.5);
-  Ptens1 Y0=Ptens1::gather(X0,yatoms);
-  Ptens1 Y1=Ptens1::gather(X1,yatoms);
-  Ptens1 Y2=Ptens1::gather(X1,yatoms);
+  Ptens1 Y0=Ptens1::gather(yatoms,X0);
+  Ptens1 Y1=Ptens1::gather(yatoms,X1);
+  Ptens1 Y2=Ptens1::gather(yatoms,X2);
 
-  Ptens1 Y0g=Ptens1::gather(X0g,yatoms);
-  Ptens1 Y1g=Ptens1::gather(X1g,yatoms);
-  Ptens1 Y2g=Ptens1::gather(X1g,yatoms);
+  Ptens1 Y0g=Ptens1::gather(yatoms,X0g);
+  Ptens1 Y1g=Ptens1::gather(yatoms,X1g);
+  Ptens1 Y2g=Ptens1::gather(yatoms,X1g);
 
   //cout<<Y0<<endl;
   //cout<<Y0g<<endl;

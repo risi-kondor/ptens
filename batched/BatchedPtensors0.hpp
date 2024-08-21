@@ -35,7 +35,7 @@ namespace ptens{
   public:
 
     typedef BatchedPtensors<TYPE> BASE;
-    typedef cnine::Ltensor<TYPE> TENSOR;
+    typedef typename BASE::TENSOR TENSOR;
     
     using cnine::diff_class<BatchedPtensors0<TYPE> >::grad;
     using BASE::get_dev;
@@ -67,7 +67,7 @@ namespace ptens{
 
 
     BatchedPtensors0(const initializer_list<Ptensors0<TYPE> >& list):
-      BASE(cnine::Ltensor<TYPE>::stack(0,list)){
+      BASE(PtensTensor<TYPE>::stack(0,list)){
       vector<shared_ptr<AtomsPackObj> > x;
       for(auto& p:list) x.push_back(p.atoms.obj);
       atoms=BatchedAtomsPack<0>(BatchedAtomsPackObj(x));

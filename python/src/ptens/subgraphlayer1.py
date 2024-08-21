@@ -35,7 +35,7 @@ class subgraphlayer1(p.subgraphlayer,ptensorlayer1):
         return R
 
     @classmethod
-    def zeros(self,G,S,nc,device='cpu'):
+    def zeros(cls,G,S,nc,device='cpu'):
         atoms=G.subgraphs(S)
         M=torch.zeros([atoms.nrows1(),nc],device=device)
         return subgraphlayer1(G,S,atoms,M)
@@ -55,6 +55,16 @@ class subgraphlayer1(p.subgraphlayer,ptensorlayer1):
     def from_matrixA(self,G,S,atoms,M):
         return subgraphlayer1(G,S,atoms,M)
 
+    def zeros_like(self,nc=None):
+        if nc is None:
+            nc=self.size(1)
+        assert isinstance(nc,int)
+        M=torch.zeros([self.size(0),nc],device=self.device)
+        return subgraphlayer1(self.G,self.S,self.atoms,M)
+
+    def sgl_backend(self):
+        return pb.sglayer1.view(self.G,self.S,self.atoms,self)
+
     
     # ---- Linmaps ------------------------------------------------------------------------------------------
 
@@ -72,6 +82,12 @@ class subgraphlayer1(p.subgraphlayer,ptensorlayer1):
         atoms=x.G.subgraphs(S)
         return subgraphlayer1(x.G,x.S,atoms,super().gather(atoms,x))
 
+    # ---- Other -------------------------------------------------------------------------------------------
+
+
+    def schur_layer(self,w,b):
+        return Subgraphlayer1b_SchurLayerFn.apply(self,w,b)
+
 
     # ---- I/O ----------------------------------------------------------------------------------------------
 
@@ -86,6 +102,25 @@ class subgraphlayer1(p.subgraphlayer,ptensorlayer1):
         return r
 
 
+# ---- Autograd functions --------------------------------------------------------------------------------------------
 
 
-
+class Subgraphlayer1b_SchurLayerFn(torch.autograd.Function):
+     @staticmethod
+     def forward(ctx,x,w,b):
+         assert(w.dim()==2)
+         assert(b.dim()==1)
+         r=self.zeros_like(w.size(1))
+         r.sgl_backend().add_schur(self.sgl_backend(),w,b)
+         ctx.x=x
+         ctx.w=w
+         ctx.b=b
+         return r
+     @staticmethod
+     def backward(ctx,g):
+         xg=ctx.x.zeros_like()
+         wg=torch.zeros_like(ctx.w)
+         bg=torch.zeros_like(ctx.b)
+         xg.sgl_backend().add_schur_back0(g.sgl_backend(),ctx.w)
+         ctx.x.sgl_backend().schur_back1(wg,bg,g.sgl_backend())
+         return xg,wg,bg

@@ -29,7 +29,8 @@ namespace ptens{
   public:
 
     typedef Ptensors2<TYPE> BASE;
-    typedef cnine::Ltensor<TYPE> TENSOR;
+    typedef typename BASE::TENSOR TENSOR;
+    //typedef cnine::Ltensor<TYPE> TENSOR;
 
     using BASE::BASE;
     using BASE::atoms;
@@ -103,13 +104,13 @@ namespace ptens{
     template<typename SOURCE>
     SubgraphLayer2(const SOURCE& x, const Subgraph& _S):
       SubgraphLayer2(x.G,_S,x.G.subgraphs(_S),x.get_nc()*vector<int>({2,5,15})[x.getk()],0,x.dev){
-      add_gather(x);
+      add_gather(x,LayerMap::overlaps_map(atoms,x.atoms));
     }
 
     template<typename SOURCE>
     SubgraphLayer2(const SOURCE& x, const Ggraph& _G, const Subgraph& _S):
       SubgraphLayer2(_G,_S,_G.subgraphs(_S),x.get_nc()*vector<int>({2,5,15})[x.getk()],0,x.dev){
-      add_gather(x);
+      add_gather(x,LayerMap::overlaps_map(atoms,x.atoms));
     }
 
 
@@ -126,7 +127,7 @@ namespace ptens{
   template<typename SOURCE>
   inline SubgraphLayer2<float> gather2(const SOURCE& x, const Subgraph& _S){
     SubgraphLayer2<float> R(x.G,_S,x.G.subgraphs(_S),x.get_nc()*vector<int>({2,5,15})[x.getk()],0,x.dev);
-    R.add_gather(x);
+    R.add_gather(x,LayerMap::overlaps_map(R.atoms,x.atoms));
     return R;
   }
 
@@ -136,46 +137,3 @@ namespace ptens{
 
 #endif 
 
-
-    /*
-    SubgraphLayer2(const Ptensors0<TYPE>& x, const Ggraph& g, const Subgraph& s):
-      SubgraphLayer2(g,s,g.subgraphs(s),2*x.get_nc(),0,x.dev){
-      add_gather(x);
-    }
-
-    SubgraphLayer2(const Ptensors1<TYPE>& x, const Ggraph& g, const Subgraph& s):
-      SubgraphLayer2(g,s,g.subgraphs(s),5*x.get_nc(),0,x.dev){
-      add_gather(x);
-    }
-
-    SubgraphLayer2(const Ptensors2<TYPE>& x, const Ggraph& g, const Subgraph& s):
-      SubgraphLayer2(g,s,g.subgraphs(s),15*x.get_nc(),0,x.dev){
-      add_gather(x);
-    }
-    */
-
-    //SubgraphLayer1(const NodeLayerb<TYPE>& x, const Subgraph& _S):
-    //SubgraphLayer1(x.G,_S,x.G.subgraphs(_S),2*x.get_nc(),x.get_dev()){
-    //add_gather(x);
-    //}
-
-    //void gather_back(NodeLayer& x){
-    //x.get_grad().emp_fromB(get_grad());
-    //}
-
-    /*
-    SubgraphLayer2(const SubgraphLayer0<float>& x, const Subgraph& _S):
-      SubgraphLayer2(x.G,_S,x.G.subgraphs(_S),2*x.get_nc(),0,x.dev){
-      add_gather(x);
-    }
-
-    SubgraphLayer2(const SubgraphLayer1<float>& x, const Subgraph& _S):
-      SubgraphLayer2(x.G,_S,x.G.subgraphs(_S),5*x.get_nc(),0,x.dev){
-      add_gather(x);
-    }
-
-    SubgraphLayer2(const SubgraphLayer2<TYPE>& x, const Subgraph& _S):
-      SubgraphLayer2(x.G,_S,x.G.subgraphs(_S),15*x.get_nc(),0,x.dev){
-      add_gather(x);
-    }
-    */

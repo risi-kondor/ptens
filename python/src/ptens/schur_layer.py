@@ -1,7 +1,7 @@
 import torch
 import ptens
 
-class Autobahn(torch.nn.Module):
+class SchurLayer(torch.nn.Module):
 
   def __init__(self, in_channels: int, out_channels: int, S:ptens.subgraph) -> None:
       super().__init__() #This follows Glorot initialization for weights.
@@ -16,6 +16,6 @@ class Autobahn(torch.nn.Module):
           self.w = torch.nn.init.xavier_uniform_(self.w)
           self.b = torch.nn.init.zeros_(self.b)
 
-  def forward(self, x: ptens.subgraphlayer1b) -> ptens.subgraphlayer1b:
-      return x.autobahn(self.w,self.b)
+  def forward(self, x: ptens.subgraphlayer1) -> ptens.subgraphlayer1:
+      return x.schur_layer(self.w,self.b)
 

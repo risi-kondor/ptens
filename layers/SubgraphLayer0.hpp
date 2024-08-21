@@ -20,7 +20,7 @@
 #include "Ptensors0.hpp"
 #include "Ptensors1.hpp"
 #include "Ptensors2.hpp"
-#include "SubgraphLayer.hpp"
+//#include "SubgraphLayer.hpp"
 
 
 namespace ptens{
@@ -31,7 +31,8 @@ namespace ptens{
   public:
 
     typedef Ptensors0<TYPE> BASE;
-    typedef cnine::Ltensor<TYPE> TENSOR;
+    typedef typename BASE::TENSOR TENSOR;
+    //typedef cnine::Ltensor<TYPE> TENSOR;
 
     using BASE::BASE;
     using BASE::atoms;
@@ -108,13 +109,13 @@ namespace ptens{
     template<typename SOURCE>
     SubgraphLayer0(const SOURCE& x, const Subgraph& _S):
       SubgraphLayer0(x.G,_S,x.G.subgraphs(_S),x.get_nc()*vector<int>({1,1,2})[x.getk()],0,x.dev){
-      add_gather(x);
+      add_gather(x,LayerMap::overlaps_map(atoms,x.atoms));
     }
 
     template<typename SOURCE>
     SubgraphLayer0(const SOURCE& x, const Ggraph& _G, const Subgraph& _S):
       SubgraphLayer0(_G,_S,_G.subgraphs(_S),x.get_nc()*vector<int>({1,1,2})[x.getk()],0,x.dev){
-      add_gather(x);
+      add_gather(x,LayerMap::overlaps_map(atoms,x.atoms));
     }
 
   };
@@ -131,7 +132,7 @@ namespace ptens{
   inline SubgraphLayer0<float> gather0(const SOURCE& x, const Subgraph& _S){
     int nc=x.get_nc()*vector<int>({1,1,2})[x.getk()];
     SubgraphLayer0<float> R(x.G,_S,x.G.subgraphs(_S),nc,0,x.dev);
-    R.add_gather(x);
+    R.add_gather(x,LayerMap::overlaps_map(R.atoms,x.atoms));
     return R;
   }
 

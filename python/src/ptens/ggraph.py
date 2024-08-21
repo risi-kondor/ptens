@@ -67,6 +67,10 @@ class ggraph:
     def subgraphs(self,H):
         return self.obj.subgraphs(H.obj)
 
+    def csubgraphs(self,H,nvecs):
+        H.set_evecs()
+        return self.obj.csubgraphs(H.obj,nvecs)
+
     def cached_subgraph_lists(self):
         dict=self.obj.cached_subgraph_lists_as_map()
         r={}

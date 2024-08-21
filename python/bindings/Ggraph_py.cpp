@@ -49,6 +49,8 @@ pybind11::class_<ptens::Ggraph>(m,"ggraph")
   .def("cached_subgraph_lists_as_map",[](const Ggraph& G){
       return G.cached_subgraph_lists_as_map();})
 
+//.def("csubgraphs",[](const Ggraph& G, const Subgraph& H, const int nvecs){
+//    return G.compressed_subgraphs(H,nvecs);})
 
   .def("str",&Ggraph::str,py::arg("indent")="")
   .def("__str__",&Ggraph::str,py::arg("indent")="");

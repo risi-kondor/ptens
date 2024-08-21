@@ -33,6 +33,8 @@ namespace ptens{
     Atoms(const initializer_list<int>& list){
       for(auto p:list)
 	push_back(p);
+      for(int i=0; i<size(); i++)
+	lookup[(*this)[i]]=i;
     }
 
     Atoms(const vector<int>& x):
@@ -100,6 +102,19 @@ namespace ptens{
       for(auto p: *this)
 	if(y.includes(p)) R.push_back(p);
       return R;
+    }
+
+    std::pair<vector<int>,vector<int> > intersecting(const Atoms& y) const{
+      vector<int> xi;
+      vector<int> yi;
+      for(int i=0; i<size(); i++){
+	auto it=y.lookup.find((*this)[i]);
+	if(it!=y.lookup.end()){
+	  xi.push_back(i);
+	  yi.push_back(it->second);
+	}
+      }
+      return make_pair(xi,yi);
     }
 
 

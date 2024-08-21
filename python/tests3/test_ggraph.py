@@ -23,7 +23,7 @@ G=p.ggraph.from_edge_index(E)
 print(G)
 
 print("The adjacency matrix can be extracted as a PyTorch tensor:\n")
-B=G.torch()
+B=G.adjacency_matrix()
 print(B)
 print("\n")
 

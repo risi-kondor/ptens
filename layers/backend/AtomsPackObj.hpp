@@ -577,19 +577,4 @@ namespace ptens{
 
 #endif 
 
-    /*
-    cnine::monitored<cnine::Ltensor<int> > gpu_offsets1=
-      cnine::monitored<cnine::Ltensor<int> >(ptens_global::atomspack_offsets1_monitor,[this](){
-	  cnine::Ltensor<int> R(BASE::dir);
-	  return make_shared<cnine::Ltensor<int> >(R,1);
-	});
-
-    cnine::monitored<cnine::Ltensor<int> > gpu_offsets2=
-      cnine::monitored<cnine::Ltensor<int> >(ptens_global::atomspack_offsets2_monitor,[this](){
-	  cnine::Ltensor<int> R({size(),2});
-	  for(int i=0; i<size(); i++){
-	    R.set(i,0,offsets2[i]);
-	    R.set(i,1,size_of(i));
-	  }
-	  return make_shared<cnine::Ltensor<int> >(R,1);});
-    */
+ 

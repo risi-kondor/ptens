@@ -18,14 +18,15 @@
 #include "AtomsPackObj.hpp"
 #include "Ltensor.hpp"
 #include "ColumnSpace.hpp"
+#include "observable.hpp"
 
 
 namespace ptens{
 
-  class CompressedAtomsPackObj{
+  class CompressedAtomsPackObj: public cnine::observable<CompressedAtomsPackObj>{
   public:
 
-    typedef AtomsPackObj BASE;
+    //typedef AtomsPackObj BASE;
     typedef cnine::Ltensor<float> TENSOR;
 
 
@@ -37,39 +38,35 @@ namespace ptens{
   public: // ---- Constructors -------------------------------------------------------------------------------
 
 
-    CompressedAtomsPackObj(){}
+    CompressedAtomsPackObj():
+      observable(this){}
     
     CompressedAtomsPackObj(const shared_ptr<AtomsPackObj>& _atoms, const TENSOR& M):
+      observable(this),
       atoms(_atoms),
-      bases(M){
-      //if(constk()>0){
-      //PTENS_ASSRT(bases.ndims()==3);
-      //PTENS_ASSRT(bases.dim(0)==size());
-      //PTENS_ASSRT(bases.dim(1)==constk());
-      //}else{
-      PTENS_ASSRT(bases.ndims()==2);
-      PTENS_ASSRT(bases.dim(1)==nrows1());
-      //}
+      bases(M.copy()){
+      PTENS_ASSRT(bases.ndims()==2 || bases.ndims()==3);
+      if(bases.ndims()==2){
+	bases.dims=bases.dims.insert(0,atoms->size());
+	bases.strides=bases.strides.insert(0,0);
+      }
     }
 
-    CompressedAtomsPackObj(const TENSOR& M, const shared_ptr<AtomsPackObj>& _atoms):
-      atoms(_atoms),
-      bases(M.unsqueeze(0).broadcast(0,_atoms->size()).fuse({0,1})){}
+    //CompressedAtomsPackObj(const TENSOR& M, const shared_ptr<AtomsPackObj>& _atoms):
+    //observable(this),
+    //atoms(_atoms),
+    //bases(M.unsqueeze(0).broadcast(0,_atoms->size()).fuse({0,1})){}
 
     CompressedAtomsPackObj(const shared_ptr<AtomsPackObj>& _atoms, const int _nvecs, const int fcode, const int _dev=0):
+      observable(this),
       atoms(_atoms),
       bases({nrows1(),_nvecs},fcode,_dev){
       if(fcode==4){
 	for(int i=0; i<size(); i++){
-	  //cout<<cnine::Ltensor<float>(cnine::ColumnSpace(basis(i)))<<endl;
 	  cnine::Ltensor<float> M=cnine::ColumnSpace(basis(i));
 	  basis(i).cols(0,M.dim(1))=M;
 	}
       }
-      //if(constk()>0)
-      //bases.reset(TENSOR(cnine::dims(size(),constk(),_nvecs),fcode,_dev));
-      //else
-      //bases.reset(TENSOR(cnine::dims(nrows1(),_nvecs),fcode,_dev));
     }
 
 	  
