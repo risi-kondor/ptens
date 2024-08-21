@@ -175,7 +175,7 @@ namespace ptens{
       PTENS_ASSRT(W.dims[1]==get_nc());
       PTENS_ASSRT(W.dims[2]==r.get_nc());
 
-      for_each_eigenslice(get_grad().view3(K),r.get_grad().view3(K),[&]
+      for_each_eigenslice(view3(K),r.view3(K),[&]
 	(cnine::Rtensor2_view rslice, cnine::Rtensor2_view xslice, const int b){
 	  rslice.add_matmul_AT(xslice,W.view3().slice0(b)); // OK
 	},true);
@@ -193,7 +193,7 @@ namespace ptens{
       PTENS_ASSRT(B.dims[0]==S.obj->eblocks.size());
       PTENS_ASSRT(B.dims[1]==r.get_nc());
 
-      for_each_eigenslice(view3(K),r.get_grad().view3(K),[&]
+      for_each_eigenslice(view3(K),r.view3(K),[&]
 	(cnine::Rtensor2_view xslice, cnine::Rtensor2_view rslice, const int b){
 	  W.view3().slice0(b).add_matmul_TA(xslice,rslice); // OK
 	  rslice.sum0_into(B.view2().slice0(b)); 
