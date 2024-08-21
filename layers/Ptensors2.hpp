@@ -108,9 +108,9 @@ namespace ptens{
       BASE(_atoms,M),
       tag(_atoms){}
 
-    Ptensors2(const AtomsPack& _atoms, const cnine::TensorView<TYPE>& M):
-      BASE(_atoms,M),
-      tag(_atoms){}
+    //Ptensors2(const AtomsPack& _atoms, const cnine::TensorView<TYPE>& M):
+    //BASE(_atoms,M),
+    //tag(_atoms){}
 
     Ptensors2(const TENSOR& M, const AtomsPack& _atoms):
       BASE(_atoms,M),

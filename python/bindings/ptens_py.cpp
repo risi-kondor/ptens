@@ -19,6 +19,8 @@
 #include "Ptensors1.hpp"
 #include "Ptensors2.hpp"
 
+#include "SubgraphLayer1.hpp"
+
 #include "BatchedGgraph.hpp"
 #include "BatchedAtomsPack.hpp"
 #include "BatchedLayerMap.hpp"
@@ -40,7 +42,8 @@ PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
   using namespace ptens;
   namespace py=pybind11;
 
-  typedef cnine::Ltensor<float> tensorf;
+  //typedef cnine::Ltensor<float> tensorf;
+  typedef cnine::TensorView<float> tensorf;
 
   typedef Ptensor0<float> Ptensor0f;
   typedef Ptensor1<float> Ptensor1f;
@@ -49,6 +52,8 @@ PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
   typedef Ptensors0<float> Ptensors0f;
   typedef Ptensors1<float> Ptensors1f;
   typedef Ptensors2<float> Ptensors2f;
+
+  typedef SubgraphLayer1<float> SGlayer1f;
 
   typedef BatchedLayerMap BLmap;
 
@@ -84,6 +89,7 @@ PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
 #include "Ptensors1_py.cpp"
 #include "Ptensors2_py.cpp"
 
+#include "SubgraphLayer1_py.cpp"
 
 #include "BatchedGgraph_py.cpp"
 #include "BatchedAtomsPack_py.cpp"

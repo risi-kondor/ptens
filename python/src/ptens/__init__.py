@@ -47,6 +47,8 @@ from ptens.batched_subgraphlayer1 import batched_subgraphlayer1
 from ptens.batched_subgraphlayer2 import batched_subgraphlayer2
 
 
+from ptens.functions import *
+from ptens.schur_layer import SchurLayer
 
 
 
@@ -59,7 +61,6 @@ from ptens.batched_subgraphlayer2 import batched_subgraphlayer2
 
 ##import ptens.modules as modules
 
-#from ptens.functions import *
 
 #from ptens.ptensors0b import ptensors0b as ptensors0b
 #from ptens.ptensors1b import ptensors1b as ptensors1b
@@ -79,7 +80,6 @@ from ptens.batched_subgraphlayer2 import batched_subgraphlayer2
 # from ptens.batched_subgraphlayer1b import batched_subgraphlayer1b as batched_subgraphlayer1b
 # from ptens.batched_subgraphlayer2b import batched_subgraphlayer2b as batched_subgraphlayer2b
 
-# from ptens.autobahn import Autobahn
 
 
 # "c" classses

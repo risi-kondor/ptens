@@ -141,22 +141,29 @@ namespace ptens{
 
 
     SubgraphLayer1 schur(const TENSOR& W, const TENSOR& B) const{
+      SubgraphLayer1 R=zeros_like(W.dims[2]);
+      R.add_schur(W,B);
+      return R;
+    }
+
+
+    void add_schur(const SubgraphLayer1& x, const TENSOR& W, const TENSOR& B) const{
+      auto& S=x.S;
       S.make_eigenbasis();
       int K=S.getn();
       PTENS_ASSRT(W.dims.size()==3);
       PTENS_ASSRT(W.dims[0]==S.obj->eblocks.size());
-      PTENS_ASSRT(W.dims[1]==get_nc());
+      PTENS_ASSRT(W.dims[1]==x.get_nc());
+      PTENS_ASSRT(W.dims[2]==get_nc());
       PTENS_ASSRT(B.dims.size()==2);
       PTENS_ASSRT(B.dims[0]==S.obj->eblocks.size());
       PTENS_ASSRT(B.dims[1]==W.dims[2]);
 
-      SubgraphLayer1 R=zeros_like(W.dims[2]);
-      for_each_eigenslice(R.view3(K),view3(K),[&]
+      x.for_each_eigenslice(view3(K),x.view3(K),[&]
 	(cnine::Rtensor2_view rslice, cnine::Rtensor2_view xslice, const int b){
 	  rslice.add_matmul_AA(xslice,W.view3().slice0(b)); // OK
 	  rslice.add_broadcast0(B.view2().slice0(b)); // OK	
 	},true);
-      return R;
     }
 
 

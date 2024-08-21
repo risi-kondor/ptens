@@ -35,7 +35,7 @@ namespace ptens{
   public:
 
     typedef BatchedPtensors<TYPE> BASE;
-    typedef cnine::Ltensor<TYPE> TENSOR;
+    typedef typename BASE::TENSOR TENSOR;
     
     using cnine::diff_class<BatchedPtensors2<TYPE> >::grad;
     using BASE::get_dev;

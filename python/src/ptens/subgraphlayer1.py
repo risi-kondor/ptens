@@ -72,6 +72,12 @@ class subgraphlayer1(p.subgraphlayer,ptensorlayer1):
         atoms=x.G.subgraphs(S)
         return subgraphlayer1(x.G,x.S,atoms,super().gather(atoms,x))
 
+    # ---- Other -------------------------------------------------------------------------------------------
+
+
+    def schur_layer(self,w,b):
+        return Subgraphlayer1b_SchurLayerFn.apply(self,w,b)
+
 
     # ---- I/O ----------------------------------------------------------------------------------------------
 
@@ -86,6 +92,23 @@ class subgraphlayer1(p.subgraphlayer,ptensorlayer1):
         return r
 
 
+# ---- Autograd functions --------------------------------------------------------------------------------------------
 
 
-
+class Subgraphlayer1b_SchurLayerFn(torch.autograd.Function):
+     @staticmethod
+     def forward(ctx,x,w,b):
+         r=subgraphlayer1b.dummy()
+         r.obj=x.obj.schur(w,b)
+         ctx.x=x.obj
+         ctx.r=r.obj
+         ctx.w=w
+         ctx.b=b
+         return r
+     @staticmethod
+     def backward(ctx,g):
+         wg=torch.zeros_like(ctx.w)
+         bg=torch.zeros_like(ctx.b)
+         ctx.x.add_schur_back0(ctx.r,ctx.w)
+         ctx.x.schur_back1(wg,bg,ctx.r)
+         return subgraphlayer1b.dummy(),wg,bg

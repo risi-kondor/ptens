@@ -1,7 +1,7 @@
 public: // ---- Broadcasting -------------------------------------------------------------------------------
 
 
-void broadcast0(const BASE& X, const int offs=0){
+void broadcast0(const TENSOR& X, const int offs=0){
   TimedFn T("Ptensors2","broadcast0",*this);
   int N=size();
   int dev=get_dev();
@@ -24,7 +24,7 @@ void broadcast0(const BASE& X, const int offs=0){
   }
 }
 
-void broadcast0_shrink(const BASE& X, int offs=0){
+void broadcast0_shrink(const TENSOR& X, int offs=0){
   TimedFn T("Ptensors2","broadcast0_shrink",*this);
   int N=size();
   int dev=get_dev();
@@ -52,7 +52,7 @@ void broadcast0_shrink(const BASE& X, int offs=0){
 }
     
 
-void broadcast1(const BASE& X, const int offs=0){
+void broadcast1(const TENSOR& X, const int offs=0){
   TimedFn T("Ptensors2","broadcast1",*this);
   int N=size();
   int dev=get_dev();
@@ -79,7 +79,7 @@ void broadcast1(const BASE& X, const int offs=0){
 }
 
 
-void broadcast1_shrink(const BASE& X, const int offs=0){
+void broadcast1_shrink(const TENSOR& X, const int offs=0){
   TimedFn T("Ptensors2","broadcast1_shrink",*this);
   int N=size();
   int dev=get_dev();
@@ -111,7 +111,7 @@ void broadcast1_shrink(const BASE& X, const int offs=0){
 }
 
 
-void broadcast2(const BASE& X, const int offs=0){
+void broadcast2(const TENSOR& X, const int offs=0){
   TimedFn T("Ptensors2","broadcast2",*this);
   int N=size();
   int dev=get_dev();

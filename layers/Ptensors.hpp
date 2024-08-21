@@ -23,13 +23,15 @@
 
 namespace ptens{
 
+  //using PtensTensor=cnine::Ltensor<TYPE>;
+
 
   template<typename TYPE>
-  class Ptensors: public cnine::Ltensor<TYPE>{
+  class Ptensors: public PtensTensor<TYPE>{
   public:
 
-    typedef cnine::Ltensor<TYPE> BASE;
-    typedef cnine::Ltensor<TYPE> TENSOR;
+    typedef PtensTensor<TYPE> BASE;
+    typedef PtensTensor<TYPE> TENSOR;
     using BASE::BASE;
     using BASE::zeros_like;
     using BASE::dim;

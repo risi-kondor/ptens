@@ -79,9 +79,9 @@ namespace ptens{
       BASE(_atoms,M),
       tag(_atoms){}
 
-    Ptensors0(const AtomsPack& _atoms, const cnine::TensorView<TYPE>& M):
-      BASE(_atoms,M),
-      tag(_atoms){}
+    //Ptensors0(const AtomsPack& _atoms, const cnine::TensorView<TYPE>& M):
+    //BASE(_atoms,M),
+    //tag(_atoms){}
 
     Ptensors0(const TENSOR& M, const AtomsPack& _atoms):
       BASE(_atoms,M),
@@ -100,6 +100,7 @@ namespace ptens{
       tag(_atoms){}
 
 
+    /*
     static Ptensors0 cat(const vector<Ptensors0>& list){
       vector<AtomsPack> v;
       for(auto& p:list)
@@ -108,7 +109,7 @@ namespace ptens{
 	return Ptensors0(TENSOR::stack(0,list),ptens_global::atomspack_cat_cache(v));
       return Ptensors0(TENSOR::stack(0,list),AtomsPack::cat(v));
     }
-
+    */
 
   public: // ---- Named parameter constructors ---------------------------------------------------------------
 
