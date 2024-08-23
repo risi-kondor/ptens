@@ -32,35 +32,36 @@ class cptensorlayer2(cptensorlayer):
     def zeros(self,atoms,nc,device='cpu'):
         assert isinstance(atoms,pb.catomspack)
         assert isinstance(nc,int)
-        return self.make(atoms,torch.zeros([len(atoms),atoms.nvecs(),nc],device=device))
+        return self.make(atoms,torch.zeros([len(atoms),atoms.nvecs(),atoms.nvecs(),nc],device=device))
 
     @classmethod
     def randn(self,atoms,nc,device='cpu'):
         assert isinstance(atoms,pb.catomspack)
         assert isinstance(nc,int)
-        return self.make(atoms,torch.randn([len(atoms),atoms.nvecs(),nc],device=device))
+        return self.make(atoms,torch.randn([len(atoms),atoms.nvecs(),atoms.nvecs(),nc],device=device))
 
     @classmethod
     def sequential(self,atoms,nc,device='cpu'):
         assert isinstance(atoms,pb.catomspack)
         assert isinstance(nc,int)
-        return self.make(atoms,torch.tensor([i for i in range (0,len(atoms)*atoms.nvecs()*nc)],
-                                            dtype=torch.float,device=device).reshape(len(atoms),atoms.nvecs(),nc))
+        return self.make(atoms,torch.tensor([i for i in range (0,len(atoms)*atoms.nvecs()*atoms.nvecs()*nc)],
+                                            dtype=torch.float,device=device).reshape(len(atoms),atoms.nvecs(),atoms.nvecs(),nc))
 
     @classmethod
     def from_tensor(self,atoms,M):
         assert isinstance(atoms,pb.catomspack)
         assert isinstance(M,torch.Tensor)
-        assert M.dim()==3
+        assert M.dim()==4
         assert M.size(0)==len(atoms)
         assert M.size(1)==atoms.nvecs()
+        assert M.size(2)==atoms.nvecs()
         return self.make(atoms,M)
 
     def zeros_like(self):
         return cptensorlayer2.zeros(self.atoms,self.get_nc(),device=self.device)
     
     def backend(self):
-        return pb.cptensors1.view(self.atoms,self)
+        return pb.cptensors2.view(self.atoms,self)
 
 
     # ----- Access -------------------------------------------------------------------------------------------
@@ -76,7 +77,7 @@ class cptensorlayer2(cptensorlayer):
         return self.size(1)
     
     def get_nc(self):
-        return self.size(2)
+        return self.size(3)
     
 
     # ---- Linmaps -------------------------------------------------------------------------------------------

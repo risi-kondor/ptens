@@ -41,6 +41,7 @@ namespace ptens{
 
     using TENSOR::dim;
     using TENSOR::get_arr;
+    using TENSOR::set;
 
     BatchedAtomsPack<1> atoms;
 
@@ -94,7 +95,8 @@ namespace ptens{
 	vector<PtensTensor<TYPE> > w;
 	for(int j=0; j<list.size(); j++)
 	  w.push_back(list[j].view_of(i));
-	R.view_of(i).cnine:: template PtensTensor<TYPE>::operator=(PtensTensor<TYPE>::stack(0,w));
+	R.view_of(i).set(PtensTensor<TYPE>::stack(0,w));
+	//R.view_of(i).cnine:: template PtensTensor<TYPE>::operator=(PtensTensor<TYPE>::stack(0,w));
       }
       return R;
     }

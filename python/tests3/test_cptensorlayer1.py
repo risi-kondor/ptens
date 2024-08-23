@@ -6,7 +6,7 @@ print("\n----------------------------------")
 print(" cptensorlayer1")
 print("----------------------------------\n")
 
-print("A ptensorlayer1 is a collection of compressed first order\nptensors stored in a single matrix.\n")
+print("A cptensorlayer1 is a collection of compressed first order\nptensors stored in a single matrix.\n")
 
 print("We can define a random first order P-tensor layer:\n")
 a0=pb.atomspack.from_list([[1,3,4],[2,5],[0,2]])
@@ -21,7 +21,6 @@ A=p.cptensorlayer1.from_tensor(atoms,M)
 print(A)
 
 print("If two compressed P-tensor layers  have the same reference domains,\nwe can do arithmetic on them:\n")
-# Unfortunately these have to be added manually one-by-one
 B=p.cptensorlayer1.randn(atoms,3)
 print(A+B)
 
@@ -35,12 +34,13 @@ print("---------\n")
 #A0=p.ptensorlayer0.randn(atoms,3)
 #print(p.ptensorlayer1.linmaps(A0))
 
-print("The linmaps from a 1st order compressed P-tensor consists of two different maps:\n")
+print("The linmaps from a 1st order compressed P-tensor layer consists of two different maps:\n")
 A1=p.cptensorlayer1.randn(atoms,3)
 print(p.cptensorlayer1.linmaps(A1))
 
-print("The linmaps from a 2nd order compressed P-tensor consists of 5 different maps:\n")
+print("The linmaps from a 2nd order compressed P-tensor layer consists of 5 different maps:\n")
 A2=p.cptensorlayer2.randn(atoms,3)
+#print(A2)
 print(p.cptensorlayer1.linmaps(A2))
 
 

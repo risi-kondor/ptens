@@ -50,7 +50,7 @@ namespace ptens{
     using TENSOR::cols;
     using TENSOR::slice;
 
-    using BASE::nc;
+    //using BASE::nc;
     using BASE::atoms;
     using BASE::size;
     //using BASE::atoms_of;

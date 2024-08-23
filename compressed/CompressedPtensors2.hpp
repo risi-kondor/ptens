@@ -49,7 +49,7 @@ namespace ptens{
     using TENSOR::cols;
     using TENSOR::slice;
 
-    using BASE::nc;
+    //using BASE::nc;
     using BASE::atoms;
     using BASE::size;
     //using BASE::atoms_of;
@@ -264,9 +264,14 @@ namespace ptens{
     TENSOR reduce1(const int offs=0, int nc=0) const{
       if(nc==0) nc=get_nc()-offs;
       TENSOR R({dim(0),dim(1),3*nc},get_dev());
+      //cout<<"aaa"<<endl;
+      //cout<<"in"<<channels(offs,nc)<<endl;
+      //cout<<"sum"<<channels(offs,nc).sum(1)<<endl;
       R.slices(2,0,nc)+=channels(offs,nc).sum(1);
       R.slices(2,nc,nc)+=channels(offs,nc).sum(2);
       R.slices(2,2*nc,nc)+=channels(offs,nc).diag({1,2});
+      //cout<<"bbb"<<endl;
+      //cout<<R<<endl;
       return R;
     }
 
@@ -310,7 +315,7 @@ namespace ptens{
 
     void broadcast1(const TENSOR& X, const int offs=0){
       PTENS_ASSRT(X.dim(0)==dim(0));
-      int nc=X.dim(1);
+      int nc=X.dim(2);
       channels(offs,nc)+=X.insert_dim(1,nvecs());
       channels(offs+nc,nc)+=X.insert_dim(2,nvecs());
       channels(offs+2*nc,nc).diag({1,2})+=X;
@@ -318,7 +323,7 @@ namespace ptens{
 
     void broadcast1_shrink(const TENSOR& X, const int offs=0){
       PTENS_ASSRT(X.dim(0)==dim(0));
-      int nc=X.dim(1)/3;
+      int nc=X.dim(2)/3;
       channels(offs,nc)+=X.slices(2,0,nc).insert_dim(1,nvecs());
       channels(offs,nc)+=X.slices(2,0,nc).insert_dim(2,nvecs());
       channels(offs,nc).diag({1,2})+=X.slices(2,0,nc);
@@ -326,7 +331,7 @@ namespace ptens{
 
     void broadcast2(const TENSOR& X, const int offs=0){
       PTENS_ASSRT(X.dim(0)==dim(0));
-      int nc=X.dim(1);
+      int nc=X.dim(3);
       channels(offs,nc)+=X;
       channels(offs+nc,nc)+=X.transp(1,2);
     }
@@ -350,7 +355,8 @@ namespace ptens{
       }
       ostringstream oss;
       for(int i=0; i<size(); i++){
-	oss<<(*this)(i).str(indent);
+	oss<<indent<<"CPtensor2"<<atoms.atoms(i)<<":"<<endl;
+	oss<<(*this)(i).str(indent+"  ");
       }
       return oss.str();
     }
