@@ -263,19 +263,14 @@ namespace ptens{
     TENSOR reduce1(const int offs=0, int nc=0) const{
       if(nc==0) nc=get_nc()-offs;
       TENSOR R({dim(0),dim(1),3*nc},get_dev());
-      //cout<<"aaa"<<endl;
-      //cout<<"in"<<channels(offs,nc)<<endl;
-      //cout<<"sum"<<channels(offs,nc).sum(1)<<endl;
       R.slices(2,0,nc)+=channels(offs,nc).sum(1);
       R.slices(2,nc,nc)+=channels(offs,nc).sum(2);
       R.slices(2,2*nc,nc)+=channels(offs,nc).diag({1,2});
-      //cout<<"bbb"<<endl;
-      //cout<<R<<endl;
       return R;
     }
 
     TENSOR reduce1_shrink(const int offs, const int nc) const{
-      TENSOR R({dim(0),dim(1),nc},get_dev());
+      TENSOR R({dim(0),dim(1),nc},0,get_dev());
       R+=channels(offs,nc).sum(1);
       R+=channels(offs+nc,nc).sum(2);
       R+=channels(offs+2*nc,nc).diag({1,2});

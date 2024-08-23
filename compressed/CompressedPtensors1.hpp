@@ -150,7 +150,7 @@ namespace ptens{
 
     void add_linmaps(const CompressedPtensors2<TYPE>& x) const{
       int nc=x.get_nc();
-      //broadcast0(x.reduce0());
+      broadcast0(x.reduce0());
       channels(2*nc,3*nc)+=x.reduce1();
     }
 
