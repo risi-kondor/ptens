@@ -46,7 +46,6 @@ namespace ptens{
     using TENSOR::add;
     using TENSOR::dev;
     using TENSOR::strides;
-    using TENSOR::get_arr;
     using TENSOR::cols;
     using TENSOR::slice;
 
@@ -139,33 +138,33 @@ namespace ptens{
       return R;
     }
 
-    void add_linmaps(const Ptensors0<TYPE>& x){
+    void add_linmaps(const Ptensors0<TYPE>& x) const{
       broadcast0(x);
     }
 
-    void add_linmaps(const CompressedPtensors1<TYPE>& x){
+    void add_linmaps(const CompressedPtensors1<TYPE>& x) const{
       int nc=x.get_nc();
       broadcast0(x.reduce0());
       channels(nc,nc)+=x;
     }
 
-    void add_linmaps(const CompressedPtensors2<TYPE>& x){
+    void add_linmaps(const CompressedPtensors2<TYPE>& x) const{
       int nc=x.get_nc();
-      broadcast0(x.reduce0());
+      //broadcast0(x.reduce0());
       channels(2*nc,3*nc)+=x.reduce1();
     }
 
-    void add_linmaps_back(const Ptensors0<TYPE>& x){
+    void add_linmaps_back(const Ptensors0<TYPE>& x) const{
       broadcast0(x);
     }
 
-    void add_linmaps_back(const CompressedPtensors1<TYPE>& x){
+    void add_linmaps_back(const CompressedPtensors1<TYPE>& x) const{
       int nc=x.get_nc();
       broadcast0(x.reduce0(0,nc));
       add(x.channels(nc,nc));
     }
 
-    void add_linmaps_back(const CompressedPtensors2<TYPE>& x){
+    void add_linmaps_back(const CompressedPtensors2<TYPE>& x) const{
       int nc=x.get_nc();
       add(x.reduce0_shrink(0,nc));
       add(x.reduce1_shrink(2*nc,nc));
@@ -259,12 +258,12 @@ namespace ptens{
   public: // ---- Broadcasting -------------------------------------------------------------------------------
 
 
-    void broadcast0(const TENSOR& X, const int offs=0){
+    void broadcast0(const TENSOR& X, const int offs=0) const{
       PTENS_ASSRT(X.dim(0)==dim(0));
       channels(offs,X.dim(1))+=X.insert_dim(1,nvecs());
     }
 
-    void broadcast1(const TENSOR& X, const int offs=0){
+    void broadcast1(const TENSOR& X, const int offs=0) const{
       PTENS_ASSRT(X.dim(0)==dim(0));
       PTENS_ASSRT(X.dim(1)==dim(1));
       channels(offs,X.dim(2))+=X;

@@ -7,18 +7,18 @@ pybind11::class_<CompressedPtensors2<float> >(m,"cptensors2")
 // ---- Linmaps ----------------------------------------------------------------------------------------------
 
 
-  .def("add_linmaps",[](CPtensors2f& obj, const Ptensors0f& x){
+  .def("add_linmaps",[](const CPtensors2f& obj, const Ptensors0f& x){
       return obj.add_linmaps(x);}) 
-  .def("add_linmaps",[](CPtensors2f& obj, const CPtensors1f& x){
+  .def("add_linmaps",[](const CPtensors2f& obj, const CPtensors1f& x){
       return obj.add_linmaps(x);}) 
-  .def("add_linmaps",[](CPtensors2f& obj, const CPtensors2f& x){
+  .def("add_linmaps",[](const CPtensors2f& obj, const CPtensors2f& x){
       return obj.add_linmaps(x);}) 
   
-  .def("add_linmaps_back",[](CPtensors2f& obj, const Ptensors0f& x){
+  .def("add_linmaps_back",[](const CPtensors2f& obj, const Ptensors0f& x){
       return obj.add_linmaps_back(x);}) 
-  .def("add_linmaps_back",[](CPtensors2f& obj, const CPtensors1f& x){
+  .def("add_linmaps_back",[](const CPtensors2f& obj, const CPtensors1f& x){
       return obj.add_linmaps_back(x);}) 
-  .def("add_linmaps_back",[](CPtensors2f& obj, const CPtensors2f& x){
+  .def("add_linmaps_back",[](const CPtensors2f& obj, const CPtensors2f& x){
       return obj.add_linmaps_back(x);}) 
   
 

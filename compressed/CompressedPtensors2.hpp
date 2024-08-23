@@ -45,7 +45,6 @@ namespace ptens{
     using TENSOR::add;
     using TENSOR::dev;
     using TENSOR::strides;
-    using TENSOR::get_arr;
     using TENSOR::cols;
     using TENSOR::slice;
 
@@ -134,34 +133,34 @@ namespace ptens{
       return R;
     }
 
-    void add_linmaps(const Ptensors0<TYPE>& x){
+    void add_linmaps(const Ptensors0<TYPE>& x) const{
       broadcast0(x);
     }
 
-    void add_linmaps(const CompressedPtensors1<TYPE>& x){
+    void add_linmaps(const CompressedPtensors1<TYPE>& x) const{
       int nc=x.get_nc();
       broadcast0(x.reduce0(),0);
       broadcast1(x,2*nc);
     }
 
-    void add_linmaps(const CompressedPtensors2<TYPE>& x){
+    void add_linmaps(const CompressedPtensors2<TYPE>& x) const{
       int nc=x.get_nc();
       broadcast0(x.reduce0(),0);
       broadcast1(x.reduce1(),4*nc);
       broadcast2(x,13*nc);
     }
 
-    void add_linmaps_back(const Ptensors0<TYPE>& x){
+    void add_linmaps_back(const Ptensors0<TYPE>& x) const{
       broadcast0_shrink(x);
     }
 
-    void add_linmaps_back(const CompressedPtensors1<TYPE>& x){
+    void add_linmaps_back(const CompressedPtensors1<TYPE>& x) const{
       int nc=x.get_nc();
       broadcast0_shrink(x.reduce0(0,2*nc));
       broadcast1_shrink(x.channels(2*nc,3*nc));
     }
 
-    void add_linmaps_back(const CompressedPtensors2<TYPE>& x){
+    void add_linmaps_back(const CompressedPtensors2<TYPE>& x) const{
       int nc=x.get_nc();
       broadcast0_shrink(x.reduce0_shrink(0,nc));
       broadcast1_shrink(x.reduce1_shrink(4*nc,3*nc));
@@ -299,21 +298,21 @@ namespace ptens{
   public: // ---- Broadcasting -------------------------------------------------------------------------------
 
 
-    void broadcast0(const TENSOR& X, const int offs=0){
+    void broadcast0(const TENSOR& X, const int offs=0) const{
       PTENS_ASSRT(X.dim(0)==dim(0));
       int nc=X.dim(1);
       channels(offs,nc)+=X.insert_dim(1,nvecs()).insert_dim(1,nvecs());
       channels(offs+nc,nc).diag({1,2})+=X.insert_dim(1,nvecs());
     }
 
-    void broadcast0_shrink(const TENSOR& X, const int offs=0){
+    void broadcast0_shrink(const TENSOR& X, const int offs=0) const{
       PTENS_ASSRT(X.dim(0)==dim(0));
       int nc=X.dim(1)/2; // different from Ptensors2
       channels(offs,nc)+=X.slices(1,0,nc).insert_dim(1,nvecs()).insert_dim(1,nvecs());
       channels(offs,nc).diag({1,2})+=X.slices(1,0,nc).insert_dim(1,nvecs());
     }
 
-    void broadcast1(const TENSOR& X, const int offs=0){
+    void broadcast1(const TENSOR& X, const int offs=0) const{
       PTENS_ASSRT(X.dim(0)==dim(0));
       int nc=X.dim(2);
       channels(offs,nc)+=X.insert_dim(1,nvecs());
@@ -321,7 +320,7 @@ namespace ptens{
       channels(offs+2*nc,nc).diag({1,2})+=X;
     }
 
-    void broadcast1_shrink(const TENSOR& X, const int offs=0){
+    void broadcast1_shrink(const TENSOR& X, const int offs=0) const{
       PTENS_ASSRT(X.dim(0)==dim(0));
       int nc=X.dim(2)/3;
       channels(offs,nc)+=X.slices(2,0,nc).insert_dim(1,nvecs());
@@ -329,7 +328,7 @@ namespace ptens{
       channels(offs,nc).diag({1,2})+=X.slices(2,0,nc);
     }
 
-    void broadcast2(const TENSOR& X, const int offs=0){
+    void broadcast2(const TENSOR& X, const int offs=0) const{
       PTENS_ASSRT(X.dim(0)==dim(0));
       int nc=X.dim(3);
       channels(offs,nc)+=X;
