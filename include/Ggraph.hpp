@@ -43,10 +43,10 @@ namespace ptens{
     Ggraph(const initializer_list<pair<int,int> >& list, const int n=-1): 
       obj(new OBJ(n,list)){};
 
-    Ggraph(const cnine::Ltensor<float>& M):
+    Ggraph(const cnine::Ltensor<int>& M):
       obj(new OBJ(M)){}
 
-    Ggraph(const cnine::Ltensor<float>& M, const cnine::Ltensor<float>& L):
+    Ggraph(const cnine::Ltensor<int>& M, const cnine::Ltensor<int>& L):
       obj(new OBJ(M,L)){}
 
     Ggraph(const int key):
@@ -58,12 +58,6 @@ namespace ptens{
 
     static Ggraph random(const int _n, const float p=0.5){
       return new OBJ(OBJ::random(_n,p));}
-
-//     static Ggraph from_edges(const cnine::Ltensor<int>& M, const bool cached=false){
-//       int n=M.max()+1;
-//       if(!cached) return new OBJ(n,M);
-//       return ptens_session->graph_cache.from_edge_list(M).second;
-//     }
 
     static Ggraph from_edges(const cnine::Ltensor<int>& M, const bool cached=false){
       int n=M.max()+1;
@@ -77,34 +71,7 @@ namespace ptens{
       return ptens_global::graph_cache.from_edge_list(M).second;
     }
 
-    /*
-    static Ggraph from_edges(const cnine::Ltensor<int>& M, const int key){
-      int n=M.max()+1;
-      return ptens_global::graph_cache.from_edge_list(key,M);
-    }
-
-    static Ggraph from_edges(int n, const cnine::Ltensor<int>& M, const int key){
-      if(n==-1) n=M.max()+1;
-      return ptens_global::graph_cache.from_edge_list(key,M);
-    }
-
-    static Ggraph from_edge_list(int n, const cnine::Ltensor<int>& M){
-      if(n==-1) n=M.max()+1;
-      return new OBJ(n,M);
-    }
-
-    static Ggraph cached_from_edge_list(const cnine::Ltensor<int>& M){
-      auto r=ptens_global::graph_cache.from_edge_list(M);
-      return Ggraph(r.second);
-    }
-
-    static Ggraph cached_from_edge_list(int n, const cnine::Ltensor<int>& M){
-      auto r=ptens_global::graph_cache.from_edge_list(M);
-      return Ggraph(r.second);
-    }
-    */
-
-
+ 
   public: // ---- Access --------------------------------------------------------------------------------------
 
 
@@ -120,7 +87,7 @@ namespace ptens{
       return obj->edges();
     }
 
-    cnine::Ltensor<float> dense() const{
+    cnine::Ltensor<int> dense() const{
       return obj->dense();
     }
 
@@ -136,7 +103,7 @@ namespace ptens{
       return obj->is_labeled();
     }
 
-    void set_labels(const cnine::Ltensor<float>& L){
+    void set_labels(const cnine::Ltensor<int>& L){
       obj->set_labels(L);
     }
 
@@ -203,4 +170,31 @@ namespace ptens{
     //cnine::Tensor<int>& subgraphs_matrix(const Subgraph& H) const{
     //return obj->subgraphs_matrix(*H.obj);
     //}
+
+   /*
+    static Ggraph from_edges(const cnine::Ltensor<int>& M, const int key){
+      int n=M.max()+1;
+      return ptens_global::graph_cache.from_edge_list(key,M);
+    }
+
+    static Ggraph from_edges(int n, const cnine::Ltensor<int>& M, const int key){
+      if(n==-1) n=M.max()+1;
+      return ptens_global::graph_cache.from_edge_list(key,M);
+    }
+
+    static Ggraph from_edge_list(int n, const cnine::Ltensor<int>& M){
+      if(n==-1) n=M.max()+1;
+      return new OBJ(n,M);
+    }
+
+    static Ggraph cached_from_edge_list(const cnine::Ltensor<int>& M){
+      auto r=ptens_global::graph_cache.from_edge_list(M);
+      return Ggraph(r.second);
+    }
+
+    static Ggraph cached_from_edge_list(int n, const cnine::Ltensor<int>& M){
+      auto r=ptens_global::graph_cache.from_edge_list(M);
+      return Ggraph(r.second);
+    }
+    */
 

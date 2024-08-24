@@ -26,10 +26,10 @@
 namespace ptens{
 
 
-  class GgraphObj: public cnine::sparse_graph<int,float,float>{
+  class GgraphObj: public cnine::sparse_graph<int,int,int>{
   public:
 
-    typedef cnine::sparse_graph<int,float,float> BASE;
+    typedef cnine::sparse_graph<int,int,int> BASE;
 
     mutable unordered_map<shared_ptr<SubgraphObj>,AtomsPack> subgraphpack_cache;
 
@@ -134,7 +134,7 @@ namespace ptens{
       int N=nedges()*2;
       cnine::Tensor<int> R({2,N},0,0);
       int t=0;
-      for_each_edge([&](const int i, const int j, const float v){
+      for_each_edge([&](const int i, const int j, const int v){
 	  R.set(0,t,i);
 	  R.set(1,t,j);
 	  R.set(0,t+1,j);
@@ -144,7 +144,7 @@ namespace ptens{
       return R;
     }
 
-    void set_labels(const cnine::Ltensor<float>& L){
+    void set_labels(const cnine::Ltensor<int>& L){
       labels=L;
       labeled=true;
     }
@@ -156,9 +156,9 @@ namespace ptens{
     GgraphObj permute(const cnine::permutation pi) const{
       cnine::Tensor<int> A({2,nedges()},cnine::fill_zero());
       int t=0;
-      for_each_edge([&](const int i, const int j, const float v){
-	  A.set(0,t,(float)pi(i));
-	  A.set(1,t,(float)pi(j));
+      for_each_edge([&](const int i, const int j, const int v){
+	  A.set(0,t,pi(i));
+	  A.set(1,t,pi(j));
 	  t++;
 	});
       return BASE(getn(),A);
@@ -196,13 +196,13 @@ namespace ptens{
 
 	if(S->getn()==2 && S->labeled==false && S->nedges()==1){
 	  AtomsPack r;
-	  for_each_edge([&](const int i, const int j, const float v){
+	  for_each_edge([&](const int i, const int j, const int v){
 	      if(i<j) r.push_back({i,j});});
 	  subgraphpack_cache[S]=r;
 	  return r;
 	}
 
-	AtomsPack r(new AtomsPackObj(cnine::Tensor<int>(cnine::FindPlantedSubgraphs<float>(*this,*S))));
+	AtomsPack r(new AtomsPackObj(cnine::Tensor<int>(cnine::FindPlantedSubgraphs<int>(*this,*S))));
 	subgraphpack_cache[S]=r;
 	return r;
       }
@@ -241,26 +241,3 @@ namespace ptens{
 
 #endif 
 
-
-    // deprecated 
-    /*
-    cnine::array_pool<int> subgraphs_list(const SubgraphObj& H){
-      auto it=subgraphlist_cache.find(H);
-      if(it!=subgraphlist_cache.end()) return *it->second;
-      auto newpack=new cnine::array_pool<int>(cnine::FindPlantedSubgraphs(*this,H));
-      subgraphlist_cache[H]=newpack;
-      return *newpack;
-    }
-    */
-    /*
-    cnine::Tensor<int>& subgraphs_matrix(const SubgraphObj& H){
-      cnine::flog timer("CachedPlantedSubgraphsMx");
-      auto it=subgraphlistmx_cache.find(H);
-      if(it!=subgraphlistmx_cache.end()) return *it->second;
-      else{
-	shared_ptr<cnine::Tensor<int> > p(new cnine::Tensor<int>(cnine::FindPlantedSubgraphs<float>(*this,H)));
-	subgraphlistmx_cache[H]=p;
-	return *p;
-      }
-    }
-    */

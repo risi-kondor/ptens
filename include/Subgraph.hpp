@@ -57,13 +57,13 @@ namespace ptens{
     Subgraph(const int _n, const initializer_list<pair<int,int> >& list): 
       obj(ptens_global::subgraph_cache.emplace(_n,list)){}
 
-    Subgraph(const int _n, const initializer_list<pair<int,int> >& list, const cnine::Tensor<float>& labels): 
+    Subgraph(const int _n, const initializer_list<pair<int,int> >& list, const cnine::Tensor<int>& labels): 
       obj(ptens_global::subgraph_cache.emplace(_n,list,labels)){}
 
-    Subgraph(const cnine::Tensor<float>& M):
+    Subgraph(const cnine::Tensor<int>& M):
       obj(ptens_global::subgraph_cache.emplace(M)){}
 
-    Subgraph(const cnine::Tensor<float>& M, const cnine::Tensor<float>& L):
+    Subgraph(const cnine::Tensor<int>& M, const cnine::Tensor<int>& L):
       obj(ptens_global::subgraph_cache.emplace(M,L)){}
 
 
@@ -137,7 +137,7 @@ namespace ptens{
       return &(*obj)==&(*x.obj);
     }
 
-    cnine::Tensor<float> dense() const{
+    cnine::Tensor<int> dense() const{
       return obj->dense();
     }
 

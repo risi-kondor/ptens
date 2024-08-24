@@ -25,11 +25,11 @@
 namespace ptens{
 
 
-  class SubgraphObj: public cnine::sparse_graph<int,float,float>{
+  class SubgraphObj: public cnine::sparse_graph<int,int,int>{
   public:
 
-    typedef cnine::sparse_graph<int,float,float> BASE;
-    typedef cnine::Tensor<float> rtensor;
+    typedef cnine::sparse_graph<int,int,int> BASE;
+    typedef cnine::Tensor<int> rtensor;
 
     using BASE::BASE;
     using BASE::operator==;
@@ -47,7 +47,7 @@ namespace ptens{
   public: // ---- Constructors -------------------------------------------------------------------------------
 
 
-    SubgraphObj(const cnine::Tensor<float>& M, const cnine::Tensor<float>& L):
+    SubgraphObj(const cnine::Tensor<int>& M, const cnine::Tensor<int>& L):
       BASE(M){
       labels=L;
       labeled=true;
@@ -70,10 +70,10 @@ namespace ptens{
       }
     }
 
-    SubgraphObj(const int _n, const initializer_list<pair<int,int> >& list, const cnine::Tensor<float>& _labels): 
+    SubgraphObj(const int _n, const initializer_list<pair<int,int> >& list, const cnine::Tensor<int>& _labels): 
       BASE(_n,list,_labels){}
 
-    SubgraphObj(const int n, const cnine::Tensor<float>& M):
+    SubgraphObj(const int n, const cnine::Tensor<int>& M):
       BASE(n){
       PTENS_ASSRT(M.ndims()==2);
       PTENS_ASSRT(M.dim(0)==2);
@@ -81,19 +81,19 @@ namespace ptens{
 	set(M(0,i),M(1,i),1.0);
     }
 
-    SubgraphObj(const int n, const cnine::Tensor<float>& _edges, const cnine::Tensor<float>& _labels):
+    SubgraphObj(const int n, const cnine::Tensor<int>& _edges, const cnine::Tensor<int>& _labels):
       SubgraphObj(n,_edges){
       labels=_labels;
       labeled=true;
     }
 
-    SubgraphObj(const int n, const cnine::Tensor<float>& _edges, const cnine::Tensor<float>& _evecs, const cnine::Tensor<float>& evals):
+    SubgraphObj(const int n, const cnine::Tensor<int>& _edges, const cnine::Tensor<int>& _evecs, const cnine::Tensor<float>& evals):
       SubgraphObj(n,_edges){
       evecs=_evecs;
       make_eblocks(evals);
     }
 
-    SubgraphObj(const int n, const cnine::Tensor<float>& _edges, const cnine::Tensor<float>& _labels, const cnine::Tensor<float>& _evecs, const cnine::Tensor<float>& evals):
+    SubgraphObj(const int n, const cnine::Tensor<int>& _edges, const cnine::Tensor<int>& _labels, const cnine::Tensor<int>& _evecs, const cnine::Tensor<float>& evals):
       SubgraphObj(n,_edges,_labels){
       evecs=_evecs;
       make_eblocks(evals);
@@ -116,8 +116,11 @@ namespace ptens{
       if(eblocks.size()>0) return;
       int n=getn();
 
+      auto A=dense();
       cnine::Tensor<float> L=cnine::Tensor<float>::zero({n,n});
-      L.view2().add(dense().view2()); 
+      A.for_each([&](const int i, const int j, const int& v){
+	  L.set(i,j,v);});
+      //L.view2().add(dense().view2()); 
       for(int i=0; i<n; i++){
 	float t=0; 
 	for(int j=0; j<n; j++) t+=L(i,j);
@@ -178,7 +181,7 @@ namespace std{
   struct hash<ptens::SubgraphObj>{
   public:
     size_t operator()(const ptens::SubgraphObj& x) const{
-      return hash<cnine::sparse_graph<int,float,float> >()(x);
+      return hash<cnine::sparse_graph<int,int,int> >()(x);
     }
   };
 }
