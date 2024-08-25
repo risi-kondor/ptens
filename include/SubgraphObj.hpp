@@ -29,13 +29,13 @@ namespace ptens{
   public:
 
     typedef cnine::sparse_graph<int,int,int> BASE;
-    typedef cnine::Tensor<int> rtensor;
+    typedef cnine::TensorView<int> rtensor;
 
     using BASE::BASE;
     using BASE::operator==;
     using BASE::dense;
 
-    mutable cnine::Tensor<float> evecs;
+    mutable cnine::TensorView<float> evecs;
     mutable vector<int> eblocks;
 
     SubgraphObj(const SubgraphObj& x):
@@ -47,9 +47,9 @@ namespace ptens{
   public: // ---- Constructors -------------------------------------------------------------------------------
 
 
-    SubgraphObj(const cnine::Tensor<int>& M, const cnine::Tensor<int>& L):
+    SubgraphObj(const cnine::TensorView<int>& M, const cnine::TensorView<int>& L):
       BASE(M){
-      labels=L;
+      labels.reset(L);
       labeled=true;
     }
 
@@ -70,7 +70,7 @@ namespace ptens{
       }
     }
 
-    SubgraphObj(const int _n, const initializer_list<pair<int,int> >& list, const cnine::Tensor<int>& _labels): 
+    SubgraphObj(const int _n, const initializer_list<pair<int,int> >& list, const cnine::TensorView<int>& _labels): 
       BASE(_n,list,_labels){}
 
     SubgraphObj(const int n, const cnine::Tensor<int>& M):
@@ -81,21 +81,21 @@ namespace ptens{
 	set(M(0,i),M(1,i),1.0);
     }
 
-    SubgraphObj(const int n, const cnine::Tensor<int>& _edges, const cnine::Tensor<int>& _labels):
+    SubgraphObj(const int n, const cnine::TensorView<int>& _edges, const cnine::TensorView<int>& _labels):
       SubgraphObj(n,_edges){
-      labels=_labels;
+      labels.reset(_labels);
       labeled=true;
     }
 
-    SubgraphObj(const int n, const cnine::Tensor<int>& _edges, const cnine::Tensor<int>& _evecs, const cnine::Tensor<float>& evals):
+    SubgraphObj(const int n, const cnine::TensorView<int>& _edges, const cnine::TensorView<float>& _evecs, const cnine::TensorView<float>& evals):
       SubgraphObj(n,_edges){
-      evecs=_evecs;
+      evecs.reset(_evecs);
       make_eblocks(evals);
     }
 
-    SubgraphObj(const int n, const cnine::Tensor<int>& _edges, const cnine::Tensor<int>& _labels, const cnine::Tensor<int>& _evecs, const cnine::Tensor<float>& evals):
+    SubgraphObj(const int n, const cnine::TensorView<int>& _edges, const cnine::TensorView<int>& _labels, const cnine::TensorView<float>& _evecs, const cnine::TensorView<float>& evals):
       SubgraphObj(n,_edges,_labels){
-      evecs=_evecs;
+      evecs.reset(_evecs);
       make_eblocks(evals);
     }
 
@@ -107,7 +107,7 @@ namespace ptens{
       return eblocks.size()>0;
     }
 
-    cnine::Tensor<float> get_evecs() const{
+    cnine::TensorView<float> get_evecs() const{
       make_eigenbasis();
       return evecs;
     }
@@ -117,7 +117,7 @@ namespace ptens{
       int n=getn();
 
       auto A=dense();
-      cnine::Tensor<float> L=cnine::Tensor<float>::zero({n,n});
+      cnine::TensorView<float> L=cnine::TensorView<float>::zero({n,n});
       A.for_each([&](const int i, const int j, const int& v){
 	  L.set(i,j,v);});
       //L.view2().add(dense().view2()); 
@@ -128,16 +128,16 @@ namespace ptens{
       }
 
       auto eigen=cnine::SymmEigendecomposition<float>(L);
-      evecs=eigen.U();
+      evecs.reset(eigen.U());
       make_eblocks(eigen.lambda());
     }
 
-    void set_evecs(const cnine::Tensor<float>& _evecs, const cnine::Tensor<float>& _evals) const{
-      const_cast<SubgraphObj&>(*this).evecs=_evecs;
+    void set_evecs(const cnine::TensorView<float>& _evecs, const cnine::TensorView<float>& _evals) const{
+      const_cast<SubgraphObj&>(*this).evecs.reset(_evecs);
       const_cast<SubgraphObj&>(*this).make_eblocks(_evals);
     }
 
-    void make_eblocks(const cnine::Tensor<float>& evals) const{
+    void make_eblocks(const cnine::TensorView<float>& evals) const{
       PTENS_ASSRT(evals.dims.size()==1);
       PTENS_ASSRT(getn()==evals.dims[0]);
       eblocks.clear();

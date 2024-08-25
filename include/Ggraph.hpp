@@ -43,10 +43,10 @@ namespace ptens{
     Ggraph(const initializer_list<pair<int,int> >& list, const int n=-1): 
       obj(new OBJ(n,list)){};
 
-    Ggraph(const cnine::Ltensor<int>& M):
+    Ggraph(const cnine::TensorView<int>& M):
       obj(new OBJ(M)){}
 
-    Ggraph(const cnine::Ltensor<int>& M, const cnine::Ltensor<int>& L):
+    Ggraph(const cnine::TensorView<int>& M, const cnine::TensorView<int>& L):
       obj(new OBJ(M,L)){}
 
     Ggraph(const int key):
@@ -59,13 +59,13 @@ namespace ptens{
     static Ggraph random(const int _n, const float p=0.5){
       return new OBJ(OBJ::random(_n,p));}
 
-    static Ggraph from_edges(const cnine::Ltensor<int>& M, const bool cached=false){
+    static Ggraph from_edges(const cnine::TensorView<int>& M, const bool cached=false){
       int n=M.max()+1;
       if(!cached) return new OBJ(n,M);
       return ptens_global::graph_cache.from_edge_list(M).second;
     }
 
-    static Ggraph from_edges(int n, const cnine::Ltensor<int>& M, const bool cached=false){
+    static Ggraph from_edges(int n, const cnine::TensorView<int>& M, const bool cached=false){
       if(n==-1) n=M.max()+1;
       if(!cached) return new OBJ(n,M);
       return ptens_global::graph_cache.from_edge_list(M).second;
@@ -87,11 +87,11 @@ namespace ptens{
       return obj->edges();
     }
 
-    cnine::Ltensor<int> dense() const{
+    cnine::TensorView<int> dense() const{
       return obj->dense();
     }
 
-    cnine::Ltensor<int> edge_list() const{
+    cnine::TensorView<int> edge_list() const{
       return obj->edge_list();
     }
 
@@ -103,11 +103,11 @@ namespace ptens{
       return obj->is_labeled();
     }
 
-    void set_labels(const cnine::Ltensor<int>& L){
+    void set_labels(const cnine::TensorView<int>& L){
       obj->set_labels(L);
     }
 
-    cnine::Ltensor<float> get_labels(){
+    cnine::TensorView<int> get_labels(){
       return obj->labels;
     }
 

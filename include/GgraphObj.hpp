@@ -50,11 +50,11 @@ namespace ptens{
       BASE(n,list){}
 
     template<typename TYPE>
-    GgraphObj(const cnine::Ltensor<TYPE>& M):
+    GgraphObj(const cnine::TensorView<TYPE>& M):
       BASE(M){}
 
     template<typename TYPE>
-    GgraphObj(const cnine::Ltensor<TYPE>& M, const cnine::Ltensor<TYPE>& L):
+    GgraphObj(const cnine::TensorView<TYPE>& M, const cnine::TensorView<TYPE>& L):
       BASE(M){
       set_labels(L);
     }
@@ -63,7 +63,7 @@ namespace ptens{
     GgraphObj(const initializer_list<pair<int,int> >& list, const int n): 
       BASE(n,list){}
 
-    GgraphObj(int n, const cnine::Ltensor<int>& M): 
+    GgraphObj(int n, const cnine::TensorView<int>& M): 
       GgraphObj(n){
       PTENS_ASSRT(M.ndims()==2);
       PTENS_ASSRT(M.dim(0)==2);
@@ -80,7 +80,7 @@ namespace ptens{
       return BASE::random(_n,p);
     }
 
-    static GgraphObj from_edges(int n, const cnine::Ltensor<int>& M){
+    static GgraphObj from_edges(int n, const cnine::TensorView<int>& M){
       GgraphObj R(n);
       PTENS_ASSRT(M.ndims()==2);
       PTENS_ASSRT(M.dim(0)==2);
@@ -90,11 +90,11 @@ namespace ptens{
       return R;
     }
 
-    static GgraphObj from_edges(const cnine::Ltensor<int>& M){
+    static GgraphObj from_edges(const cnine::TensorView<int>& M){
       return GgraphObj::from_edges(M.max()+1,M);
     }
 
-    static GgraphObj* from_edges_p(const cnine::Ltensor<int>& M){
+    static GgraphObj* from_edges_p(const cnine::TensorView<int>& M){
       auto R=new GgraphObj(M.max()+1);
       PTENS_ASSRT(M.ndims()==2);
       PTENS_ASSRT(M.dim(0)==2);
@@ -104,7 +104,7 @@ namespace ptens{
     }
 
 
-//     GgraphObj(int n, const cnine::Ltensor<int>& M):
+//     GgraphObj(int n, const cnine::TensorView<int>& M):
 //       GgraphObj(n){
 //       PTENS_ASSRT(M.ndims()==2);
 //       PTENS_ASSRT(M.dim(0)==2);
@@ -144,8 +144,8 @@ namespace ptens{
       return R;
     }
 
-    void set_labels(const cnine::Ltensor<int>& L){
-      labels=L;
+    void set_labels(const cnine::TensorView<int>& L){
+      labels.reset(L);
       labeled=true;
     }
 

@@ -13,12 +13,12 @@ G=p.ggraph.random(6,0.5)
 print(G)
 
 print("We can also define a graph from its adjaceny matrix:\n")
-A=torch.tensor([[0,1,1],[1,0,1],[1,1,0]],dtype=torch.float)
+A=torch.tensor([[0,1,1],[1,0,1],[1,1,0]]).int()
 G=p.ggraph.from_matrix(A)
 print(G)
 
 print("Or from its edge list:\n")
-E=torch.tensor([[0,2,2,3],[2,0,3,2]],dtype=torch.float)
+E=torch.tensor([[0,2,2,3],[2,0,3,2]]).int()
 G=p.ggraph.from_edge_index(E)
 print(G)
 
@@ -33,7 +33,8 @@ print(" Labels")
 print("---------\n")
 
 print("We can create a labeled graph:\n")
-L=torch.randn([A.size(0),5])
+L=torch.randn([A.size(0),5]).int()
+print(L)
 G2=p.ggraph.from_matrix(A,L)
 print(G2)
 
@@ -65,6 +66,13 @@ print("-----------\n")
 print("Given a subgraph S, we can find all occurrences of S in G:\n")
 G=p.ggraph.random(8,0.5)
 S=p.subgraph.triangle()
+print(G.subgraphs(S))
+u=G.adjacency_matrix()
+print(u)
+u[0,1]=2
+u[1,0]=2
+print(u)
+G=p.ggraph.from_matrix(u)
 A=G.subgraphs(S)
 print(A)
 print("\n")

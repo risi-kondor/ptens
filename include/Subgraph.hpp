@@ -57,27 +57,27 @@ namespace ptens{
     Subgraph(const int _n, const initializer_list<pair<int,int> >& list): 
       obj(ptens_global::subgraph_cache.emplace(_n,list)){}
 
-    Subgraph(const int _n, const initializer_list<pair<int,int> >& list, const cnine::Tensor<int>& labels): 
+    Subgraph(const int _n, const initializer_list<pair<int,int> >& list, const cnine::TensorView<int>& labels): 
       obj(ptens_global::subgraph_cache.emplace(_n,list,labels)){}
 
-    Subgraph(const cnine::Tensor<int>& M):
+    Subgraph(const cnine::TensorView<int>& M):
       obj(ptens_global::subgraph_cache.emplace(M)){}
 
-    Subgraph(const cnine::Tensor<int>& M, const cnine::Tensor<int>& L):
+    Subgraph(const cnine::TensorView<int>& M, const cnine::TensorView<int>& L):
       obj(ptens_global::subgraph_cache.emplace(M,L)){}
 
 
-    static Subgraph edge_index(const cnine::Tensor<int>& x, int _n=-1){
+    static Subgraph edge_index(const cnine::TensorView<int>& x, int _n=-1){
       if(_n==-1) _n=x.max()+1;
       return ptens_global::subgraph_cache.emplace(_n,x);
     }
 
-    static Subgraph edge_index(const cnine::Tensor<int>& x, const cnine::Tensor<int>& L, int _n=-1){
+    static Subgraph edge_index(const cnine::TensorView<int>& x, const cnine::TensorView<int>& L, int _n=-1){
       if(_n==-1) _n=x.max()+1;
       return ptens_global::subgraph_cache.emplace(_n,x,L);
     }
 
-    static Subgraph edge_index_degrees(const cnine::Tensor<int>& x, const cnine::Tensor<int>& D, int _n=-1){
+    static Subgraph edge_index_degrees(const cnine::TensorView<int>& x, const cnine::TensorView<int>& D, int _n=-1){
       if(_n==-1) _n=x.max()+1;
       SubgraphObj H(_n,x);
       H.set_degrees(D);
@@ -129,7 +129,7 @@ namespace ptens{
       return obj->eblocks.size();
     }
 
-    void set_evecs(const cnine::Tensor<float>& _evecs, const cnine::Tensor<float>& _evals) const{
+    void set_evecs(const cnine::TensorView<float>& _evecs, const cnine::TensorView<float>& _evals) const{
       obj->set_evecs(_evecs,_evals);
     }
 
@@ -137,11 +137,11 @@ namespace ptens{
       return &(*obj)==&(*x.obj);
     }
 
-    cnine::Tensor<int> dense() const{
+    cnine::TensorView<int> dense() const{
       return obj->dense();
     }
 
-    cnine::Ltensor<float> evecs(){
+    cnine::TensorView<float> evecs(){
       make_eigenbasis();
       return obj->evecs;
     }

@@ -9,13 +9,13 @@ pybind11::class_<ptens::Ggraph>(m,"ggraph")
 	return Ggraph(cnine::Ltensor<int>(x));})
 
   .def_static("from_matrix",[](const at::Tensor& x, const at::Tensor& labels){
-	return Ggraph(cnine::Ltensor<int>(x),cnine::Ltensor<float>(labels));})
+	return Ggraph(cnine::TensorView<int>(x),cnine::TensorView<int>(labels));})
 
   .def_static("from_edge_index",[](const at::Tensor& x, const int n=-1){
       return Ggraph::from_edges(n,cnine::Tensor<int>(x));})
 
   .def_static("from_edge_index",[](const at::Tensor& x, const at::Tensor& labels, const int n=-1){
-      auto G=Ggraph::from_edges(n,cnine::Tensor<int>(x));
+      auto G=Ggraph::from_edges(n,cnine::TensorView<int>(x));
       G.set_labels(labels);
     })
 
@@ -40,7 +40,7 @@ pybind11::class_<ptens::Ggraph>(m,"ggraph")
   .def("is_labeled",[](Ggraph& G){
       return G.is_labeled();})
   .def("set_labels",[](Ggraph& G, const at::Tensor& x){
-      G.set_labels(cnine::Ltensor<int>(x));})
+      G.set_labels(cnine::TensorView<int>(x));})
   .def("get_labels",[](Ggraph& G){
       return G.get_labels().torch();})
 
