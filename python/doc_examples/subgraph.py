@@ -11,8 +11,13 @@ print(C)
 S=ptens.subgraph.star(5)
 print(S)
 
-M=torch.tensor([[0,1,1],[1,0,1],[1,1,0]],dtype=torch.float)
+M=torch.tensor([[0,1,1],[1,0,1],[1,1,0]],dtype=torch.int)
 S=ptens.subgraph.from_matrix(M)
+print(S)
+
+M=torch.tensor([[0,1,1],[1,0,1],[1,1,0]],dtype=torch.int)
+L=torch.tensor([[2,3],[4,4],[5,0]],dtype=torch.int)
+S=ptens.subgraph.from_matrix(M,L)
 print(S)
 
 ix=torch.tensor([[0,1,2,0,3],[1,2,0,3,0]],dtype=torch.int)

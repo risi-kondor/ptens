@@ -38,12 +38,12 @@ namespace ptens{
 
     void apply(const cnine::TensorView<float>& r, const cnine::TensorView<float>& x) const{
       int nc=x.dims.last();
-      obj->apply_to(r.reshape({obj->nrows(),nc}),x.reshape({obj->ncols(),nc}));
+      obj->apply_to(r.fuse({0,1}),x.fuse({0,1}));
     }
 
     void apply_back(const cnine::TensorView<float>& r, const cnine::TensorView<float>& x) const{
       int nc=r.dims.last();
-      obj->apply_transp_to(r.reshape({obj->ncols(),nc}),x.reshape({obj->nrows(),nc}));
+      obj->apply_transp_to(r.fuse({0,1}),x.fuse({0,1}));
     }
 
 

@@ -66,20 +66,20 @@ namespace ptens{
 	    R->block(i,j).slice(0,0)+=r_tensor.slice(0,0).transp().fuse(0,1);
 	  }else{
 	    if(ink==0){
-	      auto b_tensor=reduction_tensor(outk,out.basis(j),in_common);
+	      auto b_tensor=reduction_tensor(outk,out.basis(i),out_common);
 	      //R->block(i,j).add_einsum("aij->(ij)a",r_tensor);
 	      R->block(i,j).slice(1,0)+=b_tensor.slice(0,0).fuse(0,1);
 	    }else{
 	      auto r_tensor=reduction_tensor(ink,in.basis(j),in_common);
-	      auto b_tensor=reduction_tensor(outk,out.basis(j),in_common);
+	      auto b_tensor=reduction_tensor(outk,out.basis(i),out_common);
 	      //R->block(i,j).add_einsum("aij,akl->(ijl)k",b_tensor,r_tensor);
 	      int rmult=r_tensor.dim(2);
 	      if(rmult==0){
 		R->block(i,j).view2().add_mprod(b_tensor.view3().fuse12().transp(),r_tensor.slice(2,0).view2());
 	      }else{
-		for(int i=0; i<rmult; i++)
-		  R->block(i,j).split(0,rmult).slice(1,i).view2().
-		    add_mprod(b_tensor.view3().fuse12().transp(),r_tensor.slice(2,i).view2());
+		for(int a=0; a<rmult; a++)
+		  R->block(i,j).split(0,rmult).slice(1,a).view2().
+		    add_mprod(b_tensor.view3().fuse12().transp(),r_tensor.slice(2,a).view2());
 	      }
 	    }
 	  }

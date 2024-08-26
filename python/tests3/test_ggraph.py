@@ -13,7 +13,7 @@ G=p.ggraph.random(6,0.5)
 print(G)
 
 print("We can also define a graph from its adjaceny matrix:\n")
-A=torch.tensor([[0,1,1],[1,0,1],[1,1,0]]).int()
+A=torch.tensor([[0,1,1],[1,0,1],[1,1,0]],dtype=torch.int)
 G=p.ggraph.from_matrix(A)
 print(G)
 

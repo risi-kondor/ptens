@@ -6,11 +6,11 @@ One of the primary applications of P-tensors are graph neural
 networks. The underlying graph must be stored in a ``ptens.ggraph`` object. 
 
 A ``ggraph`` can be constructed directly from its adjacency matrix, represented as a dense :math:`n \times n` 
-matrix:
+integer matrix:
 
 .. code-block:: python
 
- >> A=torch.tensor([[0,1,0],[1,0,1],[0,1,0]],dtype=torch.float32)
+ >> A=torch.tensor([[0,1,0],[1,0,1],[0,1,0]],dtype=torch.int)
  >> G=ptens.ggraph.from_matrix(A)
 
  Ggraph on 3 vertices:
@@ -18,12 +18,12 @@ matrix:
    [ 1 0 1 ]
    [ 0 1 0 ]
 
-Alternatively, it can be initialized from an "edge index", which is a :math:`2\times E` integer 
-tensor, listing all the edges:
+Alternatively, if ``G`` is unweighted, it can be initialized from an "edge index", 
+which is a :math:`2\times E` integer tensor, listing all the edges:
 
 .. code-block:: python
 
- >> A=torch.tensor([[0,1,1,2,0,3],[1,0,2,1,3,0]],dtype=torch.float32)
+ >> A=torch.tensor([[0,1,1,2,0,3],[1,0,2,1,3,0]],dtype=torch.int)
  >> G=ptens.ggraph.from_edge_index(A)
 
  Ggraph on 4 vertices:
@@ -58,10 +58,43 @@ The adjacency matrix can be extracted using the ``adjacency_matrix()``  method:
 
  >> G.adjacency_matrix()
 
- tensor([[0., 1., 0., 1.],
-         [1., 0., 1., 0.],
-         [0., 1., 0., 0.],
-         [1., 0., 0., 0.]])
+ tensor([[0, 1, 0, 1],
+         [1, 0, 1, 0],
+         [0, 1, 0, 0],
+         [1, 0, 0, 0]])
+
+
+=============================
+Vertex labels and edge labels
+=============================
+
+In some applications, vertices have (fixed) feature vectors, i.e., labels, attached to them. To create such  
+labeled graphs, we just provide the matrix of labels to the constructor:
+
+.. code-block:: python
+
+ >> A=torch.tensor([[0,1,0],[1,0,1],[0,1,0]],dtype=torch.int)
+ >> M=(torch.randn(3,2)*10).int()
+ >> G=ptens.ggraph.from_matrix(A,labels=M)
+ >> print(G)
+
+ Ggraph on 3 vertices:
+   [ 0 1 0 ]
+   [ 1 0 1 ]
+   [ 0 1 0 ]
+ Labels:
+   [ 17 4 ]
+   [ 2 16 ]
+   [ -8 -10 ]
+
+Edge labels can be encoded simply as edge weights:
+
+.. code-block:: python
+
+ >> A=torch.tensor([[0,3,0],[3,0,7],[0,7,0]],dtype=torch.int)
+ >> G=ptens.ggraph.from_matrix(A)
+ >> print(G)
+
 
 =======
 Caching 

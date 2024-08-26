@@ -261,8 +261,8 @@
 <p>One of the primary applications of P-tensors are graph neural
 networks. The underlying graph must be stored in a <code class="docutils literal notranslate"><span class="pre">ptens.ggraph</span></code> object.</p>
 <p>A <code class="docutils literal notranslate"><span class="pre">ggraph</span></code> can be constructed directly from its adjacency matrix, represented as a dense <img class="math" src="_images/math/6eb743c8bde71d3860a46dbd197ee7674c4961ea.svg" alt="n \times n"/>
-matrix:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;&gt;</span> <span class="n">A</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">],[</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">],[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">]],</span><span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+integer matrix:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;&gt;</span> <span class="n">A</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">],[</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">],[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">]],</span><span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">int</span><span class="p">)</span>
 <span class="o">&gt;&gt;</span> <span class="n">G</span><span class="o">=</span><span class="n">ptens</span><span class="o">.</span><span class="n">ggraph</span><span class="o">.</span><span class="n">from_matrix</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
 
 <span class="n">Ggraph</span> <span class="n">on</span> <span class="mi">3</span> <span class="n">vertices</span><span class="p">:</span>
@@ -271,9 +271,9 @@ matrix:</p>
   <span class="p">[</span> <span class="mi">0</span> <span class="mi">1</span> <span class="mi">0</span> <span class="p">]</span>
 </pre></div>
 </div>
-<p>Alternatively, it can be initialized from an “edge index”, which is a <img class="math" src="_images/math/2c3254ac3adfa8817a6b2c6986d4fcfd96616727.svg" alt="2\times E"/> integer
-tensor, listing all the edges:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;&gt;</span> <span class="n">A</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">3</span><span class="p">],[</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">0</span><span class="p">]],</span><span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+<p>Alternatively, if <code class="docutils literal notranslate"><span class="pre">G</span></code> is unweighted, it can be initialized from an “edge index”,
+which is a <img class="math" src="_images/math/2c3254ac3adfa8817a6b2c6986d4fcfd96616727.svg" alt="2\times E"/> integer tensor, listing all the edges:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;&gt;</span> <span class="n">A</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">3</span><span class="p">],[</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">0</span><span class="p">]],</span><span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">int</span><span class="p">)</span>
 <span class="o">&gt;&gt;</span> <span class="n">G</span><span class="o">=</span><span class="n">ptens</span><span class="o">.</span><span class="n">ggraph</span><span class="o">.</span><span class="n">from_edge_index</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
 
 <span class="n">Ggraph</span> <span class="n">on</span> <span class="mi">4</span> <span class="n">vertices</span><span class="p">:</span>
@@ -303,12 +303,38 @@ handle graphs with a large number of vertices.
 The adjacency matrix can be extracted using the <code class="docutils literal notranslate"><span class="pre">adjacency_matrix()</span></code>  method:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;&gt;</span> <span class="n">G</span><span class="o">.</span><span class="n">adjacency_matrix</span><span class="p">()</span>
 
-<span class="n">tensor</span><span class="p">([[</span><span class="mf">0.</span><span class="p">,</span> <span class="mf">1.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">1.</span><span class="p">],</span>
-        <span class="p">[</span><span class="mf">1.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">1.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">],</span>
-        <span class="p">[</span><span class="mf">0.</span><span class="p">,</span> <span class="mf">1.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">],</span>
-        <span class="p">[</span><span class="mf">1.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">]])</span>
+<span class="n">tensor</span><span class="p">([[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
+        <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+        <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+        <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]])</span>
 </pre></div>
 </div>
+<section id="vertex-labels-and-edge-labels">
+<h2>Vertex labels and edge labels<a class="headerlink" href="#vertex-labels-and-edge-labels" title="Link to this heading">¶</a></h2>
+<p>In some applications, vertices have (fixed) feature vectors, i.e., labels, attached to them. To create such
+labeled graphs, we just provide the matrix of labels to the constructor:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;&gt;</span> <span class="n">A</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">],[</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">],[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">]],</span><span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">int</span><span class="p">)</span>
+<span class="o">&gt;&gt;</span> <span class="n">M</span><span class="o">=</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span><span class="o">*</span><span class="mi">10</span><span class="p">)</span><span class="o">.</span><span class="n">int</span><span class="p">()</span>
+<span class="o">&gt;&gt;</span> <span class="n">G</span><span class="o">=</span><span class="n">ptens</span><span class="o">.</span><span class="n">ggraph</span><span class="o">.</span><span class="n">from_matrix</span><span class="p">(</span><span class="n">A</span><span class="p">,</span><span class="n">labels</span><span class="o">=</span><span class="n">M</span><span class="p">)</span>
+<span class="o">&gt;&gt;</span> <span class="nb">print</span><span class="p">(</span><span class="n">G</span><span class="p">)</span>
+
+<span class="n">Ggraph</span> <span class="n">on</span> <span class="mi">3</span> <span class="n">vertices</span><span class="p">:</span>
+  <span class="p">[</span> <span class="mi">0</span> <span class="mi">1</span> <span class="mi">0</span> <span class="p">]</span>
+  <span class="p">[</span> <span class="mi">1</span> <span class="mi">0</span> <span class="mi">1</span> <span class="p">]</span>
+  <span class="p">[</span> <span class="mi">0</span> <span class="mi">1</span> <span class="mi">0</span> <span class="p">]</span>
+<span class="n">Labels</span><span class="p">:</span>
+  <span class="p">[</span> <span class="mi">17</span> <span class="mi">4</span> <span class="p">]</span>
+  <span class="p">[</span> <span class="mi">2</span> <span class="mi">16</span> <span class="p">]</span>
+  <span class="p">[</span> <span class="o">-</span><span class="mi">8</span> <span class="o">-</span><span class="mi">10</span> <span class="p">]</span>
+</pre></div>
+</div>
+<p>Edge labels can be encoded simply as edge weights:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;&gt;</span> <span class="n">A</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([[</span><span class="mi">0</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">0</span><span class="p">],[</span><span class="mi">3</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">7</span><span class="p">],[</span><span class="mi">0</span><span class="p">,</span><span class="mi">7</span><span class="p">,</span><span class="mi">0</span><span class="p">]],</span><span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">int</span><span class="p">)</span>
+<span class="o">&gt;&gt;</span> <span class="n">G</span><span class="o">=</span><span class="n">ptens</span><span class="o">.</span><span class="n">ggraph</span><span class="o">.</span><span class="n">from_matrix</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+<span class="o">&gt;&gt;</span> <span class="nb">print</span><span class="p">(</span><span class="n">G</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
 <section id="caching">
 <h2>Caching<a class="headerlink" href="#caching" title="Link to this heading">¶</a></h2>
 <p>Graph neural network applications often involve learning from data on a large number of distinct graphs.
@@ -409,6 +435,7 @@ We can check the number of cached graphs with its <code class="docutils literal 
           <div class="toc-tree">
             <ul>
 <li><a class="reference internal" href="#">Graphs</a><ul>
+<li><a class="reference internal" href="#vertex-labels-and-edge-labels">Vertex labels and edge labels</a></li>
 <li><a class="reference internal" href="#caching">Caching</a></li>
 </ul>
 </li>

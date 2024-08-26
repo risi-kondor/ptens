@@ -59,6 +59,6 @@ print(atoms2,"\n")
 B1=p.cptensorlayer1.gather(atoms2,A1)
 print(B1)
 
-B2=p.cptensorlayer1.gather(atoms2,A2)
-print(B2)
+#B2=p.cptensorlayer1.gather(atoms2,A2)
+#print(B2)
 

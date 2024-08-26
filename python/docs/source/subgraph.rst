@@ -45,7 +45,7 @@ Similarly to ``ggraph``\s, ``subgraph``\s can also be defined from their adjacen
 
 .. code-block:: python
 
- >> M=torch.tensor([[0,1,1],[1,0,1],[1,1,0]],dtype=torch.float)
+ >> M=torch.tensor([[0,1,1],[1,0,1],[1,1,0]],dtype=torch.int)
  >> S=ptens.subgraph.from_matrix(M)
  >> print(S)
 
@@ -68,6 +68,15 @@ or from an edge list matrix:
    [ 1 1 0 0 ]
    [ 1 0 0 0 ]
 
+Similarly to ``ggraph``\s, subgraphs can also have weighted edges, and associated label matrices:
+
+.. code-block:: python
+
+ >> M=torch.tensor([[0,1,1],[1,0,1],[1,1,0]],dtype=torch.int)
+ >> L=torch.tensor([[2,3],[4,4],[5,0]],dtype=torch.int)
+ >> S=ptens.subgraph.from_matrix(M,labels=L)
+
+
 =================
 Finding subgraphs
 =================
@@ -86,7 +95,7 @@ in a graph ``G`` (or a collection of graphs).  This is done with the ``ggraph`` 
  ([0,5,6],[4,7,6],[4,6,5])
 
 The resulting ``atomspack`` object can be directly used to define a corresponding ``ptensorlayer``:
-
+ 
 .. code-block:: python
 
  >> A=ptens.ptensorlayer1.randn(atoms,3)
@@ -105,6 +114,10 @@ The resulting ``atomspack`` object can be directly used to define a correspondin
      [ 1.00193 -2.19192 1.63382 ]
      [ 0.507325 -0.290758 -1.33027 ]
      [ -0.349507 -1.41685 -0.111342 ]
+
+A subgraph is detected at a particular location if and only if all the 
+the edge weights between the corresponding vertices of ``G`` and ``S`` match exactly. 
+If ``G`` and ``S`` are both labled, then the corresponding vertex labels must match as well. 
 
 Finding subgraphs is a relatively expensive computation that has to be performed on the CPU. 
 Therefore, the result of the operation is automatically cached, i.e., as long as the backend objects of 
