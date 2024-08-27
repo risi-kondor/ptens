@@ -68,13 +68,14 @@ or from an edge list matrix:
    [ 1 1 0 0 ]
    [ 1 0 0 0 ]
 
-Subgraphs can have weighted edges, and can have associated label matrices:
+Similarly to ``ggraph``\s, subgraphs can also have weighted edges, and associated label matrices:
 
 .. code-block:: python
 
  >> M=torch.tensor([[0,1,1],[1,0,1],[1,1,0]],dtype=torch.int)
  >> L=torch.tensor([[2,3],[4,4],[5,0]],dtype=torch.int)
- >> S=ptens.subgraph.from_matrix(M,L)
+ >> S=ptens.subgraph.from_matrix(M,labels=L)
+
 
 =================
 Finding subgraphs
@@ -114,8 +115,8 @@ The resulting ``atomspack`` object can be directly used to define a correspondin
      [ 0.507325 -0.290758 -1.33027 ]
      [ -0.349507 -1.41685 -0.111342 ]
 
-A subgraph is detected in ``G`` at a particular location if and only if all the 
-the edge weights match between the corresponding vertices of ``G`` and ``S`` match exactly. 
+A subgraph is detected at a particular location if and only if all the 
+the edge weights between the corresponding vertices of ``G`` and ``S`` match exactly. 
 If ``G`` and ``S`` are both labled, then the corresponding vertex labels must match as well. 
 
 Finding subgraphs is a relatively expensive computation that has to be performed on the CPU. 

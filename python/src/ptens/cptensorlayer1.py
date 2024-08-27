@@ -48,13 +48,13 @@ class cptensorlayer1(cptensorlayer):
                                             dtype=torch.float,device=device).reshape(len(atoms),atoms.nvecs(),nc))
 
     @classmethod
-    def from_tensor(self,atoms,M):
+    def from_tensor(cls,atoms,M):
         assert isinstance(atoms,pb.catomspack)
         assert isinstance(M,torch.Tensor)
         assert M.dim()==3
         assert M.size(0)==len(atoms)
         assert M.size(1)==atoms.nvecs()
-        return self.make(atoms,M)
+        return cls.make(atoms,M)
 
     def zeros_like(self):
         return cptensorlayer1.zeros(self.atoms,self.get_nc(),device=self.device)
@@ -78,6 +78,19 @@ class cptensorlayer1(cptensorlayer):
     def get_nc(self):
         return self.size(2)
     
+
+    # ---- Compress ------------------------------------------------------------------------------------------
+
+
+    @classmethod
+    def compress(cls,atoms,x):
+        assert isinstance(atoms,pb.catomspack)
+        assert isinstance(x,p.ptensorlayer1)
+        return cptensorlayer1_compressFn.apply(atoms,x)
+
+    def uncompress(self):
+        return cptensorlayer1_uncompressFn.apply(self)
+
 
     # ---- Linmaps -------------------------------------------------------------------------------------------
     
@@ -118,6 +131,42 @@ class cptensorlayer1(cptensorlayer):
 
 
 # ---- Autograd functions --------------------------------------------------------------------------------------------
+
+
+class cptensorlayer1_compressFn(torch.autograd.Function):
+
+    @staticmethod
+    def forward(ctx,atoms,x):
+        r=cptensorlayer1.zeros(atoms,x.get_nc(),device=x.device)
+        r.backend().add_compress(x.backend())
+        ctx.atoms=x.atoms
+        ctx.nc=x.get_nc()
+        return r
+
+    @staticmethod
+    def backward(ctx,g):
+        assert isinstance(g,p.cptensorlayer1)
+        r=ptensorlayer1.zeros(ctx.atoms,ctx.nc,device=g.device)
+        g.backend().add_uncompress_to(r)
+        return None,r
+
+
+class cptensorlayer1_uncompressFn(torch.autograd.Function):
+
+    @staticmethod
+    def forward(ctx,x):
+        r=p.ptensorlayer1.zeros(x.atoms.atoms(),x.get_nc(),device=x.device)
+        x.backend().add_uncompress_to(r.backend())
+        ctx.atoms=x.atoms
+        ctx.nc=x.get_nc()
+        return r
+
+    @staticmethod
+    def backward(ctx,g):
+        assert isinstance(g,p.ptensorlayer1)
+        r=cptensorlayer1.zeros(ctx.atoms,ctx.nc,device=g.device)
+        r.backend().add_compress(g)
+        return r
 
 
 class cptensorlayer1_linmapsFn(torch.autograd.Function):

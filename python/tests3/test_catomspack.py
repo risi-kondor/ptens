@@ -12,6 +12,12 @@ a=pb.atomspack.from_list([[1,3,4],[2,5]])
 A=pb.catomspack.random(a,4)
 print(A)
 
+print("We can also define it from a matrix:\n")
+a=pb.atomspack.from_list([[1,3,4],[2,5]])
+M=torch.randn(a.nrows1(),4)
+A=pb.catomspack(a,M)
+print(A)
+
 print("\nWe can retrieve individual bases:\n") 
 print(A.basis(1))
 

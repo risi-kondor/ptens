@@ -46,9 +46,19 @@ namespace ptens{
       atoms(_atoms),
       bases(M.copy()){
       PTENS_ASSRT(bases.ndims()==2 || bases.ndims()==3);
+      if(bases.ndims()==3){
+	PTENS_ASSRT(atoms->constk>0);
+	PTENS_ASSRT(bases.dim(1)==atoms->constk);
+	PTENS_ASSRT(bases.dim(0)==atoms->size());
+	return;
+      }
       if(bases.ndims()==2){
-	bases.dims=bases.dims.insert(0,atoms->size());
-	bases.strides=bases.strides.insert(0,0);
+	if(atoms->constk>0 && bases.dim(0)==atoms->constk){
+	  bases.dims=bases.dims.insert(0,atoms->size());
+	  bases.strides=bases.strides.insert(0,0);
+	  return;
+	}
+	PTENS_ASSRT(bases.dim(0)==atoms->nrows1())
       }
     }
 

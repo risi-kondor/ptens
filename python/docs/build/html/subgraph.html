@@ -215,6 +215,8 @@
 <li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Subgraphs</a></li>
 <li class="toctree-l1"><a class="reference internal" href="subgraph_layer0.html">Subgraph layers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="batching.html">Batching</a></li>
+<li class="toctree-l1"><a class="reference internal" href="compressed.html">Compressed layers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="csubgraphlayer.html">Compressed subgraph layers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="global.html">Global parameters and variables</a></li>
 </ul>
 
@@ -317,10 +319,10 @@
   <span class="p">[</span> <span class="mi">1</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="p">]</span>
 </pre></div>
 </div>
-<p>Subgraphs can have weighted edges, and can have associated label matrices:</p>
+<p>Similarly to <code class="docutils literal notranslate"><span class="pre">ggraph</span></code>s, subgraphs can also have weighted edges, and associated label matrices:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;&gt;</span> <span class="n">M</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">],[</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">],[</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">]],</span><span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">int</span><span class="p">)</span>
 <span class="o">&gt;&gt;</span> <span class="n">L</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([[</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">],[</span><span class="mi">4</span><span class="p">,</span><span class="mi">4</span><span class="p">],[</span><span class="mi">5</span><span class="p">,</span><span class="mi">0</span><span class="p">]],</span><span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">int</span><span class="p">)</span>
-<span class="o">&gt;&gt;</span> <span class="n">S</span><span class="o">=</span><span class="n">ptens</span><span class="o">.</span><span class="n">subgraph</span><span class="o">.</span><span class="n">from_matrix</span><span class="p">(</span><span class="n">M</span><span class="p">,</span><span class="n">L</span><span class="p">)</span>
+<span class="o">&gt;&gt;</span> <span class="n">S</span><span class="o">=</span><span class="n">ptens</span><span class="o">.</span><span class="n">subgraph</span><span class="o">.</span><span class="n">from_matrix</span><span class="p">(</span><span class="n">M</span><span class="p">,</span><span class="n">labels</span><span class="o">=</span><span class="n">L</span><span class="p">)</span>
 </pre></div>
 </div>
 <section id="finding-subgraphs">
@@ -355,8 +357,8 @@ in a graph <code class="docutils literal notranslate"><span class="pre">G</span>
     <span class="p">[</span> <span class="o">-</span><span class="mf">0.349507</span> <span class="o">-</span><span class="mf">1.41685</span> <span class="o">-</span><span class="mf">0.111342</span> <span class="p">]</span>
 </pre></div>
 </div>
-<p>A subgraph is detected in <code class="docutils literal notranslate"><span class="pre">G</span></code> at a particular location if and only if all the
-the edge weights match between the corresponding vertices of <code class="docutils literal notranslate"><span class="pre">G</span></code> and <code class="docutils literal notranslate"><span class="pre">S</span></code> match exactly.
+<p>A subgraph is detected at a particular location if and only if all the
+the edge weights between the corresponding vertices of <code class="docutils literal notranslate"><span class="pre">G</span></code> and <code class="docutils literal notranslate"><span class="pre">S</span></code> match exactly.
 If <code class="docutils literal notranslate"><span class="pre">G</span></code> and <code class="docutils literal notranslate"><span class="pre">S</span></code> are both labled, then the corresponding vertex labels must match as well.</p>
 <p>Finding subgraphs is a relatively expensive computation that has to be performed on the CPU.
 Therefore, the result of the operation is automatically cached, i.e., as long as the backend objects of

@@ -4,6 +4,12 @@ pybind11::class_<CompressedPtensors1<float> >(m,"cptensors1")
       return CPtensors1f(atoms,tensorf::view(x));})
 
 
+  .def("add_compress",[](const CPtensors1f& obj, const Ptensors1f& x){
+      obj.add_compress(x);})
+  .def("add_uncompress_to",[](const CPtensors1f& obj, const Ptensors1f& x){
+      obj.add_uncompress_to(x);})
+
+
 // ---- Linmaps ----------------------------------------------------------------------------------------------
 
 

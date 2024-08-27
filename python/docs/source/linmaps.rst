@@ -3,7 +3,7 @@ Linmaps
 *******
 
 In a seminal paper Maron et al.[] have shown that the number of linearly independent linear maps 
-from a :math"`k_1` 'th order permutation equivariant tensor to a :math:`k_2` 'th order permutation 
+from a :math:`k_1` 'th order permutation equivariant tensor to a :math:`k_2` 'th order permutation 
 equivariant tensor with the `same` reference domain is given by the Bell number :math:`B(k_1+k_2)`. 
 The `linmaps` functions described in this section implement these linear maps. 
 

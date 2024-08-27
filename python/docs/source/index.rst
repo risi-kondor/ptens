@@ -33,6 +33,8 @@ under a custom license that can be found in the file LICENSE.TXT
    subgraph.rst
    subgraph_layer0.rst
    batching.rst 
+   compressed.rst
+   csubgraphlayer.rst
    global.rst
 
 

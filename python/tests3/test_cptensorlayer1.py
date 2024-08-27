@@ -24,6 +24,16 @@ print("If two compressed P-tensor layers  have the same reference domains,\nwe c
 B=p.cptensorlayer1.randn(atoms,3)
 print(A+B)
 
+print("\n------------")
+print(" Compression")
+print("------------\n")
+
+x=p.ptensorlayer1.randn(a0,3)
+print(x)
+X=p.cptensorlayer1.compress(atoms,x)
+print(X)
+y=X.uncompress()
+print(y)
 
 print("\n---------")
 print(" Linmaps")

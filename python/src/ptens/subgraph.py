@@ -98,7 +98,7 @@ class subgraph:
     def set_evecs(self):
         if self.has_espaces()>0:
             return
-        L=self.torch()
+        L=self.torch().float()
         L=torch.diag(torch.sum(L,1))-L
         U,S,V=torch.linalg.svd(L)
         self.obj.set_evecs(U,S)

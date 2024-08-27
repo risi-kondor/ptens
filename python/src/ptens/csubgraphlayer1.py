@@ -17,7 +17,7 @@ import torch
 import ptens as p
 import ptens_base as pb 
 
-import ptens.ptensorlayer1 as ptensorlayer1
+import ptens.cptensorlayer1 as cptensorlayer1
 
 
 class csubgraphlayer1(p.csubgraphlayer,cptensorlayer1):
@@ -27,7 +27,7 @@ class csubgraphlayer1(p.csubgraphlayer,cptensorlayer1):
         assert isinstance(atoms,pb.catomspack)
         assert isinstance(G,p.ggraph)
         assert isinstance(S,p.subgraph)
-        R=super().__new__(subgraphlayer1,M)
+        R=super().__new__(csubgraphlayer1,M)
         R.atoms=atoms
         R.G=G
         R.S=S
@@ -35,19 +35,30 @@ class csubgraphlayer1(p.csubgraphlayer,cptensorlayer1):
 
     @classmethod
     def zeros(self,G,S,nvecs,nc,device='cpu'):
-        atoms=pb.csubgraphatoms_cache(G,S,nvecs)
+        assert isinstance(G,p.ggraph)
+        assert isinstance(S,p.subgraph)
+        S.set_evecs()
+        atoms=pb.csubgraphatoms_cache.subgraphs(G.obj,S.obj,nvecs)
         M=torch.zeros([len(atoms),nvecs,nc],device=device)
         return csubgraphlayer1(G,S,atoms,M)
 
     @classmethod
-    def randn(self,G,S,nc,device='cpu'):
-        atoms=pb.csubgraphatoms_cache(G,S,nvecs)
+    def randn(self,G,S,nvecs,nc,device='cpu'):
+        assert isinstance(G,p.ggraph)
+        assert isinstance(S,p.subgraph)
+        S.set_evecs()
+        atoms=pb.csubgraphatoms_cache.subgraphs(G.obj,S.obj,nvecs)
         M=torch.randn([len(atoms),nvecs,nc],device=device)
         return csubgraphlayer1(G,S,atoms,M)
 
     @classmethod
     def from_tensor(self,G,S,M):
-        atoms=pb.csubgraphatoms_cache(G,S,nvecs)
+        assert isinstance(G,p.ggraph)
+        assert isinstance(S,p.subgraph)
+        assert isinstance(M,torch.Tensor)
+        assert M.dim()==3
+        S.set_evecs()
+        atoms=pb.csubgraphatoms_cache.subgraphs(G.obj,S.obj,M.size(1))
         return csubgraphlayer1(G,S,atoms,M)
 
     
@@ -64,7 +75,7 @@ class csubgraphlayer1(p.csubgraphlayer,cptensorlayer1):
 
     @classmethod
     def gather(self,S,x):
-        atoms=pb.csubgraphatoms_cache(G,S,nvecs)
+        atoms=pb.csubgraphatoms_cache.subgraphs(x.G.obj,S.obj,x.get_nvecs())
         return csubgraphlayer1(x.G,x.S,atoms,super().gather(atoms,x))
 
 
@@ -76,10 +87,8 @@ class csubgraphlayer1(p.csubgraphlayer,cptensorlayer1):
 
     def __str__(self,indent=""):
         r=indent+"csubgraphlayer1:\n"
-        for i in range(len(self)):
-            r=r+self[i].to_string(indent+"  ")+""
+        r=r+self.backend().__str__(indent+"  ")
         return r
-
 
 
 

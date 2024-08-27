@@ -3,10 +3,10 @@
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
-<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" />
+<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Global parameters and variables" href="global.html" /><link rel="prev" title="Compressed layers" href="compressed.html" />
 
     <!-- Generated with Sphinx 7.4.7 and Furo 2024.07.18 -->
-        <title>Unite layers - ptens documentation</title>
+        <title>Compressed subgraph layers - ptens documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=a746c00c" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=613ab9ff" />
     <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
@@ -204,7 +204,7 @@
 </form>
 <div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
   <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
-<ul>
+<ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="intro.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="ptensork.html">Ptensors</a></li>
 <li class="toctree-l1"><a class="reference internal" href="ptensorsk.html">Ptensor layers</a></li>
@@ -216,7 +216,7 @@
 <li class="toctree-l1"><a class="reference internal" href="subgraph_layer0.html">Subgraph layers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="batching.html">Batching</a></li>
 <li class="toctree-l1"><a class="reference internal" href="compressed.html">Compressed layers</a></li>
-<li class="toctree-l1"><a class="reference internal" href="csubgraphlayer.html">Compressed subgraph layers</a></li>
+<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Compressed subgraph layers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="global.html">Global parameters and variables</a></li>
 </ul>
 
@@ -238,7 +238,7 @@
         </a>
         <div class="content-icon-container">
           <div class="view-this-page">
-  <a class="muted-link" href="_sources/unite.rst.txt" title="View this page">
+  <a class="muted-link" href="_sources/csubgraphlayer.rst.txt" title="View this page">
     <svg><use href="#svg-eye"></use></svg>
     <span class="visually-hidden">View this page</span>
   </a>
@@ -258,42 +258,48 @@
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <section id="unite-layers">
-<h1>Unite layers<a class="headerlink" href="#unite-layers" title="Link to this heading">¶</a></h1>
-<p>Unite layers are similar to gather layers, except that the reference domain of each output
-vertex becomes the union of the reference domains of its neighbors.
-Consequently, a unite layers are true higher order message passing layers that can
-connect Ptensor layers of any order. The following shows a <code class="docutils literal notranslate"><span class="pre">unite1</span></code> operation applied to a
-<code class="docutils literal notranslate"><span class="pre">ptensors</span></code> layer:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">A</span><span class="o">=</span><span class="n">p</span><span class="o">.</span><span class="n">ptensors1</span><span class="o">.</span><span class="n">randn</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">],[</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">],[</span><span class="mi">3</span><span class="p">]],</span><span class="mi">3</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
-<span class="go">tensor1 [1,2]:</span>
-<span class="go">[ -1.23974 -0.407472 1.61201 ]</span>
-<span class="go">[ 0.399771 1.3828 0.0523187 ]</span>
+          <section id="compressed-subgraph-layers">
+<h1>Compressed subgraph layers<a class="headerlink" href="#compressed-subgraph-layers" title="Link to this heading">¶</a></h1>
+<p>Compressed layers are particularly useful for higher order GNNs with large subgraphs.
+The construction of the layers is particularly straightforward because there is a natural choice of
+compression basis, consisting of the <img class="math" src="_images/math/0541bd3ca64424b2b45ab42dc236b934f47bc754.svg" alt="m"/> leading (lowest eigenvalue) eigenvectors of the
+Laplacian of the subgraph. Ptens provides two specialized classes for compressed sugraph layers:
+<code class="docutils literal notranslate"><span class="pre">csubgraphlayer1</span></code> and <code class="docutils literal notranslate"><span class="pre">csubgraphlayer2</span></code>. Their usage is almost exactly the same as of
+regular subgraph layers, with the exception that their constructors also require specifying the
+number of basis vectors <img class="math" src="_images/math/0541bd3ca64424b2b45ab42dc236b934f47bc754.svg" alt="m"/>.</p>
+<p>As usual such as objects can be initialized using the <code class="docutils literal notranslate"><span class="pre">zeros</span></code>, <code class="docutils literal notranslate"><span class="pre">randn</span></code>, etc., constructors
+or from a data tensor:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;&gt;</span> <span class="n">G</span><span class="o">=</span><span class="n">ptens</span><span class="o">.</span><span class="n">ggraph</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span><span class="mf">0.5</span><span class="p">)</span>
+<span class="o">&gt;&gt;</span> <span class="n">S</span><span class="o">=</span><span class="n">ptens</span><span class="o">.</span><span class="n">subgraph</span><span class="o">.</span><span class="n">triangle</span><span class="p">()</span>
+<span class="o">&gt;&gt;</span> <span class="n">A</span><span class="o">=</span><span class="n">ptens</span><span class="o">.</span><span class="n">csubgraphlayer1</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="n">G</span><span class="p">,</span><span class="n">S</span><span class="p">,</span><span class="n">nvecs</span><span class="p">,</span><span class="mi">3</span><span class="p">)</span>
+<span class="o">&gt;&gt;</span> <span class="nb">print</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
 
-<span class="go">Ptensor1 [2,3]:</span>
-<span class="go">[ -0.904146 1.87065 -1.66043 ]</span>
-<span class="go">[ -0.688081 0.0757219 1.47339 ]</span>
-
-<span class="go">Ptensor1 [3]:</span>
-<span class="go">[ 0.097221 -0.89237 -0.228782 ]</span>
-
-<span class="gp">&gt;&gt;&gt; </span><span class="n">G</span><span class="o">=</span><span class="n">p</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">from_matrix</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([[</span><span class="mf">1.0</span><span class="p">,</span><span class="mf">1.0</span><span class="p">,</span><span class="mi">0</span><span class="p">],[</span><span class="mf">1.0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">],[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mf">1.0</span><span class="p">]]))</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">B</span><span class="o">=</span><span class="n">p</span><span class="o">.</span><span class="n">unite1</span><span class="p">(</span><span class="n">A</span><span class="p">,</span><span class="n">G</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">B</span><span class="p">)</span>
-<span class="go">Ptensor1 [1,2,3]:</span>
-<span class="go">[ -0.839965 0.97533 1.66433 -1.23974 -0.407472 1.61201 ]</span>
-<span class="go">[ -2.43219 2.92171 1.47729 -0.504376 3.25345 -1.60811 ]</span>
-<span class="go">[ -1.59223 1.94638 -0.187041 -0.688081 0.0757219 1.47339 ]</span>
-
-<span class="go">Ptensor1 [1,2]:</span>
-<span class="go">[ -0.839965 0.97533 1.66433 -1.23974 -0.407472 1.61201 ]</span>
-<span class="go">[ -0.839965 0.97533 1.66433 0.399771 1.3828 0.0523187 ]</span>
-
-<span class="go">Ptensor1 [3]:</span>
-<span class="go">[ 0.097221 -0.89237 -0.228782 0.097221 -0.89237 -0.228782 ]</span>
+<span class="n">csubgraphlayer1</span><span class="p">:</span>
+  <span class="n">CPtensor1</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span><span class="mi">6</span><span class="p">]:</span>
+    <span class="p">[</span> <span class="mf">0.493525</span> <span class="o">-</span><span class="mf">0.342878</span> <span class="mf">1.44645</span> <span class="p">]</span>
+    <span class="p">[</span> <span class="o">-</span><span class="mf">0.982564</span> <span class="o">-</span><span class="mf">0.097045</span> <span class="o">-</span><span class="mf">1.00078</span> <span class="p">]</span>
+    <span class="p">[</span> <span class="o">-</span><span class="mf">0.123699</span> <span class="mf">0.282664</span> <span class="mf">0.444347</span> <span class="p">]</span>
+  <span class="n">CPtensor1</span><span class="p">[</span><span class="mi">4</span><span class="p">,</span><span class="mi">7</span><span class="p">,</span><span class="mi">6</span><span class="p">]:</span>
+    <span class="p">[</span> <span class="o">-</span><span class="mf">0.191068</span> <span class="o">-</span><span class="mf">1.37902</span> <span class="mf">0.478407</span> <span class="p">]</span>
+    <span class="p">[</span> <span class="mf">1.22947</span> <span class="o">-</span><span class="mf">0.338276</span> <span class="mf">1.01485</span> <span class="p">]</span>
+    <span class="p">[</span> <span class="mf">0.754955</span> <span class="o">-</span><span class="mf">1.30173</span> <span class="o">-</span><span class="mf">1.71202</span> <span class="p">]</span>
+  <span class="n">CPtensor1</span><span class="p">[</span><span class="mi">4</span><span class="p">,</span><span class="mi">6</span><span class="p">,</span><span class="mi">5</span><span class="p">]:</span>
+    <span class="p">[</span> <span class="o">-</span><span class="mf">0.34454</span> <span class="mf">0.92664</span> <span class="mf">0.145421</span> <span class="p">]</span>
+    <span class="p">[</span> <span class="o">-</span><span class="mf">0.734754</span> <span class="o">-</span><span class="mf">0.457473</span> <span class="o">-</span><span class="mf">0.733602</span> <span class="p">]</span>
+    <span class="p">[</span> <span class="mf">0.722986</span> <span class="o">-</span><span class="mf">0.308857</span> <span class="mf">0.765271</span> <span class="p">]</span>
 </pre></div>
 </div>
+<p>Note that unlike for the <code class="docutils literal notranslate"><span class="pre">cptensorlayer</span></code> classes, the bases and atomspacks do not need to be explicitly
+specified, since they are computed automatically from the Laplacian of the subgraph <code class="docutils literal notranslate"><span class="pre">S</span></code>.
+This makes the syntax much simpler.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">linmaps</span></code> and <code class="docutils literal notranslate"><span class="pre">gather</span></code> operations work much the same way between compressed subgraphlayers and other
+compressed or non-compressed layers of any order as before:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;&gt;</span> <span class="n">B</span><span class="o">=</span><span class="n">ptens</span><span class="o">.</span><span class="n">csubgraphlayer1</span><span class="o">.</span><span class="n">linmaps</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+<span class="o">&gt;&gt;</span> <span class="n">A2</span><span class="o">=</span><span class="n">ptens</span><span class="o">.</span><span class="n">csubgraphlayer2</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="n">G</span><span class="p">,</span><span class="n">S</span><span class="p">,</span><span class="n">nvecs</span><span class="p">,</span><span class="mi">3</span><span class="p">)</span>
+<span class="o">&gt;&gt;</span> <span class="n">B2</span><span class="o">=</span><span class="n">ptens</span><span class="o">.</span><span class="n">csubgraphlayer1</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span><span class="n">S</span><span class="p">,</span><span class="n">A2</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The compressed subgraph layers have their own caching mechanism to facilitate fast computation.</p>
 </section>
 
         </article>
@@ -301,8 +307,26 @@ connect Ptensor layers of any order. The following shows a <code class="docutils
       <footer>
         
         <div class="related-pages">
-          
-          
+          <a class="next-page" href="global.html">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title">Global parameters and variables</div>
+              </div>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+            </a>
+          <a class="prev-page" href="compressed.html">
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">Compressed layers</div>
+                
+              </div>
+            </a>
         </div>
         <div class="bottom-of-page">
           <div class="left-details">

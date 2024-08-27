@@ -99,6 +99,20 @@ namespace ptens{
       return R;
     }
 
+    void add_compress(const Ptensors1<TYPE>& x) const{
+      PTENS_ASSRT(size()==x.size());
+      int N=size();
+      for(int i=0; i<N; i++)
+	(*this)(i).add_mprod(atoms.basis(i).transp(), x(i));
+    }
+
+    void add_uncompress_to(const Ptensors1<TYPE>& R) const{
+      PTENS_ASSRT(size()==R.size());
+      int N=size();
+      for(int i=0; i<N; i++)
+	R.view_of(i).add_mprod(atoms.basis(i),(*this)(i));
+    }
+
 
   public: // ---- Access -------------------------------------------------------------------------------------
 
