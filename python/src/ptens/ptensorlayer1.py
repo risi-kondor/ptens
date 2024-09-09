@@ -225,6 +225,7 @@ class ptensorlayer1_gatherFn(torch.autograd.Function):
     @staticmethod
     def forward(ctx,atoms,x,tmap):
         r=ptensorlayer1.zeros(atoms,x.get_nc()*([1,2,5][x.getk()]),device=x.device)
+        print(r)
         r.backend().add_gather(x.backend(),tmap)
         ctx.x=x
         ctx.tmap=tmap

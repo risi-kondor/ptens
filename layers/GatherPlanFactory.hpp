@@ -59,8 +59,13 @@ namespace ptens{
       const AtomsPackObj& out, const AtomsPackObj& in, const int outk=0, const int ink=0, const int gatherk=0){
 
       int N=map.tsize();
-      int longest=map.max_size();
-
+      //int longest=map.max_size();
+      int longest=0;
+      map.for_each([&](const int i, const int j){
+	  auto[out_ix,in_ix]=out[i].intersecting(in[j]);
+	  if(out_ix.size()>longest) longest=out_ix.size();
+	});
+      
       cnine::map_of_lists<int,int> out_lists;
       cnine::map_of_lists<int,int> in_lists;
 

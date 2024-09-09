@@ -30,7 +30,9 @@ class subgraphlayer0(p.subgraphlayer,ptensorlayer0):
         assert isinstance(atoms,pb.atomspack)
         assert isinstance(G,p.ggraph)
         assert isinstance(S,p.subgraph)
+        assert isinstance(M,torch.Tensor)
         assert M.size(0)==atoms.nrows0()
+        M=M.to(dtype=torch.float32)
         R=super().__new__(subgraphlayer0,M)
         R.atoms=atoms
         R.G=G

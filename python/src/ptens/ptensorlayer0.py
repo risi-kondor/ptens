@@ -27,6 +27,8 @@ class ptensorlayer0(ptensorlayer):
         if isinstance(atoms,list):
            atoms=pb.atomspack(atoms)
         assert isinstance(atoms,pb.atomspack)
+        assert isinstance(M,torch.Tensor)
+        M=M.to(dtype=torch.float32)
         R=ptensorlayer0(M)
         R.atoms=atoms
         return R
