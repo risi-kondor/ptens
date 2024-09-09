@@ -16,10 +16,9 @@
 #define _ptens_SubgraphObj
 
 #include "Ptens_base.hpp"
-#include "Tensor.hpp"
 #include "SymmEigendecomposition.hpp"
 #include "sparse_graph.hpp"
-#include "Tensor.hpp"
+#include "TensorView.hpp"
 
 
 namespace ptens{
@@ -73,7 +72,7 @@ namespace ptens{
     SubgraphObj(const int _n, const initializer_list<pair<int,int> >& list, const cnine::TensorView<int>& _labels): 
       BASE(_n,list,_labels){}
 
-    SubgraphObj(const int n, const cnine::Tensor<int>& M):
+    SubgraphObj(const int n, const cnine::TensorView<int>& M):
       BASE(n){
       PTENS_ASSRT(M.ndims()==2);
       PTENS_ASSRT(M.dim(0)==2);

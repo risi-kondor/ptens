@@ -17,7 +17,7 @@
 #include "once.hpp"
 #include "sparse_graph.hpp"
 #include "FindPlantedSubgraphs.hpp"
-#include "FindPlantedSubgraphs2.hpp"
+//#include "FindPlantedSubgraphs2.hpp"
 #include "SubgraphObj.hpp"
 #include "AtomsPack.hpp"
 #include "Ltensor.hpp"
@@ -130,9 +130,9 @@ namespace ptens{
   public: // ---- Access --------------------------------------------------------------------------------------
 
 
-    cnine::Tensor<int> edge_list() const{
+    cnine::TensorView<int> edge_list() const{
       int N=nedges()*2;
-      cnine::Tensor<int> R({2,N},0,0);
+      cnine::TensorView<int> R({2,N},0,0);
       int t=0;
       for_each_edge([&](const int i, const int j, const int v){
 	  R.set(0,t,i);
@@ -154,7 +154,7 @@ namespace ptens{
 
 
     GgraphObj permute(const cnine::permutation pi) const{
-      cnine::Tensor<int> A({2,nedges()},cnine::fill_zero());
+      cnine::TensorView<int> A({2,nedges()},0,0);
       int t=0;
       for_each_edge([&](const int i, const int j, const int v){
 	  A.set(0,t,pi(i));
@@ -202,7 +202,7 @@ namespace ptens{
 	  return r;
 	}
 
-	AtomsPack r(new AtomsPackObj(cnine::Tensor<int>(cnine::FindPlantedSubgraphs<int>(*this,*S))));
+	AtomsPack r(new AtomsPackObj(cnine::TensorView<int>(cnine::FindPlantedSubgraphs<int>(*this,*S))));
 	subgraphpack_cache[S]=r;
 	return r;
       }

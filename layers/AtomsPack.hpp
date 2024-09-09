@@ -72,7 +72,7 @@ namespace ptens{
     AtomsPack(cnine::array_pool<int>&& x):
       obj(new AtomsPackObj(std::move(x))){}
 
-    AtomsPack(const cnine::Tensor<int>& M):
+    AtomsPack(const cnine::TensorView<int>& M):
       obj(new AtomsPackObj(M)){}
 
 

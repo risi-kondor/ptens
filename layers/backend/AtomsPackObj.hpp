@@ -27,7 +27,9 @@
 #include "map_of_lists.hpp"
 #include "once.hpp"
 //#include "monitored.hpp"
-#include "Ltensor.hpp"
+//#include "Tensor.hpp"
+//#include "Ltensor.hpp"
+#include "TensorView_functions.hpp"
 
 #include "Atoms.hpp"
 
@@ -195,9 +197,10 @@ namespace ptens{
       cnine::array_pool<int>(std::move(x)),
       observable(this){}
 
-    AtomsPackObj(const cnine::Tensor<int>& M):
-      AtomsPackObj(cnine::array_pool<int>(M)){
-      PTENS_ASSRT(M.ndims()==2);
+    AtomsPackObj(const cnine::TensorView<int>& M):
+      //AtomsPackObj(cnine::array_pool<int>(M)){
+      AtomsPackObj(cnine::to_array_pool(M)){
+      //PTENS_ASSRT(M.ndims()==2);
       constk=M.dim(1);
     }
 

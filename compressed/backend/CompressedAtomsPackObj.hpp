@@ -73,7 +73,7 @@ namespace ptens{
       bases({nrows1(),_nvecs},fcode,_dev){
       if(fcode==4){
 	for(int i=0; i<size(); i++){
-	  cnine::Ltensor<float> M=cnine::ColumnSpace(basis(i));
+	  cnine::TensorView<float> M=cnine::ColumnSpace(basis(i));
 	  basis(i).cols(0,M.dim(1))=M;
 	}
       }

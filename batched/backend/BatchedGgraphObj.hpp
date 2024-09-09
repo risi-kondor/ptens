@@ -39,7 +39,7 @@ namespace ptens{
   public: //  ---- Named constructors -------------------------------------------------------------------------
 
 
-    static BatchedGgraphObj* from_edge_list_p(const vector<int>& sizes, const cnine::Tensor<int>& M){//, const bool cached=false){
+    static BatchedGgraphObj* from_edge_list_p(const vector<int>& sizes, const cnine::TensorView<int>& M){//, const bool cached=false){
       PTENS_ASSRT(sizes.size()>0);
       PTENS_ASSRT(M.ndims()==2);
       PTENS_ASSRT(M.dim(0)==2);

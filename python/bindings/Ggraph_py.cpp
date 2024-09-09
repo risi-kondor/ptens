@@ -6,13 +6,13 @@ pybind11::class_<ptens::Ggraph>(m,"ggraph")
 
 
   .def_static("from_matrix",[](const at::Tensor& x){
-	return Ggraph(cnine::Ltensor<int>(x));})
+	return Ggraph(cnine::TensorView<int>(x));})
 
   .def_static("from_matrix",[](const at::Tensor& x, const at::Tensor& labels){
 	return Ggraph(cnine::TensorView<int>(x),cnine::TensorView<int>(labels));})
 
   .def_static("from_edge_index",[](const at::Tensor& x, const int n=-1){
-      return Ggraph::from_edges(n,cnine::Tensor<int>(x));})
+      return Ggraph::from_edges(n,cnine::TensorView<int>(x));})
 
   .def_static("from_edge_index",[](const at::Tensor& x, const at::Tensor& labels, const int n=-1){
       auto G=Ggraph::from_edges(n,cnine::TensorView<int>(x));

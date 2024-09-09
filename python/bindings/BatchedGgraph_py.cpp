@@ -4,7 +4,7 @@ pybind11::class_<ptens::BatchedGgraph>(m,"batched_ggraph")
   .def(pybind11::init<const vector<int>&>())
 
   .def_static("edge_index",[](at::Tensor& M, vector<int>& indicators){
-      return BatchedGgraph::from_edge_list(Tensor<int>(M),indicators);
+      return BatchedGgraph::from_edge_list(TensorView<int>(M),indicators);
     })
 
   .def("__len__",&BatchedGgraph::size)
