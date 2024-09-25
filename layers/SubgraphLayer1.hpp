@@ -114,13 +114,13 @@ namespace ptens{
 
 
     template<typename SOURCE>
-    SubgraphLayer1(const SOURCE& x, const Subgraph& _S)://, const int min_overlaps=1):
+    SubgraphLayer1(const SOURCE& x, const Subgraph& _S): //, const int min_overlaps=1):
       SubgraphLayer1(x.G,_S,x.G.subgraphs(_S),x.get_nc()*vector<int>({1,2,5})[x.getk()],0,x.dev){
       add_gather(x,LayerMap::overlaps_map(atoms,x.atoms));
     }
 
     template<typename SOURCE>
-    SubgraphLayer1(const SOURCE& x, const Ggraph& _G, const Subgraph& _S)://, const int min_overlaps=1):
+    SubgraphLayer1(const SOURCE& x, const Ggraph& _G, const Subgraph& _S): //, const int min_overlaps=1):
       SubgraphLayer1(_G,_S,_G.subgraphs(_S),x.get_nc()*vector<int>({1,2,5})[x.getk()],0,x.dev){
       add_gather(x,LayerMap::overlaps_map(atoms,x.atoms));
     }

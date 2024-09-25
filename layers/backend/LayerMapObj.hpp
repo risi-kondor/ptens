@@ -33,7 +33,8 @@ namespace ptens{
     LayerMapObj():
       observable(this){}
 
-    static shared_ptr<LayerMapObj> overlaps_map(const AtomsPackObj& out, const AtomsPackObj& in){
+    static shared_ptr<LayerMapObj> overlaps_map(const AtomsPackObj& out, const AtomsPackObj& in, 
+						const int min_overlaps=1){
       cnine::flog timer("LayerMapObj::make_overlaps");
       auto R=new LayerMapObj();
 
@@ -43,7 +44,7 @@ namespace ptens{
 	  for(int j=0; j<in.size(); j++){
 	    auto w=in(j);
 	    if([&](){for(auto p:v) if(std::find(w.begin(),w.end(),p)!=w.end()) return true; return false;}())
-	      R->push_back(i,j);
+	      if(min_overlaps==1 || out.n_intersects(in,i,j)>=min_overlaps) R->push_back(i,j);
 	  }
 	}
       }
@@ -64,7 +65,7 @@ namespace ptens{
 	    auto it=map.find(p);
 	    if(it!=map.end())
 	      for(auto q:it->second)
-		R->push_back(i,q);
+	      if(min_overlaps==1 || out.n_intersects(in,i,q)>=min_overlaps) R->push_back(i,q);
 	  }
 	}
       }

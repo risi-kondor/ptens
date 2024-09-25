@@ -29,8 +29,8 @@ namespace ptens{
     LayerMap(const shared_ptr<LayerMapObj>& _obj):
       obj(_obj){}
 
-    static LayerMap overlaps_map(const AtomsPack& out, const AtomsPack& in){
-      return LayerMapObj::overlaps_map(*out.obj,*in.obj);
+    static LayerMap overlaps_map(const AtomsPack& out, const AtomsPack& in, const int min_overlaps=1){
+      return LayerMapObj::overlaps_map(*out.obj,*in.obj,min_overlaps);
     }
 
 

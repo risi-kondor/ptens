@@ -85,9 +85,9 @@ class batched_subgraphlayer0(p.subgraphlayer,p.batched_ptensorlayer0):
 
 
     @classmethod
-    def gather(self,S,x):
+    def gather(self,S,x,*args):
         atoms=x.G.subgraphs(S)
-        return batched_subgraphlayer0(x.G,x.S,atoms,super().gather(atoms,x))
+        return batched_subgraphlayer0(x.G,x.S,atoms,super().gather(atoms,x,args))
 
 
     # ---- I/O ----------------------------------------------------------------------------------------------

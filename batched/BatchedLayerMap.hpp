@@ -32,12 +32,13 @@ namespace ptens{
   public: // ---- Named constructors ------------------------------------------------------------------------
 
 
-    static BatchedLayerMap overlaps_map(const BatchedAtomsPackBase& out, const BatchedAtomsPackBase& in){
+    static BatchedLayerMap overlaps_map(const BatchedAtomsPackBase& out, const BatchedAtomsPackBase& in, 
+      const int min_overlaps=1){
       PTENS_ASSRT(out.size()==in.size());
       int N=out.size();
       BatchedLayerMap R;
       for(int i=0; i<N; i++)
-	R.maps.push_back(LayerMapObj::overlaps_map(*out[i].obj,*in[i].obj));
+	R.maps.push_back(LayerMapObj::overlaps_map(*out[i].obj,*in[i].obj,min_overlaps));
       return R;
     }
 
