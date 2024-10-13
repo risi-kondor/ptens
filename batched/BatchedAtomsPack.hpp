@@ -72,6 +72,11 @@ namespace ptens{
       return obj->as_vecs();
     }
 
+    bool operator==(const BatchedAtomsPackBase& x) const{
+      if(obj.get()==x.obj.get()) return true;
+      return (*obj)==(*x.obj);
+    }
+
 
   public: // ---- Layout -------------------------------------------------------------------------------------
 

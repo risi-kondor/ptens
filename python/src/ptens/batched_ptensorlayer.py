@@ -17,13 +17,29 @@ import ptens_base as pb
 
 class batched_ptensorlayer(torch.Tensor):
 
+    covariant_functions=[torch.Tensor.to,torch.Tensor.add,torch.Tensor.sub,torch.relu]
+
+    @classmethod
+    def __torch_function__(cls, func, types, args=(), kwargs=None):
+        if kwargs is None:
+            kwargs = {}
+        if func in batched_ptensorlayer.covariant_functions:
+            r= super().__torch_function__(func, types, args, kwargs)
+            r.atoms=args[0].atoms
+        else:
+            r= super().__torch_function__(func, types, args, kwargs)
+            if isinstance(r,torch.Tensor):
+                r=torch.Tensor(r)
+        return r
+
+
     # ---- Operations ----------------------------------------------------------------------------------------
 
 
-    def __add__(self,y):
-        assert self.size()==y.size()
-        assert self.atoms==y.atoms
-        return self.from_matrix(self.atoms,super().__add__(y))
+#    def __add__(self,y):
+#        assert self.size()==y.size()
+#        assert self.atoms==y.atoms
+#        return self.from_matrix(self.atoms,super().__add__(y))
 
 
 def matmul(x,y):

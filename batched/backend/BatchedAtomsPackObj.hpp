@@ -60,6 +60,13 @@ namespace ptens{
       return R;
     }
 
+    bool operator==(const BatchedAtomsPackObj& x){
+      if(size()!=x.size()) return false;
+      for(int i=0; i<size(); i++)
+	if((*this)[i]!=x[i]) return false;
+      return true;
+    }
+
 
   public: // ---- 0th order layout -----------------------------------------------------------------------------------
 
