@@ -17,7 +17,7 @@ import ptens_base as pb
 
 class subgraphlayer(torch.Tensor):
 
-    covariant_functions=[torch.Tensor.to,torch.Tensor.add,torch.Tensor.sub,torch.relu]
+    covariant_functions=[torch.Tensor.to,torch.Tensor.add,torch.Tensor.sub,torch.relu,torch.nn.functional.linear]
 
     @classmethod
     def __torch_function__(cls, func, types, args=(), kwargs=None):
