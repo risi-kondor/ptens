@@ -133,34 +133,51 @@ class ptensorlayer0(ptensorlayer):
 class ptensorlayer0_linmapsFn(torch.autograd.Function):
 
     @staticmethod
-    def forward(ctx,x):
+    def forward(x):
         r=ptensorlayer0.zeros(x.atoms,x.get_nc()*([1,1,2][x.getk()]),device=x.device)
         r.backend().add_linmaps(x.backend())
-        ctx.x=x
         return r
 
     @staticmethod
+    def setup_context(ctx, inputs, outputs):
+        x, = inputs
+        ctx.atoms = x.atoms
+        ctx.save_for_backward(x)
+        
+    
+    @staticmethod
     def backward(ctx,g):
-        r=ctx.x.zeros_like()
-        r.backend().add_linmaps_back(g.backend())
+        x, = ctx.saved_tensors
+        r = x.zeros_like()
+        g_view = pb.ptensor0.view(ctx.atoms, g)
+        r.backend().add_linmaps_back(g_view)
         return r
 
 
 class ptensorlayer0_gatherFn(torch.autograd.Function):
 
     @staticmethod
-    def forward(ctx,atoms,x,map):
+    def forward(atoms,x,map):
         r=ptensorlayer0.zeros(atoms,x.get_nc()*([1,1,2][x.getk()]),device=x.device)
         r.backend().add_gather(x.backend(),map)
-        ctx.x=x
-        ctx.map=map
         return r
 
     @staticmethod
-    def backward(ctx,g):
-        r=ctx.x.zeros_like()
-        r.backend().add_gather_back(g.backend(),ctx.map)
-        return r
+    def setup_context(ctx, inputs, outputs):
+        atoms, x, map = inputs
+        ctx.save_for_backward(x)
+        ctx.atoms = atoms
+        ctx.map = map
+  
+    @staticmethod
+    def backward(ctx, g):
+        x, = ctx.saved_tensors
+        r=x.zeros_like()
+        g_view = pb.ptensors0.view(ctx.atoms, g)
+        r.backend().add_gather_back(g_view, ctx.map)
+        #      atoms,x, map
+        return None, r, None
+
 
 
 
