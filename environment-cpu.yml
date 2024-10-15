@@ -1,0 +1,7 @@
+name: ptens
+channels:
+  - pytorch
+  - defaults
+dependencies:
+  - pytorch
+

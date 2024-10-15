@@ -25,9 +25,10 @@ def main():
     #os.environ["CC"] = "clang"
 
     compile_with_cuda = interpret_bool_string(os.environ.get("WITH_CUDA", False))
-    copy_warnings = False
-    torch_convert_warnings = False
 
+    copy_warnings= interpret_bool_string(os.environ.get("COPY_WARNING", False))
+    torch_convert_warnings=interpret_bool_string(os.environ.get("TORCH_CONVERT_WARNINGS", False))
+    cnine_folder = os.environ.get("CNINE_FOLDER", "/../../cnine/")
     # ------------------------------------------------------------------------------------------------------------
 
     #if 'CUDAHOME' in os.environ:
@@ -40,7 +41,7 @@ def main():
         compile_with_cuda=False
 
     cwd = os.getcwd()
-    cnine_folder = "/../../cnine/"
+
 
     _include_dirs = [cwd + cnine_folder + '/include',
 		     cwd + cnine_folder + '/combinatorial',
@@ -66,6 +67,7 @@ def main():
 
 
     _cxx_compile_args = ['-std=c++17',
+                         '-fvisibility=hidden',
                          '-Wno-sign-compare',
                          '-Wno-deprecated-declarations',
                          '-Wno-unused-variable',
