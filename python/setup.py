@@ -127,6 +127,7 @@ def main():
             '../../cnine/cuda/TensorView_add.cu',
             '../../cnine/cuda/TensorView_assign.cu',
             '../../cnine/cuda/TensorView_inc.cu',
+            '../../cnine/cuda/BlockCsparseMatrix.cu',
             #'../../cnine/cuda/RtensorPackUtils.cu',
             #'../../cnine/cuda/gatherRows.cu',
             '../cuda/Ptensors0.cu',
