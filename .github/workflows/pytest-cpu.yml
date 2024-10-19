@@ -1,0 +1,67 @@
+# Runs all the Python SDK tests within the `tests/` directory to check our code
+
+name: CI Tests with CPU build
+permissions: read-all
+
+on:
+  workflow_dispatch:
+
+  push:
+    branches:
+      - main
+      - master
+  pull_request:
+    branches:
+      - main
+      - master
+      - dev**
+
+concurrency:
+  # github.workflow: name of the workflow
+  # github.event.pull_request.number || github.ref: pull request number or branch name if not a pull request
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+
+  # Cancel in-progress runs when a new workflow with the same group name is triggered
+  cancel-in-progress: true
+
+jobs:
+  pytest-cpu:
+    name: pytest (${{ matrix.python-version }}, ${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        shell: bash -l {0}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: ["ubuntu-latest", "macos-latest"]
+        python-version: ["3.10", "3.12"]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - uses: conda-incubator/setup-miniconda@v3
+        with:
+          auto-update-conda: true
+          python-version: ${{ matrix.python-version }}
+          environment-file: environment-cpu.yml
+          activate-environment: ptens
+      - name: Install Missing Developper packages
+        run: conda install pytest
+      - name: Install cnine
+        run: |
+          git clone https://github.com/risi-kondor/cnine.git
+          cd cnine
+          git checkout dev
+          # pip install python/
+          cd ..
+      - name: Install and build
+        run: |
+          export CNINE_FOLDER="/../cnine/"
+          pip install python/
+      # TODO activate pytests when ready
+      - name: Test with pytest
+        run: |
+          # pytest python/tests
+          mkdir ./tmp-run/
+          cd ./tmp-run/
+          python -c "import ptens"
