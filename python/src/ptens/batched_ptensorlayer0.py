@@ -142,18 +142,25 @@ class batched_ptensorlayer0_linmapsFn(torch.autograd.Function):
 class batched_ptensorlayer0_gatherFn(torch.autograd.Function):
 
     @staticmethod
-    def forward(ctx,atoms,x,map):
+    def forward(atoms,x,map):
         r=batched_ptensorlayer0.zeros(atoms,x.get_nc()*([1,1,2][x.getk()]),device=x.device)
         r.backend().add_gather(x.backend(),map)
-        ctx.x=x
-        ctx.map=map
         return r
 
     @staticmethod
+    def setup_context(ctx, inputs, outputs):
+        atoms, x, map = inputs
+        ctx.map = map
+        ctx.atoms = atoms
+        ctx.save_for_backward(x)
+    
+    @staticmethod
     def backward(ctx,g):
-        r=ctx.x.zeros_like()
-        r.backend().add_gather_back(g.backend(),ctx.map)
-        return r
+        x, = ctx.saved_tensors
+        r = x.zeros_like()
+        g_view = pb.batched_ptensors0.view(ctx.atoms, g)
+        r.backend().add_gather_back(g_view, ctx.map)
+        return None, r, None
 
 
 
