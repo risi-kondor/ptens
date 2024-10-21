@@ -116,4 +116,8 @@ class subgraph:
     def __repr__(self):
         return self.obj.__str__()
 
+    # ---- Operators --------------------------------------------------------------------------------------------
+    def __eq__(self, other):
+        return self.obj.__eq__(other.obj)
+        
     
