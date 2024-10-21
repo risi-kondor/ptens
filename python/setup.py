@@ -121,7 +121,7 @@ def main():
     # ---- Compilation commands ----------------------------------------------------------------------------------
 
     if compile_with_cuda:
-        ext_modules = [CUDAExtension('ptens_base', [
+        ext_modules = [CUDAExtension('ptens_base', [os.path.relpath(path) for path in [
             cwd + cnine_folder + '/include/Cnine_base.cu',
             #cwd + cnine_folder + '/cuda/TensorView_accumulators.cu',
             #cwd + cnine_folder + '/cuda/BasicCtensorProducts.cu',
@@ -137,7 +137,7 @@ def main():
             '../cuda/Ptensors2.cu',
             #'../cuda/NodeLayer.cu',
             'bindings/ptens_py.cpp'
-        ],
+        ]],
             include_dirs=_include_dirs,
             extra_compile_args={
             'nvcc': _nvcc_compile_args,
