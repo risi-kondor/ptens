@@ -58,11 +58,13 @@ jobs:
         run: |
           export CNINE_FOLDER="/../cnine/"
           pip install python/
+          # Fixing GLIB error
+          # Dirty fix, from https://github.com/pytorch/pytorch/commit/5837e95d303464141009b8072636bb4442e2fcb2
+      - if: ${{ matrix.os }} == "ubuntu-latest" && ${{matrix.python-version}} == "3.10"
+        run: npm install -g npm@${{ matrix.npm }}
       # TODO activate pytests when ready
       - name: Test with pytest
         run: |
-          # Fixing GLIB error
-          # Dirty fix, from https://github.com/pytorch/pytorch/commit/5837e95d303464141009b8072636bb4442e2fcb2
           rm $CONDA_PREFIX/lib/libstdc++.so.6
           # pytest python/tests
           mkdir ./tmp-run/
