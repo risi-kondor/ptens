@@ -1,14 +1,14 @@
 #
-# This file is part of ptens, a C++/CUDA library for permutation 
-# equivariant message passing. 
-#  
+# This file is part of ptens, a C++/CUDA library for permutation
+# equivariant message passing.
+#
 # Copyright (c) 2023, Imre Risi Kondor
 #
-# This source code file is subject to the terms of the noncommercial 
-# license distributed with cnine in the file LICENSE.TXT. Commercial 
-# use is prohibited. All redistributed versions of this file (in 
-# original or modified form) must retain this copyright notice and 
-# must be accompanied by a verbatim copy of the license. 
+# This source code file is subject to the terms of the noncommercial
+# license distributed with cnine in the file LICENSE.TXT. Commercial
+# use is prohibited. All redistributed versions of this file (in
+# original or modified form) must retain this copyright notice and
+# must be accompanied by a verbatim copy of the license.
 #
 #
 import torch
@@ -29,7 +29,7 @@ class subgraph:
     @classmethod
     def from_edge_index(self,M,n=-1,labels=None,degrees=None):
         G=subgraph()
-        if degrees is None: 
+        if degrees is None:
             if labels is None:
                 G.obj=_subgraph.edge_index(M,n)
             else:
@@ -94,7 +94,7 @@ class subgraph:
     def evecs(self):
         self.set_evecs()
         return self.obj.evecs()
-        
+
     def set_evecs(self):
         if self.has_espaces()>0:
             return
@@ -102,7 +102,7 @@ class subgraph:
         L=torch.diag(torch.sum(L,1))-L
         U,S,V=torch.linalg.svd(L)
         self.obj.set_evecs(U,S)
-    
+
     def torch(self):
         return self.obj.dense()
 
@@ -118,6 +118,8 @@ class subgraph:
 
     # ---- Operators --------------------------------------------------------------------------------------------
     def __eq__(self, other):
+        if id(self) == id(other):
+            return True:
+        if id(self.obj) == id(other.obj):
+            return True
         return self.obj.__eq__(other.obj)
-        
-    
