@@ -44,12 +44,22 @@ class batched_subgraphlayer0(p.subgraphlayer,p.batched_ptensorlayer0):
         return batched_subgraphlayer0(G,S,atoms,M)
 
     @classmethod
-    def from_ptensorlayers(self,list):
-        for a in list:
+    def from_subgraphlayers(self,subgraphlayer_list):
+        sub_graph = None
+        graph_list = []
+        for a in subgraphlayer_list:
             assert isinstance(a,p.ptensorlayer0)
-        atoms=pb.batched_atomspack([a.atoms for a in list])
-        M=torch.cat(list,0)
-        return batched_subgraphlayer0(G,S,atoms,M)
+            if sub_graph is None:
+                sub_graph = a.S
+            elif sub_graph != a.S:
+                raise RuntimeError("When creating batched subgraphlayers0, the list of subgraphlayers did not contain identical subgraphs."
+                                   f" Please ensure all subgraphlayers in `subgraphlayer_list` have the same subgraph. The common subgraph {sub_graph}"
+                                   f" is not identical to the last found {a.S}")
+            graph_list.append(a.G)
+        atoms=pb.batched_atomspack([a.atoms for a in subgraphlayer_list])
+        G = p.batched_ggraph.from_graphs(graph_list)
+        M=torch.cat(subgraphlayer_list,0)
+        return batched_subgraphlayer0(G=G,S=sub_graph,atoms=atoms,M=M)
 
     @classmethod
     def from_matrix(self,G,S,M):
