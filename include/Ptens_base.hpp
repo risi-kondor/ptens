@@ -65,6 +65,7 @@
 
 #define PTENS_CPUONLY() if(dev!=0) {throw std::runtime_error("Ptens error: no CUDA code for "+string(__PRETTY_FUNCTION__)+".\n");}
 
+#define PTENS_CHANNEL_LIMIT(n) if(n>1024){throw std::invalid_argument("Ptens error: the number of channels cannot exceed 1024 when using GPU.");}
 
 // ---- Template decalarations -------------------------------------------------------------------------------
 

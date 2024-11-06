@@ -30,7 +30,14 @@ namespace ptens{
       obj(_obj){}
 
     static LayerMap overlaps_map(const AtomsPack& out, const AtomsPack& in, const int min_overlaps=1){
-      return LayerMapObj::overlaps_map(*out.obj,*in.obj,min_overlaps);
+      PTENS_ASSRT(min_overlaps==1);
+
+      if(ptens_global::overlaps_maps_cache.contains(*out.obj,*in.obj))
+	return (ptens_global::overlaps_maps_cache(*out.obj,*in.obj));
+
+      auto r=LayerMapObj::overlaps_map(*out.obj,*in.obj,min_overlaps);
+      ptens_global::overlaps_maps_cache.insert(*out.obj,*in.obj,r);
+      return LayerMap(r);
     }
 
 

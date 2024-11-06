@@ -15,6 +15,7 @@
 #ifndef _ptens_BatchedAtomsPackObj
 #define _ptens_BatchedAtomsPackObj
 
+#include "observable.hpp"
 #include "shared_object_pack.hpp"
 #include "AtomsPackObj.hpp"
 
@@ -22,7 +23,8 @@
 namespace ptens{
 
 
-  class BatchedAtomsPackObj: public cnine::shared_object_pack<AtomsPackObj>{
+  class BatchedAtomsPackObj:  public cnine::observable<BatchedAtomsPackObj>,
+			      public cnine::shared_object_pack<AtomsPackObj>{
   public:
 
     typedef cnine::shared_object_pack<AtomsPackObj> BASE;
@@ -39,12 +41,17 @@ namespace ptens{
   public: // ---- Constructors -------------------------------------------------------------------------------
 
 
-    BatchedAtomsPackObj(const vector<vector<vector<int> > >& v){
+    BatchedAtomsPackObj():
+      observable(this){}
+
+    BatchedAtomsPackObj(const vector<vector<vector<int> > >& v):
+      BatchedAtomsPackObj(){
       for(auto& p:v)
 	push_back(to_share(new AtomsPackObj(p)));
     }
 
-    BatchedAtomsPackObj(const initializer_list<initializer_list<initializer_list<int> > >& v){
+    BatchedAtomsPackObj(const initializer_list<initializer_list<initializer_list<int> > >& v):
+      BatchedAtomsPackObj(){
       for(auto& p:v)
 	push_back(to_share(new AtomsPackObj(p)));
     }

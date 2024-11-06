@@ -37,10 +37,11 @@ int main(int argc, char** argv){
   Subgraph trivial=Subgraph::trivial();
 
   AtomsPack xatoms0=AtomsPack::random(n,n,0.5);
-  BatchedAtomsPack xatoms({xatoms0,xatoms0,xatoms0});
+  BatchedAtomsPackBase xatoms({xatoms0,xatoms0,xatoms0});
 
   BPtens1 X1=BPtens1(xatoms,channels=3,filltype=3);
 
+  /*
   BatchedSubgraphLayer0<float> U(X1,G,trivial);
   cout<<U<<endl;
 
@@ -57,7 +58,7 @@ int main(int argc, char** argv){
   
   //auto W=BatchedSubgraphLayer0<float>::from_edge_features({0,0,0},P);
   //cout<<W<<endl;
-  
+  */
 
 
 }

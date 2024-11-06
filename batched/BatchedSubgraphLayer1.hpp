@@ -73,11 +73,11 @@ namespace ptens{
     BatchedSubgraphLayer1(const BatchedGgraph& _G, const int nc, const int fcode=0, const int _dev=0):
       G(_G), S(Subgraph::trivial()), BASE(_G.getn(),nc,fcode,_dev){}
 
-    BatchedSubgraphLayer1(const BatchedGgraph& _G, const Subgraph& _S, const BatchedAtomsPack& _atoms, const int nc, const int fcode, const int _dev=0):
+    BatchedSubgraphLayer1(const BatchedGgraph& _G, const Subgraph& _S, const BatchedAtomsPackBase& _atoms, const int nc, const int fcode, const int _dev=0):
       G(_G), S(_S), BASE(_atoms,nc,fcode,_dev){}
 
 
-    BatchedSubgraphLayer1(TYPE* _arr, const BatchedGgraph& _G, const Subgraph& _S, const BatchedAtomsPack& _atoms, const int nc, const int _dev=0):
+    BatchedSubgraphLayer1(TYPE* _arr, const BatchedGgraph& _G, const Subgraph& _S, const BatchedAtomsPackBase& _atoms, const int nc, const int _dev=0):
       G(_G), S(_S), BASE(_arr,_atoms,nc,_dev){}
 
 
@@ -305,10 +305,10 @@ namespace ptens{
       PTENS_ASSRT(E.n1==K);
       PTENS_ASSRT(x.dev==y.dev);
 
-      auto X=cnine::Ltensor<float>({N,K,xnc},0,x.dev);
+      auto X=TENSOR({N,K,xnc},0,x.dev);
       if(!inplace_add) X.view3().add_mprod(E.transp(),x);
 
-      auto Y=cnine::Tensor<float>({N,K,ync},0,x.dev);
+      auto Y=TENSOR({N,K,ync},0,x.dev);
       Y.view3().add_mprod(E.transp(),y);
 
       int offs=0;

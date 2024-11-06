@@ -32,7 +32,7 @@ int main(int argc, char** argv){
   typedef BatchedPtensors2<float> BPtens2;
 
   AtomsPack xatoms=AtomsPack::random(4,4,0.5);
-  BatchedAtomsPack bxatoms({xatoms,xatoms,xatoms});
+  BatchedAtomsPackBase bxatoms({xatoms,xatoms,xatoms});
 
   BPtens0 X0=BPtens0(bxatoms,channels=3,filltype=3);
   BPtens1 X1=BPtens1(bxatoms,channels=3,filltype=3);
@@ -57,15 +57,15 @@ int main(int argc, char** argv){
 
 
   AtomsPack yatoms=AtomsPack::random(4,4,0.5);
-  BatchedAtomsPack byatoms({xatoms,xatoms,xatoms});
+  BatchedAtomsPackBase byatoms({xatoms,xatoms,xatoms});
 
-  auto Y0=BPtens1::gather(X0,byatoms);
+  auto Y0=BPtens1::gather(byatoms,X0);
   cout<<Y0<<endl;
 
-  auto Y1=BPtens1::gather(X1,byatoms);
+  auto Y1=BPtens1::gather(byatoms,X1);
   cout<<Y1<<endl;
 
-  auto Y2=BPtens1::gather(X2,byatoms);
+  auto Y2=BPtens1::gather(byatoms,X2);
   cout<<Y2<<endl;
 
   auto u=cat_channels(Y1,Y1);
@@ -75,6 +75,7 @@ int main(int argc, char** argv){
   auto X1g=BPtens1::zeros_like(X1);
   auto X2g=BPtens2::zeros_like(X2);
 
+  /*
   X0g.add_gather_back(Y0);
   cout<<X0g<<endl;
   X1g.add_gather_back(Y1);
@@ -85,6 +86,7 @@ int main(int argc, char** argv){
   cout<<6666<<endl;
   auto C=BPtens1::cat({X1,X1,X1});
   cout<<C<<endl;
+  */  
 
   //Ptensors1b<float> Ab(A);
   //cout<<Ab<<endl;

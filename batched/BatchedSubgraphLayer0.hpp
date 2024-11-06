@@ -55,13 +55,13 @@ namespace ptens{
     BatchedSubgraphLayer0(const BatchedGgraph& _G, const Subgraph& _S, const TENSOR& M):
       BASE(_G.subgraphs(_S),M), G(_G), S(_S){}
 
-    BatchedSubgraphLayer0(const BatchedGgraph& _G, const Subgraph& _S, const BatchedAtomsPack& atoms, const TENSOR& x):
+    BatchedSubgraphLayer0(const BatchedGgraph& _G, const Subgraph& _S, const BatchedAtomsPackBase& atoms, const TENSOR& x):
       BASE(atoms,x), G(_G), S(_S){}
 
     //BatchedSubgraphLayer0(const BatchedGgraph& _G, const int nc, const int fcode=0, const int _dev=0):
     //G(_G), S(Subgraph::trivial()), BASE(_G.getn(),nc,fcode,_dev){}
 
-    BatchedSubgraphLayer0(const BatchedGgraph& _G, const Subgraph& _S, const BatchedAtomsPack& _atoms, const int nc, const int fcode, const int _dev=0):
+    BatchedSubgraphLayer0(const BatchedGgraph& _G, const Subgraph& _S, const BatchedAtomsPackBase& _atoms, const int nc, const int fcode, const int _dev=0):
       G(_G), S(_S), BASE(_atoms,nc,fcode,_dev){}
 
     /*
@@ -138,7 +138,7 @@ namespace ptens{
     template<typename SOURCE>
     BatchedSubgraphLayer0(const SOURCE& x, const BatchedGgraph& _G, const Subgraph& _S, const int min_overlaps=1):
       BatchedSubgraphLayer0(_G,_S,_G.subgraphs(_S),x.get_nc()*vector<int>({1,1,2})[x.getk()],0,x.dev){
-      add_gather(x,min_overlaps);
+      add_gather(x,BatchedLayerMap::overlaps_map(atoms,x.atoms));
     }
 
   };

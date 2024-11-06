@@ -49,13 +49,13 @@ namespace ptens{
     BatchedSubgraphLayer2(const BatchedGgraph& _G, const Subgraph& _S, const BASE& x):
       BASE(x), G(_G), S(_S){}
 
-    BatchedSubgraphLayer2(const BatchedGgraph& _G, const Subgraph& _S, const BatchedAtomsPack& atoms, const TENSOR& x):
+    BatchedSubgraphLayer2(const BatchedGgraph& _G, const Subgraph& _S, const BatchedAtomsPackBase& atoms, const TENSOR& x):
       BASE(atoms,x), G(_G), S(_S){}
 
     BatchedSubgraphLayer2(const BatchedGgraph& _G, const int nc, const int fcode=0, const int _dev=0):
       G(_G), S(Subgraph::trivial()), BASE(_G.getn(),nc,fcode,_dev){}
 
-    BatchedSubgraphLayer2(const BatchedGgraph& _G, const Subgraph& _S, const BatchedAtomsPack& _atoms, const int nc, const int fcode, const int _dev=0):
+    BatchedSubgraphLayer2(const BatchedGgraph& _G, const Subgraph& _S, const BatchedAtomsPackBase& _atoms, const int nc, const int fcode, const int _dev=0):
       G(_G), S(_S), BASE(_atoms,nc,fcode,_dev){}
 
     /*

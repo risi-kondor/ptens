@@ -68,9 +68,13 @@ namespace ptens{
 
     BatchedPtensors0(const initializer_list<Ptensors0<TYPE> >& list):
       BASE(PtensTensor<TYPE>::stack(0,list)){
-      vector<shared_ptr<AtomsPackObj> > x;
-      for(auto& p:list) x.push_back(p.atoms.obj);
-      atoms=BatchedAtomsPack<0>(BatchedAtomsPackObj(x));
+      //vector<shared_ptr<AtomsPackObj> > x;
+      //for(auto& p:list) x.push_back(p.atoms.obj);
+      vector<AtomsPack> x;
+      for(auto& p:list) x.push_back(p.atoms);
+      atoms=BatchedAtomsPack<0>(x);
+      //atoms=BatchedAtomsPack<0>(make_shared<BatchedAtomsPackObj>(x));
+      //atoms=BatchedAtomsPack<0>(BatchedAtomsPackObj(x));
     }
 	
 
@@ -126,11 +130,11 @@ namespace ptens{
     }
 
     static BatchedPtensors0 zeros_like(const BatchedPtensors0& x){
-      return BatchedPtensors0(x.TENSOR::zeros_like(),x.atoms);
+      return BatchedPtensors0(x.atoms,x.TENSOR::zeros_like());
     }
 
     static BatchedPtensors0 zeros_like(const BatchedPtensors0& x, const int nc){
-      return BatchedPtensors0(TENSOR({x.dim(0),nc},0,get_dev()),x.atoms);
+      return BatchedPtensors0(x.atoms,TENSOR({x.dim(0),nc},0,get_dev()));
     }
 
     static BatchedPtensors0 gaussian_like(const BatchedPtensors0& x){
