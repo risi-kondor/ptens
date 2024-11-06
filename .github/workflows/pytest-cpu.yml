@@ -10,6 +10,7 @@ on:
     branches:
       - main
       - master
+      - dev**
   pull_request:
     branches:
       - main
