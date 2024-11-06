@@ -1,7 +1,9 @@
 import torch
 import ptens
-from ptens_base import atomspack
-from torch.autograd.gradcheck import gradcheck, gradgradcheck
+import pytest
+import ptens_base
+
+from torch.autograd.gradcheck import gradcheck
 
 
 def test_bug1(device):
@@ -26,3 +28,32 @@ def test_bug1(device):
 
         check = gradcheck(ptens.subgraphlayer0.gather, (sg, node_attributes), eps=1e-3)
         print(check)
+
+
+
+class TestGather(object):
+
+    def backprop(self,cls,fn,N,_nc):
+        if(cls==ptens.ptensor0):
+            x=cls.randn(N,_nc)
+        else:
+            atoms=ptens_base.atomspack.random(N,0.3)
+            x=cls.randn(atoms,_nc)
+        x.requires_grad_()
+        G=ptens.ggraph.random(N,0.3)
+        z=fn(x,G)
+        
+        testvec=z.randn_like()
+        loss=z.inp(testvec).to('cuda')
+        loss.backward(torch.tensor(1.0))
+        xgrad=x.get_grad()
+
+        xeps=x.randn_like()
+        z=fn(x+xeps,G)
+        xloss=z.inp(testvec).to('cuda')
+        assert(torch.allclose(xloss-loss,xeps.inp(xgrad),rtol=1e-3, atol=1e-4))
+
+
+    @pytest.mark.parametrize('nc', [1, 2, 4])
+    def test_gather(self,nc):
+        self.backprop(ptens.ptensor0,ptens.gather,8,nc)
