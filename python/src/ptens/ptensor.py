@@ -16,7 +16,7 @@ import torch
 import ptens_base as pb
 
 class ptensor(torch.Tensor):
-
+    
     def __new__(cls, atoms:list, data:torch.Tensor | torch.Size, *args, **kwargs):
         # We write a new __new__ function here, since the signature now includes atoms.
         # But we need __new__ since it handles the memory allocations, potentially on the GPU.
@@ -49,3 +49,9 @@ class ptensor(torch.Tensor):
 
     def to_string(self,indent):
         return self.backend().str(indent)
+
+
+    def to(self, *args, **kwargs):
+        M = super().to(*args, **kwargs)
+        M.atoms = self.atoms
+        return M
