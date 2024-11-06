@@ -142,7 +142,7 @@ namespace ptens{
 
     SubgraphLayer1 schur(const TENSOR& W, const TENSOR& B) const{
       SubgraphLayer1 R=zeros_like(W.dims[2]);
-      R.add_schur(W,B);
+      R.add_schur(*this,W,B);
       return R;
     }
 

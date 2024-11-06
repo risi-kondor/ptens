@@ -37,23 +37,17 @@ __global__ void Ptensors0_reduce0_kernel(float* rarr, const int rs, const float*
 
 __global__ void Ptensors0_broadcast0_kernel(float* rarr, const int rs, const float* xarr, const int xs, 
   const int* map, const int maps, const int* bmap){
-  //extern __shared__ unsigned char _shared[]; 
-  //int* ix=reinterpret_cast<int*>(_shared);
   const int b=blockIdx.x;
   const int c=threadIdx.x;
   const int boffs=bmap[b+1];
   const int N=bmap[b+2]-bmap[b+1]-1;
   if(N==0) return;
-  //const int target=bmap[3*b+2];
 
+  int target=map[bmap[boffs+1]*maps+2];
   float t=0;
-  int target=0;
   for(int s=0; s<N; s++){
     const int row=bmap[boffs+s+1];
-    //if(c<maps) ix[c]=map[row*maps+c];
-    //__syncthreads();
-
-    if(s==0) target=map[row*maps+2];
+    //if(s==0) target=map[row*maps+2];
     t+=xarr[map[row*maps]*xs+c];
   }
   rarr[target*rs+c]+=t;
@@ -71,6 +65,7 @@ namespace ptens{
     PTENS_ASSRT(R.get_dev()==1);
     PTENS_ASSRT(x.get_dev()==1);
     if(map.dim(0)==0) return;
+    PTENS_CHANNEL_LIMIT(n);
     Ptensors0_reduce0_kernel<<<map.dim(0),n,0,stream>>>(R.get_arr(),R.stride(0),x.get_arr()+offs,x.stride(0),map.on_device(dev).get_arr(),map.stride(0),n);
   }
 
@@ -78,6 +73,7 @@ namespace ptens{
     int dev=r.dev;
     PTENS_ASSRT(x.dev==dev);
     int n=x.dim(1);
+    PTENS_CHANNEL_LIMIT(n);
     int nthrd=n; //cnine::roundup(std::max(n,map.dim(1)),32);
     if(map.n_gather_lists==0) return;
     Ptensors0_broadcast0_kernel<<<map.n_gather_lists,nthrd,map.dim(1)*4,stream>>> 

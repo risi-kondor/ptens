@@ -9,30 +9,27 @@
  * use is prohibited. All redistributed versions of this file (in 
  * original or modified form) must retain this copyright notice and 
  * must be accompanied by a verbatim copy of the license. 
- *
  */
 
-#include "Cnine_base.cpp"
-#include "Ptens_base.cpp"
-#include "BatchedAtomsPack.hpp"
-#include "PtensSession.hpp"
+#ifndef _ptens_BatchedGatherPlanCache
+#define _ptens_BatchedGatherPlanCache
 
-using namespace ptens;
-using namespace cnine;
-
-PtensSession ptens_session;
+#include "ptr_triple_indexed_cache.hpp"
+#include "BatchedAtomsPackObj.hpp"
+#include "BatchedLayerMapObj.hpp"
+#include "BatchedGatherPlanObj.hpp"
 
 
-int main(int argc, char** argv){
+namespace ptens{
 
-  int n=5;
+  class BatchedGatherPlanCache: 
+    public cnine::ptr_triple_arg_indexed_cache<BatchedLayerMapObj,BatchedAtomsPackObj,BatchedAtomsPackObj,int,shared_ptr<BatchedGatherPlanObj> >{
+  public:
 
-  AtomsPack a=AtomsPack::random(n,n,0.5);
-  cout<<a<<endl;
 
-  cout<<1<<endl;
-  BatchedAtomsPack<1> A({a,a,a});
-  cout<<2<<endl;
-  //cout<<A<<endl;
+  };
 
 }
+
+#endif 
+

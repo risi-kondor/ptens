@@ -54,7 +54,7 @@ namespace ptens{
 
 
     AindexPackB(const int n, const int maxn):
-      ITENSOR({n,maxn+4}){}
+      ITENSOR({n,maxn+4},0,0){}
 
 
   public: // ---- Copying -----------------------------------------------------------------------------------

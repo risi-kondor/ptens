@@ -16,7 +16,10 @@ namespace ptens{
 }
 
 #include "AtomsPackCatCache.hpp"
+#include "LayerMapCache.hpp"
+#include "BatchedLayerMapCache.hpp"
 #include "GatherPlanCache.hpp"
+#include "BatchedGatherPlanCache.hpp"
 #include "CompressedGatherMatrixCache.hpp"
 
 #include "GgraphCache.hpp"
@@ -37,7 +40,12 @@ namespace ptens{
     bool cache_atomspack_cats=true;
     AtomsPackCatCache atomspack_cat_cache; 
 
+    LayerMapCache overlaps_maps_cache;
+    BatchedLayerMapCache batched_overlaps_maps_cache;
+
     GatherPlanCache gather_plan_cache;
+    BatchedGatherPlanCache batched_gather_plan_cache;
+
     CompressedGatherMatrixCache gather_matrix_cache;
 
     GgraphCache graph_cache;

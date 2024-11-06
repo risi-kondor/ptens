@@ -142,6 +142,7 @@ namespace ptens{
     PTENS_ASSRT(x.dev==dev);
     if(map.dim(0)==0) return;
 
+    PTENS_CHANNEL_LIMIT(n);
     const int nthrd=cnine::roundup(std::max(n,map.dim(1)),32);
     Ptensors1_reduce0_kernel<<<map.dim(0),nthrd,map.dim(1)*4,stream>>>
       (r.get_arr(),r.stride(0),x.get_arr()+offs,x.stride(0),map.on_device(dev).get_arr(),map.stride(0),n);
@@ -152,6 +153,7 @@ namespace ptens{
     int dev=r.dev;
     PTENS_ASSRT(x.dev==dev);
 
+    PTENS_CHANNEL_LIMIT(n);
     const int nthrd=cnine::roundup(std::max(n,map.dim(1)+1),32);
     Ptensors1_reduce1_kernel<<<map.dim(0),nthrd,map.dim(1)*4,stream>>>
       (r.get_arr(),r.stride(0),x.get_arr()+offs,x.stride(0),map.on_device(dev).get_arr(),map.stride(0),n);
@@ -164,6 +166,7 @@ namespace ptens{
     //PTENS_ASSRT(map.dev==dev);
     int n=x.dim(1);
 
+    PTENS_CHANNEL_LIMIT(n);
     int nthrd=cnine::roundup(std::max(n,map.dim(1)),32);
     if(map.n_gather_lists==0) return;
     Ptensors1_broadcast0_kernel<<<map.n_gather_lists,nthrd,map.dim(1)*4,stream>>> 
@@ -178,6 +181,7 @@ namespace ptens{
     //PTENS_ASSRT(map.dev==dev);
     int n=x.dim(1);
 
+    PTENS_CHANNEL_LIMIT(n);
     int nthrd=cnine::roundup(std::max(n,map.dim(1)),32);
     if(map.n_gather_lists==0) return;
     Ptensors1_broadcast1_kernel<<<map.n_gather_lists,nthrd,map.dim(1)*4,stream>>> 

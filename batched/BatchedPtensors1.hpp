@@ -20,7 +20,7 @@
 
 #include "BatchedAtomsPack.hpp"
 #include "Ptensors1.hpp"
-//#include "BatchedPtensors.hpp"
+#include "BatchedPtensors.hpp"
 #include "MultiLoop.hpp"
 #include "BatchedGatherPlanFactory.hpp"
 
@@ -30,7 +30,7 @@ namespace ptens{
 
   template<typename TYPE>
   class BatchedPtensors1: public BatchedPtensors<TYPE>,
-			   public cnine::diff_class<BatchedPtensors1<TYPE> >{
+			  public cnine::diff_class<BatchedPtensors1<TYPE> >{
   public:
 
     typedef BatchedPtensors<TYPE> BASE;
@@ -77,8 +77,10 @@ namespace ptens{
     // TODO 
     BatchedPtensors1(const initializer_list<Ptensors1<TYPE> >& list):
       BASE(PtensTensor<TYPE>::stack(0,list)){
-      vector<shared_ptr<AtomsPackObj> > x;
-      for(auto& p:list) x.push_back(p.atoms.obj);
+      //vector<shared_ptr<AtomsPackObj> > x;
+      //for(auto& p:list) x.push_back(p.atoms.obj);
+      vector<AtomsPack> x;
+      for(auto& p:list) x.push_back(p.atoms);
       atoms=BatchedAtomsPack<1>(x);
     }
 	

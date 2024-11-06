@@ -38,15 +38,28 @@ namespace ptens{
     BatchedAtomsPackBase(BatchedAtomsPackObj* _obj):
       obj(_obj){}
 
-    BatchedAtomsPackBase(BatchedAtomsPackObj&& _obj):
-      obj(new BatchedAtomsPackObj(_obj)){}
+    //BatchedAtomsPackBase(BatchedAtomsPackObj&& _obj):
+    //obj(new BatchedAtomsPackObj(_obj)){}
 
     BatchedAtomsPackBase(shared_ptr<BatchedAtomsPackObj> _obj):
       obj(_obj){}
 
     BatchedAtomsPackBase(const vector<AtomsPack>& x):
-      BatchedAtomsPackBase(new BatchedAtomsPackObj(cnine::mapcar<AtomsPack,shared_ptr<AtomsPackObj> >
-	  (x,[](const AtomsPack& y){return y.obj;}))){}
+      obj(new BatchedAtomsPackObj()){
+      for(auto& p:x)
+	obj->push_back(p.obj);
+    }
+
+    //BatchedAtomsPackBase(const vector<AtomsPack>& x):
+    //obj(new BatchedAtomsPackObj()){
+    //for(auto& p:x)
+    //obj->push_back(p.obj);
+    //}
+
+
+    //BatchedAtomsPackBase(const vector<AtomsPack>& x):
+    //BatchedAtomsPackBase(new BatchedAtomsPackObj(cnine::mapcar<AtomsPack,shared_ptr<AtomsPackObj> >
+    //	  (x,[](const AtomsPack& y){return y.obj;}))){}
 
     BatchedAtomsPackBase(const vector<vector<vector<int> > >& x):
       obj(new BatchedAtomsPackObj(x)){}

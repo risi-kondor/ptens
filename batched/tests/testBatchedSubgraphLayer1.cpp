@@ -39,10 +39,11 @@ int main(int argc, char** argv){
   Subgraph trivial=Subgraph::trivial();
 
   AtomsPack xatoms0=AtomsPack::random(n,n,0.5);
-  BatchedAtomsPack xatoms({xatoms0,xatoms0,xatoms0});
+  BatchedAtomsPackBase xatoms({xatoms0,xatoms0,xatoms0});
 
   BPtens1 X1=BPtens1(xatoms,channels=3,filltype=3);
 
+  /*
   BatchedSubgraphLayer1<float> U(X1,G,trivial);
   cout<<U<<endl;
 
@@ -64,5 +65,6 @@ int main(int argc, char** argv){
   //Ltensor<float> M({12*g1.nedges(),3},3);
   //auto V=BatchedSubgraphLayer1<float>::from_edge_features({32,32,32},M);
   //cout<<V<<endl;
+  */
 
 }

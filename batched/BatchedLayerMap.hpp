@@ -16,7 +16,8 @@
 #define _ptens_BatchedLayerMap
 
 #include "object_pack_s.hpp"
-#include "LayerMap.hpp"
+//#include "LayerMap.hpp"
+#include "BatchedLayerMapObj.hpp"
 #include "BatchedAtomsPack.hpp"
 #include "BatchedAindexPack.hpp"
 
@@ -26,7 +27,11 @@ namespace ptens{
   class BatchedLayerMap{ 
   public:
 
-    vector<shared_ptr<LayerMapObj> > maps;
+    //vector<shared_ptr<LayerMapObj> > maps;
+    shared_ptr<BatchedLayerMapObj> obj;
+
+    BatchedLayerMap(const shared_ptr<BatchedLayerMapObj>& _obj):
+      obj(_obj){}
 
 
   public: // ---- Named constructors ------------------------------------------------------------------------
@@ -34,12 +39,20 @@ namespace ptens{
 
     static BatchedLayerMap overlaps_map(const BatchedAtomsPackBase& out, const BatchedAtomsPackBase& in, 
       const int min_overlaps=1){
-      PTENS_ASSRT(out.size()==in.size());
-      int N=out.size();
-      BatchedLayerMap R;
-      for(int i=0; i<N; i++)
-	R.maps.push_back(LayerMapObj::overlaps_map(*out[i].obj,*in[i].obj,min_overlaps));
-      return R;
+
+      if(ptens_global::batched_overlaps_maps_cache.contains(*out.obj,*in.obj))
+	return (ptens_global::batched_overlaps_maps_cache(*out.obj,*in.obj));
+
+      auto r=BatchedLayerMapObj::overlaps_map(*out.obj,*in.obj,min_overlaps);
+      ptens_global::batched_overlaps_maps_cache.insert(*out.obj,*in.obj,r);
+      return BatchedLayerMap(r);
+
+      //PTENS_ASSRT(out.size()==in.size());
+      //int N=out.size();
+      //BatchedLayerMap R;
+      //for(int i=0; i<N; i++)
+      //R.maps.push_back(LayerMapObj::overlaps_map(*out[i].obj,*in[i].obj,min_overlaps));
+      //return R;
     }
 
 
@@ -47,12 +60,13 @@ namespace ptens{
 
 
     int size() const{
-      return maps.size();
+      //return maps.size();
+      return obj->maps.size();
     }
 
     LayerMap operator[](const int i) const{
-      PTENS_ASSRT(i<maps.size());
-      return maps[i];
+      PTENS_ASSRT(i<obj->maps.size());
+      return obj->maps[i];
     }
 
 
