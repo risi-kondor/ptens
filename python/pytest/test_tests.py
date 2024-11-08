@@ -2,6 +2,7 @@ import torch
 import ptens
 import pytest
 import ptens_base
+from conftest import numerical_grad_sum
 
 from torch.autograd.gradcheck import gradcheck
 
@@ -29,7 +30,7 @@ def test_bug1(device):
 
 
 class TestGather(object):
-
+    h=1e-3
     
     def backprop(self,cls, N,nc, device):
         atoms=ptens_base.atomspack.random(N, nc, 0.3)
@@ -38,31 +39,20 @@ class TestGather(object):
         G=ptens.ggraph.random(N,0.3)
         atoms2 = G.subgraphs(ptens.subgraph.trivial())
 
-        check = gradcheck(cls.gather, (atoms2, x), eps=1e-3)
+        check = gradcheck(cls.gather, (atoms2, x), eps=self.h)
         assert check
 
         z = cls.gather(atoms2, x)
         loss=torch.sum(z)
         loss.backward()
         xgrad=x.grad
-        print("xgrad", xgrad)
 
 
-        h=1e-6
-        xgrad2 = torch.zero_like(xgrad)
-        for i in range(xgrad2.size()):
-            xp = copy.deepcopy(x)
-            xm = copy.deepcopy(x)
-            xp[i] += h
-            xm[i] -= h
-            
-            grad[i] = cls(gather
-
-        z_plus = cls.gather(atoms2, x+h)
-        z_minus = cls.gather(atoms2, x-h)
-        xgrad2 = (z_plus - z_minus)/(2*h)
-        print("xgrad2", xgrad2)
+        fn = lambda x: cls.gather(atoms2, x)
+        xgrad2 = numerical_grad_sum(fn, x, self.h)
         
+        assert torch.allclose(xgrad, xgrad2, rtol=1e-2, atol=1e-2)
+
 
         
     @pytest.mark.parametrize(('N', 'nc'), [(8, 1), (1, 2), (16, 4)])
