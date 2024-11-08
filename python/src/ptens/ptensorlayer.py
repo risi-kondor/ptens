@@ -19,7 +19,7 @@ import ptens_base as pb
 
 class ptensorlayer(torch.Tensor):
 
-    covariant_functions=[torch.Tensor.to,torch.Tensor.add,torch.Tensor.sub,torch.relu,torch.nn.functional.linear]
+    covariant_functions=[torch.Tensor.to,torch.Tensor.add,torch.Tensor.sub,torch.relu,torch.nn.functional.linear, torch.Tensor.clone]
 
     @classmethod
     def __torch_function__(cls, func, types, args=(), kwargs=None):
@@ -27,7 +27,8 @@ class ptensorlayer(torch.Tensor):
             kwargs = {}
         if func in ptensorlayer.covariant_functions:
             r= super().__torch_function__(func, types, args, kwargs)
-            r.atoms=args[0].atoms
+            if hasattr(args[0], "atoms"):
+                r.atoms=args[0].atoms
         else:
             r= super().__torch_function__(func, types, args, kwargs)
             if isinstance(r,torch.Tensor):
