@@ -69,9 +69,3 @@ class ptensor(torch.Tensor):
     def to_string(self,indent):
         return self.backend().str(indent)
 
-
-    
-    def to(self, *args, **kwargs):
-        M = super().to(*args, **kwargs)
-        M.atoms = self.atoms
-        return M
