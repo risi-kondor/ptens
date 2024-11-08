@@ -16,7 +16,7 @@ import torch
 import ptens_base as pb
 
 class ptensor(torch.Tensor):
-
+    
     def __new__(cls, atoms:list, data:torch.Tensor | torch.Size, *args, **kwargs):
         # We write a new __new__ function here, since the signature now includes atoms.
         # But we need __new__ since it handles the memory allocations, potentially on the GPU.
@@ -37,7 +37,26 @@ class ptensor(torch.Tensor):
 
     # ---- Operations ----------------------------------------------------------------------------------------
 
-
+    _covariant_functions = [
+        torch.Tensor.to,
+        torch.Tensor.clone,
+        ]
+    
+    @classmethod
+    def __torch_function__(cls, func, types, args=(), kwargs=None):
+        if kwargs is None:
+            kwargs = {}
+            
+        r= super().__torch_function__(func, types, args, kwargs)
+        if func in cls._covariant_functions:
+            # A bit more robuts with the order of arguments.
+            for arg in args:
+                if hasattr(arg, "atoms"):
+                    r.atoms = arg.atoms
+                    break
+        return r
+        
+    
     def __add__(self,y):
         assert self.size()==y.size()
         assert self.atoms==y.atoms
@@ -49,3 +68,4 @@ class ptensor(torch.Tensor):
 
     def to_string(self,indent):
         return self.backend().str(indent)
+

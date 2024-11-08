@@ -10,6 +10,7 @@ on:
     branches:
       - main
       - master
+      - dev**
   pull_request:
     branches:
       - main
@@ -57,6 +58,7 @@ jobs:
           cd ..
       - name: Install and build
         run: |
+          pip install pytest
           export CNINE_FOLDER="/../cnine/"
           pip install python/
       # TODO activate pytests when ready
@@ -66,3 +68,6 @@ jobs:
           mkdir ./tmp-run/
           cd ./tmp-run/
           python -c "import ptens"
+
+          export TORCH_TEST_DEVICE='cpu'
+          pytest ../python/pytest

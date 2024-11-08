@@ -7,13 +7,13 @@ import pytest
 class TestGather(object):
 
     def backprop(self,src,fn,N,_nc):
-        if(src==p.ptensors0):
+        if(src==p.ptensor0):
             x=src.randn(N,_nc)
         else:
             atoms=ptens_base.atomspack.random(N,0.3)
             x=src.randn(atoms,_nc)
         x.requires_grad_()
-        G=p.graph.random(N,0.3)
+        G=p.ggraph.random(N,0.3)
         z=fn(x,G)
         
         testvec=z.randn_like()
@@ -29,4 +29,4 @@ class TestGather(object):
 
     @pytest.mark.parametrize('nc', [1, 2, 4])
     def test_gather(self,nc):
-        self.backprop(p.ptensors0,p.gather,8,nc)
+        self.backprop(p.ptensor0,p.gather,8,nc)
