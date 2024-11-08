@@ -87,9 +87,9 @@ namespace ptens{
       ostringstream oss;
       oss<<"-------------------------------------"<<endl;
       oss<<"Ptens 0.0 "<<endl;
-      cout<<endl;
+      //cout<<endl;
       oss<<"CUDA support:                     "<<on_off(with_cuda)<<endl;
-      oss<<"Row level gather operations:      "<<on_off(ptens_global::row_level_operations)<<endl;
+      //oss<<"Row level gather operations:      "<<on_off(ptens_global::row_level_operations)<<endl;
       oss<<"-------------------------------------"<<endl;
       return oss.str();
     }
@@ -103,16 +103,24 @@ namespace ptens{
       ostringstream oss;
       oss<<"---------------------------------------"<<endl;
       oss<<" Ptens 0.0 "<<endl;
-      cout<<endl;
+      //cout<<endl;
       oss<<" CUDA support:                     "<<on_off(with_cuda)<<endl;
       //oss<<" Row level gather operations:      "<<on_off(ptens_global::row_level_operations)<<endl;
       oss<<endl;
-      oss<<" AtomsPack cat cache:                "<<
+      oss<<" AtomsPack cat cache:               "<<
 	size_or_off(ptens_global::cache_atomspack_cats, ptens_global::atomspack_cat_cache.size())<<endl;
-      //oss<<" Overlap maps cache:                 "<<
-      //size_or_off(ptens_global::cache_overlap_maps, ptens_global::overlaps_cache.size())<<endl;
-      //oss<<" Row level map cache:                "<<
-      //size_or_off(ptens_global::cache_rmaps, ptens_global::rmap_cache.size())<<endl;
+      oss<<" Overlap maps cache:                "<<
+      print_size(ptens_global::overlaps_maps_cache.size())<<endl;
+      oss<<" Gather plans cache:                "<<
+      print_size(ptens_global::gather_plan_cache.size())<<endl;
+      oss<<endl;
+      oss<<" Batched AtomsPack cat cache        "<<
+	print_size(ptens_global::batched_atomspack_cat_cache.size())<<endl;
+      oss<<" Batched overlap maps cache:        "<<
+      print_size(ptens_global::batched_overlaps_maps_cache.size())<<endl;
+      oss<<" Batched_gather plans cache:        "<<
+      print_size(ptens_global::batched_gather_plan_cache.size())<<endl;
+      oss<<endl;
       oss<<" Graph cache:                        "<<
 	print_size(ptens_global::graph_cache.size())<<endl;
       oss<<" Graph elist cache:                  "<<

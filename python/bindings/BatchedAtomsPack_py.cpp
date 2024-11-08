@@ -3,6 +3,8 @@ pybind11::class_<BatchedAtomsPackBase>(m,"batched_atomspack")
   .def(py::init([](const vector<AtomsPack>& x){return BatchedAtomsPackBase(x);}))
   .def(py::init([](const vector<vector<vector<int> > >& x){return BatchedAtomsPackBase(x);}))
 
+  .def_static("cat",[](const vector<BatchedAtomsPackBase> v){return BatchedAtomsPackBase::cat(v);})
+
   .def("__len__",&BatchedAtomsPackBase::size)
   .def("__getitem__",[](const BatchedAtomsPackBase& x, const int i){return x[i];})
   .def("torch",[](const BatchedAtomsPackBase& x){return x.as_vecs();})

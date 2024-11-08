@@ -18,7 +18,7 @@
 #include "Ptens_base.hpp"
 #include "Atoms.hpp"
 #include "Ptensor1.hpp"
-#include "Ptensor2_xview.hpp"
+//#include "Ptensor2_xview.hpp"
 
 namespace ptens{
 
@@ -159,7 +159,8 @@ namespace ptens{
       assert(offs+n<=nc);
       return view3().block(0,0,offs,k,k,n);
     }
-    
+
+    /*
     Ptensor2_xview view(const vector<int>& ix) const{
       return Ptensor2_xview(const_cast<TYPE*>(arr.get_arr()),nc,strides[0],strides[1],strides[2],ix,dev);
     }
@@ -167,7 +168,7 @@ namespace ptens{
     Ptensor2_xview view(const vector<int>& ix, const int offs, const int n) const{
       return Ptensor2_xview(const_cast<TYPE*>(arr.get_arr())+strides[2]*offs,n,strides[0],strides[1],strides[2],ix,dev);
     }
-
+    */
 
     // ---- Linmaps ------------------------------------------------------------------------------------------
 

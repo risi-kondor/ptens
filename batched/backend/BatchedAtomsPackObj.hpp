@@ -56,6 +56,40 @@ namespace ptens{
 	push_back(to_share(new AtomsPackObj(p)));
     }
 
+    BatchedAtomsPackObj(const BatchedAtomsPackObj&& x):
+      observable(this),
+      BASE(x){}
+
+
+  public: // ---- Concatenation -------------------------------------------------------------------------------
+
+
+    static BatchedAtomsPackObj cat(const vector<shared_ptr<BatchedAtomsPackObj> > list){
+      BatchedAtomsPackObj R;
+      if(list.size()==0) return R;
+      int N=list[0]->size();
+      for(int i=0; i<N; i++){
+	vector<shared_ptr<AtomsPackObj> > v;
+	for(auto& p:list)
+	  v.push_back((*p)(i));
+	R.push_back(make_shared<AtomsPackObj>(AtomsPackObj::cat(v)));
+      }
+      return R;
+    }
+
+   static BatchedAtomsPackObj cat(const vector<BatchedAtomsPackObj*> list){
+      BatchedAtomsPackObj R;
+      if(list.size()==0) return R;
+      int N=list[0]->size();
+      for(int i=0; i<N; i++){
+	vector<shared_ptr<AtomsPackObj> > v;
+	for(auto& p:list)
+	  v.push_back((*p)(i));
+	R.push_back(make_shared<AtomsPackObj>(AtomsPackObj::cat(v)));
+      }
+      return R;
+    }
+
 
   public: // ---- Access -------------------------------------------------------------------------------------
 

@@ -133,9 +133,9 @@ namespace ptens{
       vector<AtomsPack> v;
       for(auto& p:list)
 	v.push_back(p.atoms);
-      if(ptens_global::cache_atomspack_cats) 
-	return Ptensors2(TENSOR::stack(0,list),ptens_global::atomspack_cat_cache(v));
-      return Ptensors2(TENSOR::stack(0,list),AtomsPack::cat(v));
+      //if(ptens_global::cache_atomspack_cats) 
+      //return Ptensors2(ptens_global::atomspack_cat_cache(v),TENSOR::stack(0,list));
+      return Ptensors2(AtomsPack::cat(v),TENSOR::stack(0,list));
     }
 
 

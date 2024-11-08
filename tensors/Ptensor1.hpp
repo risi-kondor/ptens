@@ -16,10 +16,8 @@
 
 #include "Ptens_base.hpp"
 #include "Atoms.hpp"
-//#include "RtensorA.hpp"
 #include "Ltensor.hpp"
 #include "Ptensor0.hpp"
-//#include "Ptensor1_xview.hpp"
 
 
 namespace ptens{

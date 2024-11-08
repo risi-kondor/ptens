@@ -55,6 +55,21 @@ class batched_ptensorlayer0(p.batched_ptensorlayer):
         assert M.size(0)==atoms.nrows0()
         return self.make(atoms,M)
 
+    @classmethod
+    def cat(self,x):
+        nb=len(x[0])
+        ncat=len(x)
+        atoms=pb.batched_atomspack.cat([p.atoms for p in x])
+        M=torch.zeros([atoms,torch.sum(torch.tensor([p.size() for p in x]))],device=x[0].device)
+        for i in range(0,nb):
+            offs=R.atoms.offset0(i)
+            for j in range(0,ncat):
+                xoffs=x[j].atoms.offset0(i)
+                nrows=x[j].atoms.nrows0(i)
+                M[offs,offs+nrows,:]=x[j][xoffs:xoffs+nrows,:]
+                offs+=nrows
+        return batched_ptensorlayer0.make(atoms,M)
+    
     def zeros_like(self):
         return batched_ptensorlayer0.zeros(self.atoms,self.get_nc(),device=self.device)
     
@@ -121,6 +136,36 @@ class batched_ptensorlayer0(p.batched_ptensorlayer):
 
 
 # ---- Autograd functions --------------------------------------------------------------------------------------------
+
+
+# class batched_ptensorlayer0_catFn(torch.autograd.Function):
+
+#     @staticmethod
+#     def forward(ctx,x):
+#         nb=len(x[0])
+#         ncat=len(x)
+#         offsets=torch.zeros([nb,ncat])
+#         for i in range(0,nb):
+#             for j in range(0,ncat):
+#                 offsets[i,j]=x[j].atoms.nrows0(i)
+#         for i in range(0,nb):
+#             offs=R.atoms.offset0(i)
+#             for j in range(0,ncat):
+#                 xoffs=x[j].atoms.offset0(i)
+#                 R[offs,offs+offsets[i,j],:]=x[j][xoffs:xoffs+offsets[i,j],:]
+#                 xoffs=xoffs+offsets[i,j]
+#         ctx.atomsv=[p.atoms for p in x]
+#         ctx.nrowsv=[p.size(0) for p in x]
+#         return ptensorlayer0.make(pb.atomspack.cat(ctx.atomsv),torch.cat(x))
+
+#     @staticmethod
+#     def backward(ctx,g):
+#         r=[]
+#         offs=0
+#         for p in zip(ctx.atomsv,ctx.nrowsv):
+#             r.append(ptensorlayer0.make(p[0],g[offs:offs+p[1],:]))
+#             offs=offs+p[1]
+#         return tuple(r)
 
 
 class batched_ptensorlayer0_linmapsFn(torch.autograd.Function):

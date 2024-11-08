@@ -67,6 +67,10 @@ class ptensorlayer2(p.ptensorlayer):
         assert M.size(0)==atoms.nrows2()
         return self.make(atoms,M)
 
+    @classmethod
+    def cat(self,args):
+        return ptensorlayer2_catFn.apply(args)
+    
     def backend(self):
         return _ptensors2.view(self.atoms,self)
 
@@ -221,6 +225,24 @@ class ptensorlayer2(p.ptensorlayer):
 
 
 # ---- Autograd functions --------------------------------------------------------------------------------------------
+
+
+class ptensorlayer2_catFn(torch.autograd.Function):
+
+    @staticmethod
+    def forward(ctx,x):
+        ctx.atomsv=[p.atoms for p in x]
+        ctx.nrowsv=[p.size(0) for p in x]
+        return ptensorlayer2.make(pb.atomspack.cat(ctx.atomsv),torch.cat(x))
+
+    @staticmethod
+    def backward(ctx,g):
+        r=[]
+        offs=0
+        for p in zip(ctx.atomsv,ctx.nrowsv):
+            r.append(ptensorlayer2.make(p[0],g[offs:offs+p[1],:]))
+            offs=offs+p[1]
+        return tuple(r)
 
 
 class ptensorlayer2_linmapsFn(torch.autograd.Function):

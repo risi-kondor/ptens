@@ -4,6 +4,8 @@ pybind11::class_<AtomsPack>(m,"atomspack")
   .def_static("from_list",[](const vector<vector<int> >& x){return AtomsPack(x);})
   .def_static("random",[](const int n, const int m, const float p){return AtomsPack::random(n,m,p);})
 
+  .def_static("cat",[](const vector<AtomsPack> v){return AtomsPack::cat(v);})
+
   .def("__len__",&AtomsPack::size)
   .def("__eq__",&AtomsPack::operator==)
   .def("__getitem__",[](const AtomsPack& x, const int i){return vector<int>(x[i]);})

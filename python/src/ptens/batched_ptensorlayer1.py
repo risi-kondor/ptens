@@ -54,6 +54,21 @@ class batched_ptensorlayer1(p.batched_ptensorlayer):
         assert M.size(0)==atoms.nrows1()
         return self.make(atoms,M)
 
+    @classmethod
+    def cat(self,x):
+        nb=len(x[0])
+        ncat=len(x)
+        atoms=pb.batched_atomspack.cat([p.atoms for p in x])
+        M=torch.zeros([atoms,torch.sum(torch.tensor([p.size() for p in x]))],device=x[0].device)
+        for i in range(0,nb):
+            offs=R.atoms.offset0(i)
+            for j in range(0,ncat):
+                xoffs=x[j].atoms.offset0(i)
+                nrows=x[j].atoms.nrows0(i)
+                M[offs,offs+nrows,:]=x[j][xoffs:xoffs+nrows,:]
+                offs+=nrows
+        return batched_ptensorlayer1.make(atoms,M)
+    
     def zeros_like(self):
         return batched_ptensorlayer1.zeros(self.atoms,self.get_nc(),device=self.device)
     
