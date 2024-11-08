@@ -100,16 +100,16 @@ namespace ptens{
       tag(_atoms){}
 
 
-    /*
     static Ptensors0 cat(const vector<Ptensors0>& list){
       vector<AtomsPack> v;
       for(auto& p:list)
 	v.push_back(p.atoms);
-      if(ptens_global::cache_atomspack_cats) 
-	return Ptensors0(TENSOR::stack(0,list),ptens_global::atomspack_cat_cache(v));
-      return Ptensors0(TENSOR::stack(0,list),AtomsPack::cat(v));
+      return Ptensors0(AtomsPack::cat(v),TENSOR::stack(0,list));
+      //if(ptens_global::cache_atomspack_cats) 
+      //return Ptensors0(ptens_global::atomspack_cat_cache(v),TENSOR::stack(0,list));
+      //return Ptensors0(AtomsPack::cat(v),TENSOR::stack(0,list));
     }
-    */
+
 
   public: // ---- Named parameter constructors ---------------------------------------------------------------
 

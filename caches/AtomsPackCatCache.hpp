@@ -15,7 +15,7 @@
 #define _ptens_AtomsPackCatCache
 
 #include "AtomsPackObj.hpp"
-#include "AtomsPack.hpp"
+//#include "AtomsPack.hpp"
 
 
 namespace ptens{
@@ -32,7 +32,8 @@ namespace ptens{
       BASE([](const vector<AtomsPackObj*>& v){
 	  return shared_ptr<AtomsPackObj>(new AtomsPackObj(AtomsPackObj::cat(v)));}){
     }
-      
+
+    /*
     AtomsPack operator()(const vector<AtomsPack>& x){
       vector<AtomsPackObj*> v;
       for(auto& p:x)
@@ -41,6 +42,7 @@ namespace ptens{
       //if(ptens_global::cache_atomspack_cats) 
       //else return make_shared<AtomsPackObj>(AtomsPackObj::cat(v));
     }
+    */
 
   };
 

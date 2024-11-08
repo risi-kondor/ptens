@@ -156,9 +156,8 @@ namespace ptens{
       vector<AtomsPackObj*> v;
       for(auto& p:x)
 	v.push_back(p.obj.get());
-      //if(ptens_global::cache_atomspack_cats) 
-      //return (*ptens_global::atomspack_cat_cache) (v);
-      //else 
+      if(ptens_global::cache_atomspack_cats) 
+	return (ptens_global::atomspack_cat_cache)(v);
       return AtomsPack(new AtomsPackObj(AtomsPackObj::cat(v)));
     }
 

@@ -68,7 +68,6 @@ namespace ptens{
       obj(new BatchedAtomsPackObj(x)){}
 
 
-
   public: // ----- Access ------------------------------------------------------------------------------------
 
 
@@ -119,6 +118,14 @@ namespace ptens{
     //}
 
 
+    static BatchedAtomsPackBase cat(const vector<BatchedAtomsPackBase>& x){
+      vector<BatchedAtomsPackObj*> v;
+      for(auto& p:x)
+	v.push_back(p.obj.get());
+      return ptens_global::batched_atomspack_cat_cache(v);
+    }
+
+    /*
     static BatchedAtomsPackBase cat(const vector<BatchedAtomsPackBase >& v){
       PTENS_ASSRT(v.size()>0);
       int N=v[0].size();
@@ -131,6 +138,7 @@ namespace ptens{
       }
       return BatchedAtomsPackBase(R);
     }
+    */
 
 
   public: // ---- I/O ----------------------------------------------------------------------------------------
@@ -160,6 +168,13 @@ namespace ptens{
 
     BatchedAtomsPack(const BatchedAtomsPackBase& x):
       BASE(x){}
+
+    static BatchedAtomsPack cat(const vector<BatchedAtomsPackBase>& x){
+      vector<BatchedAtomsPackObj*> v;
+      for(auto& p:x)
+	v.push_back(p.obj.get());
+      return ptens_global::batched_atomspack_cat_cache(v);
+    }
 
   };
 

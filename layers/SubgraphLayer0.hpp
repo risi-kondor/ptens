@@ -60,6 +60,7 @@ namespace ptens{
     SubgraphLayer0(const Ggraph& _G, const Subgraph& _S, const AtomsPack& _atoms, const int nc, const int fcode, const int _dev=0):
       G(_G), S(_S), BASE(_atoms,nc,fcode,_dev){}
 
+    //doesn't make sense to cat together subgraph layers
     //static SubgraphLayer0 cat(const vector<SubgraphLayer0>& list){
     //vector<AtomsPack0> v;
     //for(auto& p:list)

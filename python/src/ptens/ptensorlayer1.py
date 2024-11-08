@@ -70,6 +70,10 @@ class ptensorlayer1(ptensorlayer):
         assert M.size(0)==atoms.nrows1()
         return self.make(atoms,M)
 
+    @classmethod
+    def cat(self,args):
+        return ptensorlayer1_catFn.apply(args)
+    
     def zeros_like(self):
         return ptensorlayer1.zeros(self.atoms,self.get_nc(),device=self.device)
     
@@ -170,6 +174,24 @@ class ptensorlayer1(ptensorlayer):
 
 
 # ---- Autograd functions --------------------------------------------------------------------------------------------
+
+
+class ptensorlayer1_catFn(torch.autograd.Function):
+
+    @staticmethod
+    def forward(ctx,x):
+        ctx.atomsv=[p.atoms for p in x]
+        ctx.nrowsv=[p.size(0) for p in x]
+        return ptensorlayer1.make(pb.atomspack.cat(ctx.atomsv),torch.cat(x))
+
+    @staticmethod
+    def backward(ctx,g):
+        r=[]
+        offs=0
+        for p in zip(ctx.atomsv,ctx.nrowsv):
+            r.append(ptensorlayer1.make(p[0],g[offs:offs+p[1],:]))
+            offs=offs+p[1]
+        return tuple(r)
 
 
 class ptensorlayer1_linmapsFn(torch.autograd.Function):
