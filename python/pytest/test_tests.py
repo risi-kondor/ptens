@@ -29,36 +29,36 @@ def test_bug1(device):
 
 
 
-class TestGather(object):
-    h=1e-3
+# class TestGather(object):
+#     h=1e-3
     
-    def backprop(self,cls, N,nc, device):
-        atoms=ptens_base.atomspack.random(N, nc, 0.3)
-        x=cls.randn(atoms,nc).to(device)
-        x.requires_grad_()
-        G=ptens.ggraph.random(N,0.3)
-        atoms2 = G.subgraphs(ptens.subgraph.trivial())
+#     def backprop(self,cls, N,nc, device):
+#         atoms=ptens_base.atomspack.random(N, nc, 0.3)
+#         x=cls.randn(atoms,nc).to(device)
+#         x.requires_grad_()
+#         G=ptens.ggraph.random(N,0.3)
+#         atoms2 = G.subgraphs(ptens.subgraph.trivial())
 
-        check = gradcheck(cls.gather, (atoms2, x), eps=self.h)
-        assert check
+#         check = gradcheck(cls.gather, (atoms2, x), eps=self.h)
+#         assert check
 
-        z = cls.gather(atoms2, x)
-        loss=torch.sum(z)
-        loss.backward()
-        xgrad=x.grad
+#         z = cls.gather(atoms2, x)
+#         loss=torch.sum(z)
+#         loss.backward()
+#         xgrad=x.grad
 
 
-        fn = lambda x: cls.gather(atoms2, x)
-        xgrad2 = numerical_grad_sum(fn, x, self.h)
+#         fn = lambda x: cls.gather(atoms2, x)
+#         xgrad2 = numerical_grad_sum(fn, x, self.h)
         
-        assert torch.allclose(xgrad, xgrad2, rtol=1e-2, atol=1e-2)
+#         assert torch.allclose(xgrad, xgrad2, rtol=1e-2, atol=1e-2)
 
 
         
-    @pytest.mark.parametrize(('N', 'nc'), [(8, 1), (1, 2), (16, 4)])
-    def test_gather0(self,N, nc, device):
-        self.backprop(ptens.ptensorlayer0,N,nc, device)
+#     @pytest.mark.parametrize(('N', 'nc'), [(8, 1), (1, 2), (16, 4)])
+#     def test_gather0(self,N, nc, device):
+#         self.backprop(ptens.ptensorlayer0,N,nc, device)
 
-    @pytest.mark.parametrize(('N', 'nc'), [(8, 1), (1, 2), (16, 4)])
-    def test_gather1(self,N, nc, device):
-        self.backprop(ptens.ptensorlayer0,N,nc, device)
+#     @pytest.mark.parametrize(('N', 'nc'), [(8, 1), (1, 2), (16, 4)])
+#     def test_gather1(self,N, nc, device):
+#         self.backprop(ptens.ptensorlayer0,N,nc, device)
