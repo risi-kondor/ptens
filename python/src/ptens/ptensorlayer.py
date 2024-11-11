@@ -19,20 +19,34 @@ import ptens_base as pb
 
 class ptensorlayer(torch.Tensor):
 
-    covariant_functions=[torch.Tensor.to,torch.Tensor.add,torch.Tensor.sub,torch.relu,torch.nn.functional.linear, torch.Tensor.clone]
+    covariant_functions=[torch.Tensor.to,
+                         torch.Tensor.add,
+                         torch.Tensor.sub,
+                         torch.relu,
+                         torch.nn.
+                         functional.linear,
+                         torch.Tensor.clone,
+                         torch.Tensor.mul,
+                         torch.Tensor.detach,
+                         torch.Tensor.requires_grad_,
+                         torch.Tensor.squeeze,
+                         torch.Tensor.unsqueeze,
+                         torch.zeros_like,
+                         torch.ones_like,
+                         ]
 
     @classmethod
     def __torch_function__(cls, func, types, args=(), kwargs=None):
         if kwargs is None:
             kwargs = {}
+        r= super().__torch_function__(func, types, args, kwargs)            
         if func in ptensorlayer.covariant_functions:
-            r= super().__torch_function__(func, types, args, kwargs)
-            if hasattr(args[0], "atoms"):
-                r.atoms=args[0].atoms
-        else:
-            r= super().__torch_function__(func, types, args, kwargs)
-            if isinstance(r,torch.Tensor):
-                r=torch.Tensor(r)
+            for arg in args + tuple(kwargs.items()):
+                if hasattr(arg, "atoms"):
+                    r.atoms=arg.atoms
+                
+        if (not hasattr(r, "atoms")) and isinstance(r, torch.Tensor):
+            r = torch.Tensor(r)
         return r
 
 

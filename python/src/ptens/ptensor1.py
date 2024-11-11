@@ -98,14 +98,6 @@ class ptensor1(ptensor):
 
 
 
-
-
-
-#    def clone(self):
-#        r=ptensor1(super().clone())
-#        r.atoms=self.atoms
-#        return r
-
 #     def __copy__(self):
 #         print("copied")
 #         return self.__class__(self.clone())

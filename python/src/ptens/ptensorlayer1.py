@@ -245,18 +245,25 @@ class ptensorlayer1_broadcast0Fn(torch.autograd.Function):
 class ptensorlayer1_gatherFn(torch.autograd.Function):
 
     @staticmethod
-    def forward(ctx,atoms,x,tmap):
+    def forward(atoms,x,tmap):
         r=ptensorlayer1.zeros(atoms,x.get_nc()*([1,2,5][x.getk()]),device=x.device)
-        print(r)
         r.backend().add_gather(x.backend(),tmap)
-        ctx.x=x
-        ctx.tmap=tmap
         return r
 
     @staticmethod
+    def setup_context(ctx, inputs, outputs):
+        atoms, x, tmap = inputs
+        ctx.save_for_backward(x)
+        ctx.atoms = atoms
+        ctx.tmap = tmap
+        
+    
+    @staticmethod
     def backward(ctx,g):
-        r=ctx.x.zeros_like()
-        r.backend().add_gather_back(g.backend(),ctx.tmap)
-        return r
+        x, = ctx.saved_tensors
+        r = x.zeros_like()
+        g_view = pb.ptensors1.view(ctx.atoms, g)
+        r.backend().add_gather_back(g_view,ctx.tmap)
+        return None, r, None
 
 
