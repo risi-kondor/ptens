@@ -2,7 +2,7 @@ import torch
 import ptens
 import pytest
 import ptens_base
-from conftest import numerical_grad_sum
+from conftest import numerical_grad_sum, numerical_jacobian
 
 from torch.autograd.gradcheck import gradcheck
 
@@ -28,19 +28,17 @@ def test_bug1(device):
         assert check
 
 
-
-graph_atoms_list= [
-    (ptens.ggraph.from_edge_index( torch.Tensor([[0, 1], [1, 0]]).int() ),
-     ptens_base.atomspack.from_list([[1]]),
-     4),
+graph_atoms_list = [
+    (ptens.ggraph.from_edge_index(torch.Tensor([[0, 1], [1, 0]]).int()), ptens_base.atomspack.from_list([[1]]), 4),
 ]
 
-class TestGather(object):
-    h=1e-3
 
-    def backprop(self,cls, G, atoms, nc, device):
+class TestGather(object):
+    h = 1e-3
+
+    def backprop_sum(self, cls, G, atoms, nc, device):
         print(atoms)
-        x=cls.sequential(atoms,nc).to(device)
+        x = cls.sequential(atoms, nc).to(device)
         x.requires_grad_()
         print("x", x)
         atoms2 = G.subgraphs(ptens.subgraph.trivial())
@@ -48,7 +46,6 @@ class TestGather(object):
         def loss_fn(x):
             z = cls.gather(atoms2, x)
             s = torch.sum(z)
-            print(s)
             return s
 
         xgrad = torch.autograd.grad(outputs=loss_fn(x), inputs=x)[0]
@@ -57,18 +54,46 @@ class TestGather(object):
         xgrad2 = numerical_grad_sum(fn, x, self.h)
         print("xgrad2", xgrad2)
         assert torch.allclose(xgrad, xgrad2, rtol=1e-2, atol=1e-2)
-        
+
         assert gradcheck(loss_fn, (x,), eps=self.h, nondet_tol=1e-6)
-        
-    @pytest.mark.parametrize(('G', 'atoms', 'nc'), graph_atoms_list)
-    def test_gather0(self,G, atoms, nc, device):
+
+    def backprop_jac(self, cls, G, atoms, nc, device):
+        x = cls.sequential(atoms, nc).to(device)
+        x.requires_grad_()
+        atoms2 = G.subgraphs(ptens.subgraph.trivial())
+
+        def loss_fn(x):
+            z = cls.gather(atoms2, x)
+            return z
+
+        xjac2 = numerical_jacobian(loss_fn, x, self.h)
+        print("xjac2", xjac2)
+
+        xjac = torch.autograd.functional.jacobian(loss_fn, x)
+        print("xjac", xjac)
+        assert torch.allclose(xjac, xjac2, rtol=1e-2, atol=1e-2)
+
+        assert gradcheck(loss_fn, (x,), eps=self.h, nondet_tol=1e-6)
+
+    @pytest.mark.parametrize(("G", "atoms", "nc"), graph_atoms_list)
+    def test_gather0_sum(self, G, atoms, nc, device):
         N = max(G.adjacency_matrix().size())
         for i in range(len(atoms)):
             a = atoms[i]
             if len(a) > 0:
                 assert max(a) < N
-                
-        self.backprop(ptens.ptensorlayer0, G, atoms, nc, device)
+
+        self.backprop_sum(ptens.ptensorlayer0, G, atoms, nc, device)
+
+    @pytest.mark.parametrize(("G", "atoms", "nc"), graph_atoms_list)
+    def test_gather0_jac(self, G, atoms, nc, device):
+        N = max(G.adjacency_matrix().size())
+        for i in range(len(atoms)):
+            a = atoms[i]
+            if len(a) > 0:
+                assert max(a) < N
+
+        self.backprop_jac(ptens.ptensorlayer0, G, atoms, nc, device)
 
     # @pytest.mark.parametrize(('G', 'atoms', 'nc'), graph_atoms_list)
     # def test_gather1(self, G, atoms, nc, device):
