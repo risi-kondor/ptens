@@ -45,26 +45,20 @@ class TestGather(object):
         print("x", x)
         atoms2 = G.subgraphs(ptens.subgraph.trivial())
 
-        check = gradcheck(cls.gather, (atoms2, x), eps=self.h)
-        assert check
+        def loss_fn(x):
+            z = cls.gather(atoms2, x)
+            s = torch.sum(z)
+            print(s)
+            return s
 
-        z = cls.gather(atoms2, x)
-        print("z", z)
-        z2 = cls.gather(atoms2, x*2)
-        print("z2", z2)
-
-        loss=torch.sum(z)
-        print("loss", loss.item())
-        loss.backward()
-        xgrad=x.grad
-        print("xgrad", xgrad)
+        xgrad = torch.autograd.grad(outputs=loss_fn(x), inputs=x)[0]
 
         fn = lambda x: cls.gather(atoms2, x)
         xgrad2 = numerical_grad_sum(fn, x, self.h)
         print("xgrad2", xgrad2)
         assert torch.allclose(xgrad, xgrad2, rtol=1e-2, atol=1e-2)
-
-
+        
+        assert gradcheck(loss_fn, (x,), eps=self.h, nondet_tol=1e-6)
         
     @pytest.mark.parametrize(('G', 'atoms', 'nc'), graph_atoms_list)
     def test_gather0(self,G, atoms, nc, device):
