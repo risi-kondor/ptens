@@ -37,29 +37,39 @@ class TestGather(object):
     h = 1e-3
 
     def backprop_sum(self, cls, G, atoms, nc, device):
-        print(atoms)
-        x = cls.sequential(atoms, nc).to(device)
+        x = cls.sequential(atoms, nc).to(device) + 1
+        x = x.to(device)
         x.requires_grad_()
         print("x", x)
         atoms2 = G.subgraphs(ptens.subgraph.trivial())
 
+        z = cls.gather(atoms2, x)
+
+        zero = torch.zeros_like(z)
+        l1_sum = torch.nn.L1Loss(reduction="sum")
+        
         def loss_fn(x):
             z = cls.gather(atoms2, x)
-            s = torch.sum(z)
+            s = l1_sum(z, zero)
+            # s = torch.sum(z)
             return s
 
         xgrad = torch.autograd.grad(outputs=loss_fn(x), inputs=x)[0]
+        print("xgrad", xgrad)
 
+        
         fn = lambda x: cls.gather(atoms2, x)
         xgrad2 = numerical_grad_sum(fn, x, self.h)
         print("xgrad2", xgrad2)
         assert torch.allclose(xgrad, xgrad2, rtol=1e-2, atol=1e-2)
-
         assert gradcheck(loss_fn, (x,), eps=self.h, nondet_tol=1e-6)
+
+        assert str(xgrad.device) == device
 
     def backprop_jac(self, cls, G, atoms, nc, device):
         x = cls.sequential(atoms, nc).to(device)
         x.requires_grad_()
+        x = x.to(device)
         atoms2 = G.subgraphs(ptens.subgraph.trivial())
 
         def loss_fn(x):
@@ -72,29 +82,44 @@ class TestGather(object):
         xjac = torch.autograd.functional.jacobian(loss_fn, x)
         print("xjac", xjac)
         assert torch.allclose(xjac, xjac2, rtol=1e-2, atol=1e-2)
-
         assert gradcheck(loss_fn, (x,), eps=self.h, nondet_tol=1e-6)
 
-    @pytest.mark.parametrize(("G", "atoms", "nc"), graph_atoms_list)
-    def test_gather0_sum(self, G, atoms, nc, device):
+        assert str(xjac.device) == device
+
+
+    def _verify_input(self, G, atoms):
         N = max(G.adjacency_matrix().size())
         for i in range(len(atoms)):
             a = atoms[i]
             if len(a) > 0:
-                assert max(a) < N
-
+                assert max(a) < N        
+        
+    @pytest.mark.parametrize(("G", "atoms", "nc"), graph_atoms_list)
+    def test_gather0_sum(self, G, atoms, nc, device):
+        self._verify_input(G, atoms)
         self.backprop_sum(ptens.ptensorlayer0, G, atoms, nc, device)
 
     @pytest.mark.parametrize(("G", "atoms", "nc"), graph_atoms_list)
     def test_gather0_jac(self, G, atoms, nc, device):
-        N = max(G.adjacency_matrix().size())
-        for i in range(len(atoms)):
-            a = atoms[i]
-            if len(a) > 0:
-                assert max(a) < N
-
+        self._verify_input(G, atoms)
         self.backprop_jac(ptens.ptensorlayer0, G, atoms, nc, device)
 
+    @pytest.mark.parametrize(('G', 'atoms', 'nc'), graph_atoms_list)
+    def test_gather1_sum(self, G, atoms, nc, device):
+        self._verify_input(G, atoms)
+        self.backprop_sum(ptens.ptensorlayer1, G, atoms, nc, device)
+        
+    @pytest.mark.parametrize(('G', 'atoms', 'nc'), graph_atoms_list)
+    def test_gather1_jac(self, G, atoms, nc, device):
+        self._verify_input(G, atoms)
+        self.backprop_jac(ptens.ptensorlayer1, G, atoms, nc, device)
+
     # @pytest.mark.parametrize(('G', 'atoms', 'nc'), graph_atoms_list)
-    # def test_gather1(self, G, atoms, nc, device):
-    #     self.backprop(ptens.ptensorlayer0, G, atoms, nc, device)
+    # def test_gather2_sum(self, G, atoms, nc, device):
+    #     self._verify_input(G, atoms)
+    #     self.backprop_sum(ptens.ptensorlayer2, G, atoms, nc, device)
+        
+    # @pytest.mark.parametrize(('G', 'atoms', 'nc'), graph_atoms_list)
+    # def test_gather2_jac(self, G, atoms, nc, device):
+    #     self._verify_input(G, atoms)
+    #     self.backprop_jac(ptens.ptensorlayer2, G, atoms, nc, device)

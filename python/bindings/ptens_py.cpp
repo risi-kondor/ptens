@@ -35,7 +35,6 @@
 
 ptens::PtensSession ptens_session(1); // Ltensors are not thread safe 
 
-
 PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
 
   using namespace cnine;

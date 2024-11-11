@@ -75,7 +75,7 @@ class ptensorlayer2(p.ptensorlayer):
         return _ptensors2.view(self.atoms,self)
 
     def zeros_like(self):
-        return ptensorlayer0.zeros(self.atoms,self.get_nc(),device=self.device)
+        return ptensorlayer2.zeros(self.atoms,self.get_nc(),device=self.device)
     
 
     # ----- Access -------------------------------------------------------------------------------------------
@@ -264,18 +264,25 @@ class ptensorlayer2_linmapsFn(torch.autograd.Function):
 class ptensorlayer2_gatherFn(torch.autograd.Function):
 
     @staticmethod
-    def forward(ctx,atoms,x,map):
+    def forward(atoms,x,map):
         r=ptensorlayer2.zeros(atoms,x.get_nc()*([2,5,15][x.getk()]),device=x.device)
         r.backend().add_gather(x.backend(),map)
-        ctx.x=x
-        ctx.tmap=map
         return r
 
     @staticmethod
+    def setup_context(ctx, inputs, outputs):
+        atoms, x, map = inputs
+        ctx.save_for_backward(x)
+        ctx.atoms = atoms
+        ctx.map = map
+            
+    @staticmethod
     def backward(ctx,g):
-        r=ctx.x.zeros_like()
-        r.backend().add_gather_back(g.backend(),ctx.map)
-        return r
+        x, = ctx.saved_tensors
+        r = x.zeros_like()
+        g_view = pb.ptensors2.view(ctx.atoms, g)
+        r.backend().add_gather_back(g_view,ctx.map)
+        return None, r, None
 
 
 # ------------------------------------------------------------------------------------------------------------
