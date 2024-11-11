@@ -49,6 +49,7 @@ namespace ptens{
     using cnine::diff_class<Ptensors0<TYPE> >::grad;
     using TENSOR::get_dev;
     using TENSOR::dim;
+    using TENSOR::stride;
     using TENSOR::dev;
     using TENSOR::move_to_device;
     using TENSOR::add;
@@ -251,11 +252,12 @@ namespace ptens{
     void zip0(const AindexPackB& map, const TENSOR& M, 
       const std::function<void(const Rtensor1_view&, const Rtensor1_view&, int)>& lambda, const int offset=0, int n=0) const{
       int N=map.size();
-      int nc=get_nc();
+      //int nc=get_nc();
+      int s0=stride(0);
       if(n==0) n=nc-offset; 
       for(int i=0; i<N; i++)
 	lambda(M.row(map.toffset(i)).view1(),
-	  Rtensor1_view(const_cast<float*>(get_arr())+map.soffset(i)*nc+offset,n,1,get_dev()),map.nix(i));
+	  Rtensor1_view(const_cast<float*>(get_arr())+map.soffset(i)*s0+offset,n,1,get_dev()),map.nix(i));
     }
 
 
