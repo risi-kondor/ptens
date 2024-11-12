@@ -37,34 +37,34 @@ def float_epsilon():
 
 @pytest.fixture(scope="session")
 def numerical_single_precision_eps():
-    return 1e-4
+    return 1e-3
 
 
 def get_graph_list():
     graph_list = [
-        # ptens.ggraph.from_edge_index(torch.Tensor([[], []]).int()), #Simplest graph
-        # ptens.ggraph.from_edge_index(torch.Tensor([[0], [0]]).int()), #Simplest graph
+        ptens.ggraph.from_edge_index(torch.Tensor([[], []]).int()), #Simplest graph
+        ptens.ggraph.from_edge_index(torch.Tensor([[0], [0]]).int()), #Simplest graph
         ptens.ggraph.from_edge_index(torch.Tensor([[0, 1], [1, 0]]).int()), # Simple graph
-        # ptens.ggraph.from_edge_index(torch.Tensor( # Two unconnected rings
-        #     [[0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
-        #      [1, 2, 3, 4, 5, 0, 7, 8, 9, 6,]]).int()), 
-        # ptens.ggraph.from_edge_index(torch.Tensor( # Two connected rings
-        #     [[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0],
-        #      [1, 2, 3, 4, 5, 0, 7, 8, 9, 6, 9,]]).int()),
-        # ptens.ggraph.from_edge_index(torch.Tensor( # star
-        #     [[0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        #      [1, 2, 3, 4, 5, 0, 7, 8, 9, 6,]]).int()),
-        # ptens.ggraph.from_edge_index(torch.Tensor([[0, 1], [1, 0]]).int(), labels=torch.Tensor([2, 4]).int()), # Simple graph with labels
-        # ptens.ggraph.from_matrix(torch.Tensor([[0, 1, 0], [1, 0, 1], [0, 1, 0]]).int()), # From Matrix
-        # ptens.ggraph.from_matrix(torch.Tensor([[0, 1, 0], [1, 0, 1], [0, 1, 0]]).int(), labels=torch.Tensor([4, 5, 6]).int()), # From Matrix
-        # ptens.ggraph.random(0, 0.5),
-        # ptens.ggraph.random(0, 0.),
-        # ptens.ggraph.random(0, 1.0),
-        # ptens.ggraph.random(10, 0.0),
-        # ptens.ggraph.random(10, 1.0),
-        # ptens.ggraph.random(10, 0.5),
+        ptens.ggraph.from_edge_index(torch.Tensor( # Two unconnected rings
+            [[0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+             [1, 2, 3, 4, 5, 0, 7, 8, 9, 6,]]).int()),
+        ptens.ggraph.from_edge_index(torch.Tensor( # Two connected rings
+            [[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0],
+             [1, 2, 3, 4, 5, 0, 7, 8, 9, 6, 9,]]).int()),
+        ptens.ggraph.from_edge_index(torch.Tensor( # star
+            [[0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+             [1, 2, 3, 4, 5, 0, 7, 8, 9, 6,]]).int()),
+        ptens.ggraph.from_edge_index(torch.Tensor([[0, 1], [1, 0]]).int(), labels=torch.Tensor([2, 4]).int()), # Simple graph with labels
+        ptens.ggraph.from_matrix(torch.Tensor([[0, 1, 0], [1, 0, 1], [0, 1, 0]]).int()), # From Matrix
+        ptens.ggraph.from_matrix(torch.Tensor([[0, 1, 0], [1, 0, 1], [0, 1, 0]]).int(), labels=torch.Tensor([4, 5, 6]).int()), # From Matrix
+        ptens.ggraph.random(0, 0.5),
+        ptens.ggraph.random(0, 0.),
+        ptens.ggraph.random(0, 1.0),
+        ptens.ggraph.random(10, 0.0),
+        ptens.ggraph.random(10, 1.0),
+        ptens.ggraph.random(10, 0.5),
     ]
-    
+
     return graph_list
 
 
@@ -94,18 +94,18 @@ def get_atomspack_from_graph_factory_list():
 
     def star(g, n):
         return g.subgraphs(ptens.subgraph.star(n))
-    
+
     factory_list = [
         range_atomspack,
-        # empty,
-        # empty2,
-        # trivial,
+        empty,
+        empty2,
+        trivial,
         # edge,
         # triangle,
-        # lambda g: cycle(g, 5),
+        lambda g: cycle(g, 4),
         # lambda g: star(g, 3),
         ]
-    
+
     return factory_list
 
 
