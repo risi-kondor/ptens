@@ -1,6 +1,8 @@
 import os
 import torch
 import pytest
+import ptens
+import ptens_base
 
 
 @pytest.fixture(scope="session")
@@ -35,7 +37,76 @@ def float_epsilon():
 
 @pytest.fixture(scope="session")
 def numerical_single_precision_eps():
-    return 1e-3
+    return 1e-4
+
+
+def get_graph_list():
+    graph_list = [
+        # ptens.ggraph.from_edge_index(torch.Tensor([[], []]).int()), #Simplest graph
+        # ptens.ggraph.from_edge_index(torch.Tensor([[0], [0]]).int()), #Simplest graph
+        ptens.ggraph.from_edge_index(torch.Tensor([[0, 1], [1, 0]]).int()), # Simple graph
+        # ptens.ggraph.from_edge_index(torch.Tensor( # Two unconnected rings
+        #     [[0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+        #      [1, 2, 3, 4, 5, 0, 7, 8, 9, 6,]]).int()), 
+        # ptens.ggraph.from_edge_index(torch.Tensor( # Two connected rings
+        #     [[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0],
+        #      [1, 2, 3, 4, 5, 0, 7, 8, 9, 6, 9,]]).int()),
+        # ptens.ggraph.from_edge_index(torch.Tensor( # star
+        #     [[0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        #      [1, 2, 3, 4, 5, 0, 7, 8, 9, 6,]]).int()),
+        # ptens.ggraph.from_edge_index(torch.Tensor([[0, 1], [1, 0]]).int(), labels=torch.Tensor([2, 4]).int()), # Simple graph with labels
+        # ptens.ggraph.from_matrix(torch.Tensor([[0, 1, 0], [1, 0, 1], [0, 1, 0]]).int()), # From Matrix
+        # ptens.ggraph.from_matrix(torch.Tensor([[0, 1, 0], [1, 0, 1], [0, 1, 0]]).int(), labels=torch.Tensor([4, 5, 6]).int()), # From Matrix
+        # ptens.ggraph.random(0, 0.5),
+        # ptens.ggraph.random(0, 0.),
+        # ptens.ggraph.random(0, 1.0),
+        # ptens.ggraph.random(10, 0.0),
+        # ptens.ggraph.random(10, 1.0),
+        # ptens.ggraph.random(10, 0.5),
+    ]
+    
+    return graph_list
+
+
+
+def get_atomspack_from_graph_factory_list():
+    def range_atomspack(g):
+        N = g.adjacency_matrix().size()[0]
+        return ptens_base.atomspack.from_list([[i] for i in range(N)])
+
+    def empty(g):
+        return ptens_base.atomspack.from_list([[]])
+
+    def empty2(g):
+        return ptens_base.atomspack.from_list([[]])
+
+    def trivial(g):
+        return g.subgraphs(ptens.subgraph.trivial())
+
+    def edge(g):
+        return g.subgraphs(ptens.subgraph.edge())
+
+    def triangle(g):
+        return g.subgraphs(ptens.subgraph.triangle())
+
+    def cycle(g, n):
+        return g.subgraphs(ptens.subgraph.cycle(n))
+
+    def star(g, n):
+        return g.subgraphs(ptens.subgraph.star(n))
+    
+    factory_list = [
+        range_atomspack,
+        # empty,
+        # empty2,
+        # trivial,
+        # edge,
+        # triangle,
+        # lambda g: cycle(g, 5),
+        # lambda g: star(g, 3),
+        ]
+    
+    return factory_list
 
 
 def numerical_grad_sum(fn, x, h):

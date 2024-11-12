@@ -95,4 +95,9 @@ class ggraph:
     def __repr__(self):
         return self.obj.__str__()
 
-    
+    def __eq__(self, other):
+        if self is other:
+            return True
+        if self.obj is other.obj:
+            return True
+        return self.obj.__eq__(other.obj)

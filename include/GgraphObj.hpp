@@ -133,14 +133,16 @@ namespace ptens{
     cnine::TensorView<int> edge_list() const{
       int N=nedges()*2;
       cnine::TensorView<int> R({2,N},0,0);
-      int t=0;
-      for_each_edge([&](const int i, const int j, const int v){
+      if(N > 0){
+        int t=0;
+        for_each_edge([&](const int i, const int j, const int v){
 	  R.set(0,t,i);
 	  R.set(1,t,j);
 	  R.set(0,t+1,j);
 	  R.set(1,t+1,i);
 	  t+=2;
 	});
+      }
       return R;
     }
 
