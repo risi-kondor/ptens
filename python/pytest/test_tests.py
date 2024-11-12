@@ -30,6 +30,13 @@ def test_bug1(device):
 
 graph_atoms_list = [
     (ptens.ggraph.from_edge_index(torch.Tensor([[0, 1], [1, 0]]).int()), ptens_base.atomspack.from_list([[1]]), 4),
+    (ptens.ggraph.from_edge_index(torch.Tensor( # Two unconnected rings
+        [[0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+         [1, 2, 3, 4, 5, 0, 7, 8, 9, 6,]]).int()), ptens_base.atomspack.from_list([[i] for i in range(9)]), 1),
+    (ptens.ggraph.from_edge_index(torch.Tensor( # Two connected rings
+        [[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0],
+         [1, 2, 3, 4, 5, 0, 7, 8, 9, 6, 9,]]).int()), ptens_base.atomspack.from_list([[i] for i in range(9)]), 1),
+    
 ]
 
 
@@ -56,7 +63,6 @@ class TestGather(object):
 
         xgrad = torch.autograd.grad(outputs=loss_fn(x), inputs=x)[0]
         print("xgrad", xgrad)
-
         
         fn = lambda x: cls.gather(atoms2, x)
         xgrad2 = numerical_grad_sum(fn, x, self.h)
@@ -64,7 +70,7 @@ class TestGather(object):
         assert torch.allclose(xgrad, xgrad2, rtol=1e-2, atol=1e-2)
         assert gradcheck(loss_fn, (x,), eps=self.h, nondet_tol=1e-6)
 
-        assert str(xgrad.device) == device
+        assert device in str(xgrad.device)
 
     def backprop_jac(self, cls, G, atoms, nc, device):
         x = cls.sequential(atoms, nc).to(device)
@@ -81,10 +87,11 @@ class TestGather(object):
 
         xjac = torch.autograd.functional.jacobian(loss_fn, x)
         print("xjac", xjac)
+        xjac2 = xjac2.to(device)
         assert torch.allclose(xjac, xjac2, rtol=1e-2, atol=1e-2)
         assert gradcheck(loss_fn, (x,), eps=self.h, nondet_tol=1e-6)
 
-        assert str(xjac.device) == device
+        assert device in str(xjac.device)
 
 
     def _verify_input(self, G, atoms):

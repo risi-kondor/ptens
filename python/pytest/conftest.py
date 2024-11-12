@@ -33,6 +33,11 @@ def float_epsilon():
     return 1e-5
 
 
+@pytest.fixture(scope="session")
+def numerical_single_precision_eps():
+    return 1e-3
+
+
 def numerical_grad_sum(fn, x, h):
     grad = torch.zeros_like(x)
     for i in range(x.numel()):
@@ -83,12 +88,12 @@ def numerical_jacobian(fn, x, h=1e-5):
 
 
 @pytest.mark.parametrize("m,c", [(0.0, 3.0), (0.5, -0.3), (-0.8, 0.2)])
-def test_numerical_grad_linear(m, c):
+def test_numerical_grad_linear(m, c, numerical_single_precision_eps):
     def linear(x):
         return m * x + c
 
     x = torch.randn((5, 10))
-    grad = numerical_grad_sum(linear, x, 1e-2)
+    grad = numerical_grad_sum(linear, x, numerical_single_precision_eps)
     ana_grad = torch.ones_like(x) * m
 
     allclose = torch.allclose(ana_grad, grad, rtol=1e-3, atol=1e-5)
@@ -102,14 +107,14 @@ def test_numerical_grad_linear(m, c):
 
 
 @pytest.mark.parametrize("a,b,c", [(1.0, 2.0, 3.0), (-0.5, 0.4, -0.3), (1.2, -0.8, 0.2)])
-def test_numerical_grad_square(a, b, c):
+def test_numerical_grad_square(a, b, c, numerical_single_precision_eps):
     from torch.autograd.gradcheck import gradcheck
 
     def square(x):
         return a * x**2 + b * x + c
 
     x = torch.randn((5, 10))
-    grad = numerical_grad_sum(square, x, 1e-3)
+    grad = numerical_grad_sum(square, x, numerical_single_precision_eps)
     ana_grad = 2 * a * x + b
 
     allclose = torch.allclose(ana_grad, grad, rtol=1e-2, atol=1e-2)
@@ -126,7 +131,7 @@ def test_numerical_grad_square(a, b, c):
 
 
 # Add a test against autograd for validation
-def test_numerical_grad_against_autograd():
+def test_numerical_grad_against_autograd(numerical_single_precision_eps):
     def complex_function(x):
         return torch.sum(torch.sin(x) + x**2)
 
@@ -138,7 +143,7 @@ def test_numerical_grad_against_autograd():
     autograd_grad = x.grad
 
     # Compute gradient using numerical method
-    numerical_grad = numerical_grad_sum(complex_function, x.detach(), 1e-3)
+    numerical_grad = numerical_grad_sum(complex_function, x.detach(), numerical_single_precision_eps)
 
     allclose = torch.allclose(autograd_grad, numerical_grad, rtol=1e-2, atol=1e-2)
     if not allclose:
@@ -149,12 +154,12 @@ def test_numerical_grad_against_autograd():
 
 
 @pytest.mark.parametrize("m,c", [(0.0, 3.0), (0.5, -0.3), (-0.8, 0.2)])
-def test_numerical_jacobian_linear(m, c):
+def test_numerical_jacobian_linear(m, c, numerical_single_precision_eps):
     def linear(x):
         return m * x + c
 
     x = torch.randn((5, 10))
-    jac = numerical_jacobian(linear, x, 1e-2)
+    jac = numerical_jacobian(linear, x, numerical_single_precision_eps)
     ana_jac = torch.zeros_like(jac)
 
     for i in range(jac.size()[0]):
@@ -174,12 +179,12 @@ def test_numerical_jacobian_linear(m, c):
 
 
 @pytest.mark.parametrize("a,b,c", [(1.0, 2.0, 3.0), (-0.5, 0.4, -0.3), (1.2, -0.8, 0.2)])
-def test_numerical_jacobian_square(a, b, c):
+def test_numerical_jacobian_square(a, b, c, numerical_single_precision_eps):
     def square(x):
         return a * x**2 + b * x + c
 
     x = torch.randn((5, 10))
-    jac = numerical_jacobian(square, x, 1e-3)
+    jac = numerical_jacobian(square, x, numerical_single_precision_eps)
     ana_jac = torch.zeros_like(jac)
 
     value = 2 * a * x + b
@@ -201,14 +206,14 @@ def test_numerical_jacobian_square(a, b, c):
 # Add a test against autograd for validation
 
 
-def test_numerical_jacobian_against_autograd():
+def test_numerical_jacobian_against_autograd(numerical_single_precision_eps):
     def complex_function(x):
         return torch.sin(x) + x**2
 
     x = torch.randn(5, 10, requires_grad=True)
 
     # Compute gradient using numerical method
-    numerical_jac = numerical_jacobian(complex_function, x.detach(), 1e-3)
+    numerical_jac = numerical_jacobian(complex_function, x.detach(), numerical_single_precision_eps)
 
     autograd_jac = torch.autograd.functional.jacobian(complex_function, x)
 
