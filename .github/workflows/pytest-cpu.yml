@@ -39,6 +39,9 @@ jobs:
         # Sorry 3.10 version of pytorch is buggy
         python-version: ["3.8", "3.12"]
         conda-env-file: ["environment-cpu.yml", ".old-environment-cpu.yml"]
+        exclude:
+          - conda-env-file: ".old-environment-cpu.yml"
+            python-version: "3.12"
         
     steps:
       - name: Checkout
