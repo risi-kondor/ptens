@@ -18,7 +18,7 @@ from typing import Union, List
 
 class ptensor(torch.Tensor):
     
-    def __new__(cls, atoms:list, data:torch.Tensor | torch.Size, *args, **kwargs):
+    def __new__(cls, atoms:List, data:Union[torch.Tensor, torch.Size], *args, **kwargs):
         # We write a new __new__ function here, since the signature now includes atoms.
         # But we need __new__ since it handles the memory allocations, potentially on the GPU.
         return torch.Tensor.__new__(cls, data, *args, **kwargs)
