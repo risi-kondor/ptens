@@ -37,10 +37,7 @@ jobs:
       matrix:
         os: ["ubuntu-latest"]
         python-version: ["3.8", "3.12"]
-        conda-env-file: ["environment-gpu.yml", ".old-environment-gpu.yml"]
-        exclude:
-          - conda-env-file: ".old-environment-gpu.yml"
-            python-version: "3.12"
+        conda-env-file: ["environment-gpu.yml"]
     steps:
       - name: Checkout
         uses: actions/checkout@v4
