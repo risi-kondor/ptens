@@ -70,4 +70,4 @@ jobs:
           python -c "import ptens"
 
           export TORCH_TEST_DEVICE='cpu'
-          pytest ../python/pytest
+          pytest ../python/pytest -v
