@@ -7,8 +7,10 @@ import time
 from os.path import splitext
 from os.path import basename
 from glob import glob
+from typing import Union, Tuple
 
-def interpret_bool_string(string:str|bool, _true_values:tuple[str] = ("TRUE", "ON"), _false_values:tuple[str] = ("FALSE", "OFF")):
+
+def interpret_bool_string(string:Union[str,bool], _true_values:Tuple[str] = ("TRUE", "ON"), _false_values:Tuple[str] = ("FALSE", "OFF")):
     if isinstance(string, bool):
         return string
     if string.strip().upper() in _true_values:
