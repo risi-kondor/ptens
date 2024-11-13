@@ -14,6 +14,7 @@
 
 import torch
 import ptens_base as pb
+from typing import Union, List
 
 class ptensor(torch.Tensor):
     
@@ -22,7 +23,7 @@ class ptensor(torch.Tensor):
         # But we need __new__ since it handles the memory allocations, potentially on the GPU.
         return torch.Tensor.__new__(cls, data, *args, **kwargs)
 
-    def __init__(self, atoms:list, data:torch.Tensor | torch.Size, *args, **kwargs):
+    def __init__(self, atoms:List, data: Union[torch.Tensor, torch.Size], *args, **kwargs):
         """
         Instantiate a generic P-Tensor.
         It requires `atoms` and a tensor `data` structure to be passed to the tensor.
@@ -31,7 +32,7 @@ class ptensor(torch.Tensor):
         self.atoms = atoms
 
     @classmethod
-    def make(cls, atoms:list, M:torch.Tensor | torch.Size):
+    def make(cls, atoms:List, M:Union[torch.Tensor, torch.Size]):
         R = cls(atoms, data=M)
         return R
 
