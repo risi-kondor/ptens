@@ -3,5 +3,5 @@ channels:
   - pytorch
   - defaults
 dependencies:
-  - pytorch<2
+  - pytorch==1.13.1
 
