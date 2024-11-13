@@ -53,6 +53,6 @@ pybind11::class_<ptens::Ggraph>(m,"ggraph")
 //    return G.compressed_subgraphs(H,nvecs);})
 
   .def("str",&Ggraph::str,py::arg("indent")="")
-  .def("__str__",&Ggraph::str,py::arg("indent")="");
-
+  .def("__str__",&Ggraph::str,py::arg("indent")="")
+  .def("__eq__", &Ggraph::operator==, py::is_operator());
 

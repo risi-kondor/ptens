@@ -1,6 +1,8 @@
 import os
 import torch
 import pytest
+import ptens
+import ptens_base
 
 
 @pytest.fixture(scope="session")
@@ -31,6 +33,81 @@ def device(ptens_cuda_support):
 @pytest.fixture(scope="session")
 def float_epsilon():
     return 1e-5
+
+
+@pytest.fixture(scope="session")
+def numerical_single_precision_eps():
+    return 1e-3
+
+
+def get_graph_list():
+    graph_list = [
+        # ptens.ggraph.from_edge_index(torch.Tensor([[], []]).int()), #Simplest graph
+        # ptens.ggraph.from_edge_index(torch.Tensor([[0, 1], [1, 0]]).int()), # Simple graph
+        # ptens.ggraph.from_edge_index(torch.Tensor( # Two unconnected rings
+        #     [[0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+        #      [1, 2, 3, 4, 5, 0, 7, 8, 9, 6,]]).int()),
+        # ptens.ggraph.from_edge_index(torch.Tensor( # Two connected rings
+        #     [[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0],
+        #      [1, 2, 3, 4, 5, 0, 7, 8, 9, 6, 9,]]).int()),
+        # ptens.ggraph.from_edge_index(torch.Tensor( # star
+        #     [[0, 0, 0, 0, 0, 0, 0, 0, 0],
+        #      [1, 2, 3, 4, 5, 7, 8, 9, 6,]]).int()),
+        # ptens.ggraph.from_edge_index(torch.Tensor([[0, 1], [1, 0]]).int(), labels=torch.Tensor([2, 4]).int()), # Simple graph with labels
+        # ptens.ggraph.from_matrix(torch.Tensor([[0, 1, 0], [1, 0, 1], [0, 1, 0]]).int()), # From Matrix
+        # ptens.ggraph.from_matrix(torch.Tensor([[0, 1, 0], [1, 0, 1], [0, 1, 0]]).int(), labels=torch.Tensor([4, 5, 6]).int()), # From Matrix
+        # ptens.ggraph.random(0, 0.5),
+        # ptens.ggraph.random(0, 0.),
+        # ptens.ggraph.random(0, 1.0),
+        # ptens.ggraph.random(10, 0.0),
+        # ptens.ggraph.random(10, 1.0),
+        # ptens.ggraph.random(10, 0.5),
+        ptens.ggraph.random(2, 1.0),
+        ptens.ggraph.random(9, 1.0),
+
+    ]
+
+    return graph_list
+
+
+def get_atomspack_from_graph_factory_list():
+    def range_atomspack(g):
+        N = g.adjacency_matrix().size()[0]
+        return ptens_base.atomspack.from_list([[i] for i in range(N)])
+
+    def empty(g):
+        return ptens_base.atomspack.from_list([[]])
+
+    def empty2(g):
+        return ptens_base.atomspack.from_list([[]])
+
+    def trivial(g):
+        return g.subgraphs(ptens.subgraph.trivial())
+
+    def edge(g):
+        return g.subgraphs(ptens.subgraph.edge())
+
+    def triangle(g):
+        return g.subgraphs(ptens.subgraph.triangle())
+
+    def cycle(g, n):
+        return g.subgraphs(ptens.subgraph.cycle(n))
+
+    def star(g, n):
+        return g.subgraphs(ptens.subgraph.star(n))
+
+    factory_list = [
+        # range_atomspack,
+        # empty,
+        # empty2,
+        # trivial,
+        edge,
+        # triangle,
+        # lambda g: cycle(g, 4),
+        # lambda g: star(g, 3),
+        ]
+
+    return factory_list
 
 
 def numerical_grad_sum(fn, x, h):
@@ -83,12 +160,12 @@ def numerical_jacobian(fn, x, h=1e-5):
 
 
 @pytest.mark.parametrize("m,c", [(0.0, 3.0), (0.5, -0.3), (-0.8, 0.2)])
-def test_numerical_grad_linear(m, c):
+def test_numerical_grad_linear(m, c, numerical_single_precision_eps):
     def linear(x):
         return m * x + c
 
     x = torch.randn((5, 10))
-    grad = numerical_grad_sum(linear, x, 1e-2)
+    grad = numerical_grad_sum(linear, x, numerical_single_precision_eps)
     ana_grad = torch.ones_like(x) * m
 
     allclose = torch.allclose(ana_grad, grad, rtol=1e-3, atol=1e-5)
@@ -102,14 +179,14 @@ def test_numerical_grad_linear(m, c):
 
 
 @pytest.mark.parametrize("a,b,c", [(1.0, 2.0, 3.0), (-0.5, 0.4, -0.3), (1.2, -0.8, 0.2)])
-def test_numerical_grad_square(a, b, c):
+def test_numerical_grad_square(a, b, c, numerical_single_precision_eps):
     from torch.autograd.gradcheck import gradcheck
 
     def square(x):
         return a * x**2 + b * x + c
 
     x = torch.randn((5, 10))
-    grad = numerical_grad_sum(square, x, 1e-3)
+    grad = numerical_grad_sum(square, x, numerical_single_precision_eps)
     ana_grad = 2 * a * x + b
 
     allclose = torch.allclose(ana_grad, grad, rtol=1e-2, atol=1e-2)
@@ -126,7 +203,7 @@ def test_numerical_grad_square(a, b, c):
 
 
 # Add a test against autograd for validation
-def test_numerical_grad_against_autograd():
+def test_numerical_grad_against_autograd(numerical_single_precision_eps):
     def complex_function(x):
         return torch.sum(torch.sin(x) + x**2)
 
@@ -138,7 +215,7 @@ def test_numerical_grad_against_autograd():
     autograd_grad = x.grad
 
     # Compute gradient using numerical method
-    numerical_grad = numerical_grad_sum(complex_function, x.detach(), 1e-3)
+    numerical_grad = numerical_grad_sum(complex_function, x.detach(), numerical_single_precision_eps)
 
     allclose = torch.allclose(autograd_grad, numerical_grad, rtol=1e-2, atol=1e-2)
     if not allclose:
@@ -149,12 +226,12 @@ def test_numerical_grad_against_autograd():
 
 
 @pytest.mark.parametrize("m,c", [(0.0, 3.0), (0.5, -0.3), (-0.8, 0.2)])
-def test_numerical_jacobian_linear(m, c):
+def test_numerical_jacobian_linear(m, c, numerical_single_precision_eps):
     def linear(x):
         return m * x + c
 
     x = torch.randn((5, 10))
-    jac = numerical_jacobian(linear, x, 1e-2)
+    jac = numerical_jacobian(linear, x, numerical_single_precision_eps)
     ana_jac = torch.zeros_like(jac)
 
     for i in range(jac.size()[0]):
@@ -174,12 +251,12 @@ def test_numerical_jacobian_linear(m, c):
 
 
 @pytest.mark.parametrize("a,b,c", [(1.0, 2.0, 3.0), (-0.5, 0.4, -0.3), (1.2, -0.8, 0.2)])
-def test_numerical_jacobian_square(a, b, c):
+def test_numerical_jacobian_square(a, b, c, numerical_single_precision_eps):
     def square(x):
         return a * x**2 + b * x + c
 
     x = torch.randn((5, 10))
-    jac = numerical_jacobian(square, x, 1e-3)
+    jac = numerical_jacobian(square, x, numerical_single_precision_eps)
     ana_jac = torch.zeros_like(jac)
 
     value = 2 * a * x + b
@@ -201,14 +278,14 @@ def test_numerical_jacobian_square(a, b, c):
 # Add a test against autograd for validation
 
 
-def test_numerical_jacobian_against_autograd():
+def test_numerical_jacobian_against_autograd(numerical_single_precision_eps):
     def complex_function(x):
         return torch.sin(x) + x**2
 
     x = torch.randn(5, 10, requires_grad=True)
 
     # Compute gradient using numerical method
-    numerical_jac = numerical_jacobian(complex_function, x.detach(), 1e-3)
+    numerical_jac = numerical_jacobian(complex_function, x.detach(), numerical_single_precision_eps)
 
     autograd_jac = torch.autograd.functional.jacobian(complex_function, x)
 

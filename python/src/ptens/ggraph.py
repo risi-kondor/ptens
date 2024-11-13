@@ -16,7 +16,7 @@ import ptens_base as pb
 import ptens as p
 
 from ptens_base import ggraph as _ggraph
-
+from .exception import GraphCreationError
 
 class ggraph:
 
@@ -27,16 +27,24 @@ class ggraph:
         return G
 
     @classmethod
-    def from_edge_index(self,M,n=-1,labels=None):
-        G=ggraph()
+    def from_edge_index(cls,M,n=-1,labels=None):
+        number_self_edges = M.shape[1] - torch.count_nonzero(M[0] - M[1])
+        if number_self_edges > 0:
+            raise GraphCreationError(f"Attempt to create a graph with self edges with the following edge index {M}")
+
+        G=cls()
         G.obj=_ggraph.from_edge_index(M,n)
         if labels is not None:
             G.set_labels(labels)
         return G
 
     @classmethod
-    def from_matrix(self,M,labels=None):
-        G=ggraph()
+    def from_matrix(cls,M,labels=None):
+        number_self_edges = torch.count_nonzero(torch.diag(M))
+        if number_self_edges > 0:
+            raise GraphCreationError(f"Attempt to create a graph with self edges with the following adjacency matrix index {M}")
+
+        G=cls()
         G.obj=_ggraph.from_matrix(M)
         if labels is not None:
             G.set_labels(labels)
@@ -95,4 +103,9 @@ class ggraph:
     def __repr__(self):
         return self.obj.__str__()
 
-    
+    def __eq__(self, other):
+        if self is other:
+            return True
+        if self.obj is other.obj:
+            return True
+        return self.obj.__eq__(other.obj)

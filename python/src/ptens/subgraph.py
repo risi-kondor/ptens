@@ -118,8 +118,8 @@ class subgraph:
 
     # ---- Operators --------------------------------------------------------------------------------------------
     def __eq__(self, other):
-        if id(self) == id(other):
+        if self is other:
             return True
-        if id(self.obj) == id(other.obj):
+        if self.obj is other.obj:
             return True
         return self.obj.__eq__(other.obj)
