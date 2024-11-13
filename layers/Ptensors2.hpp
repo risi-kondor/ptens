@@ -77,6 +77,7 @@ namespace ptens{
     using TENSOR::dev;
     using TENSOR::get_arr;
     using TENSOR::dim;
+    using TENSOR::stride;
     using TENSOR::move_to_device;
     using TENSOR::strides;
     using TENSOR::cols;
@@ -301,9 +302,10 @@ namespace ptens{
       int N=map.size();
       int nc=get_nc();
       if(n==0) n=nc-offset; 
+      int s0=stride(0);
       for(int i=0; i<N; i++)
 	lambda(M.row(map.toffset(i)).view1(),
-	  Ptensor2view<TYPE>(const_cast<float*>(get_arr())+map.soffset(i)*nc+offset,
+	  Ptensor2view<TYPE>(const_cast<float*>(get_arr())+map.soffset(i)*s0+offset,
 	    n,map.ssize(i)*nc,nc,1,map.ix(i),get_dev()),map.nix(i));
     }
 
