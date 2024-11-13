@@ -9,4 +9,4 @@ dependencies:
   #  - it installs $CUDA_HOME into $CONDA_PREFIX (run: export CUDA_HOME=$CONDA_PREFIX) before
   #  - something is unhappy after, which prevents packages from being added. But it compiles.
   - cuda-toolkit
-  - pytorch-cuda==1.13.1
+
