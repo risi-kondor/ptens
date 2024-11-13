@@ -38,6 +38,8 @@ jobs:
         os: ["ubuntu-latest", "macos-latest"]
         # Sorry 3.10 version of pytorch is buggy
         python-version: ["3.8", "3.12"]
+        conda-env-file: ["environment-cpu.yml", ".old-environment-cpu.yml"]
+        
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -45,7 +47,7 @@ jobs:
         with:
           auto-update-conda: true
           python-version: ${{ matrix.python-version }}
-          environment-file: environment-cpu.yml
+          environment-file: ${{ matrix.conda-env-file }}
           activate-environment: ptens
       - name: Install Missing Developper packages
         run: conda install pytest
