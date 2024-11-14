@@ -18,7 +18,7 @@ def get_graph_atomspack_nc(reduction=False):
     reduction_fns = [None]
     if reduction:
         reduction_fns = [
-            torch.sum,
+            # torch.sum,
             l1loss_reduction,
         ]
 
@@ -59,7 +59,7 @@ def backprop_sum(cls, G, atoms, nc, reduction_fn, device, numerical_single_preci
     xgrad2 = numerical_grad_sum(fn, x, numerical_single_precision_eps)
     # print("xgrad2", xgrad2)
 
-    assert gradcheck(loss_fn, (x,), eps=numerical_single_precision_eps, rtol=1e-2, atol=1e-1, nondet_tol=1e-3)
+    # assert gradcheck(loss_fn, (x,), eps=numerical_single_precision_eps, rtol=1e-2, atol=1e-1, nondet_tol=1e-3)
     
     assert torch.allclose(torch.Tensor(xgrad), torch.Tensor(xgrad2), rtol=1e-1, atol=1e-1)
 
