@@ -254,10 +254,11 @@ namespace ptens{
       int N=map.size();
       //int nc=get_nc();
       int s0=stride(0);
+      int s1=stride(1);
       if(n==0) n=nc-offset; 
       for(int i=0; i<N; i++)
 	lambda(M.row(map.toffset(i)).view1(),
-	  Rtensor1_view(const_cast<float*>(get_arr())+map.soffset(i)*s0+offset,n,1,get_dev()),map.nix(i));
+	  Rtensor1_view(const_cast<float*>(get_arr())+map.soffset(i)*s0+offset*s1,n,s1,get_dev()),map.nix(i));
     }
 
 

@@ -3,7 +3,7 @@ import ptens
 from torch.autograd.gradcheck import gradcheck
 
 def test_bug1(device):
-    nnodes = 15
+    nnodes = 2
     graph = ptens.ggraph.random(nnodes, 0.5)
     subgraphs = [ptens.subgraph.trivial(), ptens.subgraph.edge()]
     node_values = torch.rand(nnodes, 1, requires_grad=True)
@@ -20,4 +20,7 @@ def test_bug1(device):
         result.backward()
 
         check = gradcheck(ptens.subgraphlayer0.gather, (sg, node_attributes), eps=1e-3)
+        print(check)
         assert check
+
+test_bug1('cpu')

@@ -58,6 +58,7 @@ def backprop_sum(cls, G, atoms, nc, reduction_fn, device, numerical_single_preci
     fn = lambda x: cls.gather(atoms2, x)
     xgrad2 = numerical_grad_sum(fn, x, numerical_single_precision_eps)
     # print("xgrad2", xgrad2)
+    print("eps=",numerical_single_precision_eps)
 
     assert gradcheck(loss_fn, (x,), eps=numerical_single_precision_eps, rtol=1e-2, atol=1e-1, nondet_tol=1e-3)
     
