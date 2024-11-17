@@ -68,6 +68,7 @@ namespace ptens{
     template<int outk, int ink>
     static shared_ptr<BatchedGatherPlanObj> make(const BatchedLayerMap& map, 
       const BatchedAtomsPackObj& out, const BatchedAtomsPackObj& in, const int gatherk=0){
+      cout<<map.size()<<out.size()<<in.size()<<endl;
       const int N=map.size();
       PTENS_ASSRT(out.size()==N);
       PTENS_ASSRT(in.size()==N);
