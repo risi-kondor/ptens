@@ -18,11 +18,8 @@ namespace ptens{
 #include "AtomsPackCatCache.hpp"
 #include "BatchedAtomsPackCatCache.hpp"
 #include "LayerMapCache.hpp"
-#include "BatchedLayerMapCache.hpp"
 #include "GatherPlanCache.hpp"
-#include "BatchedGatherPlanCache.hpp"
 #include "CompressedGatherMatrixCache.hpp"
-
 
 namespace ptens{
   namespace ptens_global{
@@ -37,16 +34,27 @@ namespace ptens{
     BatchedAtomsPackCatCache batched_atomspack_cat_cache; 
 
     LayerMapCache overlaps_maps_cache;
-    BatchedLayerMapCache batched_overlaps_maps_cache;
 
     GatherPlanCache gather_plan_cache;
-    BatchedGatherPlanCache batched_gather_plan_cache;
 
     CompressedGatherMatrixCache gather_matrix_cache;
 
   }
 }
 
+
+#include "BatchedGatherPlanCache.hpp"
+#include "BatchedLayerMapCache.hpp"
+
+namespace ptens{
+  namespace ptens_global{
+
+    BatchedLayerMapCache batched_overlaps_maps_cache;
+    BatchedGatherPlanCache batched_gather_plan_cache;
+
+
+  }
+}
 
 #include "GgraphCache.hpp"
 #include "SubgraphCache.hpp"

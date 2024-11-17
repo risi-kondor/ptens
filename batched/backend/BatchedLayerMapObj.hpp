@@ -37,8 +37,17 @@ namespace ptens{
       PTENS_ASSRT(out.size()==in.size());
       int N=out.size();
       auto R=new BatchedLayerMapObj();
-      //for(int i=0; i<N; i++)
-      //R->maps.push_back(LayerMap::overlaps_map(*out[i],*in[i],min_overlaps));
+      for(int i=0; i<N; i++){
+	auto& out_atoms=out[i];
+	auto& in_atoms=in[i];
+	if(ptens_global::overlaps_maps_cache.contains(out_atoms,in_atoms))
+	  R->maps.push_back(ptens_global::overlaps_maps_cache(out_atoms,in_atoms));
+	else{
+	  auto r=LayerMapObj::overlaps_map(out_atoms,in_atoms,min_overlaps);
+	  ptens_global::overlaps_maps_cache.insert(out_atoms,in_atoms,r);
+	  R->maps.push_back(r);
+	}
+      }
 
       return cnine::to_share(R);
     }
