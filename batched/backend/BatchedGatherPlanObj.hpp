@@ -47,7 +47,7 @@ namespace ptens{
       return "BatchedGatherPlanObj";
     }
 
-ye    string repr() const{
+    string repr() const{
       return "<BatchedGatherPlanObj>";
     }
 
