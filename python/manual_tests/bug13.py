@@ -1,8 +1,8 @@
 import ptens
 import torch
 
-device = 'cuda:0'
-# device = 'cpu'
+#device = 'cuda:0'
+device = 'cpu'
 # hidden_dim = 3
 hidden_dim = 256
 num_vertices = 10
