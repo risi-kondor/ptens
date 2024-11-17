@@ -17,11 +17,11 @@ edge = ptens.subgraph.edge()
 
 linear_layer = torch.nn.Linear(hidden_dim, hidden_dim).to(device)
 # batch_layer = torch.nn.BatchNorm1d(hidden_dim).to(device)
-relu_layer = torch.nn.ReLU().to(device)
+#relu_layer = torch.nn.ReLU().to(device)
 # print("linear layer's weight:", linear_layer.weight)
 
-# result = linear_layer(C)
-result = C
+result = linear_layer(C)
+# result = C
 # result = batch_layer(C)
 # result = relu_layer(C)
 # print("result.atoms:", result.atoms)
