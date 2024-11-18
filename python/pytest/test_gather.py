@@ -18,7 +18,7 @@ def get_graph_atomspack_nc(reduction=False):
     reduction_fns = [None]
     if reduction:
         reduction_fns = [
-            # torch.sum,
+            torch.sum,
             l1loss_reduction,
         ]
 
