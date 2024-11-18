@@ -36,8 +36,8 @@ __global__ void Ptensors1_reduce0_kernel(float* rarr, int rs, const float* xarr,
   const int q=blockIdx.x;
   const int c=threadIdx.x;
   if(c<maps) ix[c]=maparr[q*maps+c];
-  const int k=ix[1];
   __syncthreads();
+  const int k=ix[1];
 
   if(c>=n) return;
   const float* x=xarr+ix[2]*xs+c;
@@ -56,8 +56,8 @@ __global__ void Ptensors1_reduce1_kernel(float* rarr, int rs, const float* xarr,
   const int q=blockIdx.x;
   const int c=threadIdx.x;
   if(c<maps) ix[c]=maparr[q*maps+c];
-  const int k=ix[1];
   __syncthreads();
+  const int k=ix[1];
 
   if(c>=n) return;
   const float* x=xarr+ix[2]*xs+c;
@@ -86,8 +86,8 @@ __global__ void Ptensors1_broadcast0_kernel(float* rarr, const int rs,
   for(int s=0; s<N; s++){
     const int row=bmap[boffs+s+1];
     if(c<maps) ix[c]=maparr[row*maps+c];
-    const int k=ix[1];
     __syncthreads();
+    const int k=ix[1];
 
     if(c>=n) continue;
     //assert(ix[2]==target);
@@ -116,8 +116,8 @@ __global__ void Ptensors1_broadcast1_kernel(float* rarr, const int rs,
   for(int s=0; s<N; s++){
     const int row=bmap[boffs+s+1];
     if(c<maps) ix[c]=maparr[row*maps+c];
-    const int k=ix[1];
     __syncthreads();
+    const int k=ix[1];
 
     if(c>=n) continue;
     //assert(ix[2]==target);

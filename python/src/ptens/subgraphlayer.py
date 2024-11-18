@@ -52,6 +52,6 @@ class subgraphlayer(torch.Tensor):
 
 
 def matmul(x,y):
-    return x.from_matrix(x.atoms,torch.matmul(x,y))
+    return x.from_matrix(x.atoms,x.G,x.S,torch.matmul(x,y))
 
 

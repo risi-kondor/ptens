@@ -25,6 +25,7 @@ pybind11::class_<BatchedLayerMap>(m,"batched_layer_map")
 //   .def_static("overlaps_map",[](const BatchedAtomsPack<2>& out, const BatchedAtomsPack<2>& in){
 //       return BatchedLayerMap::overlaps_map(out,in);})
 
+  .def("__len__",&BatchedLayerMap::size)
   .def("__getitem__",&BatchedLayerMap::operator[])
 
   .def("__repr__",[](const BatchedLayerMap& obj){return obj.repr();})

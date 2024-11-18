@@ -318,21 +318,24 @@ namespace ptens{
       int nc=get_nc();
       if(n==0) n=nc-offset; 
       int s0=stride(0);
+      int s1=stride(1);
       for(int i=0; i<N; i++)
 	lambda(M.row(map.toffset(i)).view1(),
-	  Ptensor1view<TYPE>(const_cast<float*>(get_arr())+map.soffset(i)*s0+offset,
-	    n,nc,1,map.ix(i),get_dev()),map.nix(i));
+	  Ptensor1view<TYPE>(const_cast<float*>(get_arr())+map.soffset(i)*s0+offset*s1,
+	    n,s0,s1,map.ix(i),get_dev()),map.nix(i));
     }
 
     void zip1(const AindexPackB& map, const TENSOR& M, 
       const std::function<void(const Rtensor2_view&, const Ptensor1view<TYPE>&, int)>& lambda, const int offset=0, int n=0) const{
       int N=map.size();
       int nc=get_nc();
+      int s0=stride(0);
+      int s1=stride(1);
       if(n==0) n=nc-offset; 
       for(int i=0; i<N; i++)
 	lambda(M.rows(map.toffset(i),map.nix(i)).view2(),
-	  Ptensor1view<TYPE>(const_cast<float*>(get_arr())+map.soffset(i)*nc+offset,
-	    n,nc,1,map.ix(i),get_dev()),map.nix(i));
+	  Ptensor1view<TYPE>(const_cast<float*>(get_arr())+map.soffset(i)*s0+offset*s1,
+	    n,s0,s1,map.ix(i),get_dev()),map.nix(i));
     }
 
 

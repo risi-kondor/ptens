@@ -264,17 +264,13 @@ class ptensorlayer2_linmapsFn(torch.autograd.Function):
 class ptensorlayer2_gatherFn(torch.autograd.Function):
 
     @staticmethod
-    def forward(atoms,x,map):
+    def forward(ctx, atoms,x,map):
         r=ptensorlayer2.zeros(atoms,x.get_nc()*([2,5,15][x.getk()]),device=x.device)
         r.backend().add_gather(x.backend(),map)
-        return r
-
-    @staticmethod
-    def setup_context(ctx, inputs, outputs):
-        atoms, x, map = inputs
         ctx.save_for_backward(x)
         ctx.atoms = atoms
         ctx.map = map
+        return r
             
     @staticmethod
     def backward(ctx,g):

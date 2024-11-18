@@ -33,9 +33,9 @@ __global__ void Ptensors2_reduce0_kernel(float* rarr, int rs, const float* xarr,
   const int q=blockIdx.x;
   const int c=threadIdx.x;
   if(c<maps) ix[c]=maparr[q*maps+c];
+  __syncthreads();
   const int k=ix[1];
   const int m=ix[3];
-  __syncthreads();
   if(c>=n) return;
   const float* x=xarr+ix[2]*xs+c;
 
@@ -58,9 +58,9 @@ __global__ void Ptensors2_reduce0_shrink_kernel(float* rarr, int rs, const float
   const int q=blockIdx.x;
   const int c=threadIdx.x;
   if(c<maps) ix[c]=maparr[q*maps+c];
+  __syncthreads();
   const int k=ix[1];
   const int m=ix[3];
-  __syncthreads();
   if(c>=n) return;
   const float* x=xarr+ix[2]*xs+c;
 
