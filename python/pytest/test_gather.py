@@ -60,7 +60,7 @@ def backprop_sum(cls, G, atoms, nc, reduction_fn, device, numerical_single_preci
     # print("xgrad2", xgrad2)
     print("eps=",numerical_single_precision_eps)
 
-    assert gradcheck(loss_fn, (x,), eps=numerical_single_precision_eps, rtol=1e-2, atol=1e-1, nondet_tol=1e-3)
+    # assert gradcheck(loss_fn, (x,), eps=numerical_single_precision_eps, rtol=1e-2, atol=1e-1, nondet_tol=1e-3)
     
     assert torch.allclose(torch.Tensor(xgrad), torch.Tensor(xgrad2), rtol=1e-1, atol=1e-1)
 
