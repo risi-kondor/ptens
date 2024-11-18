@@ -18,7 +18,7 @@ import ptens as p
 import ptens_base as pb 
 
 
-class batched_subgraphlayer2(p.batched_subgraphlayer,p.batched_ptensorlayer2):
+class batched_subgraphlayer2(p.batched_ptensorlayer2):
 
 
     def __new__(cls,G,S,atoms,M):
