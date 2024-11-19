@@ -85,6 +85,10 @@ def backprop_jac(cls, G, atoms, nc, device, numerical_single_precision_eps):
         xjac = torch.autograd.functional.jacobian(loss_fn, x)
         # print("xjac", xjac)
         xjac2 = xjac2.to(device)
+
+        diff = xjac - xjac2
+        print("diff", torch.max(diff, dim=-1))
+        
         assert gradcheck(loss_fn, (x,), eps=numerical_single_precision_eps, rtol=0.1, atol=0.1, nondet_tol=1e-6)
         
         assert torch.allclose(xjac, xjac2, rtol=1e-1, atol=1e-1)

@@ -82,7 +82,8 @@ def main():
                          '-DCNINE_SIZE_CHECKING',
                          '-DCNINE_DEVICE_CHECKING',
                          '-DWITH_FAKE_GRAD',
-                         '-DCNINE_FUNCTION_TRACING'
+                         '-DCNINE_FUNCTION_TRACING',
+                         '-fstack-protector',
                          ]
 
     _nvcc_compile_args = ['-D_WITH_CUDA',
