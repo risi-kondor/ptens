@@ -159,15 +159,18 @@ class batched_ptensorlayer1_gatherFn(torch.autograd.Function):
     def forward(ctx,atoms,x,tmap):
         r=batched_ptensorlayer1.zeros(atoms,x.get_nc()*([1,2,5][x.getk()]),device=x.device)
         r.backend().add_gather(x.backend(),tmap)
-        ctx.x=x
+        ctx.save_for_backward(x)
         ctx.tmap=tmap
+        ctx.atoms = atoms
         return r
 
     @staticmethod
     def backward(ctx,g):
-        r=ctx.x.zeros_like()
-        r.backend().add_gather_back(g.backend(),ctx.tmap)
-        return r
+        x, = ctx.saved_tensors
+        r = x.zeros_like()
+        g_view = pb.batched_ptensor1.view(ctx.atoms, g)
+        r.backend().add_gather_back(g_view, ctx.tmap)
+        return None, r, None
 
 
 
