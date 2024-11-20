@@ -55,6 +55,8 @@ namespace ptens{
     const int offs, const cudaStream_t& stream);
   extern void Ptensors2_broadcast2_cu(const cnine::Ltensor<float>& r, const cnine::Ltensor<float>& x, const AindexPackB& map, 
     const int offs, const cudaStream_t& stream);
+  extern void Ptensors2_broadcast2_shrink_cu(const cnine::Ltensor<float>& r, const cnine::Ltensor<float>& x, const AindexPackB& map, 
+    const int offs, const cudaStream_t& stream);
   #endif 
 
 
