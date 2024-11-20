@@ -55,6 +55,8 @@ namespace ptens{
     const int offs, const cudaStream_t& stream);
   extern void Ptensors2_broadcast2_cu(const cnine::Ltensor<float>& r, const cnine::Ltensor<float>& x, const AindexPackB& map, 
     const int offs, const cudaStream_t& stream);
+  extern void Ptensors2_broadcast2_shrink_cu(const cnine::Ltensor<float>& r, const cnine::Ltensor<float>& x, const AindexPackB& map, 
+    const int offs, const cudaStream_t& stream);
   #endif 
 
 
@@ -435,24 +437,24 @@ namespace ptens{
       int nc=get_nc();
 
       if constexpr(std::is_same<OUTPUT,Ptensors0<TYPE> >::value){
-	auto plan0=GatherPlanFactory::gather_map0(map,atoms,x.atoms,2,x.getk());
+	auto plan0=GatherPlanFactory::gather_map0(map,x.atoms,atoms,2,x.getk());
 	broadcast0_shrink(x.reduce0(plan0.out()),plan0.in());
       }
 
       if constexpr(std::is_same<OUTPUT,Ptensors1<TYPE> >::value){
-	auto plan0=GatherPlanFactory::gather_map0(map,atoms,x.atoms,2,x.getk());
+	auto plan0=GatherPlanFactory::gather_map0(map,x.atoms,atoms,2,x.getk());
 	broadcast0_shrink(x.reduce0(plan0.out(),0,2*nc),plan0.in());
-	auto plan1=GatherPlanFactory::gather_map1(map,atoms,x.atoms,2,x.getk());
+	auto plan1=GatherPlanFactory::gather_map1(map,x.atoms,atoms,2,x.getk());
 	broadcast1_shrink(x.reduce1(plan1.out(),2*nc,3*nc),plan1.in());
       }
 
       if constexpr(std::is_same<OUTPUT,Ptensors2<TYPE> >::value){
-	auto plan0=GatherPlanFactory::gather_map0(map,atoms,x.atoms,2,x.getk());
+	auto plan0=GatherPlanFactory::gather_map0(map,x.atoms,atoms,2,x.getk());
 	broadcast0_shrink(x.reduce0_shrink(plan0.out(),0,2*nc),plan0.in());
-	auto plan1=GatherPlanFactory::gather_map1(map,atoms,x.atoms,2,x.getk());
+	auto plan1=GatherPlanFactory::gather_map1(map,x.atoms,atoms,2,x.getk());
 	broadcast1_shrink(x.reduce1_shrink(plan1.out(),4*nc,3*nc),plan1.in());
-	auto plan2=GatherPlanFactory::gather_map2(map,atoms,x.atoms,2,x.getk());
-	broadcast2(x.reduce2_shrink(plan2.out(),13*nc,nc),plan2.in());
+	auto plan2=GatherPlanFactory::gather_map2(map,x.atoms,atoms,2,x.getk());
+	broadcast2_shrink(x.reduce2_shrink(plan2.out(),13*nc,nc),plan2.in());
       }
 
     }

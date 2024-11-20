@@ -193,3 +193,12 @@ void broadcast2(const TENSOR& x, const AindexPackB& map, const int offs=0){
   GPUCODE(CUDA_STREAM(Ptensors2_broadcast2_cu(*this,x,map,offs,stream)));
 }
 
+void broadcast2_shrink(const TENSOR& x, const AindexPackB& map, const int offs=0){
+  TimedFn T("Ptensors2","broadcast2",*this,x,map,map.count1*x.dim(1));
+  int nc=x.dim(1);
+  if(dev==0){
+    zip2(map,x,[](auto& r, auto& x, int k){x+=r;},offs,nc);
+  }
+  GPUCODE(CUDA_STREAM(Ptensors2_broadcast2_shrink_cu(*this,x,map,offs,stream)));
+}
+
