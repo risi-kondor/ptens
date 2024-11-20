@@ -278,7 +278,7 @@ TENSOR reduce0_shrink(const AindexPackB& map, const int offs=0, int nc=0) const{
   if(dev==0) zip0(map,R,[nc](auto& r, auto& x, int k){
       x.cols(0,nc).sum01_into(r);
       x.cols(nc,nc).diag01().sum0_into(r);
-    },offs,nc);
+    },offs,2*nc); // changed from nc to 2*nc 
   GPUCODE(CUDA_STREAM(Ptensors2_reduce0_shrink_cu(R,*this,map,offs,nc,stream)));
   return R;
 }
@@ -288,7 +288,7 @@ void add_reduce0_shrink(const TENSOR& R, const AindexPackB& map, const int offs=
   if(dev==0) zip0(map,R,[nc](auto& r, auto& x, int k){
       x.cols(0,nc).sum01_into(r);
       x.cols(nc,nc).diag01().sum0_into(r);
-    },offs,nc);
+    },offs,2*nc);
   GPUCODE(CUDA_STREAM(Ptensors2_reduce0_shrink_cu(R,*this,map,offs,nc,stream)));
 }
 
@@ -325,7 +325,7 @@ TENSOR reduce1_shrink(const AindexPackB& map, const int offs=0, int nc=0) const{
       x.cols(0,nc).sum0_into(r);
       x.cols(nc,nc).sum1_into(r);
       r+=x.cols(2*nc,nc).diag01();
-    },offs,nc);
+    },offs,3*nc);
   GPUCODE(CUDA_STREAM(Ptensors2_reduce1_shrink_cu(R,*this,map,offs,nc,stream)));
   return R;
 }
@@ -337,7 +337,7 @@ void add_reduce1_shrink(const TENSOR& R, const AindexPackB& map, const int offs=
       x.cols(0,nc).sum0_into(r);
       x.cols(nc,nc).sum1_into(r);
       r+=x.cols(2*nc,nc).diag01();
-    },offs,nc);
+    },offs,3*nc);
   GPUCODE(CUDA_STREAM(Ptensors2_reduce1_shrink_cu(R,*this,map,offs,nc,stream)));
 }
 

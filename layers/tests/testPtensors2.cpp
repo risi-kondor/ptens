@@ -29,33 +29,34 @@ int main(int argc, char** argv){
   typedef Ptensors0<float> Ptens0;
   typedef Ptensors1<float> Ptens1;
   typedef Ptensors2<float> Ptens2;
+  int N=4;
 
-  AtomsPack xatoms=AtomsPack::random(8,8,0.5);
+  AtomsPack xatoms=AtomsPack::random(N,N,0.5);
   Ptens0 X0=Ptens0(xatoms,channels=1,filltype=4);
   Ptens1 X1=Ptens1(xatoms,channels=1,filltype=4);
   Ptens2 X2=Ptens2(xatoms,channels=1,filltype=4);
 
-  AtomsPack yatoms=AtomsPack::random(8,8,0.5);
+  AtomsPack yatoms=AtomsPack::random(N,N,0.5);
   auto Y0=Ptens2::gather(yatoms,X0);
-  cout<<Y0<<endl;
+  //cout<<Y0<<endl;
 
   auto Y1=Ptens2::gather(yatoms,X1);
-  cout<<Y1<<endl;
+  //cout<<Y1<<endl;
 
   auto Y2=Ptens2::gather(yatoms,X2);
-  cout<<Y2<<endl;
+  //cout<<Y2<<endl;
 
-  exit(0);
+  auto lmap=LayerMap::overlaps_map(yatoms,xatoms);
   Ptens0 X0g=Ptens0::zeros_like(X0);
   Ptens1 X1g=Ptens1::zeros_like(X1);
   Ptens2 X2g=Ptens2::zeros_like(X2);
 
-  //X0g.add_gather_back(Y0);
-  //cout<<X0g<<endl;
-  //X1g.add_gather_back(Y1);
-  //cout<<X1g<<endl;
-  //X2g.add_gather_back(Y2);
-  //cout<<X2g<<endl;
+  X0g.add_gather_back(Y0,lmap);
+  cout<<X0g<<endl;
+  X1g.add_gather_back(Y1,lmap);
+  cout<<X1g<<endl;
+  X2g.add_gather_back(Y2,lmap);
+  cout<<X2g<<endl;
 
 
   //Ptensors1<float> Ab(A);

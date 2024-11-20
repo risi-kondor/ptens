@@ -367,6 +367,36 @@ __global__ void Ptensors2_broadcast2_kernel(float* rarr, const int rs,
 }
 
 
+__global__ void Ptensors2_broadcast2_shrink_kernel(float* rarr, const int rs, 
+  const float* xarr, const int xs, const int* maparr, const int maps, const int* bmap, const int n){
+  extern __shared__ unsigned char _shared[]; 
+  int* ix=reinterpret_cast<int*>(_shared);
+
+  const int b=blockIdx.x;
+  assert(b<bmap[0]);
+  const int c=threadIdx.x;
+  const int boffs=bmap[b+1];
+  const int N=bmap[b+2]-bmap[b+1]-1;
+
+  for(int s=0; s<N; s++){
+    const int row=bmap[boffs+s+1];
+    if(c<maps) ix[c]=maparr[row*maps+c];
+    __syncthreads();
+    if(c>=n) continue;
+    const int k=ix[1];
+    const int m=ix[3];
+
+    const float* x=xarr+ix[0]*xs+c;
+    float* r=rarr+ix[2]*rs+c;
+    for(int i=0; i<k; i++)
+      for(int j=0; j<k; j++){
+	float t=x[(i*k+j)*xs];
+	r[(ix[i+4]*m+ix[j+4])*rs]+=t;
+      }
+  }
+}
+
+
 // -----------------------------------------------------------------------------------------------------------
 
 
@@ -508,6 +538,20 @@ namespace ptens{
     int nthrd=cnine::roundup(std::max(n,map.dim(1)),32);
     if(map.n_gather_lists==0) return;
     Ptensors2_broadcast2_kernel<<<map.n_gather_lists,nthrd,map.dim(1)*4,stream>>> 
+      (r.get_arr()+offs,r.stride(0),x.get_arr(),x.stride(0),map.on_device(dev).get_arr(),map.stride(0),
+	map.gmap_on_device(dev).get_arr(),n);
+  }
+
+  void Ptensors2_broadcast2_shrink_cu(const TENSOR& r, const TENSOR& x, const AindexPackB& map, 
+    const int offs, const cudaStream_t& stream){
+    int dev=r.dev;
+    PTENS_ASSRT(x.dev==dev);
+    int n=x.dim(1);
+
+    PTENS_CHANNEL_LIMIT(n);
+    int nthrd=cnine::roundup(std::max(n,map.dim(1)),32);
+    if(map.n_gather_lists==0) return;
+    Ptensors2_broadcast2_shrink_kernel<<<map.n_gather_lists,nthrd,map.dim(1)*4,stream>>> 
       (r.get_arr()+offs,r.stride(0),x.get_arr(),x.stride(0),map.on_device(dev).get_arr(),map.stride(0),
 	map.gmap_on_device(dev).get_arr(),n);
   }

@@ -333,9 +333,8 @@ namespace ptens{
     template<typename OUTPUT>
     void add_gather_back(const OUTPUT& x, const LayerMap& map){
       auto plan=GatherPlanFactory::gather_map0(map,x.atoms,atoms,x.getk(),0);
-      if constexpr(std::is_same<OUTPUT,Ptensors0<TYPE> >::value){
+      if constexpr(std::is_same<OUTPUT,Ptensors0<TYPE> >::value)
 	broadcast0(x.reduce0(plan.out()),plan.in(),0);
-      }
       if constexpr(std::is_same<OUTPUT,Ptensors1<TYPE> >::value)
 	broadcast0(x.reduce0(plan.out()),plan.in(),0);
       if constexpr(std::is_same<OUTPUT,Ptensors2<TYPE> >::value)

@@ -75,7 +75,8 @@ namespace ptens{
 
 
     Ptensor2view cols(const int offs, const int n) const{
-      return Ptensor2view(arr+offs,n,s0,s1,s2,ix,dev);
+      PTENS_ASSRT(offs+n<=n2);
+      return Ptensor2view(arr+offs*s2,n,s0,s1,s2,ix,dev);
     }
 
     void sum0_into(const Rtensor2_view& r) const{
