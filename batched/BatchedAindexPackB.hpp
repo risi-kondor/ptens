@@ -16,6 +16,7 @@
 #define _ptens_BatchedAindexPackB
 
 #include "object_pack_s.hpp"
+#include "once.hpp"
 #include "AindexPackB.hpp"
 
 namespace ptens{
