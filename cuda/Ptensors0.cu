@@ -16,11 +16,11 @@ must be accompanied by a verbatim copy of the license.
 
 #include <cuda.h>
 #include <cuda_runtime.h>
-//#include <thrust/tuple.h>
 
 #include "Ptens_base.hpp"
 #include "Ltensor.hpp"
 #include "AindexPackB.hpp"
+#include "BatchedAindexPackB.hpp"
 
 
 typedef cnine::Ltensor<float> TENSOR;
@@ -60,7 +60,8 @@ __global__ void Ptensors0_broadcast0_kernel(float* rarr, const int rs, const flo
 namespace ptens{
 
 
-  void Ptensors0_reduce0_cu(const TENSOR& R, const TENSOR& x, const AindexPackB& map, int offs, int n, const cudaStream_t& stream){
+  template<typename MAP>
+  void Ptensors0_reduce0_cu(const TENSOR& R, const TENSOR& x, const MAP& map, int offs, int n, const cudaStream_t& stream){
     int dev=R.get_dev();
     PTENS_ASSRT(R.get_dev()==1);
     PTENS_ASSRT(x.get_dev()==1);
@@ -69,7 +70,8 @@ namespace ptens{
     Ptensors0_reduce0_kernel<<<map.dim(0),n,0,stream>>>(R.get_arr(),R.stride(0),x.get_arr()+offs,x.stride(0),map.on_device(dev).get_arr(),map.stride(0),n);
   }
 
-  void Ptensors0_broadcast0_cu(const TENSOR& r, const TENSOR& x, const AindexPackB& map, const int offs, const cudaStream_t& stream){
+  template<typename MAP>
+  void Ptensors0_broadcast0_cu(const TENSOR& r, const TENSOR& x, const MAP& map, const int offs, const cudaStream_t& stream){
     int dev=r.dev;
     PTENS_ASSRT(x.dev==dev);
     int n=x.dim(1);
@@ -81,6 +83,12 @@ namespace ptens{
 	map.gmap_on_device(dev).get_arr());
   }
 
+
+  void Ptensors0_reduce0_cu(const TENSOR& R, const TENSOR& x, const AindexPackB& map, int offs, int n, const cudaStream_t& stream);
+  void Ptensors0_broadcast0_cu(const TENSOR& r, const TENSOR& x, const AindexPackB& map, const int offs, const cudaStream_t& stream);
+
+  void Ptensors0_reduce0_cu(const TENSOR& R, const TENSOR& x, const BatchedAindexPackB& map, int offs, int n, const cudaStream_t& stream);
+  void Ptensors0_broadcast0_cu(const TENSOR& r, const TENSOR& x, const BatchedAindexPackB& map, const int offs, const cudaStream_t& stream);
 
 
 }

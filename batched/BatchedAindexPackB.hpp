@@ -33,6 +33,13 @@ namespace ptens{
     int count1=0;
     int count2=0;
 
+    cnine::once<int> n_gather_lists=cnine::once<int>([&](){
+	int t=0;
+	for(auto& p: obj)
+	  t+=p->n_gather_lists;
+	return t;
+      });
+
     cnine::RemoteCopy<int,ITENSOR> on_device=cnine::RemoteCopy<int,ITENSOR>([this](const int& _dev){
 	auto p=fuse_on_device(_dev);
 	gmap_on_device.insert(_dev,p.second);

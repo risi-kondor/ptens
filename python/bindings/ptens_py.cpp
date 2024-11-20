@@ -67,7 +67,7 @@ PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
 #include "PtensGlobal_py.cpp"
 
 #include "AtomsPack_py.cpp"
-#include "AindexPack_py.cpp"
+  //#include "AindexPack_py.cpp"
 #include "CatomsPack_py.cpp"
 
 #include "Ggraph_py.cpp"

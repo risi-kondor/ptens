@@ -20,6 +20,7 @@ must be accompanied by a verbatim copy of the license.
 #include "Ptens_base.hpp"
 #include "Ltensor.hpp"
 #include "AindexPackB.hpp"
+#include "BatchedAindexPackB.hpp"
 
 
 typedef cnine::Ltensor<float> TENSOR;
@@ -136,7 +137,8 @@ __global__ void Ptensors1_broadcast1_kernel(float* rarr, const int rs,
 namespace ptens{
 
 
-  void Ptensors1_reduce0_cu(const TENSOR& r, const TENSOR& x, const AindexPackB& map, 
+  template<typename IPACK>
+  void Ptensors1_reduce0_cu(const TENSOR& r, const TENSOR& x, const IPACK& map, 
     int offs, int n, const cudaStream_t& stream){
     int dev=r.dev;
     PTENS_ASSRT(x.dev==dev);
@@ -148,7 +150,8 @@ namespace ptens{
       (r.get_arr(),r.stride(0),x.get_arr()+offs,x.stride(0),map.on_device(dev).get_arr(),map.stride(0),n);
   }
 
-  void Ptensors1_reduce1_cu(const TENSOR& r, const TENSOR& x, const AindexPackB& map, 
+  template<typename IPACK>
+  void Ptensors1_reduce1_cu(const TENSOR& r, const TENSOR& x, const IPACK& map, 
     int offs, int n, const cudaStream_t& stream){
     int dev=r.dev;
     PTENS_ASSRT(x.dev==dev);
@@ -159,7 +162,8 @@ namespace ptens{
       (r.get_arr(),r.stride(0),x.get_arr()+offs,x.stride(0),map.on_device(dev).get_arr(),map.stride(0),n);
   }
 
-   void Ptensors1_broadcast0_cu(const TENSOR& r, const TENSOR& x, const AindexPackB& map, 
+  template<typename IPACK>
+  void Ptensors1_broadcast0_cu(const TENSOR& r, const TENSOR& x, const IPACK& map, 
     const int offs, const cudaStream_t& stream){
     int dev=r.dev;
     PTENS_ASSRT(x.dev==dev);
@@ -174,7 +178,8 @@ namespace ptens{
 	map.gmap_on_device(dev).get_arr(),n);
   }
 
-  void Ptensors1_broadcast1_cu(const TENSOR& r, const TENSOR& x, const AindexPackB& map, 
+  template<typename IPACK>
+  void Ptensors1_broadcast1_cu(const TENSOR& r, const TENSOR& x, const IPACK& map, 
     const int offs, const cudaStream_t& stream){
     int dev=r.dev;
     PTENS_ASSRT(x.dev==dev);
@@ -188,6 +193,17 @@ namespace ptens{
       (r.get_arr()+offs,r.stride(0),x.get_arr(),x.stride(0),map.on_device(dev).get_arr(),map.stride(0),
 	map.gmap_on_device(dev).get_arr(),n);
   }
+
+
+  void Ptensors1_reduce0_cu(const TENSOR& r, const TENSOR& x, const AindexPackB& map, int offs, int n, const cudaStream_t& stream);
+  void Ptensors1_reduce1_cu(const TENSOR& r, const TENSOR& x, const AindexPackB& map, int offs, int n, const cudaStream_t& stream);
+  void Ptensors1_broadcast0_cu(const TENSOR& r, const TENSOR& x, const AindexPackB& map, const int offs, const cudaStream_t& stream);
+  void Ptensors1_broadcast1_cu(const TENSOR& r, const TENSOR& x, const AindexPackB& map, const int offs, const cudaStream_t& stream);
+
+  void Ptensors1_reduce0_cu(const TENSOR& r, const TENSOR& x, const BatchedAindexPackB& map, int offs, int n, const cudaStream_t& stream);
+  void Ptensors1_reduce1_cu(const TENSOR& r, const TENSOR& x, const BatchedAindexPackB& map, int offs, int n, const cudaStream_t& stream);
+  void Ptensors1_broadcast0_cu(const TENSOR& r, const TENSOR& x, const BatchedAindexPackB& map, const int offs, const cudaStream_t& stream);
+  void Ptensors1_broadcast1_cu(const TENSOR& r, const TENSOR& x, const BatchedAindexPackB& map, const int offs, const cudaStream_t& stream);
 
 }
 

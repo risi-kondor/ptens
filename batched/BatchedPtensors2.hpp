@@ -38,6 +38,7 @@ namespace ptens{
     typedef typename BASE::TENSOR TENSOR;
     
     using cnine::diff_class<BatchedPtensors2<TYPE> >::grad;
+    using BASE::dev;
     using BASE::get_dev;
 
     using TENSOR::dim;
