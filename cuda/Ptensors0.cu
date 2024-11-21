@@ -1,4 +1,4 @@
-f/*
+/*
 This file is part of ptens, a C++/CUDA library for permutation 
 equivariant message passing. 
  
@@ -74,7 +74,6 @@ namespace ptens{
   }
 
 
-  template<typename AindexPackB>
   void Ptensors0_broadcast0_cu(const TENSOR& r, const TENSOR& x, const AindexPackB& _map, const int offs, const cudaStream_t& stream){
     int dev=r.dev;
     auto& map=_map.on_device(dev);
@@ -96,7 +95,6 @@ namespace ptens{
   // ---- Batched -------------------------------------------------------------------------------------------
 
 
-  template<typename AindexPackB>
   void Ptensors0_reduce0_cu(const TENSOR& r, const TENSOR& x, const BatchedAindexPackB& _map, int offs, int n, const cudaStream_t& stream){
     int dev=r.get_dev();
     auto& map=_map.on_device(dev);
@@ -110,7 +108,6 @@ namespace ptens{
     Ptensors0_reduce0_kernel<<<map.dim(0),n,0,stream>>>(r.get_arr(),r.stride(0),x.get_arr()+offs,x.stride(0),map.get_arr(),map.stride(0),n);
   }
 
-  template<typename AindexPackB>
   void Ptensors0_broadcast0_cu(const TENSOR& r, const TENSOR& x, const BatchedAindexPackB& _map, const int offs, const cudaStream_t& stream){
     int dev=r.dev;
     auto& map=_map.on_device(dev);
