@@ -28,6 +28,13 @@
 
 namespace ptens{
 
+  #ifdef _WITH_CUDA 
+  extern void Ptensors0_reduce0_cu(const cnine::Ltensor<float>& R, const cnine::Ltensor<float>& x, 
+    const BatchedAindexPackB& map, int offs, int n, const cudaStream_t& stream);
+  extern void Ptensors0_broadcast0_cu(const cnine::Ltensor<float>& x, const cnine::Ltensor<float>& R, 
+    const BatchedAindexPackB& map, const int offs, const cudaStream_t& stream);
+  #endif 
+
 
   template<typename TYPE>
   class BatchedPtensors0: public BatchedPtensors<TYPE>,
@@ -38,6 +45,7 @@ namespace ptens{
     typedef typename BASE::TENSOR TENSOR;
     
     using cnine::diff_class<BatchedPtensors0<TYPE> >::grad;
+    using BASE::dev;
     using BASE::get_dev;
 
     BatchedAtomsPack<0> atoms;
@@ -265,10 +273,13 @@ namespace ptens{
       cnine::using_vram_manager vv(ptens_global::vram_manager);
       TENSOR R({map.nrows,nc},0,get_dev());
       int tail=0;
-      for(int i=0; i<size(); i++){
-	view_of(i).add_reduce0(R.rows(tail,map[i].nrows),map[i],offs);
-	tail+=map[i].nrows;
+      if(dev==0){
+	for(int i=0; i<size(); i++){
+	  view_of(i).add_reduce0(R.rows(tail,map[i].nrows),map[i],offs);
+	  tail+=map[i].nrows;
+	}
       }
+      GPUCODE(CUDA_STREAM(Ptensors0_reduce0_cu(R,*this,map,offs,nc,stream)));
       return R;
     }
 
@@ -282,10 +293,13 @@ namespace ptens{
 
     void broadcast0(const TENSOR& x, const BatchedAindexPackB& map, const int offs=0){
       int tail=0;
-      for(int i=0; i<size(); i++){
-	view_of(i).broadcast0(x.rows(tail,map[i].nrows),map[i],offs);
-	tail+=map[i].nrows;
+      if(dev==0){
+	for(int i=0; i<size(); i++){
+	  view_of(i).broadcast0(x.rows(tail,map[i].nrows),map[i],offs);
+	  tail+=map[i].nrows;
+	}
       }
+      GPUCODE(CUDA_STREAM(Ptensors0_broadcast0_cu(*this,x,map,offs,stream)));
     }
 
 

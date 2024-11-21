@@ -19,7 +19,7 @@
 //#include "LayerMap.hpp"
 #include "BatchedLayerMapObj.hpp"
 #include "BatchedAtomsPack.hpp"
-#include "BatchedAindexPack.hpp"
+//#include "BatchedAindexPack.hpp"
 
 namespace ptens{
 

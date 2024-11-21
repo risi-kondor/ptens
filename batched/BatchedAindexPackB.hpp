@@ -16,6 +16,7 @@
 #define _ptens_BatchedAindexPackB
 
 #include "object_pack_s.hpp"
+//#include "once.hpp"
 #include "AindexPackB.hpp"
 
 namespace ptens{
@@ -32,6 +33,16 @@ namespace ptens{
     int nrows=0;
     int count1=0;
     int count2=0;
+    int n_gather_lists=0;
+
+    /*
+    cnine::once<int> n_gather_lists=cnine::once<int>([&](){
+	int t=0;
+	for(auto& p: obj)
+	  t+=p->n_gather_lists;
+	return t;
+      });
+    */
 
     cnine::RemoteCopy<int,ITENSOR> on_device=cnine::RemoteCopy<int,ITENSOR>([this](const int& _dev){
 	auto p=fuse_on_device(_dev);
@@ -76,7 +87,7 @@ namespace ptens{
       }
 
       int gmap_total=0;
-      int n_gather_lists=0;
+      n_gather_lists=0; // set the class member
       for(auto& p: obj){
 	auto M=p->gmap_on_device(dev);
 	gmap_total+=M.dim(0);
