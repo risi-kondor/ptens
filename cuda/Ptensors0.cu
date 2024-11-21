@@ -61,16 +61,16 @@ namespace ptens{
 
 
   template<typename MAP>
-  void Ptensors0_reduce0_cu(const TENSOR& R, const TENSOR& x, const MAP& map, int offs, int n, const cudaStream_t& stream){
-    int dev=R.get_dev();
-    PTENS_ASSRT(R.get_dev()==1);
+  void Ptensors0_reduce0_cu(const TENSOR& r, const TENSOR& x, const MAP& map, int offs, int n, const cudaStream_t& stream){
+    int dev=r.get_dev();
+    PTENS_ASSRT(r.get_dev()==1);
     PTENS_ASSRT(x.get_dev()==1);
     PTENS_ASSRT(r.stride(1)==1);
     PTENS_ASSRT(x.stride(1)==1);
     if(map.dim(0)==0) return;
     PTENS_CHANNEL_LIMIT(n);
 
-    Ptensors0_reduce0_kernel<<<map.dim(0),n,0,stream>>>(R.get_arr(),R.stride(0),x.get_arr()+offs,x.stride(0),map.on_device(dev).get_arr(),map.stride(0),n);
+    Ptensors0_reduce0_kernel<<<map.dim(0),n,0,stream>>>(r.get_arr(),r.stride(0),x.get_arr()+offs,x.stride(0),map.on_device(dev).get_arr(),map.stride(0),n);
   }
 
   template<typename MAP>
