@@ -137,8 +137,7 @@ __global__ void Ptensors1_broadcast1_kernel(float* rarr, const int rs,
 namespace ptens{
 
 
-  template<typename IPACK>
-  void Ptensors1_reduce0_cu(const TENSOR& r, const TENSOR& x, const IPACK& _map, 
+  void Ptensors1_reduce0_cu(const TENSOR& r, const TENSOR& x, const AindexPackB& _map, 
     int offs, int n, const cudaStream_t& stream){
     int dev=r.dev;
     PTENS_ASSRT(x.dev==dev);
@@ -156,8 +155,7 @@ namespace ptens{
   }
 
 
-  template<typename IPACK>
-  void Ptensors1_reduce1_cu(const TENSOR& r, const TENSOR& x, const IPACK& _map, 
+  void Ptensors1_reduce1_cu(const TENSOR& r, const TENSOR& x, const AindexPackB& _map, 
     int offs, int n, const cudaStream_t& stream){
     int dev=r.dev;
     PTENS_ASSRT(x.dev==dev);
@@ -175,8 +173,7 @@ namespace ptens{
   }
 
 
-  template<typename IPACK>
-  void Ptensors1_broadcast0_cu(const TENSOR& r, const TENSOR& x, const IPACK& _map, 
+  void Ptensors1_broadcast0_cu(const TENSOR& r, const TENSOR& x, const AindexPackB& _map, 
     const int offs, const cudaStream_t& stream){
     int dev=r.dev;
     PTENS_ASSRT(x.dev==dev);
@@ -196,8 +193,7 @@ namespace ptens{
   }
 
 
-  template<typename IPACK>
-  void Ptensors1_broadcast1_cu(const TENSOR& r, const TENSOR& x, const IPACK& _map, 
+  void Ptensors1_broadcast1_cu(const TENSOR& r, const TENSOR& x, const AindexPackB& _map, 
     const int offs, const cudaStream_t& stream){
     int dev=r.dev;
     PTENS_ASSRT(x.dev==dev);
@@ -217,15 +213,95 @@ namespace ptens{
   }
 
 
-  template  void Ptensors1_reduce0_cu(const TENSOR& r, const TENSOR& x, const AindexPackB& map, int offs, int n, const cudaStream_t& stream);
-  template  void Ptensors1_reduce1_cu(const TENSOR& r, const TENSOR& x, const AindexPackB& map, int offs, int n, const cudaStream_t& stream);
-  template  void Ptensors1_broadcast0_cu(const TENSOR& r, const TENSOR& x, const AindexPackB& map, const int offs, const cudaStream_t& stream);
-  template  void Ptensors1_broadcast1_cu(const TENSOR& r, const TENSOR& x, const AindexPackB& map, const int offs, const cudaStream_t& stream);
+  // ---- Batched -------------------------------------------------------------------------------------------
 
-  template  void Ptensors1_reduce0_cu(const TENSOR& r, const TENSOR& x, const BatchedAindexPackB& map, int offs, int n, const cudaStream_t& stream);
-  template  void Ptensors1_reduce1_cu(const TENSOR& r, const TENSOR& x, const BatchedAindexPackB& map, int offs, int n, const cudaStream_t& stream);
-  template  void Ptensors1_broadcast0_cu(const TENSOR& r, const TENSOR& x, const BatchedAindexPackB& map, const int offs, const cudaStream_t& stream);
-  template  void Ptensors1_broadcast1_cu(const TENSOR& r, const TENSOR& x, const BatchedAindexPackB& map, const int offs, const cudaStream_t& stream);
+
+  void Ptensors1_reduce0_cu(const TENSOR& r, const TENSOR& x, const BatchedAindexPackB& _map, 
+    int offs, int n, const cudaStream_t& stream){
+    int dev=r.dev;
+    PTENS_ASSRT(x.dev==dev);
+    auto& map=_map.on_device(dev);
+
+    PTENS_ASSRT(r.stride(1)==1);
+    PTENS_ASSRT(x.stride(1)==1);
+    if(map.dim(0)==0) return;
+
+    PTENS_CHANNEL_LIMIT(n);
+    const int nthrd=cnine::roundup(std::max(n,map.dim(1)),32);
+
+    Ptensors1_reduce0_kernel<<<map.dim(0),nthrd,map.dim(1)*4,stream>>>
+      (r.get_arr(),r.stride(0),x.get_arr()+offs,x.stride(0),map.get_arr(),map.stride(0),n);
+  }
+
+
+  void Ptensors1_reduce1_cu(const TENSOR& r, const TENSOR& x, const BatchedAindexPackB& _map, 
+    int offs, int n, const cudaStream_t& stream){
+    int dev=r.dev;
+    PTENS_ASSRT(x.dev==dev);
+    auto& map=_map.on_device(dev);
+
+    PTENS_ASSRT(r.stride(1)==1);
+    PTENS_ASSRT(x.stride(1)==1);
+    if(map.dim(0)==0) return;
+
+    PTENS_CHANNEL_LIMIT(n);
+    const int nthrd=cnine::roundup(std::max(n,map.dim(1)+1),32);
+
+    Ptensors1_reduce1_kernel<<<map.dim(0),nthrd,map.dim(1)*4,stream>>>
+      (r.get_arr(),r.stride(0),x.get_arr()+offs,x.stride(0),map.get_arr(),map.stride(0),n);
+  }
+
+
+  void Ptensors1_broadcast0_cu(const TENSOR& r, const TENSOR& x, const BatchedAindexPackB& _map, 
+    const int offs, const cudaStream_t& stream){
+    int dev=r.dev;
+    PTENS_ASSRT(x.dev==dev);
+    auto& map=_map.on_device(dev);
+
+    PTENS_ASSRT(r.stride(1)==1);
+    PTENS_ASSRT(x.stride(1)==1);
+    if(_map.n_gather_lists==0) return;
+
+    int n=x.dim(1);
+    PTENS_CHANNEL_LIMIT(n);
+    int nthrd=cnine::roundup(std::max(n,map.dim(1)),32);
+
+    Ptensors1_broadcast0_kernel<<<_map.n_gather_lists,nthrd,map.dim(1)*4,stream>>> 
+      (r.get_arr()+offs,r.stride(0),x.get_arr(),x.stride(0),map.get_arr(),map.stride(0),
+	_map.gmap_on_device(dev).get_arr(),n);
+  }
+
+
+  void Ptensors1_broadcast1_cu(const TENSOR& r, const TENSOR& x, const BatchedAindexPackB& _map, 
+    const int offs, const cudaStream_t& stream){
+    int dev=r.dev;
+    PTENS_ASSRT(x.dev==dev);
+    auto& map=_map.on_device(dev);
+
+    PTENS_ASSRT(r.stride(1)==1);
+    PTENS_ASSRT(x.stride(1)==1);
+    int n=x.dim(1);
+    if(_map.n_gather_lists==0) return;
+
+    PTENS_CHANNEL_LIMIT(n);
+    int nthrd=cnine::roundup(std::max(n,map.dim(1)),32);
+
+    Ptensors1_broadcast1_kernel<<<_map.n_gather_lists,nthrd,map.dim(1)*4,stream>>> 
+      (r.get_arr()+offs,r.stride(0),x.get_arr(),x.stride(0),map.get_arr(),map.stride(0),
+	_map.gmap_on_device(dev).get_arr(),n);
+  }
+
+
+//   template  void Ptensors1_reduce0_cu(const TENSOR& r, const TENSOR& x, const AindexPackB& map, int offs, int n, const cudaStream_t& stream);
+//   template  void Ptensors1_reduce1_cu(const TENSOR& r, const TENSOR& x, const AindexPackB& map, int offs, int n, const cudaStream_t& stream);
+//   template  void Ptensors1_broadcast0_cu(const TENSOR& r, const TENSOR& x, const AindexPackB& map, const int offs, const cudaStream_t& stream);
+//   template  void Ptensors1_broadcast1_cu(const TENSOR& r, const TENSOR& x, const AindexPackB& map, const int offs, const cudaStream_t& stream);
+
+//   template  void Ptensors1_reduce0_cu(const TENSOR& r, const TENSOR& x, const BatchedAindexPackB& map, int offs, int n, const cudaStream_t& stream);
+//   template  void Ptensors1_reduce1_cu(const TENSOR& r, const TENSOR& x, const BatchedAindexPackB& map, int offs, int n, const cudaStream_t& stream);
+//   template  void Ptensors1_broadcast0_cu(const TENSOR& r, const TENSOR& x, const BatchedAindexPackB& map, const int offs, const cudaStream_t& stream);
+//   template  void Ptensors1_broadcast1_cu(const TENSOR& r, const TENSOR& x, const BatchedAindexPackB& map, const int offs, const cudaStream_t& stream);
+
 
 }
 
