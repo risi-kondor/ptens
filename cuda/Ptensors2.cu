@@ -519,7 +519,7 @@ namespace ptens{
     PTENS_ASSRT(x.stride(1)==1);
     if(map.n_gather_lists==0) return;
 
-    int n=x.dim(1);
+    int n=x.dim(1)/2;
     PTENS_CHANNEL_LIMIT(n);
     int nthrd=cnine::roundup(std::max(n,map.dim(1)),32);
 
@@ -553,7 +553,7 @@ namespace ptens{
     PTENS_ASSRT(x.stride(1)==1);
     if(map.n_gather_lists==0) return;
 
-    int n=x.dim(1);
+    int n=x.dim(1)/3;
     PTENS_CHANNEL_LIMIT(n);
     int nthrd=cnine::roundup(std::max(n,map.dim(1)),32);
 
