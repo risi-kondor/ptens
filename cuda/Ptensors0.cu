@@ -65,8 +65,11 @@ namespace ptens{
     int dev=R.get_dev();
     PTENS_ASSRT(R.get_dev()==1);
     PTENS_ASSRT(x.get_dev()==1);
+    PTENS_ASSRT(r.stride(1)==1);
+    PTENS_ASSRT(x.stride(1)==1);
     if(map.dim(0)==0) return;
     PTENS_CHANNEL_LIMIT(n);
+
     Ptensors0_reduce0_kernel<<<map.dim(0),n,0,stream>>>(R.get_arr(),R.stride(0),x.get_arr()+offs,x.stride(0),map.on_device(dev).get_arr(),map.stride(0),n);
   }
 
@@ -74,9 +77,13 @@ namespace ptens{
   void Ptensors0_broadcast0_cu(const TENSOR& r, const TENSOR& x, const MAP& map, const int offs, const cudaStream_t& stream){
     int dev=r.dev;
     PTENS_ASSRT(x.dev==dev);
+    PTENS_ASSRT(r.stride(1)==1);
+    PTENS_ASSRT(x.stride(1)==1);
+
     int n=x.dim(1);
     PTENS_CHANNEL_LIMIT(n);
     int nthrd=n; //cnine::roundup(std::max(n,map.dim(1)),32);
+
     if(map.n_gather_lists==0) return;
     Ptensors0_broadcast0_kernel<<<map.n_gather_lists,nthrd,map.dim(1)*4,stream>>> 
       (r.get_arr()+offs,r.stride(0),x.get_arr(),x.stride(0),map.on_device(dev).get_arr(),map.stride(0),
