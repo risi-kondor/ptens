@@ -8,7 +8,7 @@ atoms_out = G.subgraphs(ptens.subgraph.trivial())
 
 nc = 2
 x = ptens.ptensorlayer2.sequential(atoms_in, nc) + 2
-x = x.to('cuda')
+#x = x.to('cuda')
 x.requires_grad_()
 
 z = ptens.ptensorlayer2.gather(atoms_out, x)
