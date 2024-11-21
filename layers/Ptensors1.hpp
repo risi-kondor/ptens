@@ -30,13 +30,13 @@
 namespace ptens{
 
   #ifdef _WITH_CUDA
-  extern void Ptensors1_reduce0_cu(const cnine::Ltensor<float>& r, const cnine::Ltensor<float>& x, const AindexPackB& map, 
+  extern template void Ptensors1_reduce0_cu(const cnine::Ltensor<float>& r, const cnine::Ltensor<float>& x, const AindexPackB& map, 
     int offs, int n, const cudaStream_t& stream);
-  extern void Ptensors1_reduce1_cu(const cnine::Ltensor<float>& r, const cnine::Ltensor<float>& x, const AindexPackB& map, 
+  extern template void Ptensors1_reduce1_cu(const cnine::Ltensor<float>& r, const cnine::Ltensor<float>& x, const AindexPackB& map, 
     int offs, int n, const cudaStream_t& stream);
-  extern void Ptensors1_broadcast0_cu(const cnine::Ltensor<float>& r, const cnine::Ltensor<float>& x, const AindexPackB& map, 
+  extern template void Ptensors1_broadcast0_cu(const cnine::Ltensor<float>& r, const cnine::Ltensor<float>& x, const AindexPackB& map, 
     const int offs, const cudaStream_t& stream);
-  extern void Ptensors1_broadcast1_cu(const cnine::Ltensor<float>& r, const cnine::Ltensor<float>& x, const AindexPackB& map, 
+  extern template void Ptensors1_broadcast1_cu(const cnine::Ltensor<float>& r, const cnine::Ltensor<float>& x, const AindexPackB& map, 
     const int offs, const cudaStream_t& stream);
   #endif 
 
