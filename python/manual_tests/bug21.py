@@ -7,13 +7,14 @@ nc = 2
 x1 = ptens.ptensorlayer2.sequential(G.subgraphs(ptens.subgraph.trivial()), nc)
 x2 = ptens.ptensorlayer2.sequential(G.subgraphs(ptens.subgraph.edge()), nc)
 
-x = ptens.batched_ptensorlayer2.from_ptensorlayers([x1,x2])
+x = ptens.batched_ptensorlayer2.from_ptensorlayers([x1, x2])
 # x = x.to("cuda")
 x.requires_grad_()
 
 atoms_out = ptens_base.batched_atomspack([ G.subgraphs(ptens.subgraph.trivial()), G.subgraphs(ptens.subgraph.trivial())])
 
 z = ptens.batched_ptensorlayer2.gather(atoms_out, x)
+
 zero = z.zeros_like()
 
 l1sum = torch.nn.L1Loss(reduction='sum')
@@ -30,6 +31,7 @@ s=fn(x)
 s.backward(torch.tensor(1))
 g=x.grad
 print(g)
+
 
 def numerical_grad_sum(fn, x, h):
     grad = torch.zeros_like(x)
