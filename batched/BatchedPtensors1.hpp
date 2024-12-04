@@ -432,7 +432,6 @@ namespace ptens{
 	  view_of(i).broadcast1(x.rows(tail,map[i].nrows),map[i],offs);
 	  tail+=map[i].nrows;
 	}
-	//cout<<"done2"<<endl;
       }
       GPUCODE(CUDA_STREAM(Ptensors1_broadcast1_cu(*this,x,map,offs,stream)));
     }

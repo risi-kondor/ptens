@@ -333,8 +333,6 @@ namespace ptens{
       int s1=stride(1);
       if(n==0) n=nc-offset; 
       for(int i=0; i<N; i++){
-	//cout<<*this<<endl;
-	//cout<<s0<<" "<<s1<<" "<<map.soffset(i)<<" "<<offset<<" "<<n<<map.ix(i)<<" "<<map.nix(i)<<endl;
 	lambda(M.rows(map.toffset(i),map.nix(i)).view2(),
 	  Ptensor1view<TYPE>(const_cast<float*>(get_arr())+map.soffset(i)*s0+offset*s1,
 	    n,s0,s1,map.ix(i),get_dev()),map.nix(i));
