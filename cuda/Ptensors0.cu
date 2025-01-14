@@ -105,6 +105,9 @@ namespace ptens{
     if(map.dim(0)==0) return;
     PTENS_CHANNEL_LIMIT(n);
 
+    //cout<<r<<endl;
+    //cout<<x<<endl;
+    //cout<<map<<endl;
     Ptensors0_reduce0_kernel<<<map.dim(0),n,0,stream>>>(r.get_arr(),r.stride(0),x.get_arr()+offs,x.stride(0),map.get_arr(),map.stride(0),n);
   }
 

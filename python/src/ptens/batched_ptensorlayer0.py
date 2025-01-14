@@ -114,6 +114,10 @@ class batched_ptensorlayer0(p.batched_ptensorlayer):
         assert isinstance(x,p.batched_ptensorlayer)
         if len(args)==0:
             map=pb.batched_layer_map.overlaps_map(atoms,x.atoms)
+            print("99")
+            print(atoms)
+            print(x.atoms)
+            print(map)
         else:
             map=args[0]
         assert isinstance(map,pb.batched_layer_map)
@@ -192,6 +196,8 @@ class batched_ptensorlayer0_gatherFn(torch.autograd.Function):
         ctx.atoms = atoms
         ctx.save_for_backward(x)
         r=batched_ptensorlayer0.zeros(atoms,x.get_nc()*([1,1,2][x.getk()]),device=x.device)
+        print(len(r))
+        print(len(map))
         r.backend().add_gather(x.backend(),map)
         return r
 

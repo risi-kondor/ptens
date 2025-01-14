@@ -26,6 +26,7 @@ x.requires_grad_()
 
 def loss_fn(x):
     z = ptens.batched_ptensorlayer0.gather(atoms_out, x)
+    print(z)
     s = l1loss_reduction(z)
     return s
 

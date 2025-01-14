@@ -95,25 +95,27 @@ namespace ptens{
       }
       ITENSOR* gmap=new ITENSOR({gmap_total-2*N+2},1,dev);
 
-      gmap->set(0,n_gather_lists);
+      // gmap->set(0,n_gather_lists); hope nobody uses this
       int index_tail=1;
       int data_tail=n_gather_lists+2;
+      int i=0;
       for(auto& p: obj){
 	auto M=p->gmap_on_device(dev);
+	bool final=(i++==obj.size()-1); 
 
 	int n_lists=p->n_gather_lists;
-	gmap->block(index_tail,n_lists)=M.block(1,n_lists);
-	gmap->block(index_tail,n_lists)+=data_tail-(n_lists+2);
+	gmap->bblock(index_tail,n_lists+final)=M.bblock(1,n_lists+final);
+	gmap->bblock(index_tail,n_lists+final)+=data_tail-(n_lists+2);
 
 	int n_data=M.dim(0)-n_lists-2;
-	gmap->block(data_tail,n_data)=M.block(n_lists+2,n_data);
-	gmap->block(data_tail,n_data)+=p->dim(0);
+	gmap->bblock(data_tail,n_data)=M.block(n_lists+2,n_data);
+	gmap->bblock(data_tail,n_data)+=p->dim(0);
 
 	index_tail+=n_lists;
 	data_tail+=n_data;
       }
-      gmap->set(n_gather_lists+1,data_tail);
-      
+      //gmap->set(n_gather_lists+1,data_tail);
+
       return make_pair(to_share(ipack),to_share(gmap));
     }
     
