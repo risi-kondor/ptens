@@ -30,7 +30,7 @@ result = C
 # result = relu_layer(C)
 # print("result stride:", result.stride())
 # print("result shape:", result.shape)
-print("result is:", result)
+#print("result is:", result)
 
 # --- bug ----
 gather0 = ptens.batched_subgraphlayer0.gather(edge, result)

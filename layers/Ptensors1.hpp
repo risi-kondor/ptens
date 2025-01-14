@@ -332,10 +332,11 @@ namespace ptens{
       int s0=stride(0);
       int s1=stride(1);
       if(n==0) n=nc-offset; 
-      for(int i=0; i<N; i++)
+      for(int i=0; i<N; i++){
 	lambda(M.rows(map.toffset(i),map.nix(i)).view2(),
 	  Ptensor1view<TYPE>(const_cast<float*>(get_arr())+map.soffset(i)*s0+offset*s1,
 	    n,s0,s1,map.ix(i),get_dev()),map.nix(i));
+      }
     }
 
 
@@ -446,7 +447,7 @@ namespace ptens{
 	auto pmap0=GatherPlanFactory::gather_map0(map,x.atoms,atoms,x.getk(),1);
 	auto pmap1=GatherPlanFactory::gather_map1(map,x.atoms,atoms,x.getk(),1);
 	broadcast0(x.reduce0_shrink(pmap0.out(),0,nc),pmap0.in(),0);
-	broadcast1(x.reduce1_shrink(pmap1.out(),2*nc,nc),pmap1.in(),2*nc);
+	broadcast1(x.reduce1_shrink(pmap1.out(),2*nc,nc),pmap1.in(),0); //changed 2*nc -> 0
       }
 
     }

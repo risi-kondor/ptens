@@ -267,7 +267,7 @@ namespace ptens{
 	auto plan2=BatchedGatherPlanFactory::gather_map2(map,x.atoms,atoms,x.getk(),2);
 	broadcast0_shrink(x.reduce0_shrink(plan0.out(),0,2*nc),plan0.in());
 	broadcast1_shrink(x.reduce1_shrink(plan1.out(),4*nc,3*nc),plan1.in());
-	broadcast2(x.reduce2_shrink(plan2.out(),13*nc,nc),plan2.in());
+	broadcast2_shrink(x.reduce2_shrink(plan2.out(),13*nc,nc),plan2.in());
       }
     }
 
@@ -409,6 +409,14 @@ namespace ptens{
       int tail=0;
       for(int i=0; i<size(); i++){
 	view_of(i).broadcast2(x.rows(tail,map[i].nrows),map[i],offs);
+	tail+=map[i].nrows;
+      }
+    }
+
+    void broadcast2_shrink(const TENSOR& x, const BatchedAindexPackB& map, const int offs=0){
+      int tail=0;
+      for(int i=0; i<size(); i++){
+	view_of(i).broadcast2_shrink(x.rows(tail,map[i].nrows),map[i],offs);
 	tail+=map[i].nrows;
       }
     }
