@@ -62,8 +62,6 @@ namespace ptens{
 
 
     pair<shared_ptr<ITENSOR>,shared_ptr<ITENSOR> > fuse_on_device(const int dev){
-      cout<<66<<endl;
-
       int N=size();
       int nrows=0;
       int max_width=0;
@@ -104,7 +102,6 @@ namespace ptens{
       int data_tail=n_gather_lists+2;
       int i=0;
       for(auto& p: obj){
-	cout<<i<<endl;
 	auto M=p->gmap_on_device(dev);
 	bool final=(i==obj.size()-1); 
 
@@ -122,7 +119,6 @@ namespace ptens{
       }
       //gmap->set(n_gather_lists+1,data_tail);
 
-      cout<<*gmap<<endl;
       return make_pair(to_share(ipack),to_share(gmap));
     }
     

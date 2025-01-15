@@ -13,16 +13,16 @@ nc = 2
 
 x_list = []
 atoms_out_list = []
-for atoms_in in [G.subgraphs(ptens.subgraph.trivial()), G.subgraphs(ptens.subgraph.trivial())]:
-#atoms_in=G.subgraphs(ptens.subgraph.trivial())
-#for i in range(0,2):
+#for atoms_in in [G.subgraphs(ptens.subgraph.trivial()), G.subgraphs(ptens.subgraph.trivial())]:
+atoms_in=G.subgraphs(ptens.subgraph.trivial())
+for i in range(0,4):
     atoms_out_list.append(atoms_in)
     x_list.append((ptens.ptensorlayer0.randn(atoms_in, nc)))
 
 x = ptens.batched_ptensorlayer0.from_ptensorlayers(x_list)
 atoms_out = ptens_base.batched_atomspack(atoms_out_list)
 
-#print(x)
+print(x)
 x = x.to("cuda")
 x.requires_grad_()
 
