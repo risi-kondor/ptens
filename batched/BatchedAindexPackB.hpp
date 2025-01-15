@@ -62,11 +62,15 @@ namespace ptens{
 
 
     pair<shared_ptr<ITENSOR>,shared_ptr<ITENSOR> > fuse_on_device(const int dev){
+      cout<<66<<endl;
 
       int N=size();
       int nrows=0;
       int max_width=0;
-      for(auto& p: obj){
+      vector<int> row_offs(N);
+      for(int i=0; i<N; i++){
+	auto& p=obj[i];
+	row_offs[i]=nrows;
 	nrows+=p->size();
 	cnine::bump(max_width,p->dim(1));
       }
@@ -100,8 +104,9 @@ namespace ptens{
       int data_tail=n_gather_lists+2;
       int i=0;
       for(auto& p: obj){
+	cout<<i<<endl;
 	auto M=p->gmap_on_device(dev);
-	bool final=(i++==obj.size()-1); 
+	bool final=(i==obj.size()-1); 
 
 	int n_lists=p->n_gather_lists;
 	gmap->bblock(index_tail,n_lists+final)=M.bblock(1,n_lists+final);
@@ -109,13 +114,15 @@ namespace ptens{
 
 	int n_data=M.dim(0)-n_lists-2;
 	gmap->bblock(data_tail,n_data)=M.block(n_lists+2,n_data);
-	gmap->bblock(data_tail,n_data)+=p->dim(0);
+	gmap->bblock(data_tail,n_data)+=row_offs[i]; //p->dim(0);
 
 	index_tail+=n_lists;
 	data_tail+=n_data;
+	i++;
       }
       //gmap->set(n_gather_lists+1,data_tail);
 
+      cout<<*gmap<<endl;
       return make_pair(to_share(ipack),to_share(gmap));
     }
     
