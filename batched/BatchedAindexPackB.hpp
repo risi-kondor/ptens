@@ -26,7 +26,7 @@ namespace ptens{
   public:
 
     typedef cnine::object_pack_s<AindexPackB> BASE;
-    typedef cnine::Ltensor<int> ITENSOR;
+    typedef cnine::Ltensor<int> ITENSOR; // change to TensorView? 
 
     using BASE::BASE;
 
