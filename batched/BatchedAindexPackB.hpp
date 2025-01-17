@@ -31,8 +31,8 @@ namespace ptens{
     using BASE::BASE;
 
     int nrows=0;
-    int count1=0;
-    int count2=0;
+    //int count1=0;
+    //int count2=0;
     int n_gather_lists=0;
 
     /*
@@ -52,7 +52,7 @@ namespace ptens{
 
     cnine::RemoteCopy<int,ITENSOR> gmap_on_device=cnine::RemoteCopy<int,ITENSOR>([this](const int& _dev){
 	auto p=fuse_on_device(_dev);
-	gmap_on_device.insert(_dev,p.first);
+	on_device.insert(_dev,p.first);
 	return p.second;
       });
 
@@ -79,8 +79,8 @@ namespace ptens{
       int roffs=0;
       for(auto& p: obj){
 	auto M=p->on_device(dev);
-	if(M.dim(1)==max_width) ipack->rows(tail,M.dim(0))+=M;
-	else ipack->block(tail,0,M.dim(0),M.dim(1))+=M;
+	if(M.dim(1)==max_width) ipack->rows(tail,M.dim(0))=M;
+	else ipack->block(tail,0,M.dim(0),M.dim(1))=M;
 	ipack->rows(tail,M.dim(0)).col(0)+=roffs;
 	ipack->rows(tail,M.dim(0)).col(2)+=xoffs;
 	tail+=M.dim(0);
@@ -118,6 +118,8 @@ namespace ptens{
 	i++;
       }
       //gmap->set(n_gather_lists+1,data_tail);
+      //cout<<*ipack<<endl;
+      //cout<<*gmap<<endl;
 
       return make_pair(to_share(ipack),to_share(gmap));
     }
