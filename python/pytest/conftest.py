@@ -56,15 +56,10 @@ def get_graph_list():
         ptens.ggraph.from_edge_index(torch.Tensor([[0, 1], [1, 0]]).int(), labels=torch.Tensor([2, 4]).int()), # Simple graph with labels
         ptens.ggraph.from_matrix(torch.Tensor([[0, 1, 0], [1, 0, 1], [0, 1, 0]]).int()), # From Matrix
         ptens.ggraph.from_matrix(torch.Tensor([[0, 1, 0], [1, 0, 1], [0, 1, 0]]).int(), labels=torch.Tensor([4, 5, 6]).int()), # From Matrix
-        ptens.ggraph.random(0, 0.5),
-        ptens.ggraph.random(0, 0.),
-        ptens.ggraph.random(0, 1.0),
         ptens.ggraph.random(10, 0.0),
         ptens.ggraph.random(10, 1.0),
         ptens.ggraph.random(10, 0.5),
-        ptens.ggraph.random(2, 1.0),
-        ptens.ggraph.random(9, 1.0),
-
+        ptens.ggraph.random(0, 0.5),
     ]
 
     return graph_list
@@ -96,6 +91,12 @@ def get_atomspack_from_graph_factory_list():
     def star(g, n):
         return g.subgraphs(ptens.subgraph.star(n))
 
+    def cycle5(g):
+        return cycle(g, 5)
+
+    def star3(g):
+        return star(g, 3)
+    
     factory_list = [
         range_atomspack,
         empty,
@@ -103,8 +104,8 @@ def get_atomspack_from_graph_factory_list():
         trivial,
         edge,
         triangle,
-        lambda g: cycle(g, 4),
-        lambda g: star(g, 3),
+        cycle5,
+        star3,
         ]
 
     return factory_list

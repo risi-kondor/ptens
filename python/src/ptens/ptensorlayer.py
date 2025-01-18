@@ -31,6 +31,7 @@ class ptensorlayer(torch.Tensor):
                          torch.Tensor.requires_grad_,
                          torch.Tensor.squeeze,
                          torch.Tensor.unsqueeze,
+                         torch.square,
                          torch.zeros_like,
                          torch.ones_like,
                          ]
