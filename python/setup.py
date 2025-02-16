@@ -36,6 +36,8 @@ def main():
     #if 'CUDAHOME' in os.environ:
         #print("CUDA found at "+os.environ['CUDAHOME'])
 
+    # export CUDA_HOME=/usr/local/cuda-11.3 
+
     if compile_with_cuda:
         print("Installing with CUDA support")
     else:

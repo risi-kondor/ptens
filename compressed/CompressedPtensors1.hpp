@@ -86,13 +86,16 @@ namespace ptens{
     CompressedPtensors1(const CompressedAtomsPack& _atoms, const Ptensors1<TYPE>& x):
       BASE(_atoms,TENSOR({_atoms.size(),_atoms.nvecs(),x.get_nc()},0,x.get_dev())){
       PTENS_ASSRT(x.atoms==atoms.atoms());
+      atoms.obj->bases.move_to_device(get_dev());
       int N=size();
       for(int i=0; i<N; i++)
-	(*this)(i).add_mprod(atoms.basis(i).transp(), x(i));
+	//(*this)(i).add_mprod(atoms.basis(i).transp(), x(i));
+	(*this)(i).view2().add_matmul_TA(atoms.basis(i).view2(), x(i).view2());
     }
 
     Ptensors1<TYPE> uncompress(){
       Ptensors1<TYPE> R(AtomsPack(atoms->atoms),get_nc(),get_dev());
+      atoms.obj->bases.move_to_device(get_dev());
       int N=size();
       for(int i=0; i<N; i++)
 	R(i).add_mprod(atoms.basis(i),(*this)(i));
@@ -101,13 +104,16 @@ namespace ptens{
 
     void add_compress(const Ptensors1<TYPE>& x) const{
       PTENS_ASSRT(size()==x.size());
+      atoms.obj->bases.move_to_device(get_dev());
       int N=size();
       for(int i=0; i<N; i++)
-	(*this)(i).add_mprod(atoms.basis(i).transp(), x(i));
+	//(*this)(i).add_mprod(atoms.basis(i).transp(), x(i));
+	(*this)(i).view2().add_matmul_TA(atoms.basis(i).view2(), x(i).view2());
     }
 
     void add_uncompress_to(const Ptensors1<TYPE>& R) const{
       PTENS_ASSRT(size()==R.size());
+      atoms.obj->bases.move_to_device(get_dev());
       int N=size();
       for(int i=0; i<N; i++)
 	R.view_of(i).add_mprod(atoms.basis(i),(*this)(i));

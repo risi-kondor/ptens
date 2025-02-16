@@ -5,7 +5,7 @@ import faulthandler
 
 faulthandler.enable()
 device = 'cuda:0'
-# device = 'cpu'
+#device = 'cpu'
 # hidden_dim = 3
 hidden_dim = 4
 num_vertices = 10
@@ -62,5 +62,5 @@ print("catoms is:", catoms)
 print("working so far")
 
 print("compressing. calling csubgraphlayer1.compress")
-compressed_gather = ptens.csubgraphlayer1.compress(catoms, gather1)
+compressed_gather = ptens.cptensorlayer1.compress(catoms, gather1)
 print("compressed_gather is:", compressed_gather)
