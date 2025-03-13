@@ -8,7 +8,7 @@ option(COPY_WARNING OFF)
 # Set the C++ standard
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-
+message(A ${WITH_CUDA})
 if(WITH_CUDA)
   check_language(CUDA)
   # Set the C++ standard
@@ -24,6 +24,7 @@ if(WITH_CUDA)
     set(WITH_CUDA OFF)
   endif(CMAKE_CUDA_COMPILER)
 endif(WITH_CUDA)
+message(B ${WITH_CUDA})
 
 # Enable CPM
 include(cmake/CPM.cmake)
@@ -37,10 +38,13 @@ add_library(ptens cuda/dummy.cpp)
 
 set(ptens_include_dirs include caches tensors layers layers/backend batched batched/backend compressed compressed/backend)
 
-target_include_directories(ptens PUBLIC ${ptens_include_dirs})
+foreach(directory IN LISTS ptens_include_dirs)
+  target_include_directories(ptens PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/${directory}> $<INSTALL_INTERFACE:${directory}>)
+endforeach()
 target_link_libraries(ptens PUBLIC "${TORCH_LIBRARIES}")
 target_link_libraries(ptens PUBLIC cnine)
 
+message(C ${WITH_CUDA})
 
 target_compile_definitions(ptens PUBLIC _WITH_ATEN)
 target_compile_definitions(ptens PUBLIC CNINE_RANGE_CHECKING)
@@ -54,7 +58,6 @@ if(WITH_CUDA)
   target_compile_definitions(ptens PUBLIC _WITH_CUBLAS)
   target_compile_definitions(ptens PUBLIC WITH_FAKE_GRAD)
   target_compile_definitions(ptens PUBLIC -D_DEF_CGCMEM)
-  target_compile_options(ptens PUBLIC --default-stream=per-thread)
 endif(WITH_CUDA)
 
 target_compile_options(ptens PUBLIC -Wno-sign-compare)
@@ -65,11 +68,37 @@ target_compile_options(ptens PUBLIC -Wno-reorder)
 target_compile_options(ptens PUBLIC -Wno-reorder-ctor)
 target_compile_options(ptens PUBLIC -Wno-overloaded-virtual)
 
+message(D ${WITH_CUDA})
+
 if(WITH_CUDA)
   add_subdirectory(cuda)
 endif(WITH_CUDA)
+message(E ${WITH_CUDA})
 
 option(BUILD_PYTHON "Build the python bindings" ON)
 if(BUILD_PYTHON)
   add_subdirectory(python)
 endif(BUILD_PYTHON)
+message(F ${WITH_CUDA})
+
+include(CMakePackageConfigHelpers)
+configure_package_config_file(${CMAKE_CURRENT_SOURCE_DIR}/cmake/ptensConfig.cmake.in ${CMAKE_CURRENT_BINARY_DIR}/ptensConfig.cmake  INSTALL_DESTINATION lib/cmake/ptens)
+
+write_basic_package_version_file(${CMAKE_CURRENT_BINARY_DIR}/ptensVersion.cmake  VERSION ${PROJECT_VERSION} COMPATIBILITY SameMajorVersion)
+
+# Install the library
+install(TARGETS ptens  EXPORT ptens  LIBRARY DESTINATION lib  ARCHIVE DESTINATION lib INCLUDES DESTINATION ptens/include)
+
+# Install the headers
+foreach(directory IN LISTS ptens_include_dirs)
+  install(DIRECTORY ${directory}/ DESTINATION ${directory})
+endforeach()
+
+# Install the config files
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/ptensConfig.cmake ${CMAKE_CURRENT_BINARY_DIR}/ptensVersion.cmake  DESTINATION lib/cmake/ptens)
+
+# Install the export
+install(EXPORT ptens FILE ptensTargets.cmake NAMESPACE ptens:: DESTINATION lib/cmake/ptens)
+
+# Register package in user's package registry
+export(PACKAGE ptens)
