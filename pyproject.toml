@@ -19,5 +19,5 @@ urls = { homepage = "https://github.com/risi-kondor/ptens" }
 test = ["pytest"]
 
 [tool.scikit-build]
-cmake.define = { BUILD_PYTHON = "ON", WITH_CUDA="ON" }
+cmake.define = { BUILD_PYTHON = "ON", WITH_CUDA="ON",  CPM_cnine_SOURCE="/home/ludwig/git/cnine/"}
 wheel.packages=["python/src/ptens"]

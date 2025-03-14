@@ -27,6 +27,7 @@ def main():
     #os.environ["CC"] = "clang"
 
     compile_with_cuda = interpret_bool_string(os.environ.get("WITH_CUDA", False))
+    compile_with_cuda = True
 
     copy_warnings= interpret_bool_string(os.environ.get("COPY_WARNING", False))
     torch_convert_warnings=interpret_bool_string(os.environ.get("TORCH_CONVERT_WARNINGS", False))
