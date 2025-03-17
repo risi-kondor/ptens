@@ -29,7 +29,7 @@ include(cmake/CPM.cmake)
 
 find_package(Torch REQUIRED)
 
-cpmfindpackage(NAME cnine GITHUB_REPOSITORY InnocentBug/cnine GIT_TAG cmake)
+cpmfindpackage(NAME cnine GITHUB_REPOSITORY risi-kondor/cnine GIT_TAG main)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${TORCH_CXX_FLAGS}")
 add_library(ptens STATIC cuda/dummy.cpp)
