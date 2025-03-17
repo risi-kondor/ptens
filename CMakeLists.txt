@@ -75,24 +75,24 @@ if(BUILD_PYTHON)
   add_subdirectory(python)
 endif(BUILD_PYTHON)
 
-# include(CMakePackageConfigHelpers)
-# configure_package_config_file(${CMAKE_CURRENT_SOURCE_DIR}/cmake/ptensConfig.cmake.in ${CMAKE_CURRENT_BINARY_DIR}/ptensConfig.cmake  INSTALL_DESTINATION lib/cmake/ptens)
+include(CMakePackageConfigHelpers)
+configure_package_config_file(${CMAKE_CURRENT_SOURCE_DIR}/cmake/ptensConfig.cmake.in ${CMAKE_CURRENT_BINARY_DIR}/ptensConfig.cmake  INSTALL_DESTINATION lib/cmake/ptens)
 
-# write_basic_package_version_file(${CMAKE_CURRENT_BINARY_DIR}/ptensVersion.cmake  VERSION ${PROJECT_VERSION} COMPATIBILITY SameMajorVersion)
+write_basic_package_version_file(${CMAKE_CURRENT_BINARY_DIR}/ptensVersion.cmake  VERSION ${PROJECT_VERSION} COMPATIBILITY SameMajorVersion)
 
-# # Install the library
-# install(TARGETS ptens  EXPORT ptens  LIBRARY DESTINATION lib  ARCHIVE DESTINATION lib INCLUDES DESTINATION ptens/include)
+# Install the library
+install(TARGETS ptens  EXPORT ptens  LIBRARY DESTINATION lib  ARCHIVE DESTINATION lib INCLUDES DESTINATION ptens/include)
 
-# # Install the headers
-# foreach(directory IN LISTS ptens_include_dirs)
-#   install(DIRECTORY ${directory}/ DESTINATION ${directory})
-# endforeach()
+# Install the headers
+foreach(directory IN LISTS ptens_include_dirs)
+  install(DIRECTORY ${directory}/ DESTINATION ${directory})
+endforeach()
 
-# # Install the config files
-# install(FILES ${CMAKE_CURRENT_BINARY_DIR}/ptensConfig.cmake ${CMAKE_CURRENT_BINARY_DIR}/ptensVersion.cmake  DESTINATION lib/cmake/ptens)
+# Install the config files
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/ptensConfig.cmake ${CMAKE_CURRENT_BINARY_DIR}/ptensVersion.cmake  DESTINATION lib/cmake/ptens)
 
-# # Install the export
-# install(EXPORT ptens FILE ptensTargets.cmake NAMESPACE ptens:: DESTINATION lib/cmake/ptens)
+# Install the export
+install(EXPORT ptens FILE ptensTargets.cmake NAMESPACE ptens:: DESTINATION lib/cmake/ptens)
 
-# # Register package in user's package registry
-# export(PACKAGE ptens)
+# Register package in user's package registry
+export(PACKAGE ptens)
