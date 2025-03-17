@@ -13,6 +13,8 @@ Documentation for the library's Python/PyTorch API can be found at https://risi-
 
 ## Installation
 
+Please install the CUDA Toolkit first!
+
 ### Basic Installation  
 Create and activate a virtual environment:  
 ```bash
