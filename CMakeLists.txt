@@ -24,12 +24,11 @@ if(WITH_CUDA)
     set(WITH_CUDA OFF)
   endif(CMAKE_CUDA_COMPILER)
 endif(WITH_CUDA)
-message(B ${WITH_CUDA})
 
-# Enable CPM
 include(cmake/CPM.cmake)
 
 find_package(Torch REQUIRED)
+
 cpmfindpackage(NAME cnine GITHUB_REPOSITORY InnocentBug/cnine GIT_TAG cmake)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${TORCH_CXX_FLAGS}")
@@ -44,7 +43,6 @@ endforeach()
 target_link_libraries(ptens PUBLIC "${TORCH_LIBRARIES}")
 target_link_libraries(ptens PUBLIC cnine)
 
-message(C ${WITH_CUDA})
 
 target_compile_definitions(ptens PUBLIC _WITH_ATEN)
 target_compile_definitions(ptens PUBLIC CNINE_RANGE_CHECKING)
@@ -68,18 +66,14 @@ target_compile_options(ptens PUBLIC -Wno-reorder)
 target_compile_options(ptens PUBLIC -Wno-reorder-ctor)
 target_compile_options(ptens PUBLIC -Wno-overloaded-virtual)
 
-message(D ${WITH_CUDA})
-
 if(WITH_CUDA)
   add_subdirectory(cuda)
 endif(WITH_CUDA)
-message(E ${WITH_CUDA})
 
 option(BUILD_PYTHON "Build the python bindings" ON)
 if(BUILD_PYTHON)
   add_subdirectory(python)
 endif(BUILD_PYTHON)
-message(F ${WITH_CUDA})
 
 # include(CMakePackageConfigHelpers)
 # configure_package_config_file(${CMAKE_CURRENT_SOURCE_DIR}/cmake/ptensConfig.cmake.in ${CMAKE_CURRENT_BINARY_DIR}/ptensConfig.cmake  INSTALL_DESTINATION lib/cmake/ptens)

@@ -1,4 +1,4 @@
-#include <torch/torch.h>
+#include <torch/extension.h>
 #include <pybind11/stl.h>
 
 #include "Ptens_base.cpp"
