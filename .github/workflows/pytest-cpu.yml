@@ -38,34 +38,15 @@ jobs:
         os: ["ubuntu-latest", "macos-latest"]
         # Sorry 3.10 version of pytorch is buggy
         python-version: ["3.8", "3.12"]
-        conda-env-file: ["environment-cpu.yml", ".old-environment-cpu.yml"]
-        exclude:
-          - conda-env-file: ".old-environment-cpu.yml"
-            python-version: "3.12"
         
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - uses: conda-incubator/setup-miniconda@v3
-        with:
-          auto-update-conda: true
-          python-version: ${{ matrix.python-version }}
-          environment-file: ${{ matrix.conda-env-file }}
-          activate-environment: ptens
       - name: Install Missing Developper packages
-        run: conda install pytest
-      - name: Install cnine
-        run: |
-          git clone https://github.com/risi-kondor/cnine.git
-          cd cnine
-          git checkout dev
-          # pip install python/
-          cd ..
+        run: pip install pytest
       - name: Install and build
         run: |
-          pip install pytest
-          export CNINE_FOLDER="/../cnine/"
-          pip install python/
+          pip install .
       # TODO activate pytests when ready
       - name: Test with pytest
         run: |
