@@ -8,7 +8,7 @@ option(COPY_WARNING OFF)
 # Set the C++ standard
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-message(A ${WITH_CUDA})
+
 if(WITH_CUDA)
   check_language(CUDA)
   # Set the C++ standard

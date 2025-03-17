@@ -7,7 +7,7 @@ pybind11_add_module(ptens_base bindings/ptens_py.cpp)
 target_include_directories(ptens_base PUBLIC bindings)
 target_link_libraries(ptens_base PUBLIC ptens)
 
-include(../cmake/FindTorchPython.cmake)
+include(${cnine_SOURCE_DIR}/cmake/FindTorchPython.cmake)
 find_torch_python_library(TORCH_PYTHON_LIBRARY)
 target_link_libraries(ptens_base PRIVATE ${TORCH_LIBRARIES} ${TORCH_PYTHON_LIBRARY} pybind11::pybind11)
 
