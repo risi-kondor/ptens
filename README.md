@@ -13,47 +13,41 @@ Documentation for the library's Python/PyTorch API can be found at https://risi-
 
 ## Installation
 
-Please install the CUDA Toolkit first!
+Ptens uses CPM to automatically download the [cnine](https://github.com/risi-kondor/cnine) dependency automatically.
+If that is not your intent, check out [CPM's docs](https://github.com/cpm-cmake/CPM.cmake?tab=readme-ov-file#local-package-override) for your options.
 
-### Basic Installation  
-Create and activate a virtual environment:  
-```bash
-python -m venv /path/to/venv
-source /path/to/venv/bin/activate
-```
+## GPU / CUDA installation
 
-Install with pip (includes PyTorch 2.0+):  
+Please install the CUDA toolkit first!
+
+Install with pip (includes PyTorch 2.0+):
 ```bash
 pip install .
 ```
 
-#### Advanced Installation
+## CPU installation
 
-For custom PyTorch versions:  
-1. Install desired PyTorch first:  
+For custom PyTorch versions:
+1. Install desired PyTorch CPU first
    ```bash
-   pip install torch==2.0.1+cu118 --extra-index-url https://download.pytorch.org/whl/cu118
+   pip install torch --index-url https://download.pytorch.org/whl/cpu
    ```
-2. Then install cnine:  
+2. Then install the build dependencies of ptens manually. (Listed in `pyproject.toml`/`build-system`/`requires`.) Except for `torch` since we manually installed that first.
    ```bash
-   pip install .
+   pip install scikit-build-core pybind11
    ```
-
-If you want to change options for the build, like activating or deactivating a CUDA build.
-Either modify locally the `pyproject.toml` `cmake.define` section or export the appropriate environment variables.
-
-This applies using a local version of `cnine` as well.
-If you want to use a local `cnine` version instead of the current github version add `CPM_cnine_SOURCE="/path/to/cnine/"` to the `cmake.define` section.
-CPM is the toolkit that we use to fetch `cnine` from github.
+2. Then install ptens, we disable the isolation build, so that module we just manually installed are used as dependencies during the build stage
+   ```bash
+   pip install --no-build-isolation .
+   ```
 
 #### Manual CMake Build
 
-Cnine uses scikit-build-core. To build manually:  
+Ptens uses scikit-build-core. To build manually:
 ```bash
-git clone https://github.com/risi-kondor/ptens
-cd cnine
+git clone https://github.com/risi-kondor/ptens.git
+cd ptens
 mkdir build && cd build
-cmake .. -DCMAKE_PREFIX_PATH="$VIRTUAL_ENV/lib/python3.11/site-packages/torch"
+cmake .. -DCMAKE_PREFIX_PATH="/path/to/python/installation"
 make -j4
 ```
-

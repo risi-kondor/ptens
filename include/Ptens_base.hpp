@@ -14,6 +14,7 @@
 #ifndef _Ptens_base
 #define _Ptens_base
 
+#include "torch/types.h"
 #include "Cnine_base.hpp"
 #include <string>
 #include "TensorView.hpp"

@@ -1,4 +1,8 @@
-set(ptens_cuda_source Ptensors0.cu Ptensors1.cu Ptensors2.cu)
+set(ptens_cuda_source
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/Ptensors0.cu>
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/Ptensors1.cu>
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/Ptensors2.cu>
+)
 set_source_files_properties(${ptens_cuda_source} PROPERTIES LANGUAGE CUDA)
 
 target_sources(ptens PRIVATE ${ptens_cuda_source})

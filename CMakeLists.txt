@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.25)
 project( ptens VERSION 0.5.0 LANGUAGES CXX CUDA)
 include(CheckLanguage)
 
-option(WITH_CUDA ON)
+option(WITH_CUDA "Compiling with CUDA support" ON)
 option(COPY_WARNING OFF)
 
 # Set the C++ standard
@@ -10,6 +10,7 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 if(WITH_CUDA)
+  set(CUDA_ARCHITECTURES "native")
   check_language(CUDA)
   # Set the C++ standard
   set(CMAKE_CUDA_STANDARD 17)
@@ -17,21 +18,26 @@ if(WITH_CUDA)
 
   if(CMAKE_CUDA_COMPILER)
     enable_language(CUDA)
-    find_package(CUDAToolkit 12.0 REQUIRED CUDA::cudart CUDA::cublas)
+    find_package(CUDAToolkit 11...<13 COMPONENTS CUDA::cudart CUDA::cublas)
 
   else(CMAKE_CUDA_COMPILER)
     message(STATUS "No CUDA compiler found")
     set(WITH_CUDA OFF)
   endif(CMAKE_CUDA_COMPILER)
+  if(CUDAToolkit_FOUND)
+    message(STATUS "Found CUDA Toolkit, continue with CUDA built.")
+  else(CUDAToolkit_FOUND)
+    message(STATUS "No CUDA Toolkit found, built without CUDA. Please ensure the installed torch version is built without CUDA as well.")
+    set(WITH_CUDA OFF)
+  endif(CUDAToolkit_FOUND)
 endif(WITH_CUDA)
 
 include(cmake/CPM.cmake)
-
-find_package(Torch REQUIRED)
-
 cpmfindpackage(NAME cnine GITHUB_REPOSITORY risi-kondor/cnine GIT_TAG main)
 
+find_package(Torch REQUIRED)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${TORCH_CXX_FLAGS}")
+
 add_library(ptens STATIC cuda/dummy.cpp)
 set_target_properties(ptens PROPERTIES POSITION_INDEPENDENT_CODE ON)
 
