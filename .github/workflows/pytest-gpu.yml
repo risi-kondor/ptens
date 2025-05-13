@@ -46,8 +46,8 @@ jobs:
         id: cuda-toolkit
         with:
           method: network
-          sub-packages: ["nvcc"]
-          non-cuda-sub-packages: ["libcublas"]
+          sub-packages: '["nvcc"]'
+          non-cuda-sub-packages: '["libcublas"]'
       - name: Install Missing Developper packages
         # We use pip here, since conda isn't very happy with the total env, but it works...
         run: pip install pytest
