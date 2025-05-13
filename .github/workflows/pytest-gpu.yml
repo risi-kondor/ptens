@@ -36,41 +36,31 @@ jobs:
       fail-fast: false
       matrix:
         os: ["ubuntu-latest"]
-        python-version: ["3.8", "3.12"]
-        conda-env-file: ["environment-gpu.yml"]
+        python-version: ["3.10", "3.12"]
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - uses: conda-incubator/setup-miniconda@v3
-        with:
-          auto-update-conda: true
-          python-version: ${{ matrix.python-version }}
-          environment-file: ${{ matrix.conda-env-file }}
-          activate-environment: ptens
-      - name: Install Missing Developper packages
-        # We use pip here, since conda isn't very happy with the total env, but it works...
-        run: pip install pytest
-      - name: Install cnine
-        run: |
-          git clone https://github.com/risi-kondor/cnine.git
-          cd cnine
-          git checkout dev
-          # pip install python/
-          cd ..
-      - name: Install and build
-        run: |
-          export CNINE_FOLDER="/../cnine/"
-          export WITH_CUDA=True
-          export CUDA_HOME=$CONDA_PREFIX
-          # Pretending we have a CUDA capable card on the runner
-          export TORCH_CUDA_ARCH_LIST="7.5"
-          pip install python/
-      # TODO activate pytests when ready
-      - name: Test with pytest
-        run: |
-          # pytest python/tests
-          mkdir ./tmp-run/
-          cd ./tmp-run/
-          # This fails due to actually missing CUDA driver, but that's OK
-          # Testing for build alone is nice already
-          # python -c "import ptens"
+
+      # - uses: Jimver/cuda-toolkit@master
+      #   id: cuda-toolkit
+      #   with:
+      #     method: network
+      # - name: Install Missing Developper packages
+      #   # We use pip here, since conda isn't very happy with the total env, but it works...
+      #   run: pip install pytest
+      # - name: Install and build
+      #   run: |
+      #     export WITH_CUDA=True
+      #     # Pretending we have a CUDA capable card on the runner
+      #     export TORCH_CUDA_ARCH_LIST="Common"
+      #     pip install .
+      # # TODO activate pytests when ready
+      # - name: Test with pytest
+      #   run: |
+      #     # pytest python/tests
+      #     mkdir ./tmp-run/
+      #     cd ./tmp-run/
+      #     # This fails due to actually missing CUDA driver, but that's OK
+      #     # Testing for build alone is nice already
+      #     # python -c "import ptens"

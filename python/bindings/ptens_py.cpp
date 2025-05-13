@@ -1,4 +1,4 @@
-#include <torch/torch.h>
+#include <torch/extension.h>
 #include <pybind11/stl.h>
 
 #include "Ptens_base.cpp"
@@ -35,7 +35,7 @@
 
 ptens::PtensSession ptens_session(1); // Ltensors are not thread safe 
 
-PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
+PYBIND11_MODULE(ptens_base, m) {
 
   using namespace cnine;
   using namespace ptens;

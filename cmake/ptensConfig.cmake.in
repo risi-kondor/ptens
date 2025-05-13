@@ -1,0 +1,5 @@
+@PACKAGE_INIT@
+
+# include("${CMAKE_CURRENT_LIST_DIR}/ptensConfig.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/ptensTargets.cmake")
+check_required_components(ptens)
