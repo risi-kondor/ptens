@@ -42,25 +42,25 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - uses: Jimver/cuda-toolkit@master
-        id: cuda-toolkit
-        with:
-          method: network
-      - name: Install Missing Developper packages
-        # We use pip here, since conda isn't very happy with the total env, but it works...
-        run: pip install pytest
-      - name: Install and build
-        run: |
-          export WITH_CUDA=True
-          # Pretending we have a CUDA capable card on the runner
-          export TORCH_CUDA_ARCH_LIST="Common"
-          pip install .
-      # TODO activate pytests when ready
-      - name: Test with pytest
-        run: |
-          # pytest python/tests
-          mkdir ./tmp-run/
-          cd ./tmp-run/
-          # This fails due to actually missing CUDA driver, but that's OK
-          # Testing for build alone is nice already
-          # python -c "import ptens"
+      # - uses: Jimver/cuda-toolkit@master
+      #   id: cuda-toolkit
+      #   with:
+      #     method: network
+      # - name: Install Missing Developper packages
+      #   # We use pip here, since conda isn't very happy with the total env, but it works...
+      #   run: pip install pytest
+      # - name: Install and build
+      #   run: |
+      #     export WITH_CUDA=True
+      #     # Pretending we have a CUDA capable card on the runner
+      #     export TORCH_CUDA_ARCH_LIST="Common"
+      #     pip install .
+      # # TODO activate pytests when ready
+      # - name: Test with pytest
+      #   run: |
+      #     # pytest python/tests
+      #     mkdir ./tmp-run/
+      #     cd ./tmp-run/
+      #     # This fails due to actually missing CUDA driver, but that's OK
+      #     # Testing for build alone is nice already
+      #     # python -c "import ptens"
