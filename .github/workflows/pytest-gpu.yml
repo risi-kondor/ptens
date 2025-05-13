@@ -53,7 +53,7 @@ jobs:
         run: |
           export WITH_CUDA=True
           # Pretending we have a CUDA capable card on the runner
-          export TORCH_CUDA_ARCH_LIST="All"
+          export TORCH_CUDA_ARCH_LIST="Common"
           pip install .
       # TODO activate pytests when ready
       - name: Test with pytest
