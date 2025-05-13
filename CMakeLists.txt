@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.25)
-project( ptens VERSION 0.5.0 LANGUAGES CXX CUDA)
+project( ptens VERSION 0.5.0 LANGUAGES CXX)
 include(CheckLanguage)
 
 option(WITH_CUDA "Compiling with CUDA support" ON)
