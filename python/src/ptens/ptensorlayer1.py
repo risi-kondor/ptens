@@ -206,7 +206,8 @@ class ptensorlayer1_linmapsFn(torch.autograd.Function):
     @staticmethod
     def backward(ctx,g):
         r=ctx.x.zeros_like()
-        r.backend().add_linmaps_back(g.backend())
+        g_view = pb.ptensors1.view(ctx.x.atoms, g)
+        r.backend().add_linmaps_back(g_view)
         return r
 
 

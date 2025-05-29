@@ -33,6 +33,8 @@ class ptensorlayer(torch.Tensor):
                          torch.Tensor.unsqueeze,
                          torch.zeros_like,
                          torch.ones_like,
+                         torch.nn.functional.batch_norm,
+                         torch.nn.functional.relu,
                          ]
 
     @classmethod
