@@ -54,7 +54,7 @@ jobs:
         run: |
           git clone https://github.com/risi-kondor/cnine.git
           cd cnine
-          git checkout dev
+          # git checkout dev
           # pip install python/
           cd ..
       - name: Install and build
